@@ -1,5 +1,6 @@
 ---
 layout: default
+title: Home
 ---
 
 # LGKA
@@ -12,7 +13,7 @@ LGKA is a Flutter mobile application for accessing and managing school substitut
 
 ## Links
 
-- [Privacy Policy](PRIVACY.html)
+- [Privacy Policy](/privacy/)
 - [GitHub Repository](https://github.com/luka-loehr/LGKA)
 - [Download Latest Release](https://github.com/luka-loehr/LGKA/releases/latest)
 
