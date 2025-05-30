@@ -1,6 +1,8 @@
-theme: jekyll-theme-minimal
 title: LGKA
 description: Digital Substitution Plan App by Luka Löhr
+show_downloads: true
+google_analytics:
+theme: jekyll-theme-minimal
 markdown: kramdown
 baseurl: ""
 url: ""
