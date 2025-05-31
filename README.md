@@ -52,7 +52,7 @@ A Flutter mobile application for accessing digital substitution plans of Lessing
 
 ## Privacy
 
-The protection of your data is important to us. The app does not collect, store, or process any personal data. For more information, please see our [privacy policy](https://luka-loehr.github.io/lgka-privacy/).
+The protection of your data is important to me. The app does not collect, store, or process any personal data. For more information, please see my [privacy policy](https://luka-loehr.github.io/lgka-privacy/).
 
 ## License
 
