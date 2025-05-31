@@ -1,28 +1,28 @@
-# LGKA - Digitaler Vertretungsplan Lessing-Gymnasium Karlsruhe
+# LGKA - Digital Substitution Plan Lessing-Gymnasium Karlsruhe
 
-Eine Flutter Mobile-Anwendung für den Zugriff auf digitale Vertretungspläne des Lessing-Gymnasiums Karlsruhe. Diese App bietet Schülern und Lehrern eine einfache Möglichkeit, Stundenplanänderungen und Ankündigungen einzusehen.
+A Flutter mobile application for accessing digital substitution plans of Lessing-Gymnasium Karlsruhe. This app provides students and teachers with an easy way to view schedule changes and announcements.
 
 ## Features
 
-- Benutzerauthentifizierung (mit festen Zugangsdaten)
-- Ansicht des digitalen Vertretungsplans für heute und morgen
-- PDF-Download von der offiziellen Schulwebsite
-- Extraktion von Metadaten aus PDFs (Wochentag, Aktualisierungsdatum)
-- Caching von heruntergeladenen Plänen für Offline-Zugriff
-- Dunkles Design
-- Haptisches Feedback für Interaktionen
-- Willkommensbildschirm für Erstnutzer
+- User authentication (with fixed credentials)
+- View digital substitution plan for today and tomorrow
+- PDF download from the official school website
+- Extraction of metadata from PDFs (weekday, update date)
+- Caching of downloaded plans for offline access
+- Dark design theme
+- Haptic feedback for interactions
+- Welcome screen for first-time users
 
-## Technische Details
+## Technical Details
 
-- Entwickelt mit Flutter
+- Developed with Flutter
 - Uses Riverpod for state management
 - Go Router for navigation
-- PDF-Verarbeitung mit `syncfusion_flutter_pdf`
-- HTTP-Anfragen mit `http`
-- Öffnen von Dateien mit `open_filex`
-- Abrufen von Paketinformationen mit `package_info_plus`
-- Pfadverwaltung mit `path_provider`
+- PDF processing with `syncfusion_flutter_pdf`
+- HTTP requests with `http`
+- File opening with `open_filex`
+- Package information retrieval with `package_info_plus`
+- Path management with `path_provider`
 
 ## Getting Started
 
@@ -34,28 +34,28 @@ Eine Flutter Mobile-Anwendung für den Zugriff auf digitale Vertretungspläne de
 
 ### Installation
 
-1.  Repository klonen:
+1. Clone the repository:
     ```
     git clone https://github.com/YourUsername/LGKA.git
     ```
-    *Hinweis: Ersetze YourUsername durch deinen GitHub-Benutzernamen.*
+    *Note: Replace YourUsername with your GitHub username.*
 
-2.  Abhängigkeiten installieren:
+2. Install dependencies:
    ```
    flutter pub get
    ```
 
-3.  App starten:
+3. Run the app:
     ```
     flutter run
     ```
 
-## Datenschutz
+## Privacy
 
-Der Schutz deiner Daten ist uns wichtig. Die App erhebt, speichert oder verarbeitet keine personenbezogenen Daten. Weitere Informationen findest du in unserer Datenschutzerklärung:
+The protection of your data is important to us. The app does not collect, store, or process any personal data. For more information, please see our privacy policy:
 
-[Datenschutzerklärung](https://luka-loehr.github.io/lgka-privacy/)
+[Privacy Policy](https://luka-loehr.github.io/lgka-privacy/)
 
-## Lizenz
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
