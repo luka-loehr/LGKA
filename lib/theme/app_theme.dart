@@ -1,3 +1,5 @@
+// Copyright Luka Löhr 2025
+
 import 'package:flutter/material.dart';
 
 // App-specific colors based on the Kotlin version

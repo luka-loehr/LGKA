@@ -1,3 +1,5 @@
+// Copyright Luka Löhr 2025
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/preferences_manager.dart';
 import '../data/pdf_repository.dart';

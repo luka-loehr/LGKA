@@ -1,3 +1,5 @@
+// Copyright Luka Löhr 2025
+
 import 'package:flutter/services.dart';
 
 /// A service for managing haptic feedback with premium, minimalistic patterns

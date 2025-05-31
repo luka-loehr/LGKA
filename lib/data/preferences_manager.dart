@@ -1,3 +1,5 @@
+// Copyright Luka Löhr 2025
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferencesManager {

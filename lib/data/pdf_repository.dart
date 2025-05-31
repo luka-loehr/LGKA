@@ -1,3 +1,5 @@
+// Copyright Luka Löhr 2025
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
