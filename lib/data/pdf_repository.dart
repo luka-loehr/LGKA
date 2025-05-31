@@ -10,6 +10,8 @@ class PdfRepository extends ChangeNotifier {
   static const String _password = 'ephraim';
   static const String todayUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_heute.pdf';
   static const String tomorrowUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_morgen.pdf';
+  
+  // Keep legacy filenames for backwards compatibility during migration
   static const String todayFilename = 'today.pdf';
   static const String tomorrowFilename = 'tomorrow.pdf';
 
@@ -25,6 +27,10 @@ class PdfRepository extends ChangeNotifier {
   String get todayLastUpdated => _todayLastUpdated;
   String get tomorrowLastUpdated => _tomorrowLastUpdated;
   bool get weekdaysLoaded => _weekdaysLoaded;
+  
+  // Dynamic filename getters based on weekdays
+  String get todayPdfFilename => _todayWeekday.isNotEmpty ? '${_todayWeekday.toLowerCase()}.pdf' : todayFilename;
+  String get tomorrowPdfFilename => _tomorrowWeekday.isNotEmpty ? '${_tomorrowWeekday.toLowerCase()}.pdf' : tomorrowFilename;
 
   /// Downloads a PDF from the given URL with HTTP Basic Auth
   Future<File?> downloadPdf(String url, String filename, {bool forceReload = false}) async {
@@ -59,7 +65,21 @@ class PdfRepository extends ChangeNotifier {
       debugPrint('Successfully downloaded PDF: $filename');
 
       // Extract metadata after successful download
-      await _extractMetadataFromPdf(file, filename == todayFilename);
+      final isToday = url == todayUrl;
+      await _extractMetadataFromPdf(file, isToday);
+
+      // If we now have weekday info, rename the file and save with weekday name
+      final newFilename = isToday ? todayPdfFilename : tomorrowPdfFilename;
+      if (newFilename != filename) {
+        final newFile = File('${cacheDir.path}/$newFilename');
+        // Copy to new filename and delete old one
+        await file.copy(newFile.path);
+        if (await file.exists()) {
+          await file.delete();
+        }
+        debugPrint('Renamed PDF from $filename to $newFilename');
+        return newFile;
+      }
 
       // Update loaded state
       _checkIfBothDaysLoaded();
@@ -67,6 +87,86 @@ class PdfRepository extends ChangeNotifier {
       return file;
     } catch (e) {
       debugPrint('Error downloading PDF: $e');
+      return null;
+    }
+  }
+
+  /// Enhanced method to download PDF with weekday-based naming
+  Future<File?> downloadPdfWithWeekdayName(String url, bool isToday, {bool forceReload = false}) async {
+    try {
+      // First, try to get the weekday-named file if we already have weekday info
+      String targetFilename;
+      if (isToday && _todayWeekday.isNotEmpty) {
+        targetFilename = todayPdfFilename;
+      } else if (!isToday && _tomorrowWeekday.isNotEmpty) {
+        targetFilename = tomorrowPdfFilename;
+      } else {
+        // Use legacy names for initial download
+        targetFilename = isToday ? todayFilename : tomorrowFilename;
+      }
+
+      final cacheDir = await getTemporaryDirectory();
+      final file = File('${cacheDir.path}/$targetFilename');
+
+      // Check if file exists and is not empty (unless force reload)
+      if (!forceReload && file.existsSync() && file.lengthSync() > 0) {
+        debugPrint('Using cached PDF file: $targetFilename');
+        return file;
+      }
+
+      // Download with basic auth
+      final credentials = base64Encode(utf8.encode('$_username:$_password'));
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Basic $credentials',
+          'User-Agent': 'LGKA-Flutter-App/1.0',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        debugPrint('Failed to download PDF: ${response.statusCode}');
+        return null;
+      }
+
+      // Extract weekday info first before saving
+      final tempBytes = response.bodyBytes;
+      final result = await _extractPdfDataInIsolate(tempBytes);
+      
+      // Update weekday info
+      if (isToday) {
+        _todayWeekday = result['weekday'] ?? '';
+        _todayLastUpdated = result['dateTime'] ?? '';
+        debugPrint('Extracted for today - weekday: $_todayWeekday, dateTime: $_todayLastUpdated');
+      } else {
+        _tomorrowWeekday = result['weekday'] ?? '';
+        _tomorrowLastUpdated = result['dateTime'] ?? '';
+        debugPrint('Extracted for tomorrow - weekday: $_tomorrowWeekday, dateTime: $_tomorrowLastUpdated');
+      }
+
+      // Now determine the final filename based on extracted weekday
+      final finalFilename = isToday ? todayPdfFilename : tomorrowPdfFilename;
+      final finalFile = File('${cacheDir.path}/$finalFilename');
+
+      // Save PDF with weekday-based filename
+      await finalFile.writeAsBytes(tempBytes);
+      debugPrint('Successfully downloaded and saved PDF as: $finalFilename');
+
+      // Clean up any old legacy files
+      if (finalFilename != targetFilename) {
+        final oldFile = File('${cacheDir.path}/$targetFilename');
+        if (await oldFile.exists()) {
+          await oldFile.delete();
+          debugPrint('Cleaned up old file: $targetFilename');
+        }
+      }
+
+      _checkIfBothDaysLoaded();
+      notifyListeners();
+
+      return finalFile;
+    } catch (e) {
+      debugPrint('Error downloading PDF with weekday name: $e');
       return null;
     }
   }
@@ -101,14 +201,19 @@ class PdfRepository extends ChangeNotifier {
     }
   }
 
-  /// Loads weekday information from cached PDFs
+  /// Loads weekday information from cached PDFs (checks both legacy and weekday-named files)
   Future<void> loadWeekdaysFromCachedPdfs() async {
-    final todayFile = await getCachedPdf(todayFilename);
+    // Try weekday-named files first, then fall back to legacy names
+    File? todayFile = await getCachedPdf(todayPdfFilename);
+    todayFile ??= await getCachedPdf(todayFilename);
+    
     if (todayFile != null) {
       await _extractMetadataFromPdf(todayFile, true);
     }
 
-    final tomorrowFile = await getCachedPdf(tomorrowFilename);
+    File? tomorrowFile = await getCachedPdf(tomorrowPdfFilename);
+    tomorrowFile ??= await getCachedPdf(tomorrowFilename);
+    
     if (tomorrowFile != null) {
       await _extractMetadataFromPdf(tomorrowFile, false);
     }
@@ -128,16 +233,31 @@ class PdfRepository extends ChangeNotifier {
     }
   }
 
+  /// Gets cached PDF using weekday-based naming with fallback to legacy names
+  Future<File?> getCachedPdfByDay(bool isToday) async {
+    // Try weekday-named file first
+    final weekdayFilename = isToday ? todayPdfFilename : tomorrowPdfFilename;
+    File? file = await getCachedPdf(weekdayFilename);
+    
+    // Fall back to legacy name if weekday file doesn't exist
+    if (file == null) {
+      final legacyFilename = isToday ? todayFilename : tomorrowFilename;
+      file = await getCachedPdf(legacyFilename);
+    }
+    
+    return file;
+  }
+
   /// Checks if both days are loaded and updates state
   void _checkIfBothDaysLoaded() {
     _weekdaysLoaded = _todayWeekday.isNotEmpty && _tomorrowWeekday.isNotEmpty;
   }
 
-  /// Preload both PDFs
+  /// Preload both PDFs using weekday-based naming
   Future<void> preloadPdfs({bool forceReload = false}) async {
     await Future.wait([
-      downloadPdf(todayUrl, todayFilename, forceReload: forceReload),
-      downloadPdf(tomorrowUrl, tomorrowFilename, forceReload: forceReload),
+      downloadPdfWithWeekdayName(todayUrl, true, forceReload: forceReload),
+      downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: forceReload),
     ]);
   }
 }
