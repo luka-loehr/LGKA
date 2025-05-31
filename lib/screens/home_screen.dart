@@ -88,7 +88,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     });
   }
 
-  Future<void> _openPdf(String filename, bool isToday) async {
+  Future<void> _openPdf(bool isToday) async {
     setState(() {
       if (isToday) {
         _isTodayLoading = true;
@@ -101,13 +101,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     try {
       final pdfRepo = ref.read(pdfRepositoryProvider);
       
-      // Check for cached file first
-      var file = await pdfRepo.getCachedPdf(filename);
+      // Check for cached file first using new weekday-based method
+      var file = await pdfRepo.getCachedPdfByDay(isToday);
       
-      // If no cached file or empty, download it
+      // If no cached file or empty, download it with weekday-based naming
       if (file == null || file.lengthSync() == 0) {
         final url = isToday ? PdfRepository.todayUrl : PdfRepository.tomorrowUrl;
-        file = await pdfRepo.downloadPdf(url, filename);
+        file = await pdfRepo.downloadPdfWithWeekdayName(url, isToday);
       }
 
       if (file != null) {
@@ -187,8 +187,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           tomorrowWeekday: pdfRepo.tomorrowWeekday,
                           isTodayLoading: _isTodayLoading,
                           isTomorrowLoading: _isTomorrowLoading,
-                          onTodayClick: () => _openPdf(PdfRepository.todayFilename, true),
-                          onTomorrowClick: () => _openPdf(PdfRepository.tomorrowFilename, false),
+                          onTodayClick: () => _openPdf(true),
+                          onTomorrowClick: () => _openPdf(false),
                         ),
                         
                         if (_error != null) ...[
