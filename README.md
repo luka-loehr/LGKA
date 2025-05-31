@@ -19,7 +19,7 @@ A Flutter mobile application for accessing digital substitution plans of Lessing
 - Uses Riverpod for state management
 - Go Router for navigation
 - PDF processing with `syncfusion_flutter_pdf`
-- HTTP requests with `http`
+- HTTPS requests with `http`
 - File opening with `open_filex`
 - Package information retrieval with `package_info_plus`
 - Path management with `path_provider`
