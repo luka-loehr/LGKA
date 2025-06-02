@@ -2,80 +2,154 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Datenschutzerklärung – LGKA-App</title>
   <style>
-    body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; line-height: 1.6; color: #222; }
-    h1, h2, h3 { color: #004080; }
+    :root {
+      --blue: #00BFFF;
+      --background: #000000;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background-color: var(--background);
+      color: var(--blue);
+      padding: 2rem 1rem;
+      line-height: 1.7;
+    }
+
+    h1, h2 {
+      color: var(--blue);
+      margin-top: 2rem;
+      font-weight: 700;
+    }
+
+    h1 {
+      font-size: 2rem;
+      border-bottom: 2px solid var(--blue);
+      padding-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p, li {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: underline;
+      word-break: break-word;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--blue);
+      margin: 2rem 0;
+    }
+
+    @media (min-width: 700px) {
+      body {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 3rem;
+      }
+
+      h1 {
+        font-size: 2.4rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      p, li {
+        font-size: 1.1rem;
+      }
+    }
   </style>
 </head>
 <body>
 
-<h1>Datenschutzerklärung – LGKA-App</h1>
-<p><strong>Stand:</strong> Juni 2025</p>
+  <h1>Datenschutzerklärung – LGKA-App</h1>
+  <p><strong>Stand:</strong> Juni 2025</p>
 
-<h2>1. Einleitung</h2>
-<p>Der Schutz Ihrer Daten ist uns wichtig. Diese App wird privat von Luka Löhr entwickelt und zeigt ausschließlich den Vertretungsplan des Lessing-Gymnasiums Karlsruhe auf Ihrem Gerät an. Sie ist komplett werbefrei, sammelt keine personenbezogenen Daten und verwendet keine externen Dienste oder Analyse-Tools.</p>
+  <h2>1. Einleitung</h2>
+  <p>Der Schutz Ihrer Daten ist uns wichtig. Diese App wird privat von Luka Löhr entwickelt und zeigt ausschließlich den Vertretungsplan des Lessing-Gymnasiums Karlsruhe auf Ihrem Gerät an. Sie ist komplett werbefrei, sammelt keine personenbezogenen Daten und verwendet keine externen Dienste oder Analyse-Tools.</p>
 
-<h2>2. Verantwortlicher</h2>
-<p><strong>Luka Löhr</strong><br>
-Privatperson, Schüler<br>
-Karlsruhe, Deutschland<br>
-📧 <a href="mailto:lgka.vertretungsplan@gmail.com">lgka.vertretungsplan@gmail.com</a></p>
-<p><em>Hinweis:</em> Diese App ist ein inoffizielles Schülerprojekt und steht in keinem offiziellen Zusammenhang mit dem Lessing-Gymnasium Karlsruhe.</p>
+  <h2>2. Verantwortlicher</h2>
+  <p><strong>Luka Löhr</strong><br>
+  Privatperson, Schüler<br>
+  Karlsruhe, Deutschland<br>
+  📧 <a href="mailto:lgka.vertretungsplan@gmail.com">lgka.vertretungsplan@gmail.com</a></p>
+  <p><em>Hinweis:</em> Diese App ist ein inoffizielles Schülerprojekt und steht in keinem offiziellen Zusammenhang mit dem Lessing-Gymnasium Karlsruhe.</p>
 
-<h2>3. Welche Daten werden verarbeitet?</h2>
-<ul>
-  <li><strong>PDF-Abruf:</strong> Die App lädt den Vertretungsplan als PDF-Datei vom Webserver des Lessing-Gymnasiums über HTTPS (mit Basic Auth). Dafür wird Ihre IP-Adresse technisch bedingt an den Schulserver übermittelt – nicht an uns.</li>
-  <li><strong>Login-Daten:</strong> Die Zugangsdaten (Benutzername/Passwort) werden nur lokal auf Ihrem Gerät gespeichert und nicht an den Entwickler oder Dritte übermittelt.</li>
-  <li><strong>Lokale Zwischenspeicherung:</strong> Die heruntergeladene PDF wird auf Ihrem Gerät gespeichert, damit sie offline verfügbar ist. Sie verbleibt ausschließlich lokal.</li>
-</ul>
+  <h2>3. Welche Daten werden verarbeitet?</h2>
+  <ul>
+    <li><strong>PDF-Abruf:</strong> Die App lädt den Vertretungsplan als PDF-Datei vom Webserver der Schule über HTTPS. Dabei wird Ihre IP-Adresse technisch bedingt an den Schulserver übermittelt – nicht an uns.</li>
+    <li><strong>Login-Daten:</strong> Die Zugangsdaten werden nur lokal auf Ihrem Gerät gespeichert und nicht an den Entwickler oder Dritte übermittelt.</li>
+    <li><strong>Lokale Zwischenspeicherung:</strong> Die heruntergeladene PDF bleibt auf Ihrem Gerät gespeichert, um sie offline verfügbar zu machen.</li>
+  </ul>
 
-<h2>4. Was wird <em>nicht</em> verarbeitet?</h2>
-<ul>
-  <li>Keine Standortdaten</li>
-  <li>Keine Gerätekennungen</li>
-  <li>Keine Kontaktdaten</li>
-  <li>Keine Analyse- oder Tracking-Dienste</li>
-  <li>Keine Werbung oder externe Server</li>
-</ul>
+  <h2>4. Was wird <em>nicht</em> verarbeitet?</h2>
+  <ul>
+    <li>Keine Standortdaten</li>
+    <li>Keine Gerätekennungen</li>
+    <li>Keine Kontaktdaten</li>
+    <li>Keine Analyse- oder Tracking-Dienste</li>
+    <li>Keine Werbung oder externe Server</li>
+  </ul>
 
-<h2>5. Rechtliche Grundlage</h2>
-<p>Die technische Datenverarbeitung erfolgt gemäß:</p>
-<ul>
-  <li><strong>Art. 6 Abs. 1 lit. b DSGVO</strong> – zur Bereitstellung der App-Funktion (Vertretungsplan anzeigen)</li>
-  <li><strong>Art. 6 Abs. 1 lit. f DSGVO</strong> – berechtigtes Interesse an stabiler App-Funktion ohne Speicherung von Nutzerdaten</li>
-</ul>
+  <h2>5. Rechtliche Grundlage</h2>
+  <p>Die Verarbeitung erfolgt gemäß:</p>
+  <ul>
+    <li><strong>Art. 6 Abs. 1 lit. b DSGVO</strong> – Bereitstellung der Funktion (Vertretungsplan anzeigen)</li>
+    <li><strong>Art. 6 Abs. 1 lit. f DSGVO</strong> – Berechtigtes Interesse an stabiler App-Funktion</li>
+  </ul>
 
-<h2>6. Kinder- und Jugendschutz</h2>
-<p>Die App ist auch für Kinder unter 16 Jahren geeignet, da keine personenbezogenen Daten erhoben oder verarbeitet werden. Sie entspricht den Anforderungen der <strong>Google Play Families Policy</strong> und <strong>COPPA</strong>.</p>
+  <h2>6. Kinder- und Jugendschutz</h2>
+  <p>Die App ist für Kinder unter 16 Jahren geeignet und erfüllt die Vorgaben der <strong>Google Play Families Policy</strong> und <strong>COPPA</strong>. Es werden keine personenbezogenen Daten von Kindern erhoben oder verarbeitet.</p>
 
-<h2>7. Ihre Datenschutzrechte</h2>
-<p>Da diese App keine personenbezogenen Daten speichert oder verarbeitet, können Rechte wie Auskunft, Löschung oder Berichtigung gegenüber dem Entwickler <strong>nicht geltend gemacht werden</strong>. Wenden Sie sich bei Fragen zur IP-Protokollierung bitte direkt an das Lessing-Gymnasium Karlsruhe.</p>
+  <h2>7. Ihre Datenschutzrechte</h2>
+  <p>Da wir keine personenbezogenen Daten speichern, können DSGVO-Rechte wie Auskunft, Löschung oder Berichtigung gegenüber dem Entwickler nicht ausgeübt werden. Wenden Sie sich ggf. an das Lessing-Gymnasium Karlsruhe.</p>
 
-<h2>8. Speicherdauer</h2>
-<p>Die App speichert keine Daten auf externen Servern. Lokale Daten (PDF & Zugangsdaten) bleiben nur auf Ihrem Gerät und können jederzeit durch Deinstallation oder App-Einstellungen gelöscht werden.</p>
+  <h2>8. Speicherdauer</h2>
+  <p>Die App speichert nichts auf externen Servern. Lokale Daten bleiben auf Ihrem Gerät und können jederzeit gelöscht werden.</p>
 
-<h2>9. Datensicherheit</h2>
-<p>Die Verbindung zum Schulserver erfolgt verschlüsselt über HTTPS. Zugangsdaten werden sicher im Gerät gespeichert (z. B. Schlüsselbund, verschlüsselter Speicher). Bitte schützen auch Sie Ihr Gerät vor unbefugtem Zugriff.</p>
+  <h2>9. Datensicherheit</h2>
+  <p>Die Verbindung zum Schulserver erfolgt verschlüsselt über HTTPS. Zugangsdaten werden sicher lokal gespeichert (z. B. Schlüsselbund oder verschlüsselter Speicher).</p>
 
-<h2>10. Keine kommerzielle Nutzung</h2>
-<p>Die LGKA-App ist ein rein privates, nicht-kommerzielles Projekt ohne Werbung, In-App-Käufe oder Datenverwertung zu wirtschaftlichen Zwecken.</p>
+  <h2>10. Keine kommerzielle Nutzung</h2>
+  <p>Die App ist ein privates Schülerprojekt ohne Werbung, Käufe oder wirtschaftliche Nutzung.</p>
 
-<h2>11. Haftungsausschluss für Inhalte</h2>
-<p>Die dargestellten Vertretungspläne stammen direkt vom Schulserver. Der Entwickler übernimmt keine Haftung für Inhalt, Richtigkeit oder Aktualität der angezeigten Informationen.</p>
+  <h2>11. Haftungsausschluss für Inhalte</h2>
+  <p>Der angezeigte Vertretungsplan stammt direkt vom Schulserver. Für dessen Inhalte ist ausschließlich das Lessing-Gymnasium verantwortlich.</p>
 
-<h2>12. Keine offizielle Schul-App</h2>
-<p>Die App wurde unabhängig von der Schule entwickelt und ist kein offizielles Angebot des Lessing-Gymnasiums. Die Nutzung erfolgt freiwillig.</p>
+  <h2>12. Keine offizielle Schul-App</h2>
+  <p>Diese App wurde unabhängig von der Schule entwickelt. Die Nutzung ist freiwillig.</p>
 
-<h2>13. Kontakt</h2>
-<p>Bei Fragen zum Datenschutz: 📧 <a href="mailto:lgka.vertretungsplan@gmail.com">lgka.vertretungsplan@gmail.com</a></p>
+  <h2>13. Kontakt</h2>
+  <p>📧 <a href="mailto:lgka.vertretungsplan@gmail.com">lgka.vertretungsplan@gmail.com</a></p>
 
-<h2>14. Änderungen</h2>
-<p>Diese Datenschutzerklärung kann bei Bedarf angepasst werden. Die aktuelle Version ist jederzeit in der App oder auf der Projektseite einsehbar.</p>
+  <h2>14. Änderungen</h2>
+  <p>Diese Erklärung kann angepasst werden. Die aktuelle Version ist jederzeit in der App oder auf der Projektseite einsehbar.</p>
 
-<hr>
+  <hr>
 
-<p><em>Hinweis:</em> Diese Datenschutzerklärung wurde mit größter Sorgfalt erstellt. Dennoch stellt sie <strong>keine rechtliche Beratung</strong> dar. Der Entwickler übernimmt keine Gewähr für Vollständigkeit oder Aktualität. Bei rechtlichen Fragen wenden Sie sich bitte an eine juristische Fachstelle.</p>
+  <p><em>Hinweis:</em> Diese Datenschutzerklärung wurde mit größter Sorgfalt erstellt, stellt jedoch <strong>keine rechtliche Beratung</strong> dar. Für die Richtigkeit, Vollständigkeit und Aktualität wird keine Haftung übernommen.</p>
 
 </body>
 </html>
