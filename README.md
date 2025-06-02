@@ -1,59 +1,55 @@
-# LGKA - Digital Substitution Plan Lessing-Gymnasium Karlsruhe
+# LGKA-App – Vertretungsplan Lessing-Gymnasium Karlsruhe
 
-A Flutter mobile application for accessing digital substitution plans of Lessing-Gymnasium Karlsruhe. This app provides students and teachers with an easy way to view schedule changes and announcements.
+Eine moderne Flutter-App zur Anzeige des Vertretungsplans des Lessing-Gymnasiums Karlsruhe. Entwickelt von Luka Löhr als nicht-kommerzielles Schulprojekt.
 
-## Features
+## 📉 Funktionen
 
-- User authentication (with fixed credentials)
-- View digital substitution plan for today and tomorrow
-- PDF download from the official school website
-- Extraction of metadata from PDFs (weekday, update date)
-- Caching of downloaded plans for offline access
-- Dark design theme
-- Haptic feedback for interactions
-- Welcome screen for first-time users
+- Anzeige des Vertretungsplans für heute & morgen
+- PDF-Download direkt vom Schulserver
+- Lokale Zwischenspeicherung der Datei zur Offline-Nutzung
+- Dark Mode
+- Haptisches Feedback
+- Willkommensbildschirm beim ersten Start
+- Metadaten-Auswertung (Datum, Wochentag)
 
-## Technical Details
+## 📊 Technisches
 
-- Developed with Flutter
-- Uses Riverpod for state management
-- Go Router for navigation
-- PDF processing with `syncfusion_flutter_pdf`
-- HTTPS requests with `http`
-- File opening with `open_filex`
-- Package information retrieval with `package_info_plus`
-- Path management with `path_provider`
+- Programmiert mit Flutter (ab Version 3.8.0)
+- State-Management mit Riverpod
+- Navigation via Go Router
+- PDF-Verarbeitung mit `syncfusion_flutter_pdf`
+- Netzwerk: `http`
+- Dateiöffnung mit `open_filex`
+- Systeminfos über `package_info_plus`
+- Dateipfade via `path_provider`
 
-## Getting Started
+## 🚀 Schnellstart
 
-### Prerequisites
+### Voraussetzungen
 
-- Flutter SDK (version ^3.8.0)
-- Dart SDK (latest stable)
-- Android Studio or VS Code with Flutter extensions
+- Flutter SDK (>= 3.8.0)
+- Dart SDK (stable)
+- Android Studio oder VS Code mit Flutter-Plugins
 
 ### Installation
 
-1. Clone the repository:
-    ```
-    git clone https://github.com/YourUsername/LGKA.git
-    ```
-    *Note: Replace YourUsername with your GitHub username.*
+```bash
+git clone https://github.com/luka-loehr/LGKA.git
+cd LGKA
+flutter pub get
+flutter run
+```
 
-2. Install dependencies:
-   ```
-   flutter pub get
-   ```
+## 🔒 Datenschutz
 
-3. Run the app:
-    ```
-    flutter run
-    ```
+Die App verarbeitet keine personenbezogenen Daten. Es werden keine Tracker, Cookies oder IDs verwendet. Die einzige Netzwerkverbindung dient dem Download der PDF-Datei vom Schulserver über HTTPS.
 
-## Privacy
+Ausführliche Informationen findest du in der [Datenschutzerklärung](https://luka-loehr.github.io/LGKA/privacy.html).
 
-The protection of your data is important to me. The app does not collect, store, or process any personal data. For more information, please see my [privacy policy](https://luka-loehr.github.io/LGKA/privacy.html).
+## 🌐 Status
 
-## License
+Diese App ist ein reines Freizeitprojekt und steht in keinerlei offiziellem Zusammenhang mit dem Lessing-Gymnasium Karlsruhe.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## ⚖️ Lizenz
+
+MIT License. Siehe [LICENSE](LICENSE) für Details.
