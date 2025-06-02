@@ -1,5 +1,7 @@
 # LGKA-App – Vertretungsplan Lessing-Gymnasium Karlsruhe
 
+Eine Flutter-App für digitale Vertretungspläne mit Anmeldung, Offline-Verfügbarkeit und modernem Dark-Theme-Design.
+
 Eine moderne Flutter-App zur Anzeige des Vertretungsplans des Lessing-Gymnasiums Karlsruhe. Entwickelt von Luka Löhr als nicht-kommerzielles Schulprojekt.
 
 ## 📉 Funktionen
@@ -52,4 +54,6 @@ Diese App ist ein reines Freizeitprojekt und steht in keinerlei offiziellem Zusa
 
 ## ⚖️ Lizenz
 
-MIT License. Siehe [LICENSE](LICENSE) für Details.
+Dieses Projekt steht unter der **Creative Commons BY-NC-ND 4.0 Lizenz**. 
+Es darf **nicht kommerziell genutzt**, **nicht verändert** und **nicht neu veröffentlicht** werden. 
+Siehe [LICENSE](LICENSE) für Details.
