@@ -1,5 +1,28 @@
 # LGKA Flutter App - Build-Anleitung & Debug-Symbole
 
+## ⚠️ Wichtige Lizenz-Hinweise
+
+**ACHTUNG**: Diese Anleitung dient nur zu **Bildungs- und Entwicklungszwecken**!
+
+🚫 **Was NICHT erlaubt ist:**
+- Erstellen und Veröffentlichen eigener App-Versionen
+- Upload von selbst erstellten Builds in App Stores
+- Kommerzielle Nutzung der App
+- Verbreitung modifizierter Versionen
+- Eigenständige Veröffentlichung unter anderem Namen
+
+✅ **Was erlaubt ist:**
+- Code studieren und verstehen
+- Lokale Entwicklungsbuilds zum Lernen
+- Beitrag zu diesem Projekt via Pull Requests
+- Teilen des ursprünglichen Repository-Links
+
+Diese App steht unter der **Creative Commons BY-NC-ND 4.0 Lizenz**. Nur der ursprüngliche Entwickler (Luka Löhr) darf offizielle Releases erstellen und veröffentlichen.
+
+**Für offizielle App-Downloads**: Nutze die offiziellen Kanäle oder kontaktiere den Entwickler.
+
+---
+
 ## Übersicht
 Dieses Dokument erklärt die Verbesserungen, die vorgenommen wurden, um die Google Play Console-Warnung bezüglich fehlender Debug-Symbole zu beheben und die App allgemein zu optimieren.
 
@@ -113,8 +136,9 @@ Die folgenden Plugins in dieser App enthalten nativen Code und profitieren von o
 - `open_filex` - Datei-Öffnungs-Funktionalität
 - `package_info_plus` - App-Informationen
 
-## Zukünftige Builds
-Um optimierte Builds mit Debug-Symbolen zu erstellen:
+## Zukünftige Builds (nur für den ursprünglichen Entwickler)
+
+⚠️ **Nur für Luka Löhr (Entwickler)**: Um optimierte Builds mit Debug-Symbolen zu erstellen:
 
 ```bash
 # Vorherige Builds bereinigen
@@ -128,6 +152,8 @@ flutter build appbundle --release --build-name=X.Y.Z --build-number=N --split-de
 ```
 
 Ersetze X.Y.Z mit deiner Version und N mit deiner Build-Nummer.
+
+**Für andere Entwickler**: Diese Befehle können für lokale Entwicklungsbuilds verwendet werden, aber die resultierenden Builds dürfen aufgrund der Lizenz nicht veröffentlicht werden.
 
 ## Fehlerbehebung
 
