@@ -1,152 +1,152 @@
-# LGKA Flutter App - Build Notes & Debug Symbols Guide
+# LGKA Flutter App - Build-Anleitung & Debug-Symbole
 
-## Overview
-This document explains the improvements made to resolve the Google Play Console warning about missing debug symbols and general app optimization.
+## Übersicht
+Dieses Dokument erklärt die Verbesserungen, die vorgenommen wurden, um die Google Play Console-Warnung bezüglich fehlender Debug-Symbole zu beheben und die App allgemein zu optimieren.
 
-## Issue Fixed
-**Google Play Console Warning**: "This App Bundle contains native code, and you've not uploaded debug symbols. We recommend you upload a symbol file to make your crashes and ANRs easier to analyze and debug."
+## Behobenes Problem
+**Google Play Console-Warnung**: "Dieses App Bundle enthält nativen Code, Sie haben jedoch keine Debug-Symbole hochgeladen. Wir empfehlen Ihnen, eine Symboldatei hochzuladen, um Ihre Abstürze und ANRs einfacher zu analysieren und zu debuggen."
 
-## Improvements Made
+## Durchgeführte Verbesserungen
 
-### 1. Enhanced Android Build Configuration
-- **File**: `android/app/build.gradle.kts`
-- **Changes**:
-  - Added proper NDK configuration with `debugSymbolLevel = "FULL"`
-  - Improved packaging options to keep debug symbols: `keepDebugSymbols += "**/*.so"`
-  - Enabled ProGuard optimization with proper rule configurations
-  - Enhanced signing configuration for release builds
+### 1. Erweiterte Android-Build-Konfiguration
+- **Datei**: `android/app/build.gradle.kts`
+- **Änderungen**:
+  - Korrekte NDK-Konfiguration mit `debugSymbolLevel = "FULL"` hinzugefügt
+  - Verbesserte Packaging-Optionen zum Behalten von Debug-Symbolen: `keepDebugSymbols += "**/*.so"`
+  - ProGuard-Optimierung mit ordnungsgemäßer Regelkonfiguration aktiviert
+  - Erweiterte Signierungskonfiguration für Release-Builds
 
-### 2. Optimized ProGuard Rules
-- **File**: `android/app/proguard-rules.pro`
-- **Added comprehensive rules for**:
-  - Flutter framework classes
-  - Google Play Core libraries (resolves R8 compilation issues)
-  - Plugin-specific classes (permission_handler, path_provider, syncfusion_pdf, etc.)
-  - Native method preservation for crash reporting
-  - Deferred component support
+### 2. Optimierte ProGuard-Regeln
+- **Datei**: `android/app/proguard-rules.pro`
+- **Umfassende Regeln hinzugefügt für**:
+  - Flutter-Framework-Klassen
+  - Google Play Core-Bibliotheken (löst R8-Kompilierungsprobleme)
+  - Plugin-spezifische Klassen (permission_handler, path_provider, syncfusion_pdf, etc.)
+  - Beibehaltung nativer Methoden für Crash-Reporting
+  - Unterstützung für verzögerte Komponenten
 
-### 3. Updated Gradle Properties
-- **File**: `android/gradle.properties`
-- **Optimizations**:
-  - Increased JVM memory allocation for better build performance
-  - Enabled parallel builds and caching
-  - Configured R8 for optimal code optimization
-  - Removed deprecated properties that were causing build failures
+### 3. Aktualisierte Gradle-Eigenschaften
+- **Datei**: `android/gradle.properties`
+- **Optimierungen**:
+  - Erhöhte JVM-Speicherzuteilung für bessere Build-Performance
+  - Parallele Builds und Caching aktiviert
+  - R8 für optimale Code-Optimierung konfiguriert
+  - Veraltete Eigenschaften entfernt, die Build-Fehler verursachten
 
-## Debug Symbol Files Generated
+## Generierte Debug-Symbol-Dateien
 
-### Flutter Debug Symbols
-Located in `symbols/` directory:
-- `app.android-arm.symbols` - ARMv7 architecture symbols
-- `app.android-arm64.symbols` - ARM64 architecture symbols  
-- `app.android-x64.symbols` - x86_64 architecture symbols
-- `debug-symbols.zip` - Compressed Flutter symbols for upload
+### Flutter Debug-Symbole
+Gespeichert im `symbols/`-Verzeichnis:
+- `app.android-arm.symbols` - ARMv7-Architektur-Symbole
+- `app.android-arm64.symbols` - ARM64-Architektur-Symbole  
+- `app.android-x64.symbols` - x86_64-Architektur-Symbole
+- `debug-symbols.zip` - Komprimierte Flutter-Symbole für Upload
 
-### Native Library Symbols
-Located in `native-symbols.zip`:
-- `arm64-v8a/` - Contains libapp.so, libflutter.so, libdatastore_shared_counter.so
-- `armeabi-v7a/` - Contains native libraries for ARMv7
-- `x86_64/` - Contains native libraries for x86_64
+### Native Bibliotheks-Symbole
+Gespeichert in `native-symbols.zip`:
+- `arm64-v8a/` - Enthält libapp.so, libflutter.so, libdatastore_shared_counter.so
+- `armeabi-v7a/` - Enthält native Bibliotheken für ARMv7
+- `x86_64/` - Enthält native Bibliotheken für x86_64
 
-## Build Commands Used
+## Verwendete Build-Befehle
 
 ### Standard Release Build
 ```bash
 flutter build appbundle --release --build-name=1.3.0 --build-number=12
 ```
 
-### Build with Debug Symbols (Recommended)
+### Build mit Debug-Symbolen (Empfohlen)
 ```bash
 flutter build appbundle --release --build-name=1.3.0 --build-number=12 --split-debug-info=symbols --obfuscate
 ```
 
-This command:
-- Creates a release build optimized for production
-- Generates separate debug symbol files
-- Obfuscates the Dart code for better security
-- Preserves crash analysis capabilities
+Dieser Befehl:
+- Erstellt einen für die Produktion optimierten Release-Build
+- Generiert separate Debug-Symbol-Dateien
+- Verschleiert den Dart-Code für bessere Sicherheit
+- Bewahrt Crash-Analyse-Fähigkeiten
 
-## Google Play Console Upload Guide
+## Google Play Console Upload-Anleitung
 
-### 1. Upload the App Bundle
-- Use: `build/app/outputs/bundle/release/app-release.aab`
+### 1. App Bundle hochladen
+- Verwende: `build/app/outputs/bundle/release/app-release.aab`
 
-### 2. Upload Debug Symbols
-There are two symbol files you can upload:
+### 2. Debug-Symbole hochladen
+Es gibt zwei Symbol-Dateien, die hochgeladen werden können:
 
-#### Option A: Flutter Debug Symbols (Recommended)
-- File: `symbols/debug-symbols.zip`
-- Contains: Dart/Flutter-specific symbols for crash analysis
-- Best for: Flutter-specific crashes and ANR analysis
+#### Option A: Flutter Debug-Symbole (Empfohlen)
+- Datei: `symbols/debug-symbols.zip`
+- Enthält: Dart/Flutter-spezifische Symbole für Crash-Analyse
+- Optimal für: Flutter-spezifische Abstürze und ANR-Analyse
 
-#### Option B: Native Library Symbols
-- File: `native-symbols.zip`  
-- Contains: Native library symbols (.so files)
-- Best for: Native library crashes and low-level debugging
+#### Option B: Native Bibliotheks-Symbole
+- Datei: `native-symbols.zip`  
+- Enthält: Native Bibliotheks-Symbole (.so-Dateien)
+- Optimal für: Native Bibliotheks-Abstürze und Low-Level-Debugging
 
-### 3. Upload Process in Google Play Console
-1. Go to Play Console → Your App → Release → App Bundle Explorer
-2. Select your release
-3. Click "Download" tab
-4. Under "Debug symbols", click "Upload debug symbols"
-5. Upload the appropriate .zip file based on your needs
+### 3. Upload-Prozess in der Google Play Console
+1. Gehe zu Play Console → Deine App → Release → App Bundle Explorer
+2. Wähle dein Release aus
+3. Klicke auf "Download"-Tab
+4. Unter "Debug-Symbole", klicke "Debug-Symbole hochladen"
+5. Lade die entsprechende .zip-Datei basierend auf deinen Bedürfnissen hoch
 
-## App Size Optimization Achieved
+## Erreichte App-Größen-Optimierung
 
-### Before Optimization
-- Basic release build without proper symbol handling
-- Potential crashes harder to debug
-- R8 compilation issues
+### Vor der Optimierung
+- Basis-Release-Build ohne ordnungsgemäße Symbol-Behandlung
+- Potentielle Abstürze schwerer zu debuggen
+- R8-Kompilierungsprobleme
 
-### After Optimization  
-- **App Bundle Size**: ~129MB (optimized)
-- **Debug Symbol Files**: ~7.8MB (separate)
-- **Native Libraries**: Properly organized by architecture
-- **Code Obfuscation**: Enabled for better security
-- **Crash Analysis**: Fully supported with symbol files
+### Nach der Optimierung  
+- **App Bundle-Größe**: ~129MB (optimiert)
+- **Debug-Symbol-Dateien**: ~7,8MB (separat)
+- **Native Bibliotheken**: Ordnungsgemäß nach Architektur organisiert
+- **Code-Verschleierung**: Aktiviert für bessere Sicherheit
+- **Crash-Analyse**: Vollständig unterstützt mit Symbol-Dateien
 
-## Dependencies with Native Code
-The following plugins in this app contain native code and benefit from proper symbol handling:
-- `permission_handler` - Android permissions
-- `path_provider` - File system access
-- `syncfusion_flutter_pdf` - PDF processing
-- `open_filex` - File opening functionality
-- `package_info_plus` - App information
+## Abhängigkeiten mit nativem Code
+Die folgenden Plugins in dieser App enthalten nativen Code und profitieren von ordnungsgemäßer Symbol-Behandlung:
+- `permission_handler` - Android-Berechtigungen
+- `path_provider` - Dateisystem-Zugriff
+- `syncfusion_flutter_pdf` - PDF-Verarbeitung
+- `open_filex` - Datei-Öffnungs-Funktionalität
+- `package_info_plus` - App-Informationen
 
-## Future Builds
-To create optimized builds with debug symbols:
+## Zukünftige Builds
+Um optimierte Builds mit Debug-Symbolen zu erstellen:
 
 ```bash
-# Clean previous builds
+# Vorherige Builds bereinigen
 flutter clean
 
-# Get dependencies  
+# Abhängigkeiten holen  
 flutter pub get
 
-# Build with symbols
+# Mit Symbolen builden
 flutter build appbundle --release --build-name=X.Y.Z --build-number=N --split-debug-info=symbols --obfuscate
 ```
 
-Replace X.Y.Z with your version and N with your build number.
+Ersetze X.Y.Z mit deiner Version und N mit deiner Build-Nummer.
 
-## Troubleshooting
+## Fehlerbehebung
 
-### If you see "failed to strip debug symbols"
-This is expected and actually desired - it means the symbols are preserved for crash analysis.
+### Falls "failed to strip debug symbols" angezeigt wird
+Das ist erwartet und tatsächlich erwünscht - es bedeutet, dass die Symbole für die Crash-Analyse bewahrt werden.
 
-### If R8 compilation fails
-Ensure the ProGuard rules in `proguard-rules.pro` include all necessary keep rules for your plugins.
+### Falls R8-Kompilierung fehlschlägt
+Stelle sicher, dass die ProGuard-Regeln in `proguard-rules.pro` alle notwendigen Keep-Regeln für deine Plugins enthalten.
 
-### If deprecated Gradle properties error occurs
-Check `gradle.properties` and remove any properties marked as deprecated in the Android Gradle Plugin version you're using.
+### Falls Fehler wegen veralteter Gradle-Eigenschaften auftreten
+Überprüfe `gradle.properties` und entferne alle Eigenschaften, die in der verwendeten Android Gradle Plugin-Version als veraltet markiert sind.
 
 ---
 
-## Summary
-The app is now properly configured to:
-✅ Generate comprehensive debug symbols for crash analysis  
-✅ Build optimized release bundles with obfuscation
-✅ Support all native plugin functionalities
-✅ Provide better crash reporting on Google Play Console
-✅ Maintain security through code obfuscation
-✅ Optimize build performance with parallel processing 
+## Zusammenfassung
+Die App ist jetzt ordnungsgemäß konfiguriert für:
+✅ Umfassende Debug-Symbole für Crash-Analyse generieren  
+✅ Optimierte Release-Bundles mit Verschleierung erstellen
+✅ Alle nativen Plugin-Funktionalitäten unterstützen
+✅ Besseres Crash-Reporting in der Google Play Console bieten
+✅ Sicherheit durch Code-Verschleierung beibehalten
+✅ Build-Performance mit paralleler Verarbeitung optimieren 
