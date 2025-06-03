@@ -42,6 +42,25 @@ flutter pub get
 flutter run
 ```
 
+## 📦 Build-Anleitung
+
+Für die Erstellung von Release-Builds mit Debug-Symbolen für Google Play Console:
+
+```bash
+# Standard Release Build
+flutter build appbundle --release --build-name=1.3.0 --build-number=N
+
+# Empfohlener Build mit Debug-Symbolen und Code-Obfuskierung
+flutter build appbundle --release --build-name=1.3.0 --build-number=N --split-debug-info=symbols --obfuscate
+```
+
+**📖 Detaillierte Build-Anleitung**: Siehe [BUILD_NOTES.md](BUILD_NOTES.md) für:
+- Vollständige Konfiguration der Android-Build-Umgebung
+- Lösung des Google Play Console Debug-Symbol-Warnings
+- Upload-Anleitung für Debug-Symbole
+- App-Optimierungen und ProGuard-Konfiguration
+- Troubleshooting-Tipps
+
 ## 🔒 Datenschutz
 
 Die App verarbeitet keine personenbezogenen Daten. Es werden keine Tracker, Cookies oder IDs verwendet. Die einzige Netzwerkverbindung dient dem Download der PDF-Datei vom Schulserver über HTTPS.
