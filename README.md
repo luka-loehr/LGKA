@@ -44,6 +44,8 @@ flutter run
 
 ## 📦 Build-Anleitung
 
+**⚠️ Lizenz-Hinweis**: Diese Build-Anleitung dient nur zu **Bildungs- und Entwicklungszwecken**. Aufgrund der CC BY-NC-ND 4.0 Lizenz dürfen keine eigenen App-Versionen erstellt und veröffentlicht werden. Nur der ursprüngliche Entwickler darf offizielle Releases erstellen.
+
 Für die Erstellung von Release-Builds mit Debug-Symbolen für Google Play Console:
 
 ```bash
