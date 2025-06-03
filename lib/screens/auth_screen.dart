@@ -1,7 +1,6 @@
 // Copyright Luka Löhr 2025
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/app_providers.dart';
@@ -118,6 +117,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       // Success with premium haptic feedback
       await HapticService.success();
       
+      if (!mounted) return;
+      
       setState(() {
         _isLoading = true;
         _showErrorFlash = false;
@@ -128,6 +129,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       
       // Simulate loading delay
       await Future.delayed(const Duration(milliseconds: 800));
+      
+      if (!mounted) return;
       
       // Update authentication state
       final prefsManager = ref.read(preferencesManagerProvider);
@@ -157,9 +160,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         if (mounted) {
           // Smoothly animate back to blue
           _buttonColorController.reverse().then((_) {
-            setState(() {
-              _showErrorFlash = false;
-            });
+            if (mounted) {
+              setState(() {
+                _showErrorFlash = false;
+              });
+            }
           });
         }
       });
