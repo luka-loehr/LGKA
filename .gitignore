@@ -85,3 +85,10 @@ app.*.map.json
 *.p8
 *.p12
 *.mobileprovision
+
+# Debug symbols and build artifacts (generated, not committed)
+/symbols/
+/native-symbols/
+native-symbols.zip
+*.aab
+*.apk

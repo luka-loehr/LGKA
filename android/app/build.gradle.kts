@@ -51,6 +51,11 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         
+        // NDK configuration for proper symbol handling
+        ndk {
+            debugSymbolLevel = "FULL"
+        }
+        
         // Disable unnecessary permissions from permission_handler
         manifestPlaceholders["permissionHandlerPermissionCamera"] = "false"
         manifestPlaceholders["permissionHandlerPermissionPhotos"] = "false"
@@ -66,24 +71,38 @@ android {
             } else {
                 signingConfig = signingConfigs.getByName("debug")
             }
+            
+            // Enable minification but not resource shrinking to avoid issues
+            isMinifyEnabled = true
+            isShrinkResources = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        debug {
+            // Ensure debug symbols are included in debug builds
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
     }
     
-    // Fix for debug symbols in native libraries
-    packagingOptions {
+    // Improved packaging options for debug symbols and native libraries
+    packaging {
         jniLibs {
-            useLegacyPackaging = true
-            keepDebugSymbols.add("**/*.so")
+            useLegacyPackaging = false
+            // Keep debug symbols for all native libraries
+            keepDebugSymbols += "**/*.so"
         }
         resources {
-            excludes.add("META-INF/DEPENDENCIES")
-            excludes.add("META-INF/LICENSE")
-            excludes.add("META-INF/LICENSE.txt")
-            excludes.add("META-INF/license.txt")
-            excludes.add("META-INF/NOTICE")
-            excludes.add("META-INF/NOTICE.txt")
-            excludes.add("META-INF/notice.txt")
-            excludes.add("META-INF/*.kotlin_module")
+            excludes += setOf(
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/license.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/notice.txt",
+                "META-INF/*.kotlin_module"
+            )
         }
     }
 }
