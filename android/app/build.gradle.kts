@@ -42,19 +42,11 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.lgka"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        
-        // NDK configuration for proper symbol handling
-        ndk {
-            debugSymbolLevel = "FULL"
-        }
         
         // Disable unnecessary permissions from permission_handler
         manifestPlaceholders["permissionHandlerPermissionCamera"] = "false"
@@ -72,26 +64,15 @@ android {
                 signingConfig = signingConfigs.getByName("debug")
             }
             
-            // Enable minification but not resource shrinking to avoid issues
+            // Standard optimizations for smaller app size
             isMinifyEnabled = true
-            isShrinkResources = false
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-        debug {
-            // Ensure debug symbols are included in debug builds
-            ndk {
-                debugSymbolLevel = "FULL"
-            }
         }
     }
     
-    // Improved packaging options for debug symbols and native libraries
+    // Standard packaging optimizations
     packaging {
-        jniLibs {
-            useLegacyPackaging = false
-            // Keep debug symbols for all native libraries
-            keepDebugSymbols += "**/*.so"
-        }
         resources {
             excludes += setOf(
                 "META-INF/DEPENDENCIES",

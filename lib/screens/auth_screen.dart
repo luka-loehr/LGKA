@@ -127,8 +127,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       // Hide keyboard
       FocusScope.of(context).unfocus();
       
-      // Simulate loading delay
-      await Future.delayed(const Duration(milliseconds: 800));
+      // Extended loading for better visual feedback
+      await Future.delayed(const Duration(milliseconds: 1200));
       
       if (!mounted) return;
       
@@ -136,6 +136,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       final prefsManager = ref.read(preferencesManagerProvider);
       await prefsManager.setAuthenticated(true);
       ref.read(isAuthenticatedProvider.notifier).state = true;
+      
+      // Additional success haptic just before navigation
+      await HapticService.light();
+      
+      // Small delay to let the haptic feedback register
+      await Future.delayed(const Duration(milliseconds: 50));
       
       // Trigger success callback or navigate
       if (widget.onLoginSuccess != null) {
@@ -387,7 +393,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                         width: 24,
                                         height: 24,
                                         child: CircularProgressIndicator(
-                                          strokeWidth: 2,
+                                          strokeWidth: 2.5,
+                                          strokeCap: StrokeCap.round,
                                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                         ),
                                       )
