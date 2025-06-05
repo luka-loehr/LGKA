@@ -8,11 +8,69 @@ import '../providers/app_providers.dart';
 import '../navigation/app_router.dart';
 import '../providers/haptic_service.dart';
 
-class WelcomeScreen extends ConsumerWidget {
+class WelcomeScreen extends ConsumerStatefulWidget {
   const WelcomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _buttonController;
+  late Animation<double> _buttonScale;
+  bool _isNavigating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _buttonController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _buttonScale = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _buttonController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _buttonController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _navigateToAuth() async {
+    if (_isNavigating) return;
+    
+    setState(() {
+      _isNavigating = true;
+    });
+
+    // Button press animation
+    await _buttonController.forward();
+    
+    // Premium haptic feedback
+    await HapticService.light();
+    
+    // Update preferences
+    final prefsManager = ref.read(preferencesManagerProvider);
+    await prefsManager.setFirstLaunch(false);
+    ref.read(isFirstLaunchProvider.notifier).state = false;
+    
+    // Release button animation
+    _buttonController.reverse();
+    
+    // Small delay for the animation to feel natural
+    await Future.delayed(const Duration(milliseconds: 50));
+    
+    // Navigate to auth screen
+    if (mounted) {
+      context.go(AppRouter.auth);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       body: SafeArea(
@@ -26,8 +84,8 @@ class WelcomeScreen extends ConsumerWidget {
                 SizedBox(
                   width: 120,
                   height: 120,
-                  child: Image.asset(
-                    'assets/images/welcome/welcome-logo.png',
+                                  child: Image.asset(
+          'assets/images/welcome/welcome-logo.png',
                     width: 120,
                     height: 120,
                     fit: BoxFit.contain,
@@ -54,39 +112,44 @@ class WelcomeScreen extends ConsumerWidget {
                 
                 const SizedBox(height: 40),
                 
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      // Premium haptic feedback
-                      await HapticService.light();
-                      
-                      // Update preferences
-                      final prefsManager = ref.read(preferencesManagerProvider);
-                      await prefsManager.setFirstLaunch(false);
-                      ref.read(isFirstLaunchProvider.notifier).state = false;
-                      
-                      // Navigate to auth screen
-                      if (context.mounted) {
-                        context.go(AppRouter.auth);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.appBlueAccent,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                AnimatedBuilder(
+                  animation: _buttonScale,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _buttonScale.value,
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _isNavigating ? null : _navigateToAuth,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.appBlueAccent,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: _isNavigating ? 0 : 2,
+                          ),
+                          child: _isNavigating
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : Text(
+                                'Weiter',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Weiter',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ],
             ),
