@@ -169,7 +169,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   margin: const EdgeInsets.symmetric(horizontal: 64, vertical: 32),
                   height: 5,
                   child: LinearProgressIndicator(
-                    backgroundColor: AppColors.appBlueAccent.withOpacity(0.2),
+                    backgroundColor: AppColors.appBlueAccent.withValues(alpha: 0.2),
                     valueColor: const AlwaysStoppedAnimation<Color>(AppColors.appBlueAccent),
                   ),
                 ),
@@ -223,7 +223,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 return GestureDetector(
                   onTap: _hideInfo,
                   child: Container(
-                    color: Colors.black.withOpacity(_fadeAnimation.value),
+                    color: Colors.black.withValues(alpha: _fadeAnimation.value),
                   ),
                 );
               },
@@ -471,7 +471,7 @@ class _InfoSheetContent extends StatelessWidget {
             Text(
               'Stand des Vertretungsplans: $todayPdfTimestamp',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.secondaryText.withOpacity(0.7),
+                                      color: AppColors.secondaryText.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -496,7 +496,7 @@ class _InfoSheetContent extends StatelessWidget {
           
           const SizedBox(height: 24),
           
-          Divider(color: AppColors.secondaryText.withOpacity(0.2)),
+                      Divider(color: AppColors.secondaryText.withValues(alpha: 0.2)),
           
           const SizedBox(height: 16),
           

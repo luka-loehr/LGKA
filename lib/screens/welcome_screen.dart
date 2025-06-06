@@ -84,8 +84,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                 SizedBox(
                   width: 120,
                   height: 120,
-                                  child: Image.asset(
-          'assets/images/welcome/welcome-logo.png',
+                  child: Image.asset(
+                    'assets/images/welcome/welcome-logo.png',
                     width: 120,
                     height: 120,
                     fit: BoxFit.contain,
