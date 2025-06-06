@@ -133,3 +133,7 @@ LGKA-v*.ipa
 build_ios_release.sh
 build_macos_release.sh
 run_macos.sh
+
+# Personal documentation (helpful but not for repository)
+APP_STORE_SUBMISSION_CHECKLIST.md
+APP_STORE_DESCRIPTION.md
