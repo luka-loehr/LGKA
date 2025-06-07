@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
+import 'package:lgka_flutter/providers/haptic_service.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -67,6 +68,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 value: preferencesManager.showDatesWithWeekdays,
                 onChanged: (value) async {
                   await preferencesManager.setShowDatesWithWeekdays(value);
+                  HapticService.subtle();
                   setState(() {});
                 },
                 activeColor: AppColors.appBlueAccent,
