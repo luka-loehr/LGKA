@@ -480,6 +480,7 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                       value: preferencesManager.showDatesWithWeekdays,
                       onChanged: (value) async {
                         await preferencesManager.setShowDatesWithWeekdays(value);
+                        HapticService.subtle();
                         setState(() {});
                         
                         // Benachrichtigung an den HomeScreen, dass sich die Einstellung geändert hat
