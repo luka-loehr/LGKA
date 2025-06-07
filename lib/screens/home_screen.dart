@@ -43,14 +43,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _openPdf(bool isToday) async {
+    setState(() {
+      if (isToday) {
+        _isTodayLoading = true;
+      } else {
+        _isTomorrowLoading = true;
+      }
+    });
+    
     final pdfRepo = ref.read(pdfRepositoryProvider);
     final file = await pdfRepo.getCachedPdfByDay(isToday);
 
     if (file != null && mounted) {
       final dayName = isToday ? pdfRepo.todayWeekday : pdfRepo.tomorrowWeekday;
+      final heroTag = isToday ? 'today-plan-hero' : 'tomorrow-plan-hero';
+      
+      if (isToday) {
+        setState(() => _isTodayLoading = false);
+      } else {
+        setState(() => _isTomorrowLoading = false);
+      }
+      
       context.push(AppRouter.pdfViewer, extra: {
         'file': file,
         'dayName': dayName,
+        'heroTag': heroTag,
       });
       
       // Track plan opening and possibly trigger review
@@ -59,7 +76,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       
       await HapticService.success();
     } else {
-      setState(() => _error = 'PDF konnte nicht geladen werden.');
+      setState(() {
+        _error = 'PDF konnte nicht geladen werden.';
+        if (isToday) {
+          _isTodayLoading = false;
+        } else {
+          _isTomorrowLoading = false;
+        }
+      });
     }
   }
 
@@ -175,6 +199,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             showDates: showDates,
                             onTodayClick: () => _openPdf(true),
                             onTomorrowClick: () => _openPdf(false),
+                            isTodayLoading: _isTodayLoading,
+                            isTomorrowLoading: _isTomorrowLoading,
                           );
                         },
                       ),
@@ -213,6 +239,8 @@ class _PlanOptions extends StatelessWidget {
   final String todayDate;
   final String tomorrowDate;
   final bool showDates;
+  final bool isTodayLoading;
+  final bool isTomorrowLoading;
 
   const _PlanOptions({
     required this.todayWeekday,
@@ -222,6 +250,8 @@ class _PlanOptions extends StatelessWidget {
     required this.todayDate,
     required this.tomorrowDate,
     required this.showDates,
+    required this.isTodayLoading,
+    required this.isTomorrowLoading,
   });
 
   @override
@@ -234,6 +264,8 @@ class _PlanOptions extends StatelessWidget {
           showDate: showDates,
           icon: Icons.calendar_today,
           onClick: onTodayClick,
+          isLoading: isTodayLoading,
+          heroTag: 'today-plan-hero',
         ),
         const SizedBox(height: 16),
         _PlanOptionButton(
@@ -242,6 +274,8 @@ class _PlanOptions extends StatelessWidget {
           showDate: showDates,
           icon: Icons.calendar_today,
           onClick: onTomorrowClick,
+          isLoading: isTomorrowLoading,
+          heroTag: 'tomorrow-plan-hero',
         ),
       ],
     );
@@ -254,6 +288,8 @@ class _PlanOptionButton extends StatefulWidget {
   final bool showDate;
   final IconData icon;
   final VoidCallback onClick;
+  final bool isLoading;
+  final String heroTag;
 
   const _PlanOptionButton({
     required this.weekday,
@@ -261,6 +297,8 @@ class _PlanOptionButton extends StatefulWidget {
     required this.showDate,
     required this.icon,
     required this.onClick,
+    this.isLoading = false,
+    required this.heroTag,
   });
 
   @override
@@ -328,73 +366,90 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (_) {
-        setState(() => _isPressed = true);
-        _scaleController.forward();
+        if (!widget.isLoading) {
+          setState(() => _isPressed = true);
+          _scaleController.forward();
+        }
       },
       onTapUp: (_) {
-        setState(() => _isPressed = false);
-        _scaleController.reverse();
-        widget.onClick();
-        HapticService.subtle();
+        if (!widget.isLoading) {
+          setState(() => _isPressed = false);
+          _scaleController.reverse();
+          widget.onClick();
+          HapticService.subtle();
+        }
       },
       onTapCancel: () {
-        setState(() => _isPressed = false);
-        _scaleController.reverse();
+        if (!widget.isLoading) {
+          setState(() => _isPressed = false);
+          _scaleController.reverse();
+        }
       },
       child: AnimatedBuilder(
         animation: _scaleAnimation,
         builder: (context, child) {
           return Transform.scale(
             scale: _isPressed ? _scaleAnimation.value : 1.0,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              decoration: BoxDecoration(
-                color: AppColors.appSurface,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      color: AppColors.calendarIconBackground,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      widget.icon,
-                      color: Colors.white,
-                      size: 24,
-                    ),
+            child: Hero(
+              tag: widget.heroTag,
+              child: Material(
+                type: MaterialType.transparency,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  decoration: BoxDecoration(
+                    color: AppColors.appSurface,
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Text(
-                          widget.weekday,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: AppColors.appOnSurface,
-                                fontWeight: FontWeight.w500,
-                              ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          color: AppColors.calendarIconBackground,
+                          shape: BoxShape.circle,
                         ),
-                        const SizedBox(width: 8),
-                        // Animiertes Datum
-                        if (widget.date.isNotEmpty)
-                          FadeTransition(
-                            opacity: _dateOpacityAnimation,
-                            child: Text(
-                              widget.date,
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.secondaryText,
-                              ),
+                        child: widget.isLoading 
+                          ? const CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            )
+                          : Icon(
+                              widget.icon,
+                              color: Colors.white,
+                              size: 24,
                             ),
-                          ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Text(
+                              widget.weekday,
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: AppColors.appOnSurface,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                            ),
+                            const SizedBox(width: 8),
+                            // Animiertes Datum
+                            if (widget.date.isNotEmpty)
+                              FadeTransition(
+                                opacity: _dateOpacityAnimation,
+                                child: Text(
+                                  widget.date,
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.secondaryText,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           );

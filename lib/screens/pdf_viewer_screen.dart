@@ -9,8 +9,14 @@ import 'package:share_plus/share_plus.dart';
 class PDFViewerScreen extends StatefulWidget {
   final File pdfFile;
   final String? dayName; // Optional day name for filename
+  final String heroTag; // Hero tag for animation
 
-  const PDFViewerScreen({super.key, required this.pdfFile, this.dayName});
+  const PDFViewerScreen({
+    super.key, 
+    required this.pdfFile, 
+    this.dayName,
+    required this.heroTag,
+  });
 
   @override
   State<PDFViewerScreen> createState() => _PDFViewerScreenState();
@@ -101,16 +107,33 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           ),
         ],
       ),
-      body: PdfView(
-        controller: _pdfController,
-        builders: PdfViewBuilders<DefaultBuilderOptions>(
-          options: const DefaultBuilderOptions(),
-          documentLoaderBuilder: (_) =>
-              const Center(child: CircularProgressIndicator()),
-          pageLoaderBuilder: (_) =>
-              const Center(child: CircularProgressIndicator()),
-          errorBuilder: (_, error) => Center(child: Text(error.toString())),
-          pageBuilder: _pageBuilder,
+      body: Hero(
+        tag: widget.heroTag,
+        flightShuttleBuilder: (
+          BuildContext flightContext,
+          Animation<double> animation,
+          HeroFlightDirection flightDirection,
+          BuildContext fromHeroContext,
+          BuildContext toHeroContext,
+        ) {
+          return Container(
+            decoration: BoxDecoration(
+              color: AppColors.appBackground,
+              borderRadius: BorderRadius.circular(
+                Tween<double>(begin: 16.0, end: 0.0).evaluate(animation)
+              ),
+            ),
+          );
+        },
+        child: PdfView(
+          controller: _pdfController,
+          builders: PdfViewBuilders<DefaultBuilderOptions>(
+            options: const DefaultBuilderOptions(),
+            documentLoaderBuilder: (_) => const SizedBox.shrink(),
+            pageLoaderBuilder: (_) => const SizedBox.shrink(),
+            errorBuilder: (_, error) => Center(child: Text(error.toString())),
+            pageBuilder: _pageBuilder,
+          ),
         ),
       ),
     );

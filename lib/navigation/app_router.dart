@@ -35,11 +35,17 @@ class AppRouter {
         ),
         GoRoute(
           path: pdfViewer,
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final data = state.extra as Map<String, dynamic>;
-            return PDFViewerScreen(
-              pdfFile: data['file'],
-              dayName: data['dayName'],
+            return CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: PDFViewerScreen(
+                pdfFile: data['file'],
+                dayName: data['dayName'],
+                heroTag: data['heroTag'],
+              ),
+              transitionsBuilder: _pdfViewerTransition,
+              transitionDuration: const Duration(milliseconds: 300),
             );
           },
         ),
@@ -155,6 +161,20 @@ class AppRouter {
           child: child,
         ),
       ),
+    );
+  }
+  
+  // PDF viewer transition
+  static Widget _pdfViewerTransition(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    // Simple fade transition for PDF Viewer
+    return FadeTransition(
+      opacity: animation,
+      child: child,
     );
   }
 } 
