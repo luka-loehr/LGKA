@@ -1,13 +1,19 @@
 // Copyright Luka Löhr 2025
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:in_app_review/in_app_review.dart';
 import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
 import '../data/pdf_repository.dart';
 import '../providers/haptic_service.dart';
 import '../services/file_opener_service.dart';
+import '../navigation/app_router.dart';
+import 'package:open_filex/open_filex.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -16,120 +22,72 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen>
-    with TickerProviderStateMixin {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _isTodayLoading = false;
   bool _isTomorrowLoading = false;
-  bool _showInfoSheet = false;
   String? _error;
-
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
-    
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 250),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 0.5).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.fastOutSlowIn),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.fastOutSlowIn,
-    ));
 
     // Preload PDFs when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _refreshPdfs();
+      _refreshPlans(forceReload: false);
     });
   }
 
-  @override
-  void dispose() {
-    _fadeController.dispose();
-    _slideController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _refreshPdfs() async {
+  Future<void> _refreshPlans({bool forceReload = true}) async {
     final pdfRepo = ref.read(pdfRepositoryProvider);
-    await pdfRepo.preloadPdfs(forceReload: true);
-  }
-
-  void _showInfo() {
-    setState(() => _showInfoSheet = true);
-    _fadeController.forward();
-    _slideController.forward();
-    HapticService.subtle();
-  }
-
-  void _hideInfo() {
-    _slideController.reverse().then((_) {
-      _fadeController.reverse().then((_) {
-        if (mounted) {
-          setState(() => _showInfoSheet = false);
-        }
-      });
-    });
+    await pdfRepo.preloadPdfs(forceReload: forceReload);
   }
 
   Future<void> _openPdf(bool isToday) async {
-    setState(() {
-      if (isToday) {
-        _isTodayLoading = true;
-      } else {
-        _isTomorrowLoading = true;
-      }
-      _error = null;
-    });
+    final pdfRepo = ref.read(pdfRepositoryProvider);
+    final file = await pdfRepo.getCachedPdfByDay(isToday);
 
-    try {
-      final pdfRepo = ref.read(pdfRepositoryProvider);
-      
-      // Check for cached file first using new weekday-based method
-      var file = await pdfRepo.getCachedPdfByDay(isToday);
-      
-      // If no cached file or empty, download it with weekday-based naming
-      if (file == null || file.lengthSync() == 0) {
-        final url = isToday ? PdfRepository.todayUrl : PdfRepository.tomorrowUrl;
-        file = await pdfRepo.downloadPdfWithWeekdayName(url, isToday);
-      }
-
-      if (file != null) {
-        await FileOpenerService.openFile(file.path);
-        await HapticService.success();
-      } else {
-        setState(() => _error = 'Fehler beim Herunterladen der PDF-Datei');
-        await HapticService.error();
-      }
-    } catch (e) {
-      setState(() => _error = 'Fehler: ${e.toString()}');
-      await HapticService.error();
-    } finally {
-      setState(() {
-        if (isToday) {
-          _isTodayLoading = false;
-        } else {
-          _isTomorrowLoading = false;
-        }
+    if (file != null && mounted) {
+      final dayName = isToday ? pdfRepo.todayWeekday : pdfRepo.tomorrowWeekday;
+      context.push(AppRouter.pdfViewer, extra: {
+        'file': file,
+        'dayName': dayName,
       });
+      
+      // Track plan opening and possibly trigger review
+      final reviewService = ref.read(reviewServiceProvider);
+      await reviewService.trackPlanOpenAndRequestReviewIfNeeded();
+      
+      await HapticService.success();
+    } else {
+      setState(() => _error = 'PDF konnte nicht geladen werden.');
     }
+  }
+
+  void _showSettingsBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E1E), // Lighter than main background
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => const _SettingsSheetContent(),
+    );
+  }
+
+  void _showAboutBottomSheet() {
+    final pdfRepo = ref.read(pdfRepositoryProvider);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E1E), // Lighter than main background
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => _AboutSheetContent(
+        todayPdfTimestamp: pdfRepo.todayLastUpdated,
+      ),
+    );
   }
 
   @override
@@ -150,7 +108,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         elevation: 0,
         actions: [
           IconButton(
-            onPressed: _showInfo,
+            onPressed: _showSettingsBottomSheet,
+            icon: const Icon(
+              Icons.settings_outlined,
+              color: AppColors.secondaryText,
+            ),
+          ),
+          IconButton(
+            onPressed: _showAboutBottomSheet,
             icon: const Icon(
               Icons.info_outline,
               color: AppColors.secondaryText,
@@ -158,107 +123,82 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          // Main content
-          Column(
-            children: [
-              // Loading indicator
-              if (_isTodayLoading || _isTomorrowLoading || !pdfRepo.weekdaysLoaded)
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 64, vertical: 32),
-                  height: 5,
-                  child: LinearProgressIndicator(
-                    backgroundColor: AppColors.appBlueAccent.withValues(alpha: 0.2),
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.appBlueAccent),
-                  ),
-                ),
-
-              // PDF Options
-              if (!_isTodayLoading && !_isTomorrowLoading && pdfRepo.weekdaysLoaded)
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 32),
-                        
-                        _PlanOptions(
-                          todayWeekday: pdfRepo.todayWeekday,
-                          tomorrowWeekday: pdfRepo.tomorrowWeekday,
-                          isTodayLoading: _isTodayLoading,
-                          isTomorrowLoading: _isTomorrowLoading,
-                          onTodayClick: () => _openPdf(true),
-                          onTomorrowClick: () => _openPdf(false),
+      body: RefreshIndicator(
+        onRefresh: () => _refreshPlans(forceReload: true),
+        backgroundColor: AppColors.appSurface,
+        color: AppColors.appBlueAccent,
+        child: CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 32),
+                    if (!pdfRepo.weekdaysLoaded)
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 64, vertical: 32),
+                        height: 5,
+                        child: LinearProgressIndicator(
+                          backgroundColor:
+                              AppColors.appBlueAccent.withOpacity(0.2),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                              AppColors.appBlueAccent),
                         ),
-                        
-                        if (_error != null) ...[
-                          const SizedBox(height: 16),
-                          Card(
-                            color: const Color(0xFF442727),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                _error!,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: const Color(0xFFCF6679),
-                                ),
-                              ),
-                            ),
+                      )
+                    else
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final preferencesManager =
+                              ref.watch(preferencesManagerProvider);
+                          final showDates =
+                              preferencesManager.showDatesWithWeekdays;
+
+                          String todayTitle = pdfRepo.todayWeekday;
+                          String tomorrowTitle = pdfRepo.tomorrowWeekday;
+
+                          if (showDates && pdfRepo.todayDate.isNotEmpty) {
+                            todayTitle =
+                                '${pdfRepo.todayWeekday} ${pdfRepo.todayDate}';
+                          }
+
+                          if (showDates && pdfRepo.tomorrowDate.isNotEmpty) {
+                            tomorrowTitle =
+                                '${pdfRepo.tomorrowWeekday} ${pdfRepo.tomorrowDate}';
+                          }
+
+                          return _PlanOptions(
+                            todayWeekday: todayTitle,
+                            tomorrowWeekday: tomorrowTitle,
+                            onTodayClick: () => _openPdf(true),
+                            onTomorrowClick: () => _openPdf(false),
+                          );
+                        },
+                      ),
+                    if (_error != null) ...[
+                      const SizedBox(height: 16),
+                      Card(
+                        color: const Color(0xFF442727),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            _error!,
+                            style:
+                                Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: const Color(0xFFCF6679),
+                                    ),
                           ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-            ],
-          ),
-
-          // Info sheet overlay
-          if (_showInfoSheet) ...[
-            // Semi-transparent background
-            AnimatedBuilder(
-              animation: _fadeAnimation,
-              builder: (context, child) {
-                return GestureDetector(
-                  onTap: _hideInfo,
-                  child: Container(
-                    color: Colors.black.withValues(alpha: _fadeAnimation.value),
-                  ),
-                );
-              },
-            ),
-
-            // Info sheet
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: AnimatedBuilder(
-                animation: _slideAnimation,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(
-                      0,
-                      _slideAnimation.value.dy * MediaQuery.of(context).size.height,
-                    ),
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 100),
-                      decoration: const BoxDecoration(
-                        color: AppColors.appSurface,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          topRight: Radius.circular(16),
                         ),
                       ),
-                      child: _InfoSheetContent(
-                        todayPdfTimestamp: pdfRepo.todayLastUpdated,
-                      ),
-                    ),
-                  );
-                },
+                    ],
+                  ],
+                ),
               ),
             ),
           ],
-        ],
+        ),
       ),
     );
   }
@@ -267,16 +207,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 class _PlanOptions extends StatelessWidget {
   final String todayWeekday;
   final String tomorrowWeekday;
-  final bool isTodayLoading;
-  final bool isTomorrowLoading;
   final VoidCallback onTodayClick;
   final VoidCallback onTomorrowClick;
 
   const _PlanOptions({
     required this.todayWeekday,
     required this.tomorrowWeekday,
-    required this.isTodayLoading,
-    required this.isTomorrowLoading,
     required this.onTodayClick,
     required this.onTomorrowClick,
   });
@@ -288,16 +224,12 @@ class _PlanOptions extends StatelessWidget {
         _PlanOptionButton(
           title: todayWeekday,
           icon: Icons.calendar_today,
-          isLoading: isTodayLoading,
-          enabled: !isTodayLoading && !isTomorrowLoading,
           onClick: onTodayClick,
         ),
         const SizedBox(height: 16),
         _PlanOptionButton(
           title: tomorrowWeekday,
           icon: Icons.calendar_today,
-          isLoading: isTomorrowLoading,
-          enabled: !isTodayLoading && !isTomorrowLoading,
           onClick: onTomorrowClick,
         ),
       ],
@@ -308,15 +240,11 @@ class _PlanOptions extends StatelessWidget {
 class _PlanOptionButton extends StatefulWidget {
   final String title;
   final IconData icon;
-  final bool isLoading;
-  final bool enabled;
   final VoidCallback onClick;
 
   const _PlanOptionButton({
     required this.title,
     required this.icon,
-    required this.isLoading,
-    required this.enabled,
     required this.onClick,
   });
 
@@ -351,20 +279,20 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: widget.enabled ? (_) {
+      onTapDown: (_) {
         setState(() => _isPressed = true);
         _scaleController.forward();
-      } : null,
-      onTapUp: widget.enabled ? (_) {
+      },
+      onTapUp: (_) {
         setState(() => _isPressed = false);
         _scaleController.reverse();
         widget.onClick();
         HapticService.subtle();
-      } : null,
-      onTapCancel: widget.enabled ? () {
+      },
+      onTapCancel: () {
         setState(() => _isPressed = false);
         _scaleController.reverse();
-      } : null,
+      },
       child: AnimatedBuilder(
         animation: _scaleAnimation,
         builder: (context, child) {
@@ -386,28 +314,19 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
                       color: AppColors.calendarIconBackground,
                       shape: BoxShape.circle,
                     ),
-                    child: widget.isLoading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : Icon(
-                            widget.icon,
-                            color: Colors.white,
-                            size: 24,
-                          ),
+                    child: Icon(
+                      widget.icon,
+                      color: Colors.white,
+                      size: 24,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Text(
                     widget.title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.appOnSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
+                          color: AppColors.appOnSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
                   ),
                 ],
               ),
@@ -419,103 +338,284 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
   }
 }
 
-class _InfoSheetContent extends StatelessWidget {
-  final String todayPdfTimestamp;
-
-  const _InfoSheetContent({
-    required this.todayPdfTimestamp,
-  });
+class _SettingsSheetContent extends ConsumerStatefulWidget {
+  const _SettingsSheetContent();
 
   @override
+  ConsumerState<_SettingsSheetContent> createState() => _SettingsSheetContentState();
+}
+
+class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final preferencesManager = ref.watch(preferencesManagerProvider);
+    
+    return Wrap(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Über die App',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+                'Einstellungen',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: AppColors.appOnSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              
+              const SizedBox(height: 20),
+              
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.appSurface,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Datum anzeigen',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.appOnSurface,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Zeigt das Datum nach dem Wochentag an',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.secondaryText,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    Switch(
+                      value: preferencesManager.showDatesWithWeekdays,
+                      onChanged: (value) async {
+                        await preferencesManager.setShowDatesWithWeekdays(value);
+                        setState(() {});
+                      },
+                      activeColor: AppColors.appBlueAccent,
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          
-          const SizedBox(height: 24),
-          
-          Text(
-            'LGKA – Lessing Gymnasium Karlsruhe App',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.appOnSurface,
-              fontWeight: FontWeight.w600,
-            ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AboutSheetContent extends StatelessWidget {
+  final String todayPdfTimestamp;
+
+  const _AboutSheetContent({
+    required this.todayPdfTimestamp,
+  });
+
+  void _launchURL(String url) async {
+    try {
+      Uri uri = Uri.parse(url);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Could not launch URL: $e');
+    }
+  }
+
+  void _triggerReview() async {
+    final InAppReview inAppReview = InAppReview.instance;
+    
+    if (await inAppReview.isAvailable()) {
+      inAppReview.requestReview();
+    } else {
+      // Fallback: Öffne Play Store Seite
+      inAppReview.openStoreListing();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'LGKA+',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: AppColors.appOnSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              
+              const SizedBox(height: 4),
+              
+              Text(
+                'Die neue Vertretungsplan-App',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: AppColors.secondaryText,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.appSurface,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Oha, krass dass du hier rein guckst!',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppColors.secondaryText,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    const Divider(height: 1, color: Color(0xFF2C2C2C)),
+                    const SizedBox(height: 16),
+                    
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildLinkRow(
+                            context,
+                            Icons.shield_outlined, 
+                            'Datenschutzerklärung', 
+                            'https://luka-loehr.github.io/LGKA/privacy.html'
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _buildLinkRow(
+                            context,
+                            Icons.description_outlined, 
+                            'Lizenz', 
+                            'https://github.com/luka-loehr/LGKA/blob/master/LICENSE'
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          
-          const SizedBox(height: 8),
-          
-          Text(
-            'Einfacher Zugriff auf den Vertretungsplan des Lessing Gymnasiums Karlsruhe.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.secondaryText,
-            ),
+        ),
+        
+        // Footer - Entwickelt von + Version
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          child: FutureBuilder<PackageInfo>(
+            future: PackageInfo.fromPlatform(),
+            builder: (context, snapshot) {
+              final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Divider(height: 1, color: Color(0xFF222222)),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '© 2025 ',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.secondaryText.withOpacity(0.7),
+                        ),
+                      ),
+                      Text(
+                        'Luka Löhr',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.appBlueAccent,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        ' • v$version',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.secondaryText.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
           ),
-          
-          if (todayPdfTimestamp.isNotEmpty) ...[
-            const SizedBox(height: 16),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildLinkRow(BuildContext context, IconData icon, String text, String url) {
+    return InkWell(
+      onTap: () => _launchURL(url),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: AppColors.appBlueAccent,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
             Text(
-              'Stand des Vertretungsplans: $todayPdfTimestamp',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.secondaryText.withValues(alpha: 0.7),
+              text,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.appBlueAccent,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
-          
-          const SizedBox(height: 32),
-          
-          Text(
-            'Entwickler: Luka Löhr',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.secondaryText,
-            ),
-          ),
-          
-          const SizedBox(height: 4),
-          
-          Text(
-            '© 2025 Alle Rechte vorbehalten',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.secondaryText,
-            ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-                      Divider(color: AppColors.secondaryText.withValues(alpha: 0.2)),
-          
-          const SizedBox(height: 16),
-          
-          Center(
-            child: FutureBuilder<PackageInfo>(
-              future: PackageInfo.fromPlatform(),
-              builder: (context, snapshot) {
-                final version = snapshot.hasData ? snapshot.data!.version : '1.1';
-                return Text(
-                  'Version $version',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.secondaryText,
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+        ),
       ),
+    );
+  }
+  
+  Widget _buildFeatureRow(BuildContext context, IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: const Color(0xFF78A5F9),
+          size: 18,
+        ),
+        const SizedBox(width: 12),
+        Text(
+          text,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: AppColors.secondaryText,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ],
     );
   }
 } 
