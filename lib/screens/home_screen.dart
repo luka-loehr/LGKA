@@ -498,26 +498,18 @@ class _AboutSheetContent extends StatelessWidget {
                     const Divider(height: 1, color: Color(0xFF2C2C2C)),
                     const SizedBox(height: 16),
                     
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildLinkRow(
-                            context,
-                            Icons.shield_outlined, 
-                            'Datenschutzerklärung', 
-                            'https://luka-loehr.github.io/LGKA/privacy.html'
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: _buildLinkRow(
-                            context,
-                            Icons.description_outlined, 
-                            'Lizenz', 
-                            'https://github.com/luka-loehr/LGKA/blob/master/LICENSE'
-                          ),
-                        ),
-                      ],
+                    _buildLinkRow(
+                      context,
+                      Icons.shield_outlined, 
+                      'Datenschutzerklärung', 
+                      'https://luka-loehr.github.io/LGKA/privacy.html'
+                    ),
+                    const SizedBox(height: 8),
+                    _buildLinkRow(
+                      context,
+                      Icons.description_outlined, 
+                      'Lizenz', 
+                      'https://github.com/luka-loehr/LGKA/blob/master/LICENSE'
                     ),
                   ],
                 ),
