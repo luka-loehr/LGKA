@@ -35,8 +35,10 @@ class HapticService {
   /// Provides a premium haptic feedback for weekday selection
   /// More distinctive than subtle but still elegant
   static Future<void> weekdaySelect() async {
-    // A single precise medium impact that feels substantial but not excessive
-    await HapticFeedback.mediumImpact();
+    // Fast double haptic - two quick light impacts in rapid succession
+    await HapticFeedback.lightImpact();
+    await Future.delayed(const Duration(milliseconds: 30));
+    await HapticFeedback.lightImpact();
   }
 
   /// Provides error feedback that feels premium but noticeable
