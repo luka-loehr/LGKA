@@ -34,6 +34,16 @@ This Flutter app is automatically configured to produce small APKs perfect for s
 - **ProGuard Rules**: Dead code elimination
 - **No Debug Symbols**: Excluded from production builds
 
+### 📋 Build-Konfiguration
+
+Die App ist permanent optimiert durch:
+- **gradle.properties**: Universal optimizations (R8, tree-shaking, resource optimization)
+- **build.gradle.kts**: Standard Flutter configuration with size optimizations
+- **proguard-rules.pro**: Essential ProGuard rules for smaller builds
+- **Keine Debug-Symbole**: Automatisch ausgeschlossen für kleinere Builds
+
+**Ergebnis**: Jeder Standard-Flutter-Build ist automatisch für Schulgeräte optimiert! 🎉 
+
 ### 📱 **Standard Build Commands (Already Optimized):**
 
 ```bash
@@ -67,16 +77,4 @@ flutter build appbundle --release --build-name=X.Y.Z --build-number=N
 flutter build apk --release --split-per-abi --build-name=X.Y.Z --build-number=N
 ```
 
-**Für Entwickler**: Lokale Builds mit denselben Befehlen möglich, aber nicht zur Veröffentlichung berechtigt.
-
----
-
-## 📋 Build-Konfiguration
-
-Die App ist permanent optimiert durch:
-- **gradle.properties**: Universal optimizations (R8, tree-shaking, resource optimization)
-- **build.gradle.kts**: Standard Flutter configuration with size optimizations
-- **proguard-rules.pro**: Essential ProGuard rules for smaller builds
-- **Keine Debug-Symbole**: Automatisch ausgeschlossen für kleinere Builds
-
-**Ergebnis**: Jeder Standard-Flutter-Build ist automatisch für Schulgeräte optimiert! 🎉 
+**Für Entwickler**: Lokale Builds mit denselben Befehlen möglich, aber nicht zur Veröffentlichung berechtigt. 
