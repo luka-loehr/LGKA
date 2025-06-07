@@ -156,22 +156,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           final showDates =
                               preferencesManager.showDatesWithWeekdays;
 
-                          String todayTitle = pdfRepo.todayWeekday;
-                          String tomorrowTitle = pdfRepo.tomorrowWeekday;
-
-                          if (showDates && pdfRepo.todayDate.isNotEmpty) {
-                            todayTitle =
-                                '${pdfRepo.todayWeekday} ${pdfRepo.todayDate}';
-                          }
-
-                          if (showDates && pdfRepo.tomorrowDate.isNotEmpty) {
-                            tomorrowTitle =
-                                '${pdfRepo.tomorrowWeekday} ${pdfRepo.tomorrowDate}';
-                          }
+                          // Verwende die direkten Wochentage aus pdfRepo
+                          final todayWeekday = pdfRepo.todayWeekday;
+                          final tomorrowWeekday = pdfRepo.tomorrowWeekday;
+                          final todayDate = pdfRepo.todayDate;
+                          final tomorrowDate = pdfRepo.tomorrowDate;
 
                           return _PlanOptions(
-                            todayWeekday: todayTitle,
-                            tomorrowWeekday: tomorrowTitle,
+                            todayWeekday: todayWeekday,
+                            tomorrowWeekday: tomorrowWeekday,
+                            todayDate: todayDate,
+                            tomorrowDate: tomorrowDate,
+                            showDates: showDates,
                             onTodayClick: () => _openPdf(true),
                             onTomorrowClick: () => _openPdf(false),
                           );
@@ -209,12 +205,18 @@ class _PlanOptions extends StatelessWidget {
   final String tomorrowWeekday;
   final VoidCallback onTodayClick;
   final VoidCallback onTomorrowClick;
+  final String todayDate;
+  final String tomorrowDate;
+  final bool showDates;
 
   const _PlanOptions({
     required this.todayWeekday,
     required this.tomorrowWeekday,
     required this.onTodayClick,
     required this.onTomorrowClick,
+    required this.todayDate,
+    required this.tomorrowDate,
+    required this.showDates,
   });
 
   @override
@@ -222,13 +224,17 @@ class _PlanOptions extends StatelessWidget {
     return Column(
       children: [
         _PlanOptionButton(
-          title: todayWeekday,
+          weekday: todayWeekday,
+          date: todayDate,
+          showDate: showDates,
           icon: Icons.calendar_today,
           onClick: onTodayClick,
         ),
         const SizedBox(height: 16),
         _PlanOptionButton(
-          title: tomorrowWeekday,
+          weekday: tomorrowWeekday,
+          date: tomorrowDate,
+          showDate: showDates,
           icon: Icons.calendar_today,
           onClick: onTomorrowClick,
         ),
@@ -238,12 +244,16 @@ class _PlanOptions extends StatelessWidget {
 }
 
 class _PlanOptionButton extends StatefulWidget {
-  final String title;
+  final String weekday;
+  final String date;
+  final bool showDate;
   final IconData icon;
   final VoidCallback onClick;
 
   const _PlanOptionButton({
-    required this.title,
+    required this.weekday,
+    required this.date,
+    required this.showDate,
     required this.icon,
     required this.onClick,
   });
@@ -256,7 +266,10 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
+  late AnimationController _dateController;
+  late Animation<double> _dateOpacityAnimation;
   bool _isPressed = false;
+  bool _showDatePrevious = false;
 
   @override
   void initState() {
@@ -268,11 +281,41 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
       CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
     );
+    
+    // Animation controller für das Ein-/Ausblenden des Datums
+    _dateController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    
+    _dateOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _dateController, curve: Curves.easeInOut)
+    );
+    
+    _showDatePrevious = widget.showDate;
+    if (widget.showDate) {
+      _dateController.value = 1.0;
+    }
+  }
+  
+  @override
+  void didUpdateWidget(_PlanOptionButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Wenn sich der showDate-Wert ändert, starte die Animation
+    if (oldWidget.showDate != widget.showDate) {
+      if (widget.showDate) {
+        _dateController.forward();
+      } else {
+        _dateController.reverse();
+      }
+      _showDatePrevious = widget.showDate;
+    }
   }
 
   @override
   void dispose() {
     _scaleController.dispose();
+    _dateController.dispose();
     super.dispose();
   }
 
@@ -321,12 +364,30 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
                     ),
                   ),
                   const SizedBox(width: 16),
-                  Text(
-                    widget.title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.appOnSurface,
-                          fontWeight: FontWeight.w500,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Text(
+                          widget.weekday,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: AppColors.appOnSurface,
+                                fontWeight: FontWeight.w500,
+                              ),
                         ),
+                        const SizedBox(width: 8),
+                        // Animiertes Datum
+                        if (widget.date.isNotEmpty)
+                          FadeTransition(
+                            opacity: _dateOpacityAnimation,
+                            child: Text(
+                              widget.date,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppColors.secondaryText,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -406,15 +467,8 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                         await preferencesManager.setShowDatesWithWeekdays(value);
                         setState(() {});
                         
-                        // Aktualisiere den PDF Repository Provider, um die Änderung sofort anzuzeigen
-                        final pdfRepo = ref.read(pdfRepositoryProvider);
-                        
-                        // Die Änderung im HomeScreen sofort sichtbar machen
-                        // Nutzt WidgetsBinding, um sicherzustellen, dass diese Aktualisierung
-                        // nach dem State-Update geschieht
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          ref.invalidate(pdfRepositoryProvider);
-                        });
+                        // Direkt setState auf dem HomeScreen auslösen, ohne PDFs neu zu laden
+                        // Die Animation wird durch die Änderung von showDates automatisch ausgelöst
                       },
                       activeColor: AppColors.appBlueAccent,
                     ),
