@@ -17,17 +17,22 @@ class PdfRepository extends ChangeNotifier {
   static const String todayFilename = 'today.pdf';
   static const String tomorrowFilename = 'tomorrow.pdf';
 
+  // Private variables for storing data
   String _todayWeekday = '';
   String _tomorrowWeekday = '';
   String _todayLastUpdated = '';
   String _tomorrowLastUpdated = '';
+  String _todayDate = '';
+  String _tomorrowDate = '';
   bool _weekdaysLoaded = false;
 
-  // Getters
+  // Getters for accessing the data
   String get todayWeekday => _todayWeekday;
   String get tomorrowWeekday => _tomorrowWeekday;
   String get todayLastUpdated => _todayLastUpdated;
   String get tomorrowLastUpdated => _tomorrowLastUpdated;
+  String get todayDate => _todayDate;
+  String get tomorrowDate => _tomorrowDate;
   bool get weekdaysLoaded => _weekdaysLoaded;
   
   // Dynamic filename getters based on weekdays
@@ -139,11 +144,13 @@ class PdfRepository extends ChangeNotifier {
       if (isToday) {
         _todayWeekday = result['weekday'] ?? '';
         _todayLastUpdated = result['dateTime'] ?? '';
-        debugPrint('Extracted for today - weekday: $_todayWeekday, dateTime: $_todayLastUpdated');
+        _todayDate = result['date'] ?? '';
+        debugPrint('Extracted for today - weekday: $_todayWeekday, dateTime: $_todayLastUpdated, date: $_todayDate');
       } else {
         _tomorrowWeekday = result['weekday'] ?? '';
         _tomorrowLastUpdated = result['dateTime'] ?? '';
-        debugPrint('Extracted for tomorrow - weekday: $_tomorrowWeekday, dateTime: $_tomorrowLastUpdated');
+        _tomorrowDate = result['date'] ?? '';
+        debugPrint('Extracted for tomorrow - weekday: $_tomorrowWeekday, dateTime: $_tomorrowLastUpdated, date: $_tomorrowDate');
       }
 
       // Now determine the final filename based on extracted weekday
@@ -182,11 +189,13 @@ class PdfRepository extends ChangeNotifier {
       if (isToday) {
         _todayWeekday = result['weekday'] ?? '';
         _todayLastUpdated = result['dateTime'] ?? '';
-        debugPrint('Extracted for today - weekday: $_todayWeekday, dateTime: $_todayLastUpdated');
+        _todayDate = result['date'] ?? '';
+        debugPrint('Extracted for today - weekday: $_todayWeekday, dateTime: $_todayLastUpdated, date: $_todayDate');
       } else {
         _tomorrowWeekday = result['weekday'] ?? '';
         _tomorrowLastUpdated = result['dateTime'] ?? '';
-        debugPrint('Extracted for tomorrow - weekday: $_tomorrowWeekday, dateTime: $_tomorrowLastUpdated');
+        _tomorrowDate = result['date'] ?? '';
+        debugPrint('Extracted for tomorrow - weekday: $_tomorrowWeekday, dateTime: $_tomorrowLastUpdated, date: $_tomorrowDate');
       }
 
       _checkIfBothDaysLoaded();
@@ -196,9 +205,11 @@ class PdfRepository extends ChangeNotifier {
       if (isToday) {
         _todayWeekday = '';
         _todayLastUpdated = '';
+        _todayDate = '';
       } else {
         _tomorrowWeekday = '';
         _tomorrowLastUpdated = '';
+        _tomorrowDate = '';
       }
     }
   }
@@ -276,19 +287,47 @@ Map<String, String> _extractPdfData(List<int> bytes) {
     final text = textExtractor.extractText(startPageIndex: 0, endPageIndex: 0);
     document.dispose();
 
-    // Extract weekday
-    final weekdayPattern = RegExp(r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)', caseSensitive: false);
-    final weekdayMatch = weekdayPattern.firstMatch(text);
-    final weekday = weekdayMatch?.group(1) ?? '';
-
-    // Extract date and time
+    // Extract "last updated" timestamp
     final dateTimePattern = RegExp(r'(\d{1,2}\.\d{1,2}\.\d{4}\s+\d{1,2}:\d{2})');
     final dateTimeMatch = dateTimePattern.firstMatch(text);
     final dateTime = dateTimeMatch?.group(1) ?? '';
 
-    return {'weekday': weekday, 'dateTime': dateTime};
+    String weekday = '';
+    String date = '';
+
+    // New pattern to get the plan's date and weekday together from "23.6. / Montag"
+    final planDateAndWeekdayPattern = RegExp(
+        r'(\d{1,2}\.\d{1,2}\.)\s*\/\s*(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)',
+        caseSensitive: false);
+    final planMatch = planDateAndWeekdayPattern.firstMatch(text);
+    
+    if (planMatch != null) {
+      final partialDate = planMatch.group(1)!; // "23.6."
+      weekday = planMatch.group(2)!;
+
+      // Extract year from the "last updated" timestamp since the plan date doesn't have it
+      final yearPattern = RegExp(r'(\d{4})');
+      final yearMatch = yearPattern.firstMatch(dateTime);
+      if (yearMatch != null) {
+        final year = yearMatch.group(0)!;
+        date = '$partialDate$year'; // "23.6.2025"
+      } else {
+        date = partialDate; // Fallback to partial date if no year is found
+      }
+    } else {
+      // Fallback to old method if new pattern fails
+      final weekdayPattern = RegExp(r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)', caseSensitive: false);
+      final weekdayMatch = weekdayPattern.firstMatch(text);
+      weekday = weekdayMatch?.group(1) ?? '';
+
+      final fallbackDatePattern = RegExp(r'(\d{1,2}\.\d{1,2}\.\d{4})');
+      final fallbackDateMatch = fallbackDatePattern.firstMatch(text);
+      date = fallbackDateMatch?.group(1) ?? '';
+    }
+
+    return {'weekday': weekday, 'dateTime': dateTime, 'date': date};
   } catch (e) {
     debugPrint('Error extracting PDF data: $e');
-    return {'weekday': '', 'dateTime': ''};
+    return {'weekday': '', 'dateTime': '', 'date': ''};
   }
 } 

@@ -69,7 +69,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'LGKA Vertretungsplan',
+      title: 'LGKA+ Vertretungsplan',
       theme: AppTheme.darkTheme,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,

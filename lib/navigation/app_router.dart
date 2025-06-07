@@ -5,11 +5,17 @@ import 'package:go_router/go_router.dart';
 import '../screens/welcome_screen.dart';
 import '../screens/auth_screen.dart';
 import '../screens/home_screen.dart';
+import '../screens/settings_screen.dart';
+import '../screens/about_screen.dart';
+import '../screens/pdf_viewer_screen.dart';
 
 class AppRouter {
   static const String welcome = '/welcome';
   static const String auth = '/auth';
-  static const String home = '/home';
+  static const String home = '/';
+  static const String pdfViewer = '/pdf-viewer';
+  static const String settings = '/settings';
+  static const String about = '/about';
 
   static GoRouter createRouter({required String initialLocation}) {
     return GoRouter(
@@ -17,36 +23,33 @@ class AppRouter {
       routes: [
         GoRoute(
           path: welcome,
-          name: 'welcome',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const WelcomeScreen(),
-            transitionDuration: const Duration(milliseconds: 400),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-                _welcomeTransition(context, animation, secondaryAnimation, child),
-          ),
+          builder: (context, state) => const WelcomeScreen(),
         ),
         GoRoute(
           path: auth,
-          name: 'auth',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const AuthScreen(),
-            transitionDuration: const Duration(milliseconds: 600),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-                _authTransition(context, animation, secondaryAnimation, child),
-          ),
+          builder: (context, state) => const AuthScreen(),
         ),
         GoRoute(
           path: home,
-          name: 'home',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const HomeScreen(),
-            transitionDuration: const Duration(milliseconds: 800),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-                _homeTransition(context, animation, secondaryAnimation, child),
-          ),
+          builder: (context, state) => const HomeScreen(),
+        ),
+        GoRoute(
+          path: pdfViewer,
+          builder: (context, state) {
+            final data = state.extra as Map<String, dynamic>;
+            return PDFViewerScreen(
+              pdfFile: data['file'],
+              dayName: data['dayName'],
+            );
+          },
+        ),
+        GoRoute(
+          path: settings,
+          builder: (context, state) => const SettingsScreen(),
+        ),
+        GoRoute(
+          path: about,
+          builder: (context, state) => const AboutScreen(),
         ),
       ],
     );
