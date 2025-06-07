@@ -38,8 +38,8 @@ class PreferencesManager {
     await _prefs.setBool(_keyDebugMode, value);
   }
 
-  // Show dates with weekdays (disabled by default)
-  bool get showDatesWithWeekdays => _prefs.getBool(_keyShowDates) ?? false;
+  // Show dates with weekdays (enabled by default)
+  bool get showDatesWithWeekdays => _prefs.getBool(_keyShowDates) ?? true;
 
   Future<void> setShowDatesWithWeekdays(bool value) async {
     await _prefs.setBool(_keyShowDates, value);
