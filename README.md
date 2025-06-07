@@ -2,11 +2,11 @@
 
 > **🎉 Neueste Verbesserung**: Die App-Größe wurde drastisch von **130MB auf nur noch 9MB** reduziert! Das bedeutet schnellere Downloads und weniger Speicherplatzverbrauch.  
 
-> **📱 Und neu in Version 1.5.5**: Jetzt auch verfügbar für **iOS und macOS** – erstmals nutzbar auf iPhones, iPads und Apple Silicon Macs!
+> **📱 Und neu in Version 1.5.5**: Jetzt auch verfügbar für **iOS** – erstmals nutzbar auf iPhones und iPads!
 
 Eine moderne Flutter-App zur digitalen Anzeige des Vertretungsplans des Lessing-Gymnasiums Karlsruhe. Entwickelt von Luka Löhr als nicht-kommerzielles Schulprojekt für Schüler, Lehrer und Eltern.
 
-## � Was macht diese App?
+## 🤔 Was macht diese App?
 
 Die LGKA-App ist ein **digitaler Vertretungsplan-Viewer**, der es ermöglicht, die tagesaktuellen Stundenplanänderungen des Lessing-Gymnasiums Karlsruhe direkt auf dem Smartphone oder Tablet anzuzeigen. Die App lädt automatisch die offiziellen PDF-Vertretungspläne vom Schulserver herunter und stellt sie in einer benutzerfreundlichen Oberfläche dar.
 
@@ -47,7 +47,7 @@ Die LGKA-App ist ein **digitaler Vertretungsplan-Viewer**, der es ermöglicht, d
 - Möglichkeit zum Öffnen der PDFs in externen Apps
 - Optimierte Darstellung für mobile Geräte
 
-## � Technische Details
+## 🤖 Technische Details
 
 ### Architektur & Frameworks
 - **Flutter SDK** (ab Version 3.8.0) für plattformübergreifende Entwicklung
@@ -77,7 +77,7 @@ Die LGKA-App ist ein **digitaler Vertretungsplan-Viewer**, der es ermöglicht, d
 - **Preloading-Mechanismus** für schnelle App-Starts
 - **Komprimierte Assets** für minimale App-Größe (nur noch 9MB!)
 
-## � Installation & Entwicklung
+## 🚀 Installation & Entwicklung
 
 ### Voraussetzungen
 ```bash
@@ -103,7 +103,7 @@ flutter build appbundle --release --build-name=1.5.0 --build-number=15
 flutter build appbundle --release --build-name=1.5.0 --build-number=15 --split-debug-info=symbols --obfuscate
 ```
 
-**� Detaillierte Build-Anleitung**: Siehe [BUILD_NOTES.md](BUILD_NOTES.md) für vollständige Konfiguration und Troubleshooting.
+**🔧 Detaillierte Build-Anleitung**: Siehe [BUILD_NOTES.md](BUILD_NOTES.md) für vollständige Konfiguration und Troubleshooting.
 
 ## 🛡️ Datenschutz & Sicherheit
 
