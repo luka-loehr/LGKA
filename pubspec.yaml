@@ -1,5 +1,5 @@
 name: lgka_flutter
-description: "LGKA App - Digitaler Vertretungsplan"
+description: "LGKA+ App - Digitaler Vertretungsplan"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -49,14 +49,17 @@ dependencies:
   
   # File Handling
   path_provider: ^2.1.5
-  permission_handler: ^12.0.0+1
   open_filex: ^4.5.0
+  share_plus: ^10.1.2
   
   # PDF Processing
-  syncfusion_flutter_pdf: ^29.2.8
   
   # App Info
   package_info_plus: ^8.3.0
+  syncfusion_flutter_pdf: ^29.2.9
+  pdfx: ^2.9.1
+  url_launcher: ^6.2.5
+  in_app_review: ^2.0.8
 
 dev_dependencies:
   flutter_test:
@@ -119,9 +122,6 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  macos:
-    generate: true
-    image_path: "assets/images/app-icons/app-logo.png"
   image_path: "assets/images/app-icons/app-logo.png"
   # Using static logo with integrated background - no adaptive icons needed
   # adaptive_icon_background: "assets/images/app-icons/app-logo-adaptive-background.png"
