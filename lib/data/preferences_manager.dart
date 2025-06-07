@@ -6,6 +6,9 @@ class PreferencesManager {
   static const String _keyFirstLaunch = 'is_first_launch';
   static const String _keyAuthenticated = 'is_authenticated';
   static const String _keyDebugMode = 'is_debug_mode';
+  static const String _keyShowDates = 'show_dates_with_weekdays';
+  static const String _keyPlanOpenCount = 'plan_open_count';
+  static const String _keyHasRequestedReview = 'has_requested_review';
 
   late final SharedPreferences _prefs;
 
@@ -33,6 +36,28 @@ class PreferencesManager {
 
   Future<void> setDebugMode(bool value) async {
     await _prefs.setBool(_keyDebugMode, value);
+  }
+
+  // Show dates with weekdays (disabled by default)
+  bool get showDatesWithWeekdays => _prefs.getBool(_keyShowDates) ?? false;
+
+  Future<void> setShowDatesWithWeekdays(bool value) async {
+    await _prefs.setBool(_keyShowDates, value);
+  }
+  
+  // Plan open count
+  int get planOpenCount => _prefs.getInt(_keyPlanOpenCount) ?? 0;
+  
+  Future<void> incrementPlanOpenCount() async {
+    final currentCount = planOpenCount;
+    await _prefs.setInt(_keyPlanOpenCount, currentCount + 1);
+  }
+  
+  // Review request status
+  bool get hasRequestedReview => _prefs.getBool(_keyHasRequestedReview) ?? false;
+  
+  Future<void> setHasRequestedReview(bool value) async {
+    await _prefs.setBool(_keyHasRequestedReview, value);
   }
 
   // Clear all preferences
