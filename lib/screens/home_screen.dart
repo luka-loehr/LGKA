@@ -56,8 +56,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       // Track plan opening and possibly trigger review
       final reviewService = ref.read(reviewServiceProvider);
       await reviewService.trackPlanOpenAndRequestReviewIfNeeded();
-      
-      await HapticService.success();
     } else {
       setState(() => _error = 'PDF konnte nicht geladen werden.');
     }
@@ -341,7 +339,7 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
         setState(() => _isPressed = false);
         _scaleController.reverse();
         widget.onClick();
-        HapticService.subtle();
+        HapticService.weekdaySelect();
       },
       onTapCancel: () {
         setState(() => _isPressed = false);
