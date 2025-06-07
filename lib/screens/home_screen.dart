@@ -405,6 +405,16 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                       onChanged: (value) async {
                         await preferencesManager.setShowDatesWithWeekdays(value);
                         setState(() {});
+                        
+                        // Aktualisiere den PDF Repository Provider, um die Änderung sofort anzuzeigen
+                        final pdfRepo = ref.read(pdfRepositoryProvider);
+                        
+                        // Die Änderung im HomeScreen sofort sichtbar machen
+                        // Nutzt WidgetsBinding, um sicherzustellen, dass diese Aktualisierung
+                        // nach dem State-Update geschieht
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          ref.invalidate(pdfRepositoryProvider);
+                        });
                       },
                       activeColor: AppColors.appBlueAccent,
                     ),
