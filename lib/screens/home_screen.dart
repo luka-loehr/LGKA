@@ -646,7 +646,10 @@ class _AboutSheetContent extends StatelessWidget {
   
   Widget _buildLinkRow(BuildContext context, IconData icon, String text, String url) {
     return InkWell(
-      onTap: () => _launchURL(url),
+      onTap: () {
+        HapticService.subtle();
+        _launchURL(url);
+      },
       borderRadius: BorderRadius.circular(8),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
