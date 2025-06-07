@@ -64,7 +64,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showSettingsBottomSheet() {
-    HapticService.subtle();
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1E1E1E), // Lighter than main background
@@ -82,7 +81,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showAboutBottomSheet() {
-    HapticService.subtle();
     final pdfRepo = ref.read(pdfRepositoryProvider);
     showModalBottomSheet(
       context: context,
@@ -115,14 +113,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            onPressed: _showSettingsBottomSheet,
+            onPressed: () {
+              HapticService.subtle();
+              _showSettingsBottomSheet();
+            },
             icon: const Icon(
               Icons.settings_outlined,
               color: AppColors.secondaryText,
             ),
           ),
           IconButton(
-            onPressed: _showAboutBottomSheet,
+            onPressed: () {
+              HapticService.subtle();
+              _showAboutBottomSheet();
+            },
             icon: const Icon(
               Icons.info_outline,
               color: AppColors.secondaryText,
