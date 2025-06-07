@@ -71,7 +71,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => const _SettingsSheetContent(),
+      builder: (context) => _SettingsSheetContent(
+        onSettingsChanged: () {
+          // Force rebuild von der HomeScreen-UI
+          setState(() {});
+        },
+      ),
     );
   }
 
@@ -400,7 +405,11 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
 }
 
 class _SettingsSheetContent extends ConsumerStatefulWidget {
-  const _SettingsSheetContent();
+  final VoidCallback onSettingsChanged;
+
+  const _SettingsSheetContent({
+    required this.onSettingsChanged,
+  });
 
   @override
   ConsumerState<_SettingsSheetContent> createState() => _SettingsSheetContentState();
@@ -467,8 +476,8 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                         await preferencesManager.setShowDatesWithWeekdays(value);
                         setState(() {});
                         
-                        // Direkt setState auf dem HomeScreen auslösen, ohne PDFs neu zu laden
-                        // Die Animation wird durch die Änderung von showDates automatisch ausgelöst
+                        // Benachrichtigung an den HomeScreen, dass sich die Einstellung geändert hat
+                        widget.onSettingsChanged();
                       },
                       activeColor: AppColors.appBlueAccent,
                     ),
