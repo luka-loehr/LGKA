@@ -75,7 +75,8 @@ Die LGKA-App ist ein **digitaler Vertretungsplan-Viewer**, der es ermöglicht, d
 - **Hintergrund-Isolate** für PDF-Textextraktion ohne UI-Blockierung
 - **Intelligentes Caching** mit weekday-basierter Dateibenennung
 - **Preloading-Mechanismus** für schnelle App-Starts
-- **Komprimierte Assets** für minimale App-Größe (nur noch 9MB!)
+- **ABI-Split APKs** für minimale App-Größe (~10MB pro Architektur)
+- **Komprimierte Assets** ohne Debug-Symbole für optimale Performance
 
 ## 🚀 Installation & Entwicklung
 
@@ -96,11 +97,11 @@ flutter run
 
 ### Build-Prozess
 ```bash
-# Standard Release Build
-flutter build appbundle --release --build-name=1.5.5 --build-number=18
+# Split APKs für optimale Größe (~10MB pro ABI)
+flutter build apk --release --split-per-abi
 
-# Optimierter Build mit Debug-Symbolen
-flutter build appbundle --release --build-name=1.5.5 --build-number=18 --split-debug-info=symbols --obfuscate
+# Installation auf verbundenem Gerät
+adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
 
 **🔧 Detaillierte Build-Anleitung**: Siehe [BUILD_NOTES.md](BUILD_NOTES.md) für vollständige Konfiguration und Troubleshooting.
@@ -128,7 +129,7 @@ Diese App richtet sich an:
 ## 🌟 Besonderheiten
 
 ### Warum diese App verwenden?
-- **Extrem kompakt**: Nur 9MB statt der ursprünglich 130MB
+- **Extrem kompakt**: Nur ~10MB pro Gerät statt der ursprünglich 130MB
 - **Offline-fähig**: Funktioniert auch ohne Internet
 - **Benutzerfreundlich**: Modernes Design mit Dark Mode
 - **Zuverlässig**: Direkte Verbindung zum offiziellen Schulserver
