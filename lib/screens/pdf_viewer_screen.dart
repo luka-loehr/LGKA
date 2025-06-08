@@ -75,16 +75,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         await tempFile.delete();
       }
 
-      if (result.status == ShareResultStatus.success) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('PDF erfolgreich geteilt'),
-              backgroundColor: AppColors.appBlueAccent,
-            ),
-          );
-        }
-      }
+      // No success message needed - users can see the sharing worked themselves
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
