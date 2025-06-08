@@ -206,7 +206,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const Spacer(),
                     Padding(
                       padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).padding.bottom > 0 
+                        bottom: MediaQuery.of(context).systemGestureInsets.bottom > 0 
                           ? 16.0  // Gesture navigation (white bar) - use original fixed padding
                           : 64.0,  // Button navigation (3 buttons) - use larger fixed padding (moved up 4px)
                       ),
