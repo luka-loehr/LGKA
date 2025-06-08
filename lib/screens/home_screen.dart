@@ -737,7 +737,7 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'PDFs in der App öffnen oder externe App verwenden',
+                                'PDFs einfach direkt in der App öffnen lassen',
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                   color: AppColors.secondaryText,
                                 ),
