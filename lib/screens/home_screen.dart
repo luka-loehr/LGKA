@@ -148,7 +148,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               _showAboutBottomSheet();
             },
             icon: const Icon(
-              Icons.info_outline,
+              Icons.privacy_tip_outlined,
               color: AppColors.secondaryText,
             ),
           ),
