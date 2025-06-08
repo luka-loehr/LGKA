@@ -577,7 +577,7 @@ class _AboutSheetContent extends StatelessWidget {
                       context,
                       Icons.description_outlined, 
                       'Lizenz', 
-                      'https://github.com/luka-loehr/LGKA/blob/master/LICENSE'
+                      'https://github.com/luka-loehr/LGKA/blob/main/LICENSE'
                     ),
                   ],
                 ),
