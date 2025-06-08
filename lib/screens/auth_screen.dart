@@ -151,20 +151,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       // Hide keyboard
       FocusScope.of(context).unfocus();
       
-      // Hold the green color briefly (600ms like error)
+      // Hold the green color briefly, then start loading while staying green
       await Future.delayed(const Duration(milliseconds: 600));
       
       if (!mounted) return;
       
-      // Start loading state
+      // Start loading state while keeping green color
       setState(() {
         _isLoading = true;
       });
       
-      // Smoothly animate back to blue while loading
-      _successColorController.reverse();
-      
-      // Continue loading for visual feedback
+      // Continue loading for visual feedback (button stays green)
       await Future.delayed(const Duration(milliseconds: 600));
       
       if (!mounted) return;
