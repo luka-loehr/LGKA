@@ -69,11 +69,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final file = await pdfRepo.getCachedPdfByDay(isToday);
 
     if (file != null && mounted) {
-      final dayName = isToday ? pdfRepo.todayWeekday : pdfRepo.tomorrowWeekday;
-      context.push(AppRouter.pdfViewer, extra: {
-        'file': file,
-        'dayName': dayName,
-      });
+      final preferencesManager = ref.read(preferencesManagerProvider);
+      
+      if (preferencesManager.useBuiltInPdfViewer) {
+        // Use built-in PDF viewer
+        final dayName = isToday ? pdfRepo.todayWeekday : pdfRepo.tomorrowWeekday;
+        context.push(AppRouter.pdfViewer, extra: {
+          'file': file,
+          'dayName': dayName,
+        });
+      } else {
+        // Use external PDF app via OpenFileX
+        try {
+          final result = await OpenFilex.open(file.path);
+          if (result.type != ResultType.done) {
+            // If external app failed, show error
+            setState(() => _error = 'PDF konnte nicht mit externer App geöffnet werden.');
+          }
+        } catch (e) {
+          setState(() => _error = 'Fehler beim Öffnen der PDF: ${e.toString()}');
+        }
+      }
       
       // Track plan opening and possibly trigger review
       final reviewService = ref.read(reviewServiceProvider);
@@ -677,6 +693,63 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                       value: preferencesManager.showDatesWithWeekdays,
                       onChanged: (value) async {
                         await preferencesManager.setShowDatesWithWeekdays(value);
+                        HapticService.subtle();
+                        setState(() {});
+                        
+                        // Benachrichtigung an den HomeScreen, dass sich die Einstellung geändert hat
+                        widget.onSettingsChanged();
+                      },
+                      activeColor: AppColors.appBlueAccent,
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // PDF Viewer Setting
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.appSurface,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Icon(
+                      Icons.picture_as_pdf_outlined,
+                      color: AppColors.appBlueAccent,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Integrierter PDF-Viewer',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.appBlueAccent,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'PDFs in der App öffnen oder externe App verwenden',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.secondaryText,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    Switch(
+                      value: preferencesManager.useBuiltInPdfViewer,
+                      onChanged: (value) async {
+                        await preferencesManager.setUseBuiltInPdfViewer(value);
                         HapticService.subtle();
                         setState(() {});
                         
