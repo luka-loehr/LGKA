@@ -140,8 +140,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         _showErrorFlash = false;
       });
       
-      // Start success animation immediately
-      _successColorController.forward(from: 0);
+      // Start success animation with smooth fade
+      _successColorController.forward();
       
       // Success with premium haptic feedback
       await HapticService.success();
