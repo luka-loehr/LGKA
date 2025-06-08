@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
+import 'package:lgka_flutter/providers/haptic_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends ConsumerWidget {
   const AboutScreen({super.key});
@@ -38,15 +40,15 @@ class AboutScreen extends ConsumerWidget {
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 24),
             Text(
-              'Die neue Vertretungsplan-App',
+              'Rechtliches',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.secondaryText,
-                    fontWeight: FontWeight.w500,
+                    color: AppColors.appOnSurface,
+                    fontWeight: FontWeight.w600,
                   ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -57,89 +59,91 @@ class AboutScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.school_outlined,
-                        color: AppColors.appOnSurface,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Lessing Gymnasium Karlsruhe',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: AppColors.appOnSurface,
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                    ],
+                  _buildLinkRow(
+                    context,
+                    Icons.shield_outlined, 
+                    'Datenschutzerklärung', 
+                    'https://luka-loehr.github.io/LGKA/privacy.html'
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    '✨ Kein langes Suchen mehr\n📱 Vertretungsplan direkt aufs Handy\n⚡ Immer up-to-date',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.secondaryText,
-                          height: 1.6,
-                        ),
+                  _buildLinkRow(
+                    context,
+                    Icons.description_outlined, 
+                    'Lizenz', 
+                    'https://github.com/luka-loehr/LGKA/blob/master/LICENSE'
                   ),
-                  if (todayPdfTimestamp.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: AppColors.calendarIconBackground
-                            .withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.update,
-                            color: AppColors.calendarIconBackground,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Update: $todayPdfTimestamp',
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.calendarIconBackground,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),
             const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Made by Luka 👋',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.secondaryText,
+            FutureBuilder<PackageInfo>(
+              future: PackageInfo.fromPlatform(),
+              builder: (context, snapshot) {
+                final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '© 2025 ',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.secondaryText.withOpacity(0.7),
+                      ),
+                    ),
+                    Text(
+                      'Luka Löhr',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.appBlueAccent,
                         fontWeight: FontWeight.w500,
                       ),
-                ),
-                FutureBuilder<PackageInfo>(
-                  future: PackageInfo.fromPlatform(),
-                  builder: (context, snapshot) {
-                    final version =
-                        snapshot.hasData ? snapshot.data!.version : '1.1';
-                    return Text(
-                      'v$version',
+                    ),
+                    Text(
+                      ' • v$version',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.secondaryText.withOpacity(0.7),
-                          ),
-                    );
-                  },
-                ),
-              ],
+                        color: AppColors.secondaryText.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _launchURL(String url) async {
+    try {
+      Uri uri = Uri.parse(url);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Could not launch URL: $e');
+    }
+  }
+  
+  Widget _buildLinkRow(BuildContext context, IconData icon, String text, String url) {
+    return InkWell(
+      onTap: () {
+        HapticService.subtle();
+        _launchURL(url);
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: AppColors.appBlueAccent,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              text,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.appBlueAccent,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
