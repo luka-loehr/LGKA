@@ -73,7 +73,7 @@ class AboutScreen extends ConsumerWidget {
               builder: (context, snapshot) {
                 final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
                 return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
                       '© 2025 ',

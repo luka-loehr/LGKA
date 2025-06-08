@@ -592,7 +592,7 @@ class _AboutSheetContent extends StatelessWidget {
                   const Divider(height: 1, color: Color(0xFF222222)),
                   const SizedBox(height: 16),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
                         '© 2025 ',
