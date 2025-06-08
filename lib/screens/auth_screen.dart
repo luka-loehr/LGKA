@@ -358,39 +358,45 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   
                   const SizedBox(height: 42),
                   
-                  // Login Button with smooth 350ms color fade
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 350),
-                    curve: Curves.easeInOut,
+                  // Login Button with 350ms smooth color transitions
+                  SizedBox(
                     width: double.infinity,
                     height: 50,
-                    child: ElevatedButton(
-                      onPressed: _canLogin && !_showErrorFlash ? _validateLogin : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _currentButtonColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: _canLogin && !_showErrorFlash ? 2 : 0,
-                        animationDuration: const Duration(milliseconds: 350),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.easeInOut,
+                      decoration: BoxDecoration(
+                        color: _currentButtonColor,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: _isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : Text(
-                            'Anmelden',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
+                      child: ElevatedButton(
+                        onPressed: _canLogin && !_showErrorFlash ? _validateLogin : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          foregroundColor: Colors.white,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
+                          elevation: 0,
+                        ),
+                        child: _isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : Text(
+                              'Anmelden',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                      ),
                     ),
                   ),
                   
