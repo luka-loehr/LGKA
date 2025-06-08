@@ -613,6 +613,12 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      color: AppColors.appBlueAccent,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -620,7 +626,7 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                           Text(
                             'Datum anzeigen',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.appOnSurface,
+                              color: AppColors.appBlueAccent,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
