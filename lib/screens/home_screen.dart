@@ -705,7 +705,7 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                 ),
               ),
               
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               
               // PDF Viewer Setting
               Container(
