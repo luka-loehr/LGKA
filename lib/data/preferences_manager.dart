@@ -10,6 +10,7 @@ class PreferencesManager {
   static const String _keyPlanOpenCount = 'plan_open_count';
   static const String _keyHasRequestedReview = 'has_requested_review';
   static const String _keyShowNavigationDebug = 'show_navigation_debug';
+  static const String _keyUseBuiltInPdfViewer = 'use_built_in_pdf_viewer';
 
   late final SharedPreferences _prefs;
 
@@ -51,6 +52,13 @@ class PreferencesManager {
 
   Future<void> setShowNavigationDebug(bool value) async {
     await _prefs.setBool(_keyShowNavigationDebug, value);
+  }
+  
+  // Use built-in PDF viewer (enabled by default)
+  bool get useBuiltInPdfViewer => _prefs.getBool(_keyUseBuiltInPdfViewer) ?? true;
+
+  Future<void> setUseBuiltInPdfViewer(bool value) async {
+    await _prefs.setBool(_keyUseBuiltInPdfViewer, value);
   }
   
   // Plan open count
