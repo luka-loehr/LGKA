@@ -283,7 +283,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           ),
                                         ),
                                         Text(
-                                          'Footer Padding: ${isButtonNavigation ? "36.0px" : "16.0px"}',
+                                          'Footer Padding: ${isButtonNavigation ? "32.0px" : "12.0px"}',
                                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                             color: AppColors.secondaryText,
                                           ),
@@ -319,8 +319,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Padding(
                       padding: EdgeInsets.only(
                         bottom: _isButtonNavigation(context)
-                          ? 36.0  // Button navigation (3 buttons) - 20px higher than gesture nav
-                          : 16.0,  // Gesture navigation (white bar) - use original fixed padding
+                          ? 32.0  // Button navigation (3 buttons) - 20px higher than gesture nav
+                          : 12.0,  // Gesture navigation (white bar) - closer to bottom
                       ),
                       child: FutureBuilder<PackageInfo>(
                         future: PackageInfo.fromPlatform(),
