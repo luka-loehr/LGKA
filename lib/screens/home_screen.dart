@@ -689,7 +689,7 @@ class _AboutSheetContent extends StatelessWidget {
             16, 
             16, 
             _isButtonNavigation(context)
-              ? 44.0  // Button navigation (3 buttons) - increased clearance
+              ? 54.0  // Button navigation (3 buttons) - 10px higher position
               : 8.0,   // Gesture navigation (white bar) - matches footer padding
           ),
           child: Column(
