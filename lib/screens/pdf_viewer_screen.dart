@@ -46,6 +46,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   }
 
   Future<void> _sharePdf() async {
+    // Subtle haptic feedback when share button is pressed
+    await HapticService.subtle();
+    
     try {
       // Create a nice filename for sharing
       String fileName;
