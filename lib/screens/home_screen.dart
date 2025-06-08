@@ -201,6 +201,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       ),
                     ],
+                    
+                    // Add footer with version and copyright at bottom of home screen
+                    const Spacer(),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: FutureBuilder<PackageInfo>(
+                        future: PackageInfo.fromPlatform(),
+                        builder: (context, snapshot) {
+                          final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '© 2025 ',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.secondaryText.withOpacity(0.5),
+                                ),
+                              ),
+                              Text(
+                                'Luka Löhr',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.appBlueAccent.withOpacity(0.7),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Text(
+                                ' • v$version',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.secondaryText.withOpacity(0.5),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -578,48 +614,7 @@ class _AboutSheetContent extends StatelessWidget {
           ),
         ),
         
-        // Footer - Entwickelt von + Version
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-          child: FutureBuilder<PackageInfo>(
-            future: PackageInfo.fromPlatform(),
-            builder: (context, snapshot) {
-              final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Divider(height: 1, color: Color(0xFF222222)),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        '© 2025 ',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.secondaryText.withOpacity(0.7),
-                        ),
-                      ),
-                      Text(
-                        'Luka Löhr',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.appBlueAccent,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        ' • v$version',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.secondaryText.withOpacity(0.7),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
+
       ],
     );
   }
