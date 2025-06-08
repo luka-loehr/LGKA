@@ -742,7 +742,7 @@ class _AboutSheetContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'LGKA+',
+                'Rechtliches',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: AppColors.appOnSurface,
                   fontWeight: FontWeight.bold,
