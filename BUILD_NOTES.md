@@ -23,58 +23,110 @@ Diese App steht unter der **Creative Commons BY-NC-ND 4.0 Lizenz**. Nur der ursp
 
 ---
 
-## 🎯 Optimized for Small Size
+## 🎯 Optimiert für minimale Größe
 
-This Flutter app is automatically configured to produce small APKs perfect for school devices with limited storage.
+Diese Flutter-App ist automatisch konfiguriert, um kleine APKs zu erstellen, die perfekt für Schulgeräte mit begrenztem Speicherplatz geeignet sind.
 
-### ✅ **Automatic Optimizations Active:**
-- **Icon Tree-Shaking**: 99%+ font size reduction
-- **R8 Full Mode**: Aggressive code optimization
-- **Resource Shrinking**: Removes unused resources
-- **ProGuard Rules**: Dead code elimination
-- **No Debug Symbols**: Excluded from production builds
+### ✅ **Aktive automatische Optimierungen:**
+- **Icon Tree-Shaking**: 99%+ Schriftarten-Größenreduzierung
+- **R8 Full Mode**: Aggressive Code-Optimierung
+- **Resource Shrinking**: Entfernt ungenutzte Ressourcen
+- **ProGuard Rules**: Dead-Code-Eliminierung
+- **Keine Debug-Symbole**: Ausgeschlossen für kleinere Builds
 
 ### 📋 Build-Konfiguration
 
 Die App ist permanent optimiert durch:
-- **gradle.properties**: Universal optimizations (R8, tree-shaking, resource optimization)
-- **build.gradle.kts**: Standard Flutter configuration with size optimizations
-- **proguard-rules.pro**: Essential ProGuard rules for smaller builds
+- **gradle.properties**: Universelle Optimierungen (R8, Tree-Shaking, Ressourcen-Optimierung)
+- **build.gradle.kts**: Standard Flutter-Konfiguration mit Größen-Optimierungen
+- **proguard-rules.pro**: Essentielle ProGuard-Regeln für kleinere Builds
 - **Keine Debug-Symbole**: Automatisch ausgeschlossen für kleinere Builds
 
-**Ergebnis**: Jeder Standard-Flutter-Build ist automatisch für Schulgeräte optimiert! 🎉 
+**Ergebnis**: Jeder Standard-Flutter-Build ist automatisch für Schulgeräte optimiert! 🎉
 
-### 📱 **Standard Build Commands (Already Optimized):**
+### 📱 **Standard Build-Befehle (bereits optimiert):**
 
 ```bash
-# Small APKs for direct distribution (9-10MB each)
+# Split APKs für direkte Verteilung (~9MB pro ABI)
 flutter build apk --release --split-per-abi
 
-# App Bundle for Google Play Store (~45MB, optimized by Play Store)
-flutter build appbundle --release
+# Installation auf verbundenem Gerät (ARM64 Beispiel)
+adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 
-# For iOS (also optimized automatically)
-flutter build ios --release
+# Alle verfügbaren APKs anzeigen
+ls -la build/app/outputs/flutter-apk/
 ```
 
-### 📊 **Current Optimized Sizes:**
-- **ARM64 APK**: ~9.8MB (perfect for school phones)
-- **ARMv7 APK**: ~9.4MB (older school devices)
-- **App Bundle**: ~45MB (Play Store delivers ~10MB to users)
+### 📊 **Aktuelle optimierte Größen:**
+- **ARM64 APK**: ~9.9MB (perfekt für moderne Schulhandys)
+- **ARMv7 APK**: ~9.5MB (ältere Schulgeräte)
+- **x86_64 APK**: ~10.0MB (Emulatoren und x86-Geräte)
 
-### 🎒 **Perfect for School Kids:**
-- **No special commands needed** - standard Flutter builds are optimized
-- **Works for both Android and iOS** with same codebase
-- **Easy to maintain** - no platform-specific configurations
-- **Consistent small sizes** every time you build
+### 🔧 **Entwicklungsworkflow:**
 
-## Zukünftige Builds
+```bash
+# 1. Abhängigkeiten installieren
+flutter pub get
+
+# 2. Split APKs erstellen
+flutter build apk --release --split-per-abi
+
+# 3. Gerät-ABI prüfen
+adb shell getprop ro.product.cpu.abi
+
+# 4. Passende APK installieren
+adb install build/app/outputs/flutter-apk/app-[ABI]-release.apk
+```
+
+### 🎒 **Perfekt für Schulkinder:**
+- **Keine speziellen Befehle nötig** - Standard Flutter-Builds sind optimiert
+- **Funktioniert für Android und iOS** mit derselben Codebasis
+- **Einfach zu warten** - keine plattformspezifischen Konfigurationen
+- **Konsistent kleine Größen** bei jedem Build
+
+### 🚀 **Warum Split APKs statt App Bundles:**
+- **Direkte Installation**: Sofortige Installation via ADB ohne Play Store
+- **Kleinere Größe**: Nur die benötigte Architektur (~9MB statt ~45MB)
+- **Entwicklungsfreundlich**: Schnellere Builds und Tests
+- **Schulgeräte-optimiert**: Minimaler Speicherverbrauch
+
+## 📋 **Troubleshooting:**
+
+### Problem: APK zu groß
+```bash
+# Prüfe ob Split APKs verwendet werden
+flutter build apk --release --split-per-abi
+# Nicht: flutter build apk --release (erstellt Universal APK)
+```
+
+### Problem: Falsche ABI installiert
+```bash
+# Gerät-ABI prüfen
+adb shell getprop ro.product.cpu.abi
+# Passende APK wählen: arm64-v8a, armeabi-v7a, oder x86_64
+```
+
+### Problem: Installation fehlgeschlagen
+```bash
+# Alte Version deinstallieren
+adb uninstall com.lgka
+# Neue APK installieren
+adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+```
+
+## 🔮 **Zukünftige Builds**
 
 **Für offizielle Releases (nur Luka Löhr)**:
 ```bash
-# Standard optimized builds
-flutter build appbundle --release --build-name=X.Y.Z --build-number=N
-flutter build apk --release --split-per-abi --build-name=X.Y.Z --build-number=N
+# Split APKs für direkte Verteilung
+flutter build apk --release --split-per-abi
+
+# App Bundle für Play Store (falls benötigt)
+flutter build appbundle --release
 ```
 
-**Für Entwickler**: Lokale Builds mit denselben Befehlen möglich, aber nicht zur Veröffentlichung berechtigt. 
+**Für Entwickler**: Lokale Builds mit denselben Befehlen möglich, aber nicht zur Veröffentlichung berechtigt.
+
+---
+
+**Entwickelt mit ❤️ von Luka Löhr für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe** 
