@@ -74,6 +74,9 @@ dev_dependencies:
   
   # App Icon Generation
   flutter_launcher_icons: ^0.14.1
+  
+  # Configuration Management
+  yaml: ^3.1.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
