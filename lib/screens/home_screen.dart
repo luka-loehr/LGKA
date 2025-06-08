@@ -441,7 +441,7 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
     
     // Animation controller für das Ein-/Ausblenden des Datums
     _dateController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 300),
       vsync: this,
     );
     
