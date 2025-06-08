@@ -97,10 +97,10 @@ flutter run
 ### Build-Prozess
 ```bash
 # Standard Release Build
-flutter build appbundle --release --build-name=1.5.0 --build-number=15
+flutter build appbundle --release --build-name=1.5.5 --build-number=18
 
 # Optimierter Build mit Debug-Symbolen
-flutter build appbundle --release --build-name=1.5.0 --build-number=15 --split-debug-info=symbols --obfuscate
+flutter build appbundle --release --build-name=1.5.5 --build-number=18 --split-debug-info=symbols --obfuscate
 ```
 
 **🔧 Detaillierte Build-Anleitung**: Siehe [BUILD_NOTES.md](BUILD_NOTES.md) für vollständige Konfiguration und Troubleshooting.
@@ -143,7 +143,7 @@ Diese App richtet sich an:
 
 ## 🔧 Status & Entwicklung
 
-**Aktuelle Version**: 1.5.0 (Build 15)
+**Aktuelle Version**: 1.5.5 (Build 18)
 
 Diese App ist ein **reines Freizeitprojekt** und steht in keinerlei offiziellem Zusammenhang mit dem Lessing-Gymnasium Karlsruhe. Sie wurde von einem Schüler für Schüler entwickelt, um den Schulalltag zu vereinfachen.
 
