@@ -82,12 +82,12 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
               children: [
                 // Logo - direct image display
                 SizedBox(
-                  width: 120,
-                  height: 120,
+                  width: 160,
+                  height: 160,
                   child: Image.asset(
                     'assets/images/welcome/welcome-logo.png',
-                    width: 120,
-                    height: 120,
+                    width: 160,
+                    height: 160,
                     fit: BoxFit.contain,
                   ),
                 ),
