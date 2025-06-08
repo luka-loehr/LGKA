@@ -174,14 +174,67 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           final todayDate = pdfRepo.todayDate;
                           final tomorrowDate = pdfRepo.tomorrowDate;
 
-                          return _PlanOptions(
-                            todayWeekday: todayWeekday,
-                            tomorrowWeekday: tomorrowWeekday,
-                            todayDate: todayDate,
-                            tomorrowDate: tomorrowDate,
-                            showDates: showDates,
-                            onTodayClick: () => _openPdf(true),
-                            onTomorrowClick: () => _openPdf(false),
+                          return Column(
+                            children: [
+                              _PlanOptions(
+                                todayWeekday: todayWeekday,
+                                tomorrowWeekday: tomorrowWeekday,
+                                todayDate: todayDate,
+                                tomorrowDate: tomorrowDate,
+                                showDates: showDates,
+                                onTodayClick: () => _openPdf(true),
+                                onTomorrowClick: () => _openPdf(false),
+                              ),
+                              
+                              // Debug navigation mode detection
+                              const SizedBox(height: 16),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: AppColors.appSurface.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: AppColors.appBlueAccent.withOpacity(0.3),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Debug: Navigation Mode Detection',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppColors.appBlueAccent,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'systemGestureInsets.bottom: ${MediaQuery.of(context).systemGestureInsets.bottom}',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppColors.secondaryText,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Detected Mode: ${MediaQuery.of(context).systemGestureInsets.bottom > 0 ? "Gesture Navigation (white bar)" : "Button Navigation (3 buttons)"}',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: MediaQuery.of(context).systemGestureInsets.bottom > 0 
+                                          ? Colors.green 
+                                          : Colors.orange,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Footer Padding: ${MediaQuery.of(context).systemGestureInsets.bottom > 0 ? "16.0px" : "64.0px"}',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppColors.secondaryText,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),
