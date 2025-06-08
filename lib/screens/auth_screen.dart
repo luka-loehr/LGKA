@@ -26,6 +26,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   
   bool _isLoading = false;
   bool _showErrorFlash = false;
+  bool _showSuccessFlash = false;
   bool _shouldShowOffset = false;
   
   // Fixed animation values
@@ -37,11 +38,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   static const Color _activeBlueColor = AppColors.appBlueAccent; // Use centralized brand color
   static const Color _inactiveBlueColor = Color(0xFF1D3A80); // Darker blue instead of gray-blue
   static const Color _errorRedColor = Colors.red;
+  static const Color _successGreenColor = Colors.green;
   
   static const Duration _buttonColorTransitionDuration = Duration(milliseconds: 300);
   
   late AnimationController _buttonColorController;
   late Animation<Color?> _buttonColorAnimation;
+  late AnimationController _successColorController;
+  late Animation<Color?> _successColorAnimation;
 
   @override
   void initState() {
@@ -58,6 +62,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       end: _errorRedColor,
     ).animate(CurvedAnimation(
       parent: _buttonColorController,
+      curve: Curves.easeInOut,
+    ));
+
+    // Setup success color animation
+    _successColorController = AnimationController(
+      duration: _buttonAnimationDuration,
+      vsync: this,
+    );
+
+    _successColorAnimation = ColorTween(
+      begin: _activeBlueColor, // Blue
+      end: _successGreenColor, // Green
+    ).animate(CurvedAnimation(
+      parent: _successColorController,
       curve: Curves.easeInOut,
     ));
     
@@ -107,6 +125,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     _usernameFocusNode.dispose();
     _passwordFocusNode.dispose();
     _buttonColorController.dispose();
+    _successColorController.dispose();
     super.dispose();
   }
 
@@ -115,21 +134,38 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     final password = _passwordController.text.trim();
 
     if (username == "vertretungsplan" && password == "ephraim") {
+      // Show success flash immediately
+      setState(() {
+        _showSuccessFlash = true;
+        _showErrorFlash = false;
+      });
+      
+      // Start success animation immediately
+      _successColorController.forward(from: 0);
+      
       // Success with premium haptic feedback
       await HapticService.success();
       
       if (!mounted) return;
       
-      setState(() {
-        _isLoading = true;
-        _showErrorFlash = false;
-      });
-      
       // Hide keyboard
       FocusScope.of(context).unfocus();
       
-      // Extended loading for better visual feedback
-      await Future.delayed(const Duration(milliseconds: 1200));
+      // Hold the green color briefly (600ms like error)
+      await Future.delayed(const Duration(milliseconds: 600));
+      
+      if (!mounted) return;
+      
+      // Start loading state
+      setState(() {
+        _isLoading = true;
+      });
+      
+      // Smoothly animate back to blue while loading
+      _successColorController.reverse();
+      
+      // Continue loading for visual feedback
+      await Future.delayed(const Duration(milliseconds: 600));
       
       if (!mounted) return;
       
@@ -143,6 +179,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       
       // Small delay to let the haptic feedback register
       await Future.delayed(const Duration(milliseconds: 50));
+      
+      // Reset success flash state before navigation
+      setState(() {
+        _showSuccessFlash = false;
+      });
       
       // Trigger success callback or navigate
       if (widget.onLoginSuccess != null) {
@@ -186,6 +227,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   
   // Get the current button color based on state
   Color get _currentButtonColor {
+    if (_showSuccessFlash) {
+      return _successColorAnimation.value ?? _successGreenColor;
+    }
+    
     if (_showErrorFlash) {
       return _buttonColorAnimation.value ?? _errorRedColor;
     }
@@ -360,7 +405,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   
                   // Login Button with animated color
                   AnimatedBuilder(
-                    animation: _buttonColorAnimation,
+                    animation: Listenable.merge([_buttonColorAnimation, _successColorAnimation]),
                     builder: (context, child) {
                       return SizedBox(
                         width: double.infinity,
@@ -384,7 +429,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               width: double.infinity,
                               height: double.infinity,
                               child: InkWell(
-                                onTap: _canLogin && !_showErrorFlash ? _validateLogin : null,
+                                onTap: _canLogin && !_showErrorFlash && !_showSuccessFlash ? _validateLogin : null,
                                 borderRadius: BorderRadius.circular(12),
                                 splashColor: Colors.transparent,
                                 highlightColor: Colors.transparent,
