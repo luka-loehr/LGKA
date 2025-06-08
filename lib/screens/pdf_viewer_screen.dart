@@ -19,7 +19,7 @@ class PDFViewerScreen extends StatefulWidget {
 
 class _PDFViewerScreenState extends State<PDFViewerScreen> {
   late final PdfController _pdfController;
-  bool _isLoaded = false;
+  bool _hasTriggeredLoadedHaptic = false;
 
   @override
   void initState() {
@@ -28,21 +28,19 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       document: PdfDocument.openFile(widget.pdfFile.path),
     );
     
-    // Listen for PDF document loading completion
-    _pdfController.addListener(_onPdfControllerChanged);
-  }
-  
-  void _onPdfControllerChanged() {
-    if (!_isLoaded && _pdfController.pagesCount != null && _pdfController.pagesCount! > 0) {
-      _isLoaded = true;
-      // Medium vibration when PDF is fully loaded
-      HapticService.pdfLoading();
-    }
+    // Trigger haptic feedback after a short delay to indicate PDF is loaded
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted && !_hasTriggeredLoadedHaptic) {
+          _hasTriggeredLoadedHaptic = true;
+          HapticService.pdfLoading();
+        }
+      });
+    });
   }
   
   @override
   void dispose() {
-    _pdfController.removeListener(_onPdfControllerChanged);
     _pdfController.dispose();
     super.dispose();
   }
