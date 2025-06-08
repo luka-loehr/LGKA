@@ -47,8 +47,8 @@ class PreferencesManager {
     await _prefs.setBool(_keyShowDates, value);
   }
   
-  // Show navigation debug window (enabled by default)
-  bool get showNavigationDebug => _prefs.getBool(_keyShowNavigationDebug) ?? true;
+  // Show navigation debug window (disabled by default)
+  bool get showNavigationDebug => _prefs.getBool(_keyShowNavigationDebug) ?? false;
 
   Future<void> setShowNavigationDebug(bool value) async {
     await _prefs.setBool(_keyShowNavigationDebug, value);
