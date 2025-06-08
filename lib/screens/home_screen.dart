@@ -684,7 +684,14 @@ class _AboutSheetContent extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          padding: EdgeInsets.fromLTRB(
+            16, 
+            16, 
+            16, 
+            _isButtonNavigation(context)
+              ? 34.0  // Button navigation (3 buttons) - matches footer padding
+              : 8.0,   // Gesture navigation (white bar) - matches footer padding
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -729,7 +736,6 @@ class _AboutSheetContent extends StatelessWidget {
             ],
           ),
         ),
-        
 
       ],
     );
