@@ -358,8 +358,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   
                   const SizedBox(height: 42),
                   
-                  // Login Button matching welcome screen button exactly
-                  SizedBox(
+                  // Login Button with smooth 350ms color fade
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 350),
+                    curve: Curves.easeInOut,
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
@@ -371,6 +373,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: _canLogin && !_showErrorFlash ? 2 : 0,
+                        animationDuration: const Duration(milliseconds: 350),
                       ),
                       child: _isLoading
                         ? const SizedBox(
