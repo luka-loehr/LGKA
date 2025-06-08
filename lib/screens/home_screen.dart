@@ -543,17 +543,17 @@ class _AboutSheetContent extends StatelessWidget {
                 ),
               ),
               
-              const SizedBox(height: 4),
+              const SizedBox(height: 24),
               
               Text(
-                'Die neue Vertretungsplan-App',
+                'Rechtliches',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.secondaryText,
-                  fontWeight: FontWeight.w500,
+                  color: AppColors.appOnSurface,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               
               Container(
                 width: double.infinity,
@@ -565,16 +565,6 @@ class _AboutSheetContent extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Oha, krass dass du hier rein guckst!',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.secondaryText,
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    const Divider(height: 1, color: Color(0xFF2C2C2C)),
-                    const SizedBox(height: 16),
                     
                     _buildLinkRow(
                       context,
