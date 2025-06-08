@@ -581,7 +581,14 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
     return Wrap(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+          padding: EdgeInsets.fromLTRB(
+            16, 
+            16, 
+            16, 
+            _isButtonNavigation(context)
+              ? 54.0  // Button navigation (3 buttons) - 10px higher position
+              : 8.0,   // Gesture navigation (white bar) - matches footer padding
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -594,7 +601,7 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                 ),
               ),
               
-              const SizedBox(height: 20),
+              const SizedBox(height: 1),
               
               Container(
                 width: double.infinity,
