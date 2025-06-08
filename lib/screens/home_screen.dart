@@ -474,17 +474,41 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) {
+      onPanDown: (details) {
         setState(() => _isPressed = true);
         _scaleController.forward();
         HapticService.subtle(); // Add haptic feedback on press
       },
-      onTapUp: (_) {
+      onPanUpdate: (details) {
+        // Check if finger is still within button bounds
+        final RenderBox renderBox = context.findRenderObject() as RenderBox;
+        final localPosition = renderBox.globalToLocal(details.globalPosition);
+        final buttonRect = Offset.zero & renderBox.size;
+        
+        final isInside = buttonRect.contains(localPosition);
+        if (isInside && !_isPressed) {
+          setState(() => _isPressed = true);
+          _scaleController.forward();
+        } else if (!isInside && _isPressed) {
+          setState(() => _isPressed = false);
+          _scaleController.reverse();
+        }
+      },
+      onPanEnd: (details) {
+        if (_isPressed) {
+          // Only trigger click if finger was still on button when released
+          final RenderBox renderBox = context.findRenderObject() as RenderBox;
+          final localPosition = renderBox.globalToLocal(details.globalPosition);
+          final buttonRect = Offset.zero & renderBox.size;
+          
+          if (buttonRect.contains(localPosition)) {
+            widget.onClick();
+          }
+        }
         setState(() => _isPressed = false);
         _scaleController.reverse();
-        widget.onClick();
       },
-      onTapCancel: () {
+      onPanCancel: () {
         setState(() => _isPressed = false);
         _scaleController.reverse();
       },
