@@ -68,36 +68,6 @@ class AboutScreen extends ConsumerWidget {
               ),
             ),
             const Spacer(),
-            FutureBuilder<PackageInfo>(
-              future: PackageInfo.fromPlatform(),
-              builder: (context, snapshot) {
-                final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      '© 2025 ',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.secondaryText.withOpacity(0.7),
-                      ),
-                    ),
-                    Text(
-                      'Luka Löhr',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.appBlueAccent,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Text(
-                      ' • v$version',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.secondaryText.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
           ],
         ),
       ),
