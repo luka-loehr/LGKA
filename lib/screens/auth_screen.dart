@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../providers/app_providers.dart';
 import '../navigation/app_router.dart';
 import '../providers/haptic_service.dart';
+import '../theme/app_theme.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   final VoidCallback? onLoginSuccess;
@@ -33,7 +34,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   static const Duration _buttonAnimationDuration = Duration(milliseconds: 300);
   
   // Colors
-  static const Color _activeBlueColor = Color(0xFF3770D4);
+  static const Color _activeBlueColor = AppColors.appBlueAccent; // Use centralized brand color
   static const Color _inactiveBlueColor = Color(0xFF1D3A80); // Darker blue instead of gray-blue
   static const Color _errorRedColor = Colors.red;
   
