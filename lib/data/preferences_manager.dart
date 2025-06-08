@@ -9,6 +9,7 @@ class PreferencesManager {
   static const String _keyShowDates = 'show_dates_with_weekdays';
   static const String _keyPlanOpenCount = 'plan_open_count';
   static const String _keyHasRequestedReview = 'has_requested_review';
+  static const String _keyShowNavigationDebug = 'show_navigation_debug';
 
   late final SharedPreferences _prefs;
 
@@ -43,6 +44,13 @@ class PreferencesManager {
 
   Future<void> setShowDatesWithWeekdays(bool value) async {
     await _prefs.setBool(_keyShowDates, value);
+  }
+  
+  // Show navigation debug window (disabled by default)
+  bool get showNavigationDebug => _prefs.getBool(_keyShowNavigationDebug) ?? false;
+
+  Future<void> setShowNavigationDebug(bool value) async {
+    await _prefs.setBool(_keyShowNavigationDebug, value);
   }
   
   // Plan open count

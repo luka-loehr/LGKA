@@ -197,94 +197,96 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         onTomorrowClick: () => _openPdf(false),
                       ),
                       
-                      // Debug navigation mode detection
-                      const SizedBox(height: 16),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.appSurface.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.appBlueAccent.withOpacity(0.3),
-                            width: 1,
+                      // Debug navigation mode detection (only show if enabled in preferences)
+                      if (ref.watch(preferencesManagerProvider).showNavigationDebug) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.appSurface.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: AppColors.appBlueAccent.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Builder(
+                            builder: (context) {
+                              final mediaQuery = MediaQuery.of(context);
+                              final gestureInsets = mediaQuery.systemGestureInsets.bottom;
+                              final viewPadding = mediaQuery.viewPadding.bottom;
+                              final padding = mediaQuery.padding.bottom;
+                              
+                              // More robust detection logic that should work across devices
+                              // Primary: systemGestureInsets.bottom - button nav usually has higher values
+                              // Secondary: viewPadding.bottom - as additional indicator
+                              // Fallback: Use conservative approach if values are ambiguous
+                              bool isButtonNavigation;
+                              String detectionMethod;
+                              
+                              if (gestureInsets >= 45) {
+                                // Very likely button navigation
+                                isButtonNavigation = true;
+                                detectionMethod = "High gesture insets (≥45)";
+                              } else if (gestureInsets <= 25) {
+                                // Very likely gesture navigation
+                                isButtonNavigation = false;
+                                detectionMethod = "Low gesture insets (≤25)";
+                              } else {
+                                // Ambiguous range (26-44) - use viewPadding as secondary indicator
+                                isButtonNavigation = viewPadding > 50;
+                                detectionMethod = "Ambiguous range, using viewPadding";
+                              }
+                              
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Debug: Navigation Mode Detection',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.appBlueAccent,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'systemGestureInsets.bottom: $gestureInsets',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.secondaryText,
+                                    ),
+                                  ),
+                                  Text(
+                                    'viewPadding.bottom: $viewPadding',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.secondaryText,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Detection: $detectionMethod',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.secondaryText.withOpacity(0.7),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Detected Mode: ${isButtonNavigation ? "Button Navigation (3 buttons)" : "Gesture Navigation (white bar)"}',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: isButtonNavigation ? Colors.orange : Colors.green,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Footer Padding: ${isButtonNavigation ? "34.0px" : "8.0px"}',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.secondaryText,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                         ),
-                        child: Builder(
-                          builder: (context) {
-                            final mediaQuery = MediaQuery.of(context);
-                            final gestureInsets = mediaQuery.systemGestureInsets.bottom;
-                            final viewPadding = mediaQuery.viewPadding.bottom;
-                            final padding = mediaQuery.padding.bottom;
-                            
-                            // More robust detection logic that should work across devices
-                            // Primary: systemGestureInsets.bottom - button nav usually has higher values
-                            // Secondary: viewPadding.bottom - as additional indicator
-                            // Fallback: Use conservative approach if values are ambiguous
-                            bool isButtonNavigation;
-                            String detectionMethod;
-                            
-                            if (gestureInsets >= 45) {
-                              // Very likely button navigation
-                              isButtonNavigation = true;
-                              detectionMethod = "High gesture insets (≥45)";
-                            } else if (gestureInsets <= 25) {
-                              // Very likely gesture navigation
-                              isButtonNavigation = false;
-                              detectionMethod = "Low gesture insets (≤25)";
-                            } else {
-                              // Ambiguous range (26-44) - use viewPadding as secondary indicator
-                              isButtonNavigation = viewPadding > 50;
-                              detectionMethod = "Ambiguous range, using viewPadding";
-                            }
-                            
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Debug: Navigation Mode Detection',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.appBlueAccent,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'systemGestureInsets.bottom: $gestureInsets',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.secondaryText,
-                                  ),
-                                ),
-                                Text(
-                                  'viewPadding.bottom: $viewPadding',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.secondaryText,
-                                  ),
-                                ),
-                                Text(
-                                  'Detection: $detectionMethod',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.secondaryText.withOpacity(0.7),
-                                  ),
-                                ),
-                                Text(
-                                  'Detected Mode: ${isButtonNavigation ? "Button Navigation (3 buttons)" : "Gesture Navigation (white bar)"}',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: isButtonNavigation ? Colors.orange : Colors.green,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  'Footer Padding: ${isButtonNavigation ? "34.0px" : "8.0px"}',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.secondaryText,
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
+                      ],
                     ],
                   );
                 },
