@@ -205,7 +205,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     // Add footer with version and copyright at bottom of home screen
                     const Spacer(),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).padding.bottom + 16.0,
+                      ),
                       child: FutureBuilder<PackageInfo>(
                         future: PackageInfo.fromPlatform(),
                         builder: (context, snapshot) {
