@@ -481,13 +481,7 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
     return GestureDetector(
       onPanDown: (details) {
         setState(() => _isPressed = true);
-        // Always complete the forward animation
-        _scaleController.forward().then((_) {
-          // Small delay to ensure user sees the pressed state
-          if (_isPressed) {
-            Future.delayed(const Duration(milliseconds: 50));
-          }
-        });
+        _scaleController.forward();
         HapticService.subtle(); // Add haptic feedback on press
       },
       onPanUpdate: (details) {
@@ -506,8 +500,6 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
         }
       },
       onPanEnd: (details) {
-        bool shouldTriggerClick = false;
-        
         if (_isPressed) {
           // Only trigger click if finger was still on button when released
           final RenderBox renderBox = context.findRenderObject() as RenderBox;
@@ -515,25 +507,14 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
           final buttonRect = Offset.zero & renderBox.size;
           
           if (buttonRect.contains(localPosition)) {
-            shouldTriggerClick = true;
+            widget.onClick();
           }
         }
-        
         setState(() => _isPressed = false);
-        
-        // Always complete the reverse animation, then trigger click if needed
-        _scaleController.reverse().then((_) {
-          if (shouldTriggerClick) {
-            // Small delay to ensure user sees the release animation
-            Future.delayed(const Duration(milliseconds: 50), () {
-              widget.onClick();
-            });
-          }
-        });
+        _scaleController.reverse();
       },
       onPanCancel: () {
         setState(() => _isPressed = false);
-        // Always complete the reverse animation
         _scaleController.reverse();
       },
       child: AnimatedBuilder(
