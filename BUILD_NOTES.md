@@ -19,114 +19,137 @@
 
 Diese App steht unter der **Creative Commons BY-NC-ND 4.0 Lizenz**. Nur der ursprüngliche Entwickler (Luka Löhr) darf offizielle Releases erstellen und veröffentlichen.
 
-**Für offizielle App-Downloads**: Nutze die offiziellen Kanäle oder kontaktiere den Entwickler.
-
 ---
 
-## 🎯 Optimiert für minimale Größe
+## 🏗️ Build-Konfiguration
 
-Diese Flutter-App ist automatisch konfiguriert, um kleine APKs zu erstellen, die perfekt für Schulgeräte mit begrenztem Speicherplatz geeignet sind.
-
-### ✅ **Aktive automatische Optimierungen:**
-- **Icon Tree-Shaking**: 99%+ Schriftarten-Größenreduzierung
-- **R8 Full Mode**: Aggressive Code-Optimierung
+### Automatische Optimierungen
+- **R8 Full Mode**: Aktiviert in `gradle.properties`
 - **Resource Shrinking**: Entfernt ungenutzte Ressourcen
-- **ProGuard Rules**: Dead-Code-Eliminierung
-- **Keine Debug-Symbole**: Ausgeschlossen für kleinere Builds
+- **ProGuard**: Dead-Code-Eliminierung
+- **Icon Tree-Shaking**: 99%+ Schriftarten-Reduzierung
+- **Keine Debug-Symbole**: Für kleinere APK-Größen
 
-### 📋 Build-Konfiguration
+### Konfigurationsdateien
+- `android/gradle.properties`: R8, Tree-Shaking, Ressourcen-Optimierung
+- `android/app/build.gradle.kts`: Standard Flutter-Konfiguration
+- `android/app/proguard-rules.pro`: ProGuard-Regeln
 
-Die App ist permanent optimiert durch:
-- **gradle.properties**: Universelle Optimierungen (R8, Tree-Shaking, Ressourcen-Optimierung)
-- **build.gradle.kts**: Standard Flutter-Konfiguration mit Größen-Optimierungen
-- **proguard-rules.pro**: Essentielle ProGuard-Regeln für kleinere Builds
-- **Keine Debug-Symbole**: Automatisch ausgeschlossen für kleinere Builds
+## 📱 Production Builds (App Stores)
 
-**Ergebnis**: Jeder Standard-Flutter-Build ist automatisch für Schulgeräte optimiert! 🎉
-
-### 📱 **Standard Build-Befehle (bereits optimiert):**
-
+### Google Play Store
 ```bash
-# Split APKs für direkte Verteilung (~9MB pro ABI)
+flutter build appbundle --release
+```
+- **Output**: `build/app/outputs/bundle/release/app-release.aab`
+- **Größe**: ~45MB (Play Store optimiert auf ~9MB für Endnutzer)
+- **Verwendung**: Offizielle Releases im Google Play Store
+
+### Apple App Store
+```bash
+flutter build ios --release
+```
+- **Output**: iOS App für App Store Connect
+- **Verwendung**: Offizielle Releases im Apple App Store
+
+## 🔧 Development Builds (Testing)
+
+### Split APKs für lokales Testing
+```bash
 flutter build apk --release --split-per-abi
-
-# Installation auf verbundenem Gerät (ARM64 Beispiel)
-adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-
-# Alle verfügbaren APKs anzeigen
-ls -la build/app/outputs/flutter-apk/
 ```
 
-### 📊 **Aktuelle optimierte Größen:**
-- **ARM64 APK**: ~9.9MB (perfekt für moderne Schulhandys)
-- **ARMv7 APK**: ~9.5MB (ältere Schulgeräte)
-- **x86_64 APK**: ~10.0MB (Emulatoren und x86-Geräte)
+**Output-Dateien:**
+- `app-arm64-v8a-release.apk` (~9.9MB)
+- `app-armeabi-v7a-release.apk` (~9.5MB)  
+- `app-x86_64-release.apk` (~10.0MB)
 
-### 🔧 **Entwicklungsworkflow:**
+**Verwendung:**
+- Lokales Testing auf Entwicklungsgeräten
+- Debugging ohne App Store Upload
+- Schnelle Installation via ADB
 
+### Installation auf Testgerät
 ```bash
-# 1. Abhängigkeiten installieren
-flutter pub get
-
-# 2. Split APKs erstellen
-flutter build apk --release --split-per-abi
-
-# 3. Gerät-ABI prüfen
+# Gerät-ABI ermitteln
 adb shell getprop ro.product.cpu.abi
 
-# 4. Passende APK installieren
-adb install build/app/outputs/flutter-apk/app-[ABI]-release.apk
+# Passende APK installieren
+adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
 
-### 🎒 **Perfekt für Schulkinder:**
-- **Keine speziellen Befehle nötig** - Standard Flutter-Builds sind optimiert
-- **Funktioniert für Android und iOS** mit derselben Codebasis
-- **Einfach zu warten** - keine plattformspezifischen Konfigurationen
-- **Konsistent kleine Größen** bei jedem Build
+## 📊 Build-Größen
 
-### 🚀 **Warum Split APKs statt App Bundles:**
-- **Direkte Installation**: Sofortige Installation via ADB ohne Play Store
-- **Kleinere Größe**: Nur die benötigte Architektur (~9MB statt ~45MB)
-- **Entwicklungsfreundlich**: Schnellere Builds und Tests
-- **Schulgeräte-optimiert**: Minimaler Speicherverbrauch
+| Build-Typ | Größe | Verwendung |
+|-----------|-------|------------|
+| App Bundle | ~45MB | Google Play Store |
+| ARM64 APK | ~9.9MB | Development/Testing |
+| ARMv7 APK | ~9.5MB | Development/Testing |
+| x86_64 APK | ~10.0MB | Emulator/Testing |
 
-## 📋 **Troubleshooting:**
+## 🚀 Release-Workflow
 
-### Problem: APK zu groß
+### 1. Development Testing
 ```bash
-# Prüfe ob Split APKs verwendet werden
+# Lokale Tests mit Split APKs
 flutter build apk --release --split-per-abi
-# Nicht: flutter build apk --release (erstellt Universal APK)
+adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
 
-### Problem: Falsche ABI installiert
+### 2. Production Release
+```bash
+# Google Play Store
+flutter build appbundle --release
+
+# Apple App Store  
+flutter build ios --release
+```
+
+### 3. Version Management
+```bash
+# Mit spezifischer Version (nur für offizielle Releases)
+flutter build appbundle --release --build-name=1.5.5 --build-number=18
+```
+
+## 🔍 Troubleshooting
+
+### APK Installation fehlgeschlagen
+```bash
+# Alte Version entfernen
+adb uninstall com.lgka
+
+# Neue Version installieren
+adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+```
+
+### Falsche ABI-Architektur
 ```bash
 # Gerät-ABI prüfen
 adb shell getprop ro.product.cpu.abi
-# Passende APK wählen: arm64-v8a, armeabi-v7a, oder x86_64
+
+# Verfügbare APKs anzeigen
+ls -la build/app/outputs/flutter-apk/
 ```
 
-### Problem: Installation fehlgeschlagen
+### Build-Größe zu groß
+- **Problem**: Universal APK statt Split APK erstellt
+- **Lösung**: `--split-per-abi` Flag verwenden
+- **Nicht verwenden**: `flutter build apk --release` (erstellt Universal APK ~30MB)
+
+## 📋 Entwicklungsumgebung
+
+### Voraussetzungen
+- Flutter SDK ≥ 3.8.0
+- Android SDK mit Build Tools
+- Xcode (für iOS Builds)
+
+### Setup
 ```bash
-# Alte Version deinstallieren
-adb uninstall com.lgka
-# Neue APK installieren
-adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+git clone https://github.com/luka-loehr/LGKA.git
+cd LGKA
+flutter pub get
 ```
-
-## 🔮 **Zukünftige Builds**
-
-**Für offizielle Releases (nur Luka Löhr)**:
-```bash
-# Split APKs für direkte Verteilung
-flutter build apk --release --split-per-abi
-
-# App Bundle für Play Store (falls benötigt)
-flutter build appbundle --release
-```
-
-**Für Entwickler**: Lokale Builds mit denselben Befehlen möglich, aber nicht zur Veröffentlichung berechtigt.
 
 ---
 
-**Entwickelt mit ❤️ von Luka Löhr für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe** 
+**Nur offizielle Releases durch Luka Löhr. Entwickler können lokale Builds für Lernzwecke erstellen.** 
