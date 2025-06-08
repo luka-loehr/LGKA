@@ -658,105 +658,107 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                   color: AppColors.appSurface,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
                   children: [
-                    Icon(
-                      Icons.calendar_today_outlined,
-                      color: AppColors.appBlueAccent,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Datum anzeigen',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.appBlueAccent,
-                              fontWeight: FontWeight.w500,
-                            ),
+                    // Date Setting
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          color: AppColors.appBlueAccent,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Datum anzeigen',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.appBlueAccent,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Zeigt das Datum nach dem Wochentag an',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.secondaryText,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Zeigt das Datum nach dem Wochentag an',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.secondaryText,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                        
+                        Switch(
+                          value: preferencesManager.showDatesWithWeekdays,
+                          onChanged: (value) async {
+                            await preferencesManager.setShowDatesWithWeekdays(value);
+                            HapticService.subtle();
+                            setState(() {});
+                            
+                            // Benachrichtigung an den HomeScreen, dass sich die Einstellung geändert hat
+                            widget.onSettingsChanged();
+                          },
+                          activeColor: AppColors.appBlueAccent,
+                        ),
+                      ],
                     ),
                     
-                    Switch(
-                      value: preferencesManager.showDatesWithWeekdays,
-                      onChanged: (value) async {
-                        await preferencesManager.setShowDatesWithWeekdays(value);
-                        HapticService.subtle();
-                        setState(() {});
-                        
-                        // Benachrichtigung an den HomeScreen, dass sich die Einstellung geändert hat
-                        widget.onSettingsChanged();
-                      },
-                      activeColor: AppColors.appBlueAccent,
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 12),
-              
-              // PDF Viewer Setting
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.appSurface,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Icon(
-                      Icons.picture_as_pdf_outlined,
-                      color: AppColors.appBlueAccent,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Integrierter PDF-Viewer',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.appBlueAccent,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'PDFs in der App öffnen oder externe App verwenden',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.secondaryText,
-                            ),
-                          ),
-                        ],
-                      ),
+                    // Divider
+                    Container(
+                      height: 1,
+                      margin: const EdgeInsets.symmetric(vertical: 16),
+                      color: Colors.white.withValues(alpha: 0.1),
                     ),
                     
-                    Switch(
-                      value: preferencesManager.useBuiltInPdfViewer,
-                      onChanged: (value) async {
-                        await preferencesManager.setUseBuiltInPdfViewer(value);
-                        HapticService.subtle();
-                        setState(() {});
+                    // PDF Viewer Setting
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Icon(
+                          Icons.picture_as_pdf_outlined,
+                          color: AppColors.appBlueAccent,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Integrierter PDF-Viewer',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.appBlueAccent,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'PDFs in der App öffnen oder externe App verwenden',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.secondaryText,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                         
-                        // Benachrichtigung an den HomeScreen, dass sich die Einstellung geändert hat
-                        widget.onSettingsChanged();
-                      },
-                      activeColor: AppColors.appBlueAccent,
+                        Switch(
+                          value: preferencesManager.useBuiltInPdfViewer,
+                          onChanged: (value) async {
+                            await preferencesManager.setUseBuiltInPdfViewer(value);
+                            HapticService.subtle();
+                            setState(() {});
+                            
+                            // Benachrichtigung an den HomeScreen, dass sich die Einstellung geändert hat
+                            widget.onSettingsChanged();
+                          },
+                          activeColor: AppColors.appBlueAccent,
+                        ),
+                      ],
                     ),
                   ],
                 ),
