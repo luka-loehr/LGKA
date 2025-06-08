@@ -41,14 +41,6 @@ class AboutScreen extends ConsumerWidget {
                   ),
             ),
             const SizedBox(height: 24),
-            Text(
-              'Rechtliches',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.appOnSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const SizedBox(height: 16),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
