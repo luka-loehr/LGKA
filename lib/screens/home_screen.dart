@@ -43,6 +43,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _openPdf(bool isToday) async {
+    // Medium vibration when opening PDF
+    await HapticService.pdfLoading();
+    
     final pdfRepo = ref.read(pdfRepositoryProvider);
     final file = await pdfRepo.getCachedPdfByDay(isToday);
 
@@ -339,7 +342,6 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
         setState(() => _isPressed = false);
         _scaleController.reverse();
         widget.onClick();
-        HapticService.weekdaySelect();
       },
       onTapCancel: () {
         setState(() => _isPressed = false);

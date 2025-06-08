@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
+import 'package:lgka_flutter/providers/haptic_service.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -18,6 +19,7 @@ class PDFViewerScreen extends StatefulWidget {
 
 class _PDFViewerScreenState extends State<PDFViewerScreen> {
   late final PdfController _pdfController;
+  bool _isLoaded = false;
 
   @override
   void initState() {
@@ -25,6 +27,24 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     _pdfController = PdfController(
       document: PdfDocument.openFile(widget.pdfFile.path),
     );
+    
+    // Listen for PDF document loading completion
+    _pdfController.addListener(_onPdfControllerChanged);
+  }
+  
+  void _onPdfControllerChanged() {
+    if (!_isLoaded && _pdfController.pagesCount != null && _pdfController.pagesCount! > 0) {
+      _isLoaded = true;
+      // Medium vibration when PDF is fully loaded
+      HapticService.pdfLoading();
+    }
+  }
+  
+  @override
+  void dispose() {
+    _pdfController.removeListener(_onPdfControllerChanged);
+    _pdfController.dispose();
+    super.dispose();
   }
 
   Future<void> _sharePdf() async {
