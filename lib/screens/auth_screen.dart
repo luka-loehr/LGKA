@@ -358,46 +358,61 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   
                   const SizedBox(height: 42),
                   
-                  // Login Button with 350ms smooth color transitions
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 350),
-                      curve: Curves.easeInOut,
-                      decoration: BoxDecoration(
-                        color: _currentButtonColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ElevatedButton(
-                        onPressed: _canLogin && !_showErrorFlash ? _validateLogin : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          foregroundColor: Colors.white,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : Text(
-                              'Anmelden',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                  // Login Button with animated color
+                  AnimatedBuilder(
+                    animation: _buttonColorAnimation,
+                    builder: (context, child) {
+                      return SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: Stack(
+                          children: [
+                            // Animated background button
+                            Positioned.fill(
+                              child: AnimatedContainer(
+                                duration: _buttonColorTransitionDuration,
+                                curve: Curves.easeInOut,
+                                decoration: BoxDecoration(
+                                  color: _currentButtonColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
                             ),
-                      ),
-                    ),
+                            
+                            // Clickable transparent button with always-white text
+                            SizedBox(
+                              width: double.infinity,
+                              height: double.infinity,
+                              child: InkWell(
+                                onTap: _canLogin && !_showErrorFlash ? _validateLogin : null,
+                                borderRadius: BorderRadius.circular(12),
+                                splashColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                child: Center(
+                                  child: _isLoading
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.5,
+                                          strokeCap: StrokeCap.round,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      )
+                                    : Text(
+                                        'Anmelden',
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                   
                   const Spacer(), // Flexible spacer at bottom
