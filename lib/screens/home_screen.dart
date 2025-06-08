@@ -427,10 +427,10 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
   void initState() {
     super.initState();
     _scaleController = AnimationController(
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.92).animate(
       CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
     );
     
@@ -477,6 +477,7 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
       onTapDown: (_) {
         setState(() => _isPressed = true);
         _scaleController.forward();
+        HapticService.subtle(); // Add haptic feedback on press
       },
       onTapUp: (_) {
         setState(() => _isPressed = false);
@@ -492,12 +493,24 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
         builder: (context, child) {
           return Transform.scale(
             scale: _isPressed ? _scaleAnimation.value : 1.0,
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               decoration: BoxDecoration(
-                color: AppColors.appSurface,
+                color: _isPressed 
+                    ? AppColors.appSurface.withOpacity(0.8)
+                    : AppColors.appSurface,
                 borderRadius: BorderRadius.circular(16),
+                boxShadow: _isPressed 
+                    ? []
+                    : [
+                        BoxShadow(
+                          color: AppColors.appBlueAccent.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
               ),
               child: Row(
                 children: [
