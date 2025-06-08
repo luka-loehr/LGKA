@@ -704,7 +704,7 @@ class _AboutSheetContent extends StatelessWidget {
                 ),
               ),
               
-              const SizedBox(height: 4),
+              const SizedBox(height: 1),
               
               Container(
                 width: double.infinity,
