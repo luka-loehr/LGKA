@@ -217,16 +217,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       ),
                                     ),
                                     Text(
-                                      'Detected Mode: ${MediaQuery.of(context).systemGestureInsets.bottom > 20 ? "Button Navigation (3 buttons)" : "Gesture Navigation (white bar)"}',
+                                      'Detected Mode: ${MediaQuery.of(context).systemGestureInsets.bottom > 40 ? "Button Navigation (3 buttons)" : "Gesture Navigation (white bar)"}',
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: MediaQuery.of(context).systemGestureInsets.bottom > 20 
+                                        color: MediaQuery.of(context).systemGestureInsets.bottom > 40 
                                           ? Colors.orange 
                                           : Colors.green,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                     Text(
-                                      'Footer Padding: ${MediaQuery.of(context).systemGestureInsets.bottom > 20 ? "64.0px" : "16.0px"}',
+                                      'Footer Padding: ${MediaQuery.of(context).systemGestureInsets.bottom > 40 ? "64.0px" : "16.0px"}',
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                         color: AppColors.secondaryText,
                                       ),
@@ -259,7 +259,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const Spacer(),
                     Padding(
                       padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).systemGestureInsets.bottom > 20 
+                        bottom: MediaQuery.of(context).systemGestureInsets.bottom > 40 
                           ? 64.0  // Button navigation (3 buttons) - use larger fixed padding (moved up 4px)
                           : 16.0,  // Gesture navigation (white bar) - use original fixed padding
                       ),
