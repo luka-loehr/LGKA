@@ -267,10 +267,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 160), // Spacer at top
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: constraints.maxHeight > 700 ? 160 : 80), // Responsive spacer at top
                   
                   // Title
                   const Text(
@@ -457,8 +464,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     },
                   ),
                   
-                  const Spacer(), // Flexible spacer at bottom
-                ],
+                          SizedBox(height: constraints.maxHeight > 700 ? 160 : 80), // Responsive spacer at bottom
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),

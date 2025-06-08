@@ -433,7 +433,7 @@ class _PlanOptionButton extends StatefulWidget {
 }
 
 class _PlanOptionButtonState extends State<_PlanOptionButton>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
   late AnimationController _dateController;
