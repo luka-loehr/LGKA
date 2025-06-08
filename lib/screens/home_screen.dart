@@ -428,10 +428,15 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
     super.initState();
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 150),
+      reverseDuration: const Duration(milliseconds: 300), // Slower reverse animation
       vsync: this,
     );
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.92).animate(
-      CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
+      CurvedAnimation(
+        parent: _scaleController, 
+        curve: Curves.easeInOut,
+        reverseCurve: Curves.easeOutBack, // Nice bounce back effect
+      ),
     );
     
     // Animation controller für das Ein-/Ausblenden des Datums
@@ -518,7 +523,7 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
           return Transform.scale(
             scale: _isPressed ? _scaleAnimation.value : 1.0,
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
+              duration: Duration(milliseconds: _isPressed ? 150 : 300), // Slower when releasing
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               decoration: BoxDecoration(
