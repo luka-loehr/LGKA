@@ -8,53 +8,34 @@ class VersionService {
   
   VersionService(this._preferencesManager);
   
-  /// Checks if the app was updated and determines if the AI upgrade screen should be shown
+  /// Checks if the AI upgrade screen should be shown for authenticated users opening v1.7.0 for the first time
   /// Returns true if the AI upgrade screen should be displayed
   Future<bool> shouldShowAiUpgradePrompt() async {
     try {
       final packageInfo = await PackageInfo.fromPlatform();
       final currentVersion = packageInfo.version;
-      final lastVersion = _preferencesManager.lastAppVersion;
+      final isAuthenticated = _preferencesManager.isAuthenticated;
+      final isFirstLaunch = _preferencesManager.isFirstLaunch;
       final isUsingAiVersion = _preferencesManager.useAiVersion;
       final promptAlreadyShown = _preferencesManager.aiUpgradePromptShown;
       
-      // If prompt was already shown, don't show it again
-      if (promptAlreadyShown) {
+      // Simple logic: Show AI upgrade prompt if:
+      // 1. This is v1.7.0
+      // 2. User is authenticated (has used the app before)
+      // 3. Not a first launch (they've been through onboarding)
+      // 4. Not already using AI version
+      // 5. Haven't shown the prompt before
+      return currentVersion == '1.7.0' && 
+             isAuthenticated && 
+             !isFirstLaunch && 
+             !isUsingAiVersion && 
+             !promptAlreadyShown;
+      
+          } catch (e) {
+        // In case of any error, don't show the prompt
         return false;
       }
-      
-      // Update the stored version for future checks
-      await _preferencesManager.setLastAppVersion(currentVersion);
-      
-      // If no previous version stored, this is first install - don't show prompt
-      if (lastVersion == null) {
-        return false;
-      }
-      
-      // If user is already using AI version, don't show prompt
-      if (isUsingAiVersion) {
-        return false;
-      }
-      
-      // Check if updating from 1.6.0 to 1.7.0
-      final isUpdatingFrom160 = lastVersion == '1.6.0';
-      final isUpdatingTo170 = currentVersion == '1.7.0';
-      
-      return isUpdatingFrom160 && isUpdatingTo170;
-      
-    } catch (e) {
-      // In case of any error, don't show the prompt
-      return false;
-    }
   }
   
-  /// Updates the stored app version to the current version
-  Future<void> updateStoredVersion() async {
-    try {
-      final packageInfo = await PackageInfo.fromPlatform();
-      await _preferencesManager.setLastAppVersion(packageInfo.version);
-    } catch (e) {
-      // Silent failure - not critical
-    }
-  }
+
 } 

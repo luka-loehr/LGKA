@@ -13,8 +13,7 @@ class PreferencesManager {
   static const String _keyUseBuiltInPdfViewer = 'use_built_in_pdf_viewer';
   static const String _keyUserClass = 'user_class';
   static const String _keyUseAiVersion = 'use_ai_version';
-  static const String _keyLastAppVersion = 'last_app_version';
-  static const String _keyAiUpgradePromptShown = 'ai_upgrade_prompt_shown';
+  static const String _keyAiUpgradePromptShown = 'ai_upgrade_prompt_shown_170';
 
   late final SharedPreferences _prefs;
 
@@ -98,14 +97,7 @@ class PreferencesManager {
     await _prefs.setBool(_keyUseAiVersion, value);
   }
 
-  // Last app version for update detection
-  String? get lastAppVersion => _prefs.getString(_keyLastAppVersion);
-  
-  Future<void> setLastAppVersion(String version) async {
-    await _prefs.setString(_keyLastAppVersion, version);
-  }
-
-  // AI upgrade prompt shown flag
+  // AI upgrade prompt shown flag for v1.7.0
   bool get aiUpgradePromptShown => _prefs.getBool(_keyAiUpgradePromptShown) ?? false;
   
   Future<void> setAiUpgradePromptShown(bool value) async {
