@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
 import '../providers/haptic_service.dart';
@@ -154,12 +155,56 @@ class _AiHomeScreenState extends ConsumerState<AiHomeScreen>
             return _EmptyState(day: day);
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: substitutions.length,
-            itemBuilder: (context, index) {
-              return _SubstitutionCard(substitution: substitutions[index]);
-            },
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: substitutions.length,
+                  itemBuilder: (context, index) {
+                    return _SubstitutionCard(substitution: substitutions[index]);
+                  },
+                ),
+              ),
+              // Footer with version and copyright at bottom
+              Padding(
+                padding: EdgeInsets.only(
+                  bottom: _isButtonNavigation(context)
+                    ? 34.0  // Button navigation (3 buttons) - 26px higher than gesture nav
+                    : 8.0,   // Gesture navigation (white bar) - perfect position
+                ),
+                child: FutureBuilder<PackageInfo>(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snapshot) {
+                    final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '© 2025 ',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.secondaryText.withOpacity(0.5),
+                          ),
+                        ),
+                        Text(
+                          'Luka Löhr',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.appBlueAccent.withOpacity(0.7),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          ' • v$version',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.secondaryText.withOpacity(0.5),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         }).toList(),
       ),
@@ -323,33 +368,77 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.check_circle_outline,
-            size: 64,
-            color: Colors.green.withOpacity(0.5),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Keine Vertretungen',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryText,
+    return Column(
+      children: [
+        Expanded(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.check_circle_outline,
+                  size: 64,
+                  color: Colors.green.withOpacity(0.5),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Keine Vertretungen',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryText,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Für $day sind keine Vertretungen für deine Klasse eingetragen.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.secondaryText,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Für $day sind keine Vertretungen für deine Klasse eingetragen.',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.secondaryText,
-            ),
+        ),
+        // Footer with version and copyright at bottom
+        Padding(
+          padding: EdgeInsets.only(
+            bottom: _isButtonNavigation(context)
+              ? 34.0  // Button navigation (3 buttons) - 26px higher than gesture nav
+              : 8.0,   // Gesture navigation (white bar) - perfect position
           ),
-        ],
-      ),
+          child: FutureBuilder<PackageInfo>(
+            future: PackageInfo.fromPlatform(),
+            builder: (context, snapshot) {
+              final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '© 2025 ',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.secondaryText.withOpacity(0.5),
+                    ),
+                  ),
+                  Text(
+                    'Luka Löhr',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.appBlueAccent.withOpacity(0.7),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    ' • v$version',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.secondaryText.withOpacity(0.5),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
