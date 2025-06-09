@@ -123,38 +123,52 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-            child: Column(
-              children: [
-                // Hero section with icon and title
-                SlideTransition(
-                  position: _heroSlideAnimation,
-                  child: FadeTransition(
-                    opacity: _heroFadeAnimation,
-                    child: _buildHeroSection(context),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                      child: Column(
+                        children: [
+                          // Hero section with icon and title
+                          SlideTransition(
+                            position: _heroSlideAnimation,
+                            child: FadeTransition(
+                              opacity: _heroFadeAnimation,
+                              child: _buildHeroSection(context),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Features section
+                          FadeTransition(
+                            opacity: _featuresAnimation,
+                            child: _buildFeaturesSection(),
+                          ),
+
+                          const Spacer(),
+
+                          // Action buttons
+                          ScaleTransition(
+                            scale: _buttonsAnimation,
+                            child: _buildActionButtons(context),
+                          ),
+                          
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-
-                const SizedBox(height: 32),
-
-                // Features section
-                Expanded(
-                  child: FadeTransition(
-                    opacity: _featuresAnimation,
-                    child: _buildFeaturesSection(),
-                  ),
-                ),
-
-                // Action buttons
-                ScaleTransition(
-                  scale: _buttonsAnimation,
-                  child: _buildActionButtons(context),
-                ),
-                
-                const SizedBox(height: 20),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
@@ -164,7 +178,7 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
   Widget _buildHeroSection(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(32.0),
+      padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -174,12 +188,12 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
             AppColors.appSurface.withOpacity(0.9),
           ],
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: AppColors.appBlueAccent.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -187,8 +201,8 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
         children: [
           // Animated AI icon with glow effect
           Container(
-            width: 100,
-            height: 100,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -196,23 +210,23 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
                   AppColors.appBlueAccent.withOpacity(0.8),
                 ],
               ),
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.appBlueAccent.withOpacity(0.3),
-                  blurRadius: 20,
-                  spreadRadius: 4,
+                  blurRadius: 15,
+                  spreadRadius: 2,
                 ),
               ],
             ),
             child: const Icon(
               Icons.psychology_rounded,
-              size: 50,
+              size: 40,
               color: Colors.white,
             ),
           ),
           
-          const SizedBox(height: 28),
+          const SizedBox(height: 20),
           
           // Title with better typography
           Text(
@@ -220,20 +234,20 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               color: AppColors.primaryText,
               fontWeight: FontWeight.bold,
-              fontSize: 28,
+              fontSize: 24,
             ),
             textAlign: TextAlign.center,
           ),
           
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           
           // Subtitle with improved styling
           Text(
             'Intelligente Aufbereitung der Vertretungspläne\nspeziell für deine Klasse',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               color: AppColors.secondaryText,
-              height: 1.6,
-              fontSize: 16,
+              height: 1.5,
+              fontSize: 14,
             ),
             textAlign: TextAlign.center,
           ),
@@ -251,14 +265,14 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
           description: 'Nur Vertretungen für deine Klasse werden angezeigt',
           delay: 0,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         _buildFeature(
           icon: Icons.dashboard_customize_rounded,
           title: 'Übersichtliche Darstellung',
           description: 'Strukturierte Karten statt unübersichtlicher PDF-Listen',
           delay: 100,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         _buildFeature(
           icon: Icons.refresh_rounded,
           title: 'Automatische Updates',
@@ -280,15 +294,15 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
       builder: (context, child) {
         final animationValue = (_featuresAnimation.value - (delay / 1000)).clamp(0.0, 1.0);
         return Transform.translate(
-          offset: Offset(0, 30 * (1 - animationValue)),
+          offset: Offset(0, 20 * (1 - animationValue)),
           child: Opacity(
             opacity: animationValue,
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(20.0),
               decoration: BoxDecoration(
                 color: AppColors.appSurface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: AppColors.appBlueAccent.withOpacity(0.1),
                   width: 1,
@@ -296,16 +310,16 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
               child: Row(
                 children: [
                   Container(
-                    width: 56,
-                    height: 56,
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -313,15 +327,15 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
                           AppColors.appBlueAccent.withOpacity(0.1),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: Icon(
                       icon,
-                      size: 28,
+                      size: 24,
                       color: AppColors.appBlueAccent,
                     ),
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,16 +345,16 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: AppColors.primaryText,
                             fontWeight: FontWeight.bold,
-                            fontSize: 17,
+                            fontSize: 16,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
                         Text(
                           description,
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: AppColors.secondaryText,
-                            height: 1.5,
-                            fontSize: 14,
+                            height: 1.4,
+                            fontSize: 13,
                           ),
                         ),
                       ],
@@ -361,7 +375,7 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
         // Primary button with gradient
         Container(
           width: double.infinity,
-          height: 56,
+          height: 52,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -369,12 +383,12 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
                 AppColors.appBlueAccent.withOpacity(0.8),
               ],
             ),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
                 color: AppColors.appBlueAccent.withOpacity(0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -398,7 +412,7 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(14),
               ),
             ),
             child: Row(
@@ -407,15 +421,15 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
                 const Icon(
                   Icons.psychology_rounded,
                   color: Colors.white,
-                  size: 24,
+                  size: 20,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Text(
                   'KI-Version aktivieren',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 15,
                   ),
                 ),
               ],
@@ -423,12 +437,12 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
           ),
         ),
         
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         
         // Secondary button
         SizedBox(
           width: double.infinity,
-          height: 56,
+          height: 52,
           child: OutlinedButton(
             onPressed: () {
               HapticService.subtle();
@@ -445,7 +459,7 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
                 width: 1.5,
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(14),
               ),
             ),
             child: Text(
@@ -453,7 +467,7 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: AppColors.secondaryText,
                 fontWeight: FontWeight.w600,
-                fontSize: 16,
+                fontSize: 15,
               ),
             ),
           ),
