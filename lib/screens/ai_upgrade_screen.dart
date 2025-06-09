@@ -1,4 +1,5 @@
-import 'dart:ui';
+// Copyright Luka Löhr 2025
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,29 +17,10 @@ class AiUpgradeScreen extends ConsumerStatefulWidget {
   ConsumerState<AiUpgradeScreen> createState() => _AiUpgradeScreenState();
 }
 
-class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-
+class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
   @override
   void initState() {
     super.initState();
-    
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
-    
-    _controller.forward();
-    
     // Mark the prompt as shown
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final preferencesManager = ref.read(preferencesManagerProvider);
@@ -47,236 +29,239 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> with SingleTi
   }
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21),
-      body: Stack(
-        children: [
-          // Subtle gradient background
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0xFF0A0E21),
-                  const Color(0xFF0A0E21).withOpacity(0.95),
-                  const Color(0xFF1A1F36),
+      backgroundColor: AppColors.appBackground,
+      appBar: AppBar(
+        title: Text(
+          'KI-Funktionen',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.primaryText,
+          ),
+        ),
+        backgroundColor: AppColors.appBackground,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            HapticService.subtle();
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.pushReplacement(AppRouter.home);
+            }
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: AppColors.secondaryText,
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Hero section with icon
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24.0),
+              decoration: BoxDecoration(
+                color: AppColors.appSurface,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: AppColors.appBlueAccent.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Icon(
+                      Icons.psychology_outlined,
+                      size: 40,
+                      color: AppColors.appBlueAccent,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'KI-Version verfügbar',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: AppColors.primaryText,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Intelligente Aufbereitung der Vertretungspläne speziell für deine Klasse',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: AppColors.secondaryText,
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               ),
             ),
-          ),
-          
-          // Content
-          SafeArea(
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 48.0),
-                child: Column(
-                  children: [
-                    const Spacer(flex: 1),
-                    
-                    // Minimalistic icon
-                    Container(
-                      width: 88,
-                      height: 88,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
-                          width: 1,
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(44),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.05),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.auto_awesome,
-                              size: 36,
-                              color: Colors.white.withOpacity(0.9),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 48),
-                    
-                    // Clean title
-                    Text(
-                      'KI-Version verfügbar',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w300,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Subtle description
-                    Text(
-                      'Intelligente Filterung\nfür deine Klasse',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withOpacity(0.6),
-                        height: 1.6,
-                        fontWeight: FontWeight.w300,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    
-                    const SizedBox(height: 64),
-                    
-                    // Minimal feature list
-                    Column(
-                      children: [
-                        _buildFeature('Automatische Filterung'),
-                        const SizedBox(height: 24),
-                        _buildFeature('Klare Darstellung'),
-                        const SizedBox(height: 24),
-                        _buildFeature('Echtzeit-Updates'),
-                      ],
-                    ),
-                    
-                    const Spacer(flex: 2),
-                    
-                    // Primary button - glassmorphic
-                    Container(
-                      width: double.infinity,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
-                          width: 1,
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                await HapticService.medium();
-                                
-                                final preferencesManager = ref.read(preferencesManagerProvider);
-                                await preferencesManager.setUseAiVersion(true);
-                                ref.read(useAiVersionProvider.notifier).state = true;
-                                
-                                if (!mounted) return;
-                                
-                                if (preferencesManager.userClass == null) {
-                                  context.pushReplacement(AppRouter.classSelector);
-                                } else {
-                                  context.pushReplacement(AppRouter.home);
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                elevation: 0,
-                              ),
-                              child: Text(
-                                'KI aktivieren',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w400,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Secondary button - minimal
-                    TextButton(
-                      onPressed: () {
-                        HapticService.subtle();
-                        if (context.canPop()) {
-                          context.pop();
-                        } else {
-                          context.pushReplacement(AppRouter.home);
-                        }
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                      ),
-                      child: Text(
-                        'Später',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.white.withOpacity(0.4),
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 24),
-                  ],
-                ),
+
+            const SizedBox(height: 24),
+
+            // Features
+            Expanded(
+              child: Column(
+                children: [
+                  _buildFeature(
+                    icon: Icons.filter_list_outlined,
+                    title: 'Intelligente Filterung',
+                    description: 'Nur Vertretungen für deine Klasse werden angezeigt',
+                  ),
+                  const SizedBox(height: 16),
+                  _buildFeature(
+                    icon: Icons.view_list_outlined,
+                    title: 'Übersichtliche Darstellung',
+                    description: 'Strukturierte Karten statt unübersichtlicher PDF-Listen',
+                  ),
+                  const SizedBox(height: 16),
+                  _buildFeature(
+                    icon: Icons.update_outlined,
+                    title: 'Automatische Updates',
+                    description: 'Alle 5 Minuten wird nach neuen Vertretungen gesucht',
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+
+            // Action buttons
+            Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await HapticService.medium();
+                      
+                      final preferencesManager = ref.read(preferencesManagerProvider);
+                      await preferencesManager.setUseAiVersion(true);
+                      ref.read(useAiVersionProvider.notifier).state = true;
+                      
+                      if (!mounted) return;
+                      
+                      if (preferencesManager.userClass == null) {
+                        context.pushReplacement(AppRouter.classSelector);
+                      } else {
+                        context.pushReplacement(AppRouter.home);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.appBlueAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'KI-Version aktivieren',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      HapticService.subtle();
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.pushReplacement(AppRouter.home);
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.secondaryText,
+                      side: const BorderSide(color: AppColors.iconTint),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Vielleicht später',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: AppColors.secondaryText,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildFeature(String text) {
+  Widget _buildFeature({
+    required IconData icon,
+    required String title,
+    required String description,
+  }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.08),
-          width: 1,
-        ),
+        color: AppColors.appSurface,
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 4,
-            height: 4,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.6),
-              shape: BoxShape.circle,
+              color: AppColors.appBlueAccent.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              size: 24,
+              color: AppColors.appBlueAccent,
             ),
           ),
-          const SizedBox(width: 12),
-          Text(
-            text,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Colors.white.withOpacity(0.7),
-              fontWeight: FontWeight.w300,
-              letterSpacing: 0.3,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: AppColors.primaryText,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.secondaryText,
+                    height: 1.4,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
-} 
+}
