@@ -345,7 +345,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: FutureBuilder<PackageInfo>(
                 future: PackageInfo.fromPlatform(),
                 builder: (context, snapshot) {
-                  final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
+                  final version = snapshot.hasData ? snapshot.data!.version : '1.6.0';
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

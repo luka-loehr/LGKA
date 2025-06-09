@@ -176,7 +176,7 @@ class _AiHomeScreenState extends ConsumerState<AiHomeScreen>
                 child: FutureBuilder<PackageInfo>(
                   future: PackageInfo.fromPlatform(),
                   builder: (context, snapshot) {
-                    final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
+                    final version = snapshot.hasData ? snapshot.data!.version : '1.6.0';
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -410,7 +410,7 @@ class _EmptyState extends StatelessWidget {
           child: FutureBuilder<PackageInfo>(
             future: PackageInfo.fromPlatform(),
             builder: (context, snapshot) {
-              final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
+              final version = snapshot.hasData ? snapshot.data!.version : '1.6.0';
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
