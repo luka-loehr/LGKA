@@ -117,6 +117,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  void _showAiUpgradeScreen() {
+    context.push(AppRouter.aiUpgrade);
+  }
+
   void _showAboutBottomSheet() {
     final pdfRepo = ref.read(pdfRepositoryProvider);
     showModalBottomSheet(
@@ -158,6 +162,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         backgroundColor: AppColors.appBackground,
         elevation: 0,
         actions: [
+          IconButton(
+            onPressed: () {
+              HapticService.subtle();
+              _showAiUpgradeScreen();
+            },
+            icon: const Icon(
+              Icons.psychology_outlined, // Brain icon for AI
+              color: AppColors.appBlueAccent,
+            ),
+          ),
           IconButton(
             onPressed: () {
               HapticService.subtle();

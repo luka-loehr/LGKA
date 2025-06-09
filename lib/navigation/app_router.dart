@@ -11,6 +11,7 @@ import '../screens/pdf_viewer_screen.dart';
 import '../screens/class_selector_screen.dart';
 import '../screens/class_confirmation_screen.dart';
 import '../screens/app_choice_screen.dart';
+import '../screens/ai_upgrade_screen.dart';
 import 'dart:io';
 
 class AppRouter {
@@ -23,6 +24,7 @@ class AppRouter {
   static const String pdfViewer = '/pdf-viewer';
   static const String settings = '/settings';
   static const String about = '/about';
+  static const String aiUpgrade = '/ai-upgrade';
 
   static GoRouter createRouter({required String initialLocation}) {
     return GoRouter(
@@ -72,6 +74,10 @@ class AppRouter {
         GoRoute(
           path: appChoice,
           builder: (context, state) => const AppChoiceScreen(),
+        ),
+        GoRoute(
+          path: aiUpgrade,
+          builder: (context, state) => const AiUpgradeScreen(),
         ),
       ],
     );
