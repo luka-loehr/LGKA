@@ -60,33 +60,33 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.appBackground,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.appBackground,
-              AppColors.appBackground.withOpacity(0.8),
-              AppColors.appBlueAccent.withOpacity(0.05),
-            ],
-            stops: const [0.0, 0.7, 1.0],
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                AppColors.appBackground,
+                AppColors.appBackground.withOpacity(0.8),
+                AppColors.appBlueAccent.withOpacity(0.05),
+              ],
+              stops: const [0.0, 0.7, 1.0],
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
-                  child: IntrinsicHeight(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
+          child: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
                         child: Column(
                           children: [
                             // Hero section
@@ -108,9 +108,9 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
                       ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),
