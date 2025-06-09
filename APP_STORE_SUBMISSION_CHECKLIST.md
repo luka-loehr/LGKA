@@ -59,18 +59,32 @@
 
 #### App Description (German)
 ```
-LGKA - Digitaler Vertretungsplan
+LGKA-App – dein Vertretungsplan in Sekunden
+📱 Kein Bock auf PDFs oder verstaubte Schulwebsites? Same.
+Mit der LGKA-App checkst du in Sekundenschnelle, ob morgen vielleicht endlich mal wieder was ausfällt.
 
-Einfacher und schneller Zugriff auf den Vertretungsplan des Lessing Gymnasiums Karlsruhe.
+Einfach App öffnen – Plan sehen – Feierabend.
 
-Funktionen:
-• Vertretungsplan für heute und morgen
-• Automatisches Herunterladen und Caching
-• Offline-Zugriff auf heruntergeladene Pläne
-• Moderne, benutzerfreundliche Oberfläche
-• Unterstützt iPhone, iPad und Mac
+✅ Was die App kann
+📅 Vertretungsplan für heute & morgen – klar, lesbar, ohne Scroll-Marathon.
+🔐 Greift automatisch auf den Plan zu – kein Login für dich nötig.
+⚡️ Lädt den Plan direkt von der Schulwebsite – immer aktuell.
+🧠 Checkt automatisch das richtige Datum – kein manuelles Rumgeklicke.
+📂 Funktioniert offline – dank cleverem Cache auch ohne Internet.
+📄 Eingebauter PDF-Viewer ODER nutze deine Lieblings-App. Du entscheidest!
+🌙 Minimalistisches, schnelles Design – clean, wie's sich gehört.
+ℹ️ Zeigt dir sekundengenau, wann der Plan zuletzt aktualisiert wurde.
 
-Entwickelt speziell für Schüler, Lehrer und Eltern des Lessing Gymnasiums Karlsruhe.
+🎓 Perfekt für deinen Schulalltag
+In der Bahn, noch im Bett oder 3 Minuten vorm Gong:
+Die App ist ready, bevor du's bist. Die Pläne laden automatisch bei jedem Öffnen.
+
+Ideal, wenn du heimlich hoffst, dass die 8. Stunde spontan wegfällt. 😏
+
+👨‍💻 Von einem LGKA-Schüler. Für alle am LGKA.
+Mit ❤️ entwickelt, komplett werbefrei und 100 % datenschutzkonform.
+Kein Konto, keine Tracker, kein Bullshit.
+Nur du und dein Plan.
 ```
 
 #### Keywords (German)
@@ -178,4 +192,4 @@ Vertretungsplan,Schule,Lessing Gymnasium,Karlsruhe,Stundenplan,Bildung,Schüler
 
 **🎯 Estimated Timeline**: 2-3 weeks from submission to App Store availability
 **💰 Total Cost**: $99/year (Apple Developer Program)
-**🏆 Success Rate**: Very high for educational apps like yours! 
+**🏆 Success Rate**: Very high for educational apps like yours!
