@@ -35,6 +35,8 @@ void main() async {
     ProviderScope(
       overrides: [
         preferencesManagerProvider.overrideWithValue(preferencesManager),
+        userClassProvider.overrideWith((ref) => preferencesManager.userClass),
+        useAiVersionProvider.overrideWith((ref) => preferencesManager.useAiVersion),
       ],
       child: LGKAApp(initialRoute: initialRoute),
     ),

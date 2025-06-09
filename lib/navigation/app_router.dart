@@ -8,9 +8,16 @@ import '../screens/home_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/about_screen.dart';
 import '../screens/pdf_viewer_screen.dart';
+import '../screens/class_selector_screen.dart';
+import '../screens/class_confirmation_screen.dart';
+import '../screens/app_choice_screen.dart';
+import 'dart:io';
 
 class AppRouter {
   static const String welcome = '/welcome';
+  static const String appChoice = '/app-choice';
+  static const String classSelector = '/class-selector';
+  static const String classConfirmation = '/class-confirmation';
   static const String auth = '/auth';
   static const String home = '/';
   static const String pdfViewer = '/pdf-viewer';
@@ -50,6 +57,21 @@ class AppRouter {
         GoRoute(
           path: about,
           builder: (context, state) => const AboutScreen(),
+        ),
+        GoRoute(
+          path: classSelector,
+          builder: (context, state) => const ClassSelectorScreen(),
+        ),
+        GoRoute(
+          path: classConfirmation,
+          builder: (context, state) {
+            final className = state.extra as String;
+            return ClassConfirmationScreen(className: className);
+          },
+        ),
+        GoRoute(
+          path: appChoice,
+          builder: (context, state) => const AppChoiceScreen(),
         ),
       ],
     );

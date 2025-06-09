@@ -13,6 +13,7 @@ import '../data/pdf_repository.dart';
 import '../providers/haptic_service.dart';
 import '../services/file_opener_service.dart';
 import '../navigation/app_router.dart';
+import '../screens/ai_home_screen.dart';
 import 'package:open_filex/open_filex.dart';
 
 // Helper function for robust navigation bar detection across all Android devices
@@ -133,6 +134,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final preferencesManager = ref.watch(preferencesManagerProvider);
+    final useAiVersionFromState = ref.watch(useAiVersionProvider);
+    
+    // Show AI version if user chose it (prefer state over preferences)
+    if (useAiVersionFromState) {
+      return const AiHomeScreen();
+    }
+    
+    // Show simple PDF version
     final pdfRepo = ref.watch(pdfRepositoryProvider);
     
     return Scaffold(
@@ -660,6 +670,93 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                 ),
                 child: Column(
                   children: [
+                    // Upgrade to AI Version
+                    InkWell(
+                      onTap: () async {
+                        await HapticService.subtle();
+                        final preferencesManager = ref.read(preferencesManagerProvider);
+                        await preferencesManager.setUseAiVersion(true);
+                        
+                        // Aktualisiere auch den State Provider
+                        ref.read(useAiVersionProvider.notifier).state = true;
+                        
+                        Navigator.pop(context);
+                        // Navigation zur Klassenauswahl
+                        context.push(AppRouter.classSelector);
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(
+                              Icons.upgrade,
+                              color: AppColors.appBlueAccent,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Zur KI-Version wechseln',
+                                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                          color: AppColors.appBlueAccent,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.appBlueAccent,
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: Text(
+                                          'NEU',
+                                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Intelligente Vertretungsanzeige für deine Klasse',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.secondaryText,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: AppColors.secondaryText,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    
+                    // Divider
+                    Container(
+                      height: 1,
+                      margin: const EdgeInsets.symmetric(vertical: 16),
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
+                    
                     // Date Setting
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

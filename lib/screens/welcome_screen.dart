@@ -39,7 +39,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     super.dispose();
   }
 
-  Future<void> _navigateToAuth() async {
+  Future<void> _navigateToClassSelector() async {
     if (_isNavigating) return;
     
     setState(() {
@@ -63,9 +63,9 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     // Small delay for the animation to feel natural
     await Future.delayed(const Duration(milliseconds: 50));
     
-    // Navigate to auth screen
+    // Navigate to app choice screen
     if (mounted) {
-      context.go(AppRouter.auth);
+      context.go(AppRouter.appChoice);
     }
   }
 
@@ -121,7 +121,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                         width: double.infinity,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: _isNavigating ? null : _navigateToAuth,
+                          onPressed: _isNavigating ? null : _navigateToClassSelector,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.appBlueAccent,
                             foregroundColor: Colors.white,

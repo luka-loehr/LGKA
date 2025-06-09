@@ -11,6 +11,8 @@ class PreferencesManager {
   static const String _keyHasRequestedReview = 'has_requested_review';
   static const String _keyShowNavigationDebug = 'show_navigation_debug';
   static const String _keyUseBuiltInPdfViewer = 'use_built_in_pdf_viewer';
+  static const String _keyUserClass = 'user_class';
+  static const String _keyUseAiVersion = 'use_ai_version';
 
   late final SharedPreferences _prefs;
 
@@ -74,6 +76,24 @@ class PreferencesManager {
   
   Future<void> setHasRequestedReview(bool value) async {
     await _prefs.setBool(_keyHasRequestedReview, value);
+  }
+
+  // User class
+  String? get userClass => _prefs.getString(_keyUserClass);
+  
+  Future<void> setUserClass(String className) async {
+    await _prefs.setString(_keyUserClass, className);
+  }
+  
+  Future<void> clearUserClass() async {
+    await _prefs.remove(_keyUserClass);
+  }
+
+  // Use AI version (disabled by default)
+  bool get useAiVersion => _prefs.getBool(_keyUseAiVersion) ?? false;
+  
+  Future<void> setUseAiVersion(bool value) async {
+    await _prefs.setBool(_keyUseAiVersion, value);
   }
 
   // Clear all preferences

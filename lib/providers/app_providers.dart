@@ -23,6 +23,12 @@ final isLoadingProvider = StateProvider<bool>((ref) => false);
 // Navigation State Provider
 final currentRouteProvider = StateProvider<String>((ref) => '/welcome');
 
+// User Class State Provider
+final userClassProvider = StateProvider<String?>((ref) => null);
+
+// Use AI Version State Provider
+final useAiVersionProvider = StateProvider<bool>((ref) => false);
+
 // Review Service Provider
 final reviewServiceProvider = Provider<ReviewService>((ref) {
   final preferencesManager = ref.watch(preferencesManagerProvider);
