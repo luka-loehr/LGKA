@@ -182,7 +182,7 @@ class _AiHomeScreenState extends ConsumerState<AiHomeScreen>
             child: FutureBuilder<PackageInfo>(
               future: PackageInfo.fromPlatform(),
               builder: (context, snapshot) {
-                final version = snapshot.hasData ? snapshot.data!.version : '1.6.0';
+                final version = snapshot.hasData ? snapshot.data!.version : '1.7.0';
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
