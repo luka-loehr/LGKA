@@ -27,80 +27,189 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              
-              // Header with Brain Icon and Title
-              Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.appBlueAccent.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Icon(
-                      Icons.psychology_outlined,
-                      size: 60,
-                      color: AppColors.appBlueAccent,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    '🤖 Neue KI-Version verfügbar!',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryText,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Deine Vertretungen automatisch\nnur für deine Klasse gefiltert',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.secondaryText,
-                      height: 1.4,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 60),
-              
-              // Simple benefits
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.appBackground,
+              AppColors.appBlueAccent.withOpacity(0.05),
+              AppColors.appBackground,
+            ],
+            stops: const [0.0, 0.5, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                
+                // Header with Brain Icon and Title
+                Column(
                   children: [
-                    _SimpleBenefit(
-                      text: '✨ Nur deine Klasse angezeigt',
+                    // Glassmorphic brain container
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withOpacity(0.25),
+                            Colors.white.withOpacity(0.1),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.appBlueAccent.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: [
+                              AppColors.appBlueAccent.withOpacity(0.2),
+                              AppColors.appBlueAccent.withOpacity(0.05),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Icon(
+                          Icons.psychology_outlined,
+                          size: 64,
+                          color: AppColors.appBlueAccent,
+                        ),
+                      ),
                     ),
+                    const SizedBox(height: 32),
                     
-                    _SimpleBenefit(
-                      text: '📅 Übersichtlich strukturiert',
+                    // Animated title with gradient
+                    ShaderMask(
+                      shaderCallback: (bounds) => LinearGradient(
+                        colors: [
+                          AppColors.appBlueAccent,
+                          AppColors.appBlueAccent.withOpacity(0.7),
+                        ],
+                      ).createShader(bounds),
+                      child: Text(
+                        '🤖 Neue KI-Version verfügbar!',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
+                    const SizedBox(height: 16),
                     
-                    _SimpleBenefit(
-                      text: '🔄 Automatisch aktuell',
+                    // Subtitle in glassmorphic container
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.15),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        'Deine Vertretungen automatisch\nnur für deine Klasse gefiltert',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: AppColors.primaryText.withOpacity(0.8),
+                          height: 1.4,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ],
                 ),
-              ),
+                
+                const SizedBox(height: 50),
+                
+                // Premium benefits with glassmorphism
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _GlassmorphicBenefit(
+                        text: '✨ Nur deine Klasse angezeigt',
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.purple.withOpacity(0.1),
+                            Colors.blue.withOpacity(0.05),
+                          ],
+                        ),
+                      ),
+                      
+                      _GlassmorphicBenefit(
+                        text: '📅 Übersichtlich strukturiert',
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.green.withOpacity(0.1),
+                            Colors.teal.withOpacity(0.05),
+                          ],
+                        ),
+                      ),
+                      
+                      _GlassmorphicBenefit(
+                        text: '🔄 Automatisch aktuell',
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.orange.withOpacity(0.1),
+                            Colors.pink.withOpacity(0.05),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               
               const SizedBox(height: 24),
               
-              // Action Buttons
+              // Premium Action Buttons
               Column(
                 children: [
-                  // Primary Button - Switch to AI
-                  SizedBox(
+                  // Premium Primary Button with glassmorphism
+                  Container(
                     width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppColors.appBlueAccent,
+                          AppColors.appBlueAccent.withOpacity(0.8),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.appBlueAccent.withOpacity(0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.1),
+                          blurRadius: 0,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
                     child: ElevatedButton(
                       onPressed: () async {
                         await HapticService.medium();
@@ -118,27 +227,36 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.appBlueAccent,
+                        backgroundColor: Colors.transparent,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        elevation: 2,
+                        elevation: 0,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            '🚀',
-                            style: TextStyle(fontSize: 20),
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '🚀',
+                              style: TextStyle(fontSize: 18),
+                            ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 12),
                           Text(
                             'Ausprobieren!',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
                               color: Colors.white,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ],
@@ -146,11 +264,26 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
                     ),
                   ),
                   
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   
-                  // Secondary Button - Maybe Later
-                  SizedBox(
+                  // Glassmorphic Secondary Button
+                  Container(
                     width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white.withOpacity(0.1),
+                          Colors.white.withOpacity(0.05),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
                     child: TextButton(
                       onPressed: () {
                         HapticService.subtle();
@@ -163,15 +296,16 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
                         }
                       },
                       style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       child: Text(
                         'Später',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.secondaryText,
+                          color: AppColors.primaryText.withOpacity(0.8),
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -186,28 +320,63 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
   }
 }
 
-class _SimpleBenefit extends StatelessWidget {
+class _GlassmorphicBenefit extends StatelessWidget {
   final String text;
+  final Gradient gradient;
 
-  const _SimpleBenefit({
+  const _GlassmorphicBenefit({
     required this.text,
+    required this.gradient,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
-        color: AppColors.appSurface.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-          color: AppColors.primaryText,
-          fontWeight: FontWeight.w500,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withOpacity(0.2),
+            Colors.white.withOpacity(0.1),
+          ],
         ),
-        textAlign: TextAlign.center,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.25),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.white.withOpacity(0.1),
+            blurRadius: 0,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          text,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: AppColors.primaryText,
+            fontWeight: FontWeight.w600,
+            height: 1.3,
+            letterSpacing: 0.2,
+          ),
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }
