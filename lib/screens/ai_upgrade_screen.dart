@@ -19,68 +19,33 @@ class AiUpgradeScreen extends ConsumerStatefulWidget {
 
 class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> 
     with TickerProviderStateMixin {
-  late AnimationController _heroController;
-  late AnimationController _featuresController;
-  late AnimationController _buttonsController;
-  
-  late Animation<double> _heroFadeAnimation;
-  late Animation<Offset> _heroSlideAnimation;
-  late Animation<double> _featuresAnimation;
-  late Animation<double> _buttonsAnimation;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
     
-    // Initialize animation controllers
-    _heroController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _featuresController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    _buttonsController = AnimationController(
-      duration: const Duration(milliseconds: 500),
+    // Single animation controller for smooth fade-in
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
 
-    // Create animations
-    _heroFadeAnimation = Tween<double>(
+    _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
-      parent: _heroController,
-      curve: Curves.easeOutQuart,
-    ));
-
-    _heroSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _heroController,
-      curve: Curves.easeOutQuart,
-    ));
-
-    _featuresAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _featuresController,
+      parent: _animationController,
       curve: Curves.easeOutCubic,
     ));
 
-    _buttonsAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _buttonsController,
-      curve: Curves.elasticOut,
-    ));
-
-    // Start animations
-    _startAnimations();
+    // Start animation after a brief delay
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        _animationController.forward();
+      }
+    });
     
     // Mark the prompt as shown
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -89,19 +54,9 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
     });
   }
 
-  void _startAnimations() async {
-    await _heroController.forward();
-    await Future.delayed(const Duration(milliseconds: 200));
-    await _featuresController.forward();
-    await Future.delayed(const Duration(milliseconds: 150));
-    await _buttonsController.forward();
-  }
-
   @override
   void dispose() {
-    _heroController.dispose();
-    _featuresController.dispose();
-    _buttonsController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -134,35 +89,37 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
                   child: IntrinsicHeight(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-                      child: Column(
-                        children: [
-                          // Hero section with icon and title
-                          SlideTransition(
-                            position: _heroSlideAnimation,
-                            child: FadeTransition(
-                              opacity: _heroFadeAnimation,
-                              child: _buildHeroSection(context),
-                            ),
-                          ),
+                      child: AnimatedBuilder(
+                        animation: _fadeAnimation,
+                        builder: (context, child) {
+                          return Column(
+                            children: [
+                              // Hero section - fades in first
+                              _buildAnimatedSection(
+                                delay: 0.0,
+                                child: _buildHeroSection(context),
+                              ),
 
-                          const SizedBox(height: 24),
+                              const SizedBox(height: 24),
 
-                          // Features section
-                          FadeTransition(
-                            opacity: _featuresAnimation,
-                            child: _buildFeaturesSection(),
-                          ),
+                              // Features section - fades in second
+                              _buildAnimatedSection(
+                                delay: 0.2,
+                                child: _buildFeaturesSection(),
+                              ),
 
-                          const Spacer(),
+                              const Spacer(),
 
-                          // Action buttons
-                          ScaleTransition(
-                            scale: _buttonsAnimation,
-                            child: _buildActionButtons(context),
-                          ),
-                          
-                          const SizedBox(height: 16),
-                        ],
+                              // Action buttons - fades in last
+                              _buildAnimatedSection(
+                                delay: 0.6,
+                                child: _buildActionButtons(context),
+                              ),
+                              
+                              const SizedBox(height: 16),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -171,6 +128,22 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
             },
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAnimatedSection({
+    required double delay,
+    required Widget child,
+  }) {
+    final animationValue = (_fadeAnimation.value - delay).clamp(0.0, 1.0);
+    final curvedValue = Curves.easeOutCubic.transform(animationValue);
+    
+    return Transform.translate(
+      offset: Offset(0, 20 * (1 - curvedValue)),
+      child: Opacity(
+        opacity: curvedValue,
+        child: child,
       ),
     );
   }
@@ -263,21 +236,18 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
           icon: Icons.auto_awesome_rounded,
           title: 'Intelligente Filterung',
           description: 'Nur Vertretungen für deine Klasse werden angezeigt',
-          delay: 0,
         ),
         const SizedBox(height: 16),
         _buildFeature(
           icon: Icons.dashboard_customize_rounded,
           title: 'Übersichtliche Darstellung',
           description: 'Strukturierte Karten statt unübersichtlicher PDF-Listen',
-          delay: 100,
         ),
         const SizedBox(height: 16),
         _buildFeature(
           icon: Icons.refresh_rounded,
           title: 'Automatische Updates',
           description: 'Alle 5 Minuten wird nach neuen Vertretungen gesucht',
-          delay: 200,
         ),
       ],
     );
@@ -287,85 +257,72 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
     required IconData icon,
     required String title,
     required String description,
-    required int delay,
   }) {
-    return AnimatedBuilder(
-      animation: _featuresAnimation,
-      builder: (context, child) {
-        final animationValue = (_featuresAnimation.value - (delay / 1000)).clamp(0.0, 1.0);
-        return Transform.translate(
-          offset: Offset(0, 20 * (1 - animationValue)),
-          child: Opacity(
-            opacity: animationValue,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                color: AppColors.appSurface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: AppColors.appBlueAccent.withOpacity(0.1),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: AppColors.appSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.appBlueAccent.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.appBlueAccent.withOpacity(0.2),
+                  AppColors.appBlueAccent.withOpacity(0.1),
                 ],
               ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.appBlueAccent.withOpacity(0.2),
-                          AppColors.appBlueAccent.withOpacity(0.1),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      icon,
-                      size: 24,
-                      color: AppColors.appBlueAccent,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppColors.primaryText,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          description,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.secondaryText,
-                            height: 1.4,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              icon,
+              size: 24,
+              color: AppColors.appBlueAccent,
             ),
           ),
-        );
-      },
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: AppColors.primaryText,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.secondaryText,
+                    height: 1.4,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
