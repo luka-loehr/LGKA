@@ -26,9 +26,9 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
   void initState() {
     super.initState();
     
-    // Single animation controller for smooth fade-in
+    // Simple fade-in animation
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
 
@@ -37,15 +37,11 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeOutCubic,
+      curve: Curves.easeOut,
     ));
 
-    // Start animation after a brief delay
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted) {
-        _animationController.forward();
-      }
-    });
+    // Start animation immediately
+    _animationController.forward();
     
     // Mark the prompt as shown
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -89,37 +85,26 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
                   child: IntrinsicHeight(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-                      child: AnimatedBuilder(
-                        animation: _fadeAnimation,
-                        builder: (context, child) {
-                          return Column(
-                            children: [
-                              // Hero section - fades in first
-                              _buildAnimatedSection(
-                                delay: 0.0,
-                                child: _buildHeroSection(context),
-                              ),
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: Column(
+                          children: [
+                            // Hero section
+                            _buildHeroSection(context),
 
-                              const SizedBox(height: 24),
+                            const SizedBox(height: 24),
 
-                              // Features section - fades in second
-                              _buildAnimatedSection(
-                                delay: 0.2,
-                                child: _buildFeaturesSection(),
-                              ),
+                            // Features section
+                            _buildFeaturesSection(),
 
-                              const Spacer(),
+                            const Spacer(),
 
-                              // Action buttons - fades in last
-                              _buildAnimatedSection(
-                                delay: 0.6,
-                                child: _buildActionButtons(context),
-                              ),
-                              
-                              const SizedBox(height: 16),
-                            ],
-                          );
-                        },
+                            // Action buttons
+                            _buildActionButtons(context),
+                            
+                            const SizedBox(height: 16),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -128,22 +113,6 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
             },
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildAnimatedSection({
-    required double delay,
-    required Widget child,
-  }) {
-    final animationValue = (_fadeAnimation.value - delay).clamp(0.0, 1.0);
-    final curvedValue = Curves.easeOutCubic.transform(animationValue);
-    
-    return Transform.translate(
-      offset: Offset(0, 20 * (1 - curvedValue)),
-      child: Opacity(
-        opacity: curvedValue,
-        child: child,
       ),
     );
   }
