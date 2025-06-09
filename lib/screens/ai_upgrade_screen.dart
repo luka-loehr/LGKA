@@ -16,23 +16,16 @@ class AiUpgradeScreen extends ConsumerStatefulWidget {
   ConsumerState<AiUpgradeScreen> createState() => _AiUpgradeScreenState();
 }
 
-class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
+class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
   late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
     
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
-    
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
     
@@ -40,21 +33,11 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> with TickerPr
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOutCubic,
+      parent: _controller,
+      curve: Curves.easeOut,
     ));
     
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
-    
-    // Start animations
-    _fadeController.forward();
-    _slideController.forward();
+    _controller.forward();
     
     // Mark the prompt as shown
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -65,428 +48,235 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> with TickerPr
 
   @override
   void dispose() {
-    _fadeController.dispose();
-    _slideController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.topCenter,
-            radius: 1.5,
-            colors: [
-              AppColors.appBlueAccent.withOpacity(0.15),
-              AppColors.appBackground,
-              AppColors.appBackground,
-            ],
-            stops: const [0.0, 0.4, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: AnimatedBuilder(
-            animation: _fadeAnimation,
-            builder: (context, child) {
-              return Opacity(
-                opacity: _fadeAnimation.value,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 40),
-                        
-                        // Premium Header
-                        _buildHeader(),
-                        
-                        const SizedBox(height: 60),
-                        
-                        // Benefits
-                        Expanded(
-                          child: _buildBenefits(),
-                        ),
-                        
-                        const SizedBox(height: 40),
-                        
-                        // Action Buttons
-                        _buildActionButtons(),
-                        
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        // Floating AI Icon with multiple glass layers
-        Container(
-          width: 120,
-          height: 120,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.appBlueAccent.withOpacity(0.3),
-                blurRadius: 30,
-                offset: const Offset(0, 15),
-                spreadRadius: 5,
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withOpacity(0.4),
-                      Colors.white.withOpacity(0.1),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
-                    width: 1.5,
-                  ),
-                ),
-                child: Container(
-                  margin: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      colors: [
-                        AppColors.appBlueAccent.withOpacity(0.3),
-                        AppColors.appBlueAccent.withOpacity(0.1),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  child: Icon(
-                    Icons.psychology_outlined,
-                    size: 56,
-                    color: AppColors.appBlueAccent,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        
-        const SizedBox(height: 32),
-        
-        // Premium Title with gradient and glow
-        ShaderMask(
-          shaderCallback: (bounds) => LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.appBlueAccent,
-              AppColors.appBlueAccent.withOpacity(0.7),
-              Colors.purple.withOpacity(0.8),
-            ],
-          ).createShader(bounds),
-          child: Text(
-            '🌟 KI-Upgrade verfügbar',
-            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-              letterSpacing: -0.8,
-              height: 1.1,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        
-        const SizedBox(height: 16),
-        
-        // Elegant subtitle with glass effect
-        ClipRRect(
-          borderRadius: BorderRadius.circular(25),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.white.withOpacity(0.2),
-                    Colors.white.withOpacity(0.1),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
-                  width: 1,
-                ),
-              ),
-              child: Text(
-                'Vertretungen perfekt für dich gefiltert\nund wunderschön dargestellt',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppColors.primaryText.withOpacity(0.9),
-                  height: 1.5,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBenefits() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildBenefit(
-          '✨ Intelligent gefiltert',
-          'Nur deine Klasse, automatisch sortiert',
-          [Colors.purple.withOpacity(0.15), Colors.blue.withOpacity(0.1)],
-        ),
-        _buildBenefit(
-          '🎨 Wunderschön gestaltet', 
-          'Moderne Karten statt Textwüste',
-          [Colors.green.withOpacity(0.15), Colors.teal.withOpacity(0.1)],
-        ),
-        _buildBenefit(
-          '⚡ Blitzschnell aktuell',
-          'Automatische Updates alle 5 Minuten',
-          [Colors.orange.withOpacity(0.15), Colors.pink.withOpacity(0.1)],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBenefit(String title, String subtitle, List<Color> gradientColors) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.25),
-                Colors.white.withOpacity(0.1),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.3),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 25,
-                offset: const Offset(0, 10),
-                spreadRadius: 0,
-              ),
-            ],
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(20),
+      backgroundColor: const Color(0xFF0A0E21),
+      body: Stack(
+        children: [
+          // Subtle gradient background
+          Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: gradientColors,
+                colors: [
+                  const Color(0xFF0A0E21),
+                  const Color(0xFF0A0E21).withOpacity(0.95),
+                  const Color(0xFF1A1F36),
+                ],
               ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.primaryText,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.3,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.secondaryText,
-                    fontWeight: FontWeight.w500,
-                    height: 1.3,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
             ),
           ),
-        ),
+          
+          // Content
+          SafeArea(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 48.0),
+                child: Column(
+                  children: [
+                    const Spacer(flex: 1),
+                    
+                    // Minimalistic icon
+                    Container(
+                      width: 88,
+                      height: 88,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                          width: 1,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(44),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.05),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.auto_awesome,
+                              size: 36,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 48),
+                    
+                    // Clean title
+                    Text(
+                      'KI-Version verfügbar',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Subtle description
+                    Text(
+                      'Intelligente Filterung\nfür deine Klasse',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Colors.white.withOpacity(0.6),
+                        height: 1.6,
+                        fontWeight: FontWeight.w300,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    
+                    const SizedBox(height: 64),
+                    
+                    // Minimal feature list
+                    Column(
+                      children: [
+                        _buildFeature('Automatische Filterung'),
+                        const SizedBox(height: 24),
+                        _buildFeature('Klare Darstellung'),
+                        const SizedBox(height: 24),
+                        _buildFeature('Echtzeit-Updates'),
+                      ],
+                    ),
+                    
+                    const Spacer(flex: 2),
+                    
+                    // Primary button - glassmorphic
+                    Container(
+                      width: double.infinity,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                          width: 1,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                            ),
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await HapticService.medium();
+                                
+                                final preferencesManager = ref.read(preferencesManagerProvider);
+                                await preferencesManager.setUseAiVersion(true);
+                                ref.read(useAiVersionProvider.notifier).state = true;
+                                
+                                if (!mounted) return;
+                                
+                                if (preferencesManager.userClass == null) {
+                                  context.pushReplacement(AppRouter.classSelector);
+                                } else {
+                                  context.pushReplacement(AppRouter.home);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Text(
+                                'KI aktivieren',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w400,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Secondary button - minimal
+                    TextButton(
+                      onPressed: () {
+                        HapticService.subtle();
+                        if (context.canPop()) {
+                          context.pop();
+                        } else {
+                          context.pushReplacement(AppRouter.home);
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                      ),
+                      child: Text(
+                        'Später',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Colors.white.withOpacity(0.4),
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildActionButtons() {
-    return Column(
-      children: [
-        // Premium upgrade button with glow
-        Container(
-          width: double.infinity,
-          height: 60,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.appBlueAccent.withOpacity(0.4),
-                blurRadius: 25,
-                offset: const Offset(0, 10),
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.appBlueAccent,
-                      AppColors.appBlueAccent.withOpacity(0.8),
-                      Colors.purple.withOpacity(0.9),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
-                    width: 1,
-                  ),
-                ),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    await HapticService.medium();
-                    
-                    final preferencesManager = ref.read(preferencesManagerProvider);
-                    await preferencesManager.setUseAiVersion(true);
-                    ref.read(useAiVersionProvider.notifier).state = true;
-                    
-                    if (!mounted) return;
-                    
-                    if (preferencesManager.userClass == null) {
-                      context.pushReplacement(AppRouter.classSelector);
-                    } else {
-                      context.pushReplacement(AppRouter.home);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Text(
-                          '🚀',
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        'Jetzt ausprobieren!',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+  Widget _buildFeature(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.08),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 4,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.6),
+              shape: BoxShape.circle,
             ),
           ),
-        ),
-        
-        const SizedBox(height: 16),
-        
-        // Subtle later button
-        ClipRRect(
-          borderRadius: BorderRadius.circular(18),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.white.withOpacity(0.15),
-                    Colors.white.withOpacity(0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
-                  width: 1,
-                ),
-              ),
-              child: TextButton(
-                onPressed: () {
-                  HapticService.subtle();
-                  if (context.canPop()) {
-                    context.pop();
-                  } else {
-                    context.pushReplacement(AppRouter.home);
-                  }
-                },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                ),
-                child: Text(
-                  'Vielleicht später',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.primaryText.withOpacity(0.7),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+          const SizedBox(width: 12),
+          Text(
+            text,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Colors.white.withOpacity(0.7),
+              fontWeight: FontWeight.w300,
+              letterSpacing: 0.3,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 } 
