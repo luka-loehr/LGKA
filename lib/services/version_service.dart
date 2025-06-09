@@ -17,18 +17,28 @@ class VersionService {
       final currentVersion = packageInfo.version;
       final lastVersion = _preferencesManager.lastAppVersion;
       final isUsingAiVersion = _preferencesManager.useAiVersion;
+      final promptAlreadyShown = _preferencesManager.aiUpgradePromptShown;
       
       // Debug logging
       debugPrint('🔍 VersionService Debug:');
       debugPrint('  Current version: $currentVersion');
       debugPrint('  Last stored version: $lastVersion');
       debugPrint('  Is using AI version: $isUsingAiVersion');
+      debugPrint('  AI upgrade prompt already shown: $promptAlreadyShown');
+      
+      // If prompt was already shown, don't show it again
+      if (promptAlreadyShown) {
+        debugPrint('  ❌ AI upgrade prompt already shown to user');
+        return false;
+      }
       
       // Special case for testing: if this is a fresh install of 1.7.0 and user is not using AI version,
-      // treat it as an upgrade from 1.6.0 for testing purposes
+      // treat it as an upgrade from 1.6.0 for testing purposes, but also set authentication to simulate real user
       if (lastVersion == null && currentVersion == '1.7.0' && !isUsingAiVersion) {
         debugPrint('  🧪 Testing scenario: treating fresh 1.7.0 install as upgrade from 1.6.0');
         await _preferencesManager.setLastAppVersion('1.6.0'); // Set it as if upgrading from 1.6.0
+        await _preferencesManager.setAuthenticated(true); // Simulate authenticated user
+        await _preferencesManager.setFirstLaunch(false); // Not first launch
         debugPrint('  ✅ Should show AI upgrade prompt: true (testing scenario)');
         return true;
       }

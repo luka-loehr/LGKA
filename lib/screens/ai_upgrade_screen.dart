@@ -6,11 +6,26 @@ import '../providers/app_providers.dart';
 import '../providers/haptic_service.dart';
 import '../navigation/app_router.dart';
 
-class AiUpgradeScreen extends ConsumerWidget {
+class AiUpgradeScreen extends ConsumerStatefulWidget {
   const AiUpgradeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AiUpgradeScreen> createState() => _AiUpgradeScreenState();
+}
+
+class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Mark the AI upgrade prompt as shown when this screen is displayed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final preferencesManager = ref.read(preferencesManagerProvider);
+      preferencesManager.setAiUpgradePromptShown(true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       body: SafeArea(

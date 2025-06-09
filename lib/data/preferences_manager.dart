@@ -14,6 +14,7 @@ class PreferencesManager {
   static const String _keyUserClass = 'user_class';
   static const String _keyUseAiVersion = 'use_ai_version';
   static const String _keyLastAppVersion = 'last_app_version';
+  static const String _keyAiUpgradePromptShown = 'ai_upgrade_prompt_shown';
 
   late final SharedPreferences _prefs;
 
@@ -102,6 +103,13 @@ class PreferencesManager {
   
   Future<void> setLastAppVersion(String version) async {
     await _prefs.setString(_keyLastAppVersion, version);
+  }
+
+  // AI upgrade prompt shown flag
+  bool get aiUpgradePromptShown => _prefs.getBool(_keyAiUpgradePromptShown) ?? false;
+  
+  Future<void> setAiUpgradePromptShown(bool value) async {
+    await _prefs.setBool(_keyAiUpgradePromptShown, value);
   }
 
   // Clear all preferences
