@@ -17,31 +17,10 @@ class AiUpgradeScreen extends ConsumerStatefulWidget {
   ConsumerState<AiUpgradeScreen> createState() => _AiUpgradeScreenState();
 }
 
-class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> 
-    with TickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-
+class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
   @override
   void initState() {
     super.initState();
-    
-    // Simple fade-in animation
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
-    ));
-
-    // Start animation immediately
-    _animationController.forward();
     
     // Mark the prompt as shown
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -51,66 +30,57 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen>
   }
 
   @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.appBackground,
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.appBackground,
-                AppColors.appBackground.withOpacity(0.8),
-                AppColors.appBlueAccent.withOpacity(0.05),
-              ],
-              stops: const [0.0, 0.7, 1.0],
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.appBackground,
+              AppColors.appBackground.withOpacity(0.8),
+              AppColors.appBlueAccent.withOpacity(0.05),
+            ],
+            stops: const [0.0, 0.7, 1.0],
           ),
-          child: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: IntrinsicHeight(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-                        child: Column(
-                          children: [
-                            // Hero section
-                            _buildHeroSection(context),
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                      child: Column(
+                        children: [
+                          // Hero section
+                          _buildHeroSection(context),
 
-                            const SizedBox(height: 24),
+                          const SizedBox(height: 24),
 
-                            // Features section
-                            _buildFeaturesSection(),
+                          // Features section
+                          _buildFeaturesSection(),
 
-                            const Spacer(),
+                          const Spacer(),
 
-                            // Action buttons
-                            _buildActionButtons(context),
-                            
-                            const SizedBox(height: 16),
-                          ],
-                        ),
+                          // Action buttons
+                          _buildActionButtons(context),
+                          
+                          const SizedBox(height: 16),
+                        ],
                       ),
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
