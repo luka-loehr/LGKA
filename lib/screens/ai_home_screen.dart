@@ -173,9 +173,11 @@ class _AiHomeScreenState extends ConsumerState<AiHomeScreen>
           // Fixed footer at bottom - outside of TabBarView so it doesn't swipe
           Padding(
             padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
               bottom: _isButtonNavigation(context)
-                ? 34.0  // Button navigation (3 buttons) - 26px higher than gesture nav
-                : 8.0,   // Gesture navigation (white bar) - perfect position
+                ? 50.0  // Button navigation (3 buttons) - higher position needed
+                : 24.0,   // Gesture navigation (white bar) - higher position needed
             ),
             child: FutureBuilder<PackageInfo>(
               future: PackageInfo.fromPlatform(),
