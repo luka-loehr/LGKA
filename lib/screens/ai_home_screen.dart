@@ -155,56 +155,54 @@ class _AiHomeScreenState extends ConsumerState<AiHomeScreen>
             return _EmptyState(day: day);
           }
 
-          return Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: substitutions.length,
-                  itemBuilder: (context, index) {
-                    return _SubstitutionCard(substitution: substitutions[index]);
-                  },
-                ),
-              ),
-              // Footer with version and copyright at bottom
-              Padding(
-                padding: EdgeInsets.only(
-                  bottom: _isButtonNavigation(context)
-                    ? 34.0  // Button navigation (3 buttons) - 26px higher than gesture nav
-                    : 8.0,   // Gesture navigation (white bar) - perfect position
-                ),
-                child: FutureBuilder<PackageInfo>(
-                  future: PackageInfo.fromPlatform(),
-                  builder: (context, snapshot) {
-                    final version = snapshot.hasData ? snapshot.data!.version : '1.6.0';
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '© 2025 ',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.secondaryText.withOpacity(0.5),
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // Substitution cards in scrollable area
+                ...substitutions.map((substitution) => _SubstitutionCard(substitution: substitution)),
+                
+                // Add footer with version and copyright at bottom of home screen - EXACT COPY from simple version
+                const Spacer(),
+                Padding(
+                  padding: EdgeInsets.only(
+                    bottom: _isButtonNavigation(context)
+                      ? 34.0  // Button navigation (3 buttons) - 26px higher than gesture nav
+                      : 8.0,   // Gesture navigation (white bar) - perfect position
+                  ),
+                  child: FutureBuilder<PackageInfo>(
+                    future: PackageInfo.fromPlatform(),
+                    builder: (context, snapshot) {
+                      final version = snapshot.hasData ? snapshot.data!.version : '1.6.0';
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '© 2025 ',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.secondaryText.withOpacity(0.5),
+                            ),
                           ),
-                        ),
-                        Text(
-                          'Luka Löhr',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.appBlueAccent.withOpacity(0.7),
-                            fontWeight: FontWeight.w500,
+                          Text(
+                            'Luka Löhr',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.appBlueAccent.withOpacity(0.7),
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                        Text(
-                          ' • v$version',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.secondaryText.withOpacity(0.5),
+                          Text(
+                            ' • v$version',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.secondaryText.withOpacity(0.5),
+                            ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         }).toList(),
       ),
@@ -368,10 +366,12 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Center(
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          // Empty state content centered
+          Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -399,46 +399,48 @@ class _EmptyState extends StatelessWidget {
               ],
             ),
           ),
-        ),
-        // Footer with version and copyright at bottom
-        Padding(
-          padding: EdgeInsets.only(
-            bottom: _isButtonNavigation(context)
-              ? 34.0  // Button navigation (3 buttons) - 26px higher than gesture nav
-              : 8.0,   // Gesture navigation (white bar) - perfect position
+          
+          // Add footer with version and copyright at bottom of home screen - EXACT COPY from simple version
+          const Spacer(),
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: _isButtonNavigation(context)
+                ? 34.0  // Button navigation (3 buttons) - 26px higher than gesture nav
+                : 8.0,   // Gesture navigation (white bar) - perfect position
+            ),
+            child: FutureBuilder<PackageInfo>(
+              future: PackageInfo.fromPlatform(),
+              builder: (context, snapshot) {
+                final version = snapshot.hasData ? snapshot.data!.version : '1.6.0';
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '© 2025 ',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.secondaryText.withOpacity(0.5),
+                      ),
+                    ),
+                    Text(
+                      'Luka Löhr',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.appBlueAccent.withOpacity(0.7),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      ' • v$version',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.secondaryText.withOpacity(0.5),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
-          child: FutureBuilder<PackageInfo>(
-            future: PackageInfo.fromPlatform(),
-            builder: (context, snapshot) {
-              final version = snapshot.hasData ? snapshot.data!.version : '1.6.0';
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '© 2025 ',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.secondaryText.withOpacity(0.5),
-                    ),
-                  ),
-                  Text(
-                    'Luka Löhr',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.appBlueAccent.withOpacity(0.7),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    ' • v$version',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.secondaryText.withOpacity(0.5),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
