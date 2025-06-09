@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/preferences_manager.dart';
 import '../data/pdf_repository.dart';
 import '../services/review_service.dart';
+import '../services/version_service.dart';
 
 // Preferences Manager Provider
 final preferencesManagerProvider = Provider<PreferencesManager>((ref) {
@@ -33,4 +34,10 @@ final useAiVersionProvider = StateProvider<bool>((ref) => false);
 final reviewServiceProvider = Provider<ReviewService>((ref) {
   final preferencesManager = ref.watch(preferencesManagerProvider);
   return ReviewService(preferencesManager);
+});
+
+// Version Service Provider
+final versionServiceProvider = Provider<VersionService>((ref) {
+  final preferencesManager = ref.watch(preferencesManagerProvider);
+  return VersionService(preferencesManager);
 });

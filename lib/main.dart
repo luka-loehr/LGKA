@@ -7,6 +7,7 @@ import 'theme/app_theme.dart';
 import 'data/preferences_manager.dart';
 import 'providers/app_providers.dart';
 import 'navigation/app_router.dart';
+import 'services/version_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,9 +22,16 @@ void main() async {
   final preferencesManager = PreferencesManager();
   await preferencesManager.init();
   
+  // Check for version updates and determine if AI upgrade screen should be shown
+  final versionService = VersionService(preferencesManager);
+  final shouldShowAiUpgrade = await versionService.shouldShowAiUpgradePrompt();
+  
   // Determine initial route
   String initialRoute;
-  if (preferencesManager.isFirstLaunch) {
+  if (shouldShowAiUpgrade) {
+    // Show AI upgrade screen for users updating from 1.6.0 to 1.7.0
+    initialRoute = AppRouter.aiUpgrade;
+  } else if (preferencesManager.isFirstLaunch) {
     initialRoute = AppRouter.welcome;
   } else if (preferencesManager.isAuthenticated) {
     initialRoute = AppRouter.home;

@@ -166,7 +166,13 @@ class AiUpgradeScreen extends ConsumerWidget {
                     child: TextButton(
                       onPressed: () {
                         HapticService.subtle();
-                        context.pop();
+                        // Check if we can pop (showing from within app) or need to replace (initial route)
+                        if (context.canPop()) {
+                          context.pop();
+                        } else {
+                          // If this is the initial route, navigate to home
+                          context.pushReplacement(AppRouter.home);
+                        }
                       },
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),

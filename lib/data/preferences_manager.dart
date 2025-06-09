@@ -13,6 +13,7 @@ class PreferencesManager {
   static const String _keyUseBuiltInPdfViewer = 'use_built_in_pdf_viewer';
   static const String _keyUserClass = 'user_class';
   static const String _keyUseAiVersion = 'use_ai_version';
+  static const String _keyLastAppVersion = 'last_app_version';
 
   late final SharedPreferences _prefs;
 
@@ -94,6 +95,13 @@ class PreferencesManager {
   
   Future<void> setUseAiVersion(bool value) async {
     await _prefs.setBool(_keyUseAiVersion, value);
+  }
+
+  // Last app version for update detection
+  String? get lastAppVersion => _prefs.getString(_keyLastAppVersion);
+  
+  Future<void> setLastAppVersion(String version) async {
+    await _prefs.setString(_keyLastAppVersion, version);
   }
 
   // Clear all preferences
