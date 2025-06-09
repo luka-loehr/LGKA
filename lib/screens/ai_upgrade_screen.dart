@@ -52,74 +52,80 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'NEU: KI in der LGKA+ App',
+                    '🤖 Neue KI-Version verfügbar!',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryText,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   Text(
-                    'Erlebe Vertretungspläne auf eine völlig neue Art',
+                    'Deine Vertretungen automatisch\nnur für deine Klasse gefiltert',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppColors.secondaryText,
+                      height: 1.4,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ],
               ),
               
-              const SizedBox(height: 40),
+              const SizedBox(height: 60),
               
-              // Benefits List
+              // Simple visual benefits
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _FeatureCard(
-                        icon: Icons.smart_toy_outlined,
-                        title: 'Intelligente Aufbereitung',
-                        description: 'Deine Vertretungen werden automatisch für deine Klasse gefiltert und übersichtlich dargestellt.',
-                        gradient: LinearGradient(
-                          colors: [AppColors.appBlueAccent.withOpacity(0.1), Colors.purple.withOpacity(0.1)],
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Quick benefit icons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _SimpleBenefit(
+                          icon: Icons.filter_alt_outlined,
+                          text: 'Nur deine\nKlasse',
                         ),
-                      ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      _FeatureCard(
-                        icon: Icons.schedule_outlined,
-                        title: 'Strukturierte Übersicht',
-                        description: 'Alle wichtigen Infos auf einen Blick: Stunde, Fach, Lehrer, Raum und Hinweise.',
-                        gradient: LinearGradient(
-                          colors: [Colors.green.withOpacity(0.1), AppColors.appBlueAccent.withOpacity(0.1)],
+                        _SimpleBenefit(
+                          icon: Icons.schedule_outlined,
+                          text: 'Übersichtlich\nstrukturiert',
                         ),
-                      ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      _FeatureCard(
-                        icon: Icons.trending_up_outlined,
-                        title: 'Immer aktuell',
-                        description: 'Automatische Updates alle 5 Minuten sorgen dafür, dass du nie etwas verpasst.',
-                        gradient: LinearGradient(
-                          colors: [Colors.orange.withOpacity(0.1), Colors.red.withOpacity(0.1)],
+                        _SimpleBenefit(
+                          icon: Icons.refresh_outlined,
+                          text: 'Immer\naktuell',
                         ),
+                      ],
+                    ),
+                    
+                    const SizedBox(height: 40),
+                    
+                    // Simple comparison
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.appSurface.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      _FeatureCard(
-                        icon: Icons.phone_android_outlined,
-                        title: 'Perfekte Bedienung',
-                        description: 'Einfach zwischen den Tagen wischen und alle Infos sofort finden.',
-                        gradient: LinearGradient(
-                          colors: [Colors.teal.withOpacity(0.1), Colors.blue.withOpacity(0.1)],
-                        ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.lightbulb_outline,
+                            color: AppColors.appBlueAccent,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Du kannst jederzeit zur normalen Version zurück',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppColors.secondaryText,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               
@@ -159,10 +165,13 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.psychology_outlined),
+                          Text(
+                            '🚀',
+                            style: TextStyle(fontSize: 20),
+                          ),
                           const SizedBox(width: 8),
                           Text(
-                            'Jetzt zur KI-Version wechseln',
+                            'Ausprobieren!',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
@@ -196,7 +205,7 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
                         ),
                       ),
                       child: Text(
-                        'Jetzt nicht',
+                        'Später',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: AppColors.secondaryText,
                         ),
@@ -213,69 +222,41 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
   }
 }
 
-class _FeatureCard extends StatelessWidget {
+class _SimpleBenefit extends StatelessWidget {
   final IconData icon;
-  final String title;
-  final String description;
-  final Gradient gradient;
+  final String text;
 
-  const _FeatureCard({
+  const _SimpleBenefit({
     required this.icon,
-    required this.title,
-    required this.description,
-    required this.gradient,
+    required this.text,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.appBlueAccent.withOpacity(0.1),
-          width: 1,
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.appBlueAccent.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Icon(
+            icon,
+            color: AppColors.appBlueAccent,
+            size: 32,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.appBlueAccent.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              icon,
-              color: AppColors.appBlueAccent,
-              size: 24,
-            ),
+        const SizedBox(height: 12),
+        Text(
+          text,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: AppColors.secondaryText,
+            fontWeight: FontWeight.w500,
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryText,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.secondaryText,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 } 
