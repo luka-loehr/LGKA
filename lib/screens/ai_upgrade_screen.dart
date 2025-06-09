@@ -73,57 +73,21 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
               
               const SizedBox(height: 60),
               
-              // Simple visual benefits
+              // Simple benefits
               Expanded(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Quick benefit icons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _SimpleBenefit(
-                          icon: Icons.filter_alt_outlined,
-                          text: 'Nur deine\nKlasse',
-                        ),
-                        _SimpleBenefit(
-                          icon: Icons.schedule_outlined,
-                          text: 'Übersichtlich\nstrukturiert',
-                        ),
-                        _SimpleBenefit(
-                          icon: Icons.refresh_outlined,
-                          text: 'Immer\naktuell',
-                        ),
-                      ],
+                    _SimpleBenefit(
+                      text: '✨ Nur deine Klasse angezeigt',
                     ),
                     
-                    const SizedBox(height: 40),
+                    _SimpleBenefit(
+                      text: '📅 Übersichtlich strukturiert',
+                    ),
                     
-                    // Simple comparison
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.appSurface.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.lightbulb_outline,
-                            color: AppColors.appBlueAccent,
-                            size: 24,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Du kannst jederzeit zur normalen Version zurück',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.secondaryText,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    _SimpleBenefit(
+                      text: '🔄 Automatisch aktuell',
                     ),
                   ],
                 ),
@@ -223,40 +187,28 @@ class _AiUpgradeScreenState extends ConsumerState<AiUpgradeScreen> {
 }
 
 class _SimpleBenefit extends StatelessWidget {
-  final IconData icon;
   final String text;
 
   const _SimpleBenefit({
-    required this.icon,
     required this.text,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.appBlueAccent.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Icon(
-            icon,
-            color: AppColors.appBlueAccent,
-            size: 32,
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      decoration: BoxDecoration(
+        color: AppColors.appSurface.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+          color: AppColors.primaryText,
+          fontWeight: FontWeight.w500,
         ),
-        const SizedBox(height: 12),
-        Text(
-          text,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.secondaryText,
-            fontWeight: FontWeight.w500,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
+        textAlign: TextAlign.center,
+      ),
     );
   }
 } 
