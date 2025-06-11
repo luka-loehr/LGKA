@@ -174,13 +174,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const SizedBox(height: 32),
+                        const SizedBox(height: 24),
             
             // Loading bar or network notification - they replace each other at the same position
             if (pdfRepo.showLoadingBar)
               Container(
                 margin: const EdgeInsets.symmetric(
-                    horizontal: 64, vertical: 32),
+                    horizontal: 64, vertical: 24),
                 height: 5,
                 child: LinearProgressIndicator(
                   backgroundColor:
@@ -189,13 +189,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       AppColors.appBlueAccent),
                 ),
               )
-                          else if (pdfRepo.hasSlowConnection)
+            else if (pdfRepo.hasSlowConnection)
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 8),
+                margin: const EdgeInsets.only(bottom: 8),
                 child: Container(
                   width: double.infinity,
                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   decoration: BoxDecoration(
                     color: AppColors.appSurface,
                     borderRadius: BorderRadius.circular(16),
@@ -237,7 +237,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               )
             else
-              const SizedBox(height: 32),
+              const SizedBox(height: 8),
             
             if (pdfRepo.weekdaysLoaded)
               Consumer(
