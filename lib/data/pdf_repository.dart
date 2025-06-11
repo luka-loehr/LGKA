@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' show min;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -286,6 +287,9 @@ class PdfRepository extends ChangeNotifier {
     }
   }
 
+  // Flag to track if auto-retry is in progress
+  bool _isAutoRetrying = false;
+  
   /// Preload both PDFs using weekday-based naming with network monitoring
   Future<void> preloadPdfs({bool forceReload = false}) async {
     _isLoading = true;
@@ -319,6 +323,11 @@ class PdfRepository extends ChangeNotifier {
         _hasSlowConnection = true;
         _showLoadingBar = false; // Hide loading bar immediately
         notifyListeners();
+        
+        // Start auto-retry if not already retrying
+        if (!_isAutoRetrying) {
+          _startAutoRetry(forceReload);
+        }
         return;
       }
 
@@ -331,11 +340,17 @@ class PdfRepository extends ChangeNotifier {
       if (results[0] != null || results[1] != null) {
         _showLoadingBar = false;
         _hasSlowConnection = false;
+        _isAutoRetrying = false; // Stop auto-retry if successful
         debugPrint('PDFs loaded successfully');
       } else {
         // Keep slow connection notification if no PDFs were downloaded
         _showLoadingBar = false;
         debugPrint('Failed to download PDFs, keeping slow connection notification');
+        
+        // Start auto-retry if not already retrying
+        if (!_isAutoRetrying) {
+          _startAutoRetry(forceReload);
+        }
       }
       
     } catch (e) {
@@ -343,12 +358,79 @@ class PdfRepository extends ChangeNotifier {
       _hasSlowConnection = true;
       _showLoadingBar = false; // Hide loading bar on error
       notifyListeners();
+      
+      // Start auto-retry if not already retrying
+      if (!_isAutoRetrying) {
+        _startAutoRetry(forceReload);
+      }
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+  
+  /// Auto-retry downloading PDFs with exponential backoff
+  void _startAutoRetry(bool forceReload) async {
+    _isAutoRetrying = true;
+    int retryDelay = 5; // Start with 5 seconds delay
+    int maxRetries = 10; // Maximum number of retries
+    int retryCount = 0;
+    
+    while (_hasSlowConnection && retryCount < maxRetries) {
+      debugPrint('Auto-retry attempt ${retryCount + 1} in $retryDelay seconds');
+      await Future.delayed(Duration(seconds: retryDelay));
       
-      // We don't automatically clear the notification - it stays until successful download
-      // or until the user takes an action that forces a new attempt
+      // Check if we're still in slow connection state
+      if (!_hasSlowConnection) {
+        debugPrint('Connection restored, stopping auto-retry');
+        break;
+      }
+      
+      // Check if we have internet connection
+      final hasConnection = await hasInternetConnection();
+      if (!hasConnection) {
+        debugPrint('Still no internet connection, waiting for next retry');
+        retryCount++;
+        retryDelay = min(retryDelay * 2, 60); // Exponential backoff, max 60 seconds
+        continue;
+      }
+      
+      debugPrint('Internet connection detected, retrying download...');
+      try {
+        // Try to download PDFs again
+        _isLoading = true;
+        notifyListeners();
+        
+        final results = await Future.wait([
+          downloadPdfWithWeekdayName(todayUrl, true, forceReload: forceReload),
+          downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: forceReload),
+        ]);
+        
+        // Check if download was successful
+        if (results[0] != null || results[1] != null) {
+          _hasSlowConnection = false;
+          _showLoadingBar = false;
+          _isLoading = false;
+          debugPrint('Auto-retry successful, PDFs downloaded');
+          notifyListeners();
+          break;
+        }
+      } catch (e) {
+        debugPrint('Auto-retry failed: $e');
+      } finally {
+        _isLoading = false;
+        notifyListeners();
+      }
+      
+      retryCount++;
+      retryDelay = min(retryDelay * 2, 60); // Exponential backoff, max 60 seconds
+    }
+    
+    _isAutoRetrying = false;
+    
+    // If we've exhausted all retries and still have slow connection
+    if (_hasSlowConnection && retryCount >= maxRetries) {
+      debugPrint('Auto-retry max attempts reached');
     }
   }
 }
