@@ -186,8 +186,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   valueColor: const AlwaysStoppedAnimation<Color>(
                       AppColors.appBlueAccent),
                 ),
-              )
-            else
+              ),
+            
+            // Network notification
+            if (pdfRepo.hasSlowConnection) ...[
+              const SizedBox(height: 16),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 32),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.appSurface.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.orange.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.signal_wifi_off_outlined,
+                      color: Colors.orange.withOpacity(0.8),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Sieht so aus als hättest du gerade ziemlich schlechten Empfang.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.primaryText.withOpacity(0.9),
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+            
+            if (!pdfRepo.weekdaysLoaded && !pdfRepo.hasSlowConnection)
+              const SizedBox(height: 32)
+            else if (pdfRepo.weekdaysLoaded)
               Consumer(
                 builder: (context, ref, child) {
                   final preferencesManager =

@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class PdfRepository extends ChangeNotifier {
   static const String _username = 'vertretungsplan';
@@ -25,6 +26,8 @@ class PdfRepository extends ChangeNotifier {
   String _todayDate = '';
   String _tomorrowDate = '';
   bool _weekdaysLoaded = false;
+  bool _isLoading = false;
+  bool _hasSlowConnection = false;
 
   // Getters for accessing the data
   String get todayWeekday => _todayWeekday;
@@ -34,6 +37,8 @@ class PdfRepository extends ChangeNotifier {
   String get todayDate => _todayDate;
   String get tomorrowDate => _tomorrowDate;
   bool get weekdaysLoaded => _weekdaysLoaded;
+  bool get isLoading => _isLoading;
+  bool get hasSlowConnection => _hasSlowConnection;
   
   // Dynamic filename getters based on weekdays
   String get todayPdfFilename => _todayWeekday.isNotEmpty ? '${_todayWeekday.toLowerCase()}.pdf' : todayFilename;
@@ -121,7 +126,7 @@ class PdfRepository extends ChangeNotifier {
         return file;
       }
 
-      // Download with basic auth
+      // Download with basic auth and timeout
       final credentials = base64Encode(utf8.encode('$_username:$_password'));
       final response = await http.get(
         Uri.parse(url),
@@ -129,7 +134,7 @@ class PdfRepository extends ChangeNotifier {
           'Authorization': 'Basic $credentials',
           'User-Agent': 'LGKA-Flutter-App/1.0',
         },
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode != 200) {
         debugPrint('Failed to download PDF: ${response.statusCode}');
@@ -266,12 +271,71 @@ class PdfRepository extends ChangeNotifier {
     _weekdaysLoaded = _todayWeekday.isNotEmpty && _tomorrowWeekday.isNotEmpty;
   }
 
-  /// Preload both PDFs using weekday-based naming
+  /// Check if device has internet connectivity
+  Future<bool> hasInternetConnection() async {
+    try {
+      final connectivityResult = await Connectivity().checkConnectivity();
+      return !connectivityResult.contains(ConnectivityResult.none);
+    } catch (e) {
+      debugPrint('Error checking connectivity: $e');
+      return false;
+    }
+  }
+
+  /// Preload both PDFs using weekday-based naming with network monitoring
   Future<void> preloadPdfs({bool forceReload = false}) async {
-    await Future.wait([
-      downloadPdfWithWeekdayName(todayUrl, true, forceReload: forceReload),
-      downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: forceReload),
-    ]);
+    _isLoading = true;
+    _hasSlowConnection = false;
+    notifyListeners();
+
+    bool slowConnectionTimerTriggered = false;
+
+    // Start a timer to detect slow connection after 3 seconds
+    final slowConnectionTimer = Future.delayed(const Duration(seconds: 3), () {
+      if (_isLoading && !slowConnectionTimerTriggered) {
+        slowConnectionTimerTriggered = true;
+        _hasSlowConnection = true;
+        notifyListeners();
+      }
+    });
+
+    try {
+      // Check connectivity first
+      final hasConnection = await hasInternetConnection();
+      if (!hasConnection) {
+        if (!slowConnectionTimerTriggered) {
+          _hasSlowConnection = true;
+          notifyListeners();
+        }
+        return;
+      }
+
+      await Future.wait([
+        downloadPdfWithWeekdayName(todayUrl, true, forceReload: forceReload),
+        downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: forceReload),
+      ]);
+    } catch (e) {
+      debugPrint('Error preloading PDFs: $e');
+      if (!slowConnectionTimerTriggered) {
+        _hasSlowConnection = true;
+        notifyListeners();
+      }
+    } finally {
+      _isLoading = false;
+      // Only reset slow connection if we finished quickly (< 3 seconds)
+      if (!slowConnectionTimerTriggered) {
+        _hasSlowConnection = false;
+      }
+      notifyListeners();
+      
+      // Clear the slow connection notification after a delay if it was shown
+      if (_hasSlowConnection) {
+        Future.delayed(const Duration(seconds: 5), () {
+          _hasSlowConnection = false;
+          notifyListeners();
+        });
+      }
+    }
   }
 }
 
