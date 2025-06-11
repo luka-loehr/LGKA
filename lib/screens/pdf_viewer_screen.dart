@@ -102,6 +102,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         backgroundColor: AppColors.appBackground,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.primaryText),
+        // Override the back button to add haptic feedback
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          color: AppColors.primaryText,
+          onPressed: () {
+            HapticService.subtle(); // Add haptic feedback
+            Navigator.of(context).pop();
+          },
+        ),
         actions: [
           IconButton(
             onPressed: _sharePdf,
