@@ -193,29 +193,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             // Network notification - show regardless of weekdays loaded state
             if (pdfRepo.hasSlowConnection) ...[
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 32),
-                padding: const EdgeInsets.all(16),
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 decoration: BoxDecoration(
-                  color: AppColors.appSurface.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.orange.withOpacity(0.3),
-                    width: 1,
-                  ),
+                  color: AppColors.appSurface,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.appBlueAccent.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.signal_wifi_off_outlined,
-                      color: Colors.orange.withOpacity(0.8),
-                      size: 20,
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.signal_wifi_off_outlined,
+                        color: Colors.orange,
+                        size: 22,
+                      ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Text(
                         'Sieht so aus als hättest du gerade ziemlich schlechten Empfang.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.primaryText.withOpacity(0.9),
+                          color: AppColors.primaryText,
                           height: 1.3,
                         ),
                       ),
