@@ -322,15 +322,21 @@ class PdfRepository extends ChangeNotifier {
         return;
       }
 
-      await Future.wait([
+      final results = await Future.wait([
         downloadPdfWithWeekdayName(todayUrl, true, forceReload: forceReload),
         downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: forceReload),
       ]);
       
-      // Success - hide everything
-      _showLoadingBar = false;
-      _hasSlowConnection = false;
-      debugPrint('PDFs loaded successfully');
+      // Only clear slow connection notification if at least one PDF was successfully downloaded
+      if (results[0] != null || results[1] != null) {
+        _showLoadingBar = false;
+        _hasSlowConnection = false;
+        debugPrint('PDFs loaded successfully');
+      } else {
+        // Keep slow connection notification if no PDFs were downloaded
+        _showLoadingBar = false;
+        debugPrint('Failed to download PDFs, keeping slow connection notification');
+      }
       
     } catch (e) {
       debugPrint('Error preloading PDFs: $e');
@@ -341,13 +347,8 @@ class PdfRepository extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       
-      // Clear the slow connection notification after a delay if it was shown
-      if (_hasSlowConnection) {
-        Future.delayed(const Duration(seconds: 5), () {
-          _hasSlowConnection = false;
-          notifyListeners();
-        });
-      }
+      // We don't automatically clear the notification - it stays until successful download
+      // or until the user takes an action that forces a new attempt
     }
   }
 }
