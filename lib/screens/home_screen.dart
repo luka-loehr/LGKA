@@ -178,61 +178,71 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             
             // Loading bar or network notification - they replace each other at the same position
             if (pdfRepo.showLoadingBar)
-              Container(
-                margin: const EdgeInsets.symmetric(
-                    horizontal: 64, vertical: 24),
-                height: 5,
-                child: LinearProgressIndicator(
-                  backgroundColor:
-                      AppColors.appBlueAccent.withOpacity(0.2),
-                  valueColor: const AlwaysStoppedAnimation<Color>(
-                      AppColors.appBlueAccent),
+              AnimatedOpacity(
+                opacity: 1.0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeIn,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 64, vertical: 24),
+                  height: 5,
+                  child: LinearProgressIndicator(
+                    backgroundColor:
+                        AppColors.appBlueAccent.withOpacity(0.2),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                        AppColors.appBlueAccent),
+                  ),
                 ),
               )
             else if (pdfRepo.hasSlowConnection)
-              Container(
-                margin: const EdgeInsets.only(bottom: 8),
+              AnimatedOpacity(
+                opacity: 1.0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeIn,
                 child: Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  decoration: BoxDecoration(
-                    color: AppColors.appSurface,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.appBlueAccent.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.orange.withOpacity(0.2),
-                          shape: BoxShape.circle,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: AppColors.appSurface,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.appBlueAccent.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
-                        child: const Icon(
-                          Icons.signal_wifi_off_outlined,
-                          color: Colors.orange,
-                          size: 22,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          'Sieht so aus als hättest du gerade ziemlich schlechten Empfang.',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.primaryText,
-                            height: 1.3,
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.signal_wifi_off_outlined,
+                            color: Colors.orange,
+                            size: 22,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            'Sieht so aus als hättest du gerade ziemlich schlechten Empfang.',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.primaryText,
+                              height: 1.3,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               )
@@ -240,137 +250,147 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 8),
             
             if (pdfRepo.weekdaysLoaded)
-              Consumer(
-                builder: (context, ref, child) {
-                  final preferencesManager =
-                      ref.watch(preferencesManagerProvider);
-                  final showDates =
-                      preferencesManager.showDatesWithWeekdays;
+              AnimatedOpacity(
+                opacity: 1.0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeIn,
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final preferencesManager =
+                        ref.watch(preferencesManagerProvider);
+                    final showDates =
+                        preferencesManager.showDatesWithWeekdays;
 
-                  // Verwende die direkten Wochentage aus pdfRepo
-                  final todayWeekday = pdfRepo.todayWeekday;
-                  final tomorrowWeekday = pdfRepo.tomorrowWeekday;
-                  final todayDate = pdfRepo.todayDate;
-                  final tomorrowDate = pdfRepo.tomorrowDate;
+                    // Verwende die direkten Wochentage aus pdfRepo
+                    final todayWeekday = pdfRepo.todayWeekday;
+                    final tomorrowWeekday = pdfRepo.tomorrowWeekday;
+                    final todayDate = pdfRepo.todayDate;
+                    final tomorrowDate = pdfRepo.tomorrowDate;
 
-                  return Column(
-                    children: [
-                      _PlanOptions(
-                        todayWeekday: todayWeekday,
-                        tomorrowWeekday: tomorrowWeekday,
-                        todayDate: todayDate,
-                        tomorrowDate: tomorrowDate,
-                        showDates: showDates,
-                        onTodayClick: () => _openPdf(true),
-                        onTomorrowClick: () => _openPdf(false),
-                      ),
-                      
-                      // Debug navigation mode detection (only show if enabled in preferences)
-                      if (ref.watch(preferencesManagerProvider).showNavigationDebug) ...[
-                        const SizedBox(height: 16),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.appSurface.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: AppColors.appBlueAccent.withOpacity(0.3),
-                              width: 1,
+                    return Column(
+                      children: [
+                        _PlanOptions(
+                          todayWeekday: todayWeekday,
+                          tomorrowWeekday: tomorrowWeekday,
+                          todayDate: todayDate,
+                          tomorrowDate: tomorrowDate,
+                          showDates: showDates,
+                          onTodayClick: () => _openPdf(true),
+                          onTomorrowClick: () => _openPdf(false),
+                        ),
+                        
+                        // Debug navigation mode detection (only show if enabled in preferences)
+                        if (ref.watch(preferencesManagerProvider).showNavigationDebug) ...[
+                          const SizedBox(height: 16),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.appSurface.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: AppColors.appBlueAccent.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Builder(
+                              builder: (context) {
+                                final mediaQuery = MediaQuery.of(context);
+                                final gestureInsets = mediaQuery.systemGestureInsets.bottom;
+                                final viewPadding = mediaQuery.viewPadding.bottom;
+                                final padding = mediaQuery.padding.bottom;
+                                
+                                // More robust detection logic that should work across devices
+                                // Primary: systemGestureInsets.bottom - button nav usually has higher values
+                                // Secondary: viewPadding.bottom - as additional indicator
+                                // Fallback: Use conservative approach if values are ambiguous
+                                bool isButtonNavigation;
+                                String detectionMethod;
+                                
+                                if (gestureInsets >= 45) {
+                                  // Very likely button navigation
+                                  isButtonNavigation = true;
+                                  detectionMethod = "High gesture insets (≥45)";
+                                } else if (gestureInsets <= 25) {
+                                  // Very likely gesture navigation
+                                  isButtonNavigation = false;
+                                  detectionMethod = "Low gesture insets (≤25)";
+                                } else {
+                                  // Ambiguous range (26-44) - use viewPadding as secondary indicator
+                                  isButtonNavigation = viewPadding > 50;
+                                  detectionMethod = "Ambiguous range, using viewPadding";
+                                }
+                                
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Debug: Navigation Mode Detection',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppColors.appBlueAccent,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'systemGestureInsets.bottom: $gestureInsets',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppColors.secondaryText,
+                                      ),
+                                    ),
+                                    Text(
+                                      'viewPadding.bottom: $viewPadding',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppColors.secondaryText,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Detection: $detectionMethod',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppColors.secondaryText.withOpacity(0.7),
+                                      ),
+                                    ),
+                                    Text(
+                                      'Detected Mode: ${isButtonNavigation ? "Button Navigation (3 buttons)" : "Gesture Navigation (white bar)"}',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: isButtonNavigation ? Colors.orange : Colors.green,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Footer Padding: ${isButtonNavigation ? "34.0px" : "8.0px"}',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppColors.secondaryText,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
                           ),
-                          child: Builder(
-                            builder: (context) {
-                              final mediaQuery = MediaQuery.of(context);
-                              final gestureInsets = mediaQuery.systemGestureInsets.bottom;
-                              final viewPadding = mediaQuery.viewPadding.bottom;
-                              final padding = mediaQuery.padding.bottom;
-                              
-                              // More robust detection logic that should work across devices
-                              // Primary: systemGestureInsets.bottom - button nav usually has higher values
-                              // Secondary: viewPadding.bottom - as additional indicator
-                              // Fallback: Use conservative approach if values are ambiguous
-                              bool isButtonNavigation;
-                              String detectionMethod;
-                              
-                              if (gestureInsets >= 45) {
-                                // Very likely button navigation
-                                isButtonNavigation = true;
-                                detectionMethod = "High gesture insets (≥45)";
-                              } else if (gestureInsets <= 25) {
-                                // Very likely gesture navigation
-                                isButtonNavigation = false;
-                                detectionMethod = "Low gesture insets (≤25)";
-                              } else {
-                                // Ambiguous range (26-44) - use viewPadding as secondary indicator
-                                isButtonNavigation = viewPadding > 50;
-                                detectionMethod = "Ambiguous range, using viewPadding";
-                              }
-                              
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Debug: Navigation Mode Detection',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.appBlueAccent,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'systemGestureInsets.bottom: $gestureInsets',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.secondaryText,
-                                    ),
-                                  ),
-                                  Text(
-                                    'viewPadding.bottom: $viewPadding',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.secondaryText,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Detection: $detectionMethod',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.secondaryText.withOpacity(0.7),
-                                    ),
-                                  ),
-                                  Text(
-                                    'Detected Mode: ${isButtonNavigation ? "Button Navigation (3 buttons)" : "Gesture Navigation (white bar)"}',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: isButtonNavigation ? Colors.orange : Colors.green,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Footer Padding: ${isButtonNavigation ? "34.0px" : "8.0px"}',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.secondaryText,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
+                        ],
                       ],
-                    ],
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             if (_error != null) ...[
               const SizedBox(height: 16),
-              Card(
-                color: const Color(0xFF442727),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    _error!,
-                    style:
-                        Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: const Color(0xFFCF6679),
-                            ),
+              AnimatedOpacity(
+                opacity: 1.0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeIn,
+                child: Card(
+                  color: const Color(0xFF442727),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      _error!,
+                      style:
+                          Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: const Color(0xFFCF6679),
+                              ),
+                    ),
                   ),
                 ),
               ),
