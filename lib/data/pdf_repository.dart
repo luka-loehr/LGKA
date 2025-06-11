@@ -128,6 +128,8 @@ class PdfRepository extends ChangeNotifier {
         return file;
       }
 
+
+      
       // Download with basic auth and timeout
       final credentials = base64Encode(utf8.encode('$_username:$_password'));
       final response = await http.get(
