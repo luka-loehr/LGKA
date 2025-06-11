@@ -186,11 +186,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   valueColor: const AlwaysStoppedAnimation<Color>(
                       AppColors.appBlueAccent),
                 ),
-              ),
+              )
+            else
+              const SizedBox(height: 32),
             
-            // Network notification
+            // Network notification - show regardless of weekdays loaded state
             if (pdfRepo.hasSlowConnection) ...[
-              const SizedBox(height: 16),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 32),
                 padding: const EdgeInsets.all(16),
@@ -225,9 +226,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 16),
             ],
             
-            if (!pdfRepo.weekdaysLoaded && !pdfRepo.hasSlowConnection)
-              const SizedBox(height: 32)
-            else if (pdfRepo.weekdaysLoaded)
+            if (pdfRepo.weekdaysLoaded)
               Consumer(
                 builder: (context, ref, child) {
                   final preferencesManager =

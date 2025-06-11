@@ -302,11 +302,12 @@ class PdfRepository extends ChangeNotifier {
     try {
       // Check connectivity first
       final hasConnection = await hasInternetConnection();
+      debugPrint('Network connection available: $hasConnection');
+      
       if (!hasConnection) {
-        if (!slowConnectionTimerTriggered) {
-          _hasSlowConnection = true;
-          notifyListeners();
-        }
+        debugPrint('No internet connection detected - showing notification');
+        _hasSlowConnection = true;
+        notifyListeners();
         return;
       }
 
@@ -316,14 +317,13 @@ class PdfRepository extends ChangeNotifier {
       ]);
     } catch (e) {
       debugPrint('Error preloading PDFs: $e');
-      if (!slowConnectionTimerTriggered) {
-        _hasSlowConnection = true;
-        notifyListeners();
-      }
+      _hasSlowConnection = true;
+      notifyListeners();
     } finally {
       _isLoading = false;
-      // Only reset slow connection if we finished quickly (< 3 seconds)
-      if (!slowConnectionTimerTriggered) {
+      // Only reset slow connection if we finished quickly (< 3 seconds) AND had connection
+      final hasConnection = await hasInternetConnection();
+      if (!slowConnectionTimerTriggered && hasConnection) {
         _hasSlowConnection = false;
       }
       notifyListeners();
