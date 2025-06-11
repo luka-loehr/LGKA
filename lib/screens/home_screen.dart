@@ -190,68 +190,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               )
                           else if (pdfRepo.hasSlowConnection)
-              GestureDetector(
-                onTap: () {
-                  // Manual retry when tapping the network notification
-                  HapticService.subtle();
-                  _refreshPlans(forceReload: true);
-                },
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 8),
                 child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  child: Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                    decoration: BoxDecoration(
-                      color: AppColors.appSurface,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.appBlueAccent.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                  width: double.infinity,
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  decoration: BoxDecoration(
+                    color: AppColors.appSurface,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.appBlueAccent.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.2),
+                          shape: BoxShape.circle,
                         ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.signal_wifi_off_outlined,
-                            color: Colors.orange,
-                            size: 22,
-                          ),
+                        child: const Icon(
+                          Icons.signal_wifi_off_outlined,
+                          color: Colors.orange,
+                          size: 22,
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Sieht so aus als hättest du gerade ziemlich schlechten Empfang.',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: AppColors.primaryText,
-                                  height: 1.3,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Tippen zum erneut versuchen',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.appBlueAccent.withOpacity(0.8),
-                                ),
-                              ),
-                            ],
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          'Sieht so aus als hättest du gerade ziemlich schlechten Empfang.',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.primaryText,
+                            height: 1.3,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               )
