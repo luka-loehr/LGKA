@@ -93,7 +93,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Vertretungsplan',
+          widget.dayName ?? 'Vertretungsplan',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.primaryText,
