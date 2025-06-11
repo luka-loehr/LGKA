@@ -41,14 +41,26 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStateMixin {
   bool _isTodayLoading = false;
   bool _isTomorrowLoading = false;
   String? _error;
+  
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+    
+    // Initialize fade animation controller
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
+    );
 
     // Preload PDFs when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -59,6 +71,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _refreshPlans({bool forceReload = true}) async {
     final pdfRepo = ref.read(pdfRepositoryProvider);
     await pdfRepo.preloadPdfs(forceReload: forceReload);
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
   }
 
   Future<void> _openPdf(bool isToday) async {
@@ -134,6 +152,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final pdfRepo = ref.watch(pdfRepositoryProvider);
+    
+    // Trigger fade-in animation when weekdays are loaded
+    if (pdfRepo.weekdaysLoaded && _fadeController.status == AnimationStatus.dismissed) {
+      _fadeController.forward();
+    }
     
     return Scaffold(
       backgroundColor: AppColors.appBackground,
@@ -250,10 +273,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 8),
             
             if (pdfRepo.weekdaysLoaded)
-              AnimatedOpacity(
-                opacity: 1.0,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeIn,
+              FadeTransition(
+                opacity: _fadeAnimation,
                 child: Consumer(
                   builder: (context, ref, child) {
                     final preferencesManager =
