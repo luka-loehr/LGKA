@@ -28,6 +28,7 @@ class PdfRepository extends ChangeNotifier {
   bool _weekdaysLoaded = false;
   bool _isLoading = false;
   bool _hasSlowConnection = false;
+  bool _showLoadingBar = false;
 
   // Getters for accessing the data
   String get todayWeekday => _todayWeekday;
@@ -39,6 +40,7 @@ class PdfRepository extends ChangeNotifier {
   bool get weekdaysLoaded => _weekdaysLoaded;
   bool get isLoading => _isLoading;
   bool get hasSlowConnection => _hasSlowConnection;
+  bool get showLoadingBar => _showLoadingBar;
   
   // Dynamic filename getters based on weekdays
   String get todayPdfFilename => _todayWeekday.isNotEmpty ? '${_todayWeekday.toLowerCase()}.pdf' : todayFilename;
@@ -286,7 +288,11 @@ class PdfRepository extends ChangeNotifier {
   Future<void> preloadPdfs({bool forceReload = false}) async {
     _isLoading = true;
     _hasSlowConnection = false;
+    _showLoadingBar = true;
     notifyListeners();
+
+    // Always try to load from cache first to get weekdays
+    await loadWeekdaysFromCachedPdfs();
 
     bool slowConnectionTimerTriggered = false;
 
@@ -295,7 +301,9 @@ class PdfRepository extends ChangeNotifier {
       if (_isLoading && !slowConnectionTimerTriggered) {
         slowConnectionTimerTriggered = true;
         _hasSlowConnection = true;
+        _showLoadingBar = false; // Hide loading bar, show notification instead
         notifyListeners();
+        debugPrint('Slow connection detected after 3 seconds - replacing loading bar with notification');
       }
     });
 
@@ -305,8 +313,9 @@ class PdfRepository extends ChangeNotifier {
       debugPrint('Network connection available: $hasConnection');
       
       if (!hasConnection) {
-        debugPrint('No internet connection detected - showing notification');
+        debugPrint('No internet connection detected - replacing loading bar with notification immediately');
         _hasSlowConnection = true;
+        _showLoadingBar = false; // Hide loading bar immediately
         notifyListeners();
         return;
       }
@@ -315,17 +324,19 @@ class PdfRepository extends ChangeNotifier {
         downloadPdfWithWeekdayName(todayUrl, true, forceReload: forceReload),
         downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: forceReload),
       ]);
+      
+      // Success - hide everything
+      _showLoadingBar = false;
+      _hasSlowConnection = false;
+      debugPrint('PDFs loaded successfully');
+      
     } catch (e) {
       debugPrint('Error preloading PDFs: $e');
       _hasSlowConnection = true;
+      _showLoadingBar = false; // Hide loading bar on error
       notifyListeners();
     } finally {
       _isLoading = false;
-      // Only reset slow connection if we finished quickly (< 3 seconds) AND had connection
-      final hasConnection = await hasInternetConnection();
-      if (!slowConnectionTimerTriggered && hasConnection) {
-        _hasSlowConnection = false;
-      }
       notifyListeners();
       
       // Clear the slow connection notification after a delay if it was shown

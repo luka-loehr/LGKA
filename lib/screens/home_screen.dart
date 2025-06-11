@@ -175,7 +175,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           children: [
             const SizedBox(height: 32),
-            if (!pdfRepo.weekdaysLoaded)
+            if (pdfRepo.showLoadingBar)
               Container(
                 margin: const EdgeInsets.symmetric(
                     horizontal: 64, vertical: 32),

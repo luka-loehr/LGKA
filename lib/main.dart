@@ -67,7 +67,6 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
     try {
       final pdfRepo = ref.read(pdfRepositoryProvider);
       await pdfRepo.preloadPdfs();
-      await pdfRepo.loadWeekdaysFromCachedPdfs();
     } catch (e) {
       debugPrint('Error preloading PDFs: $e');
     }
