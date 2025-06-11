@@ -174,20 +174,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
           IconButton(
             onPressed: () {
               HapticService.subtle();
-              _showSettingsBottomSheet();
+              _showAboutBottomSheet();
             },
             icon: const Icon(
-              Icons.settings_outlined,
+              Icons.privacy_tip_outlined,
               color: AppColors.secondaryText,
             ),
           ),
           IconButton(
             onPressed: () {
               HapticService.subtle();
-              _showAboutBottomSheet();
+              _showSettingsBottomSheet();
             },
             icon: const Icon(
-              Icons.privacy_tip_outlined,
+              Icons.settings_outlined,
               color: AppColors.secondaryText,
             ),
           ),
