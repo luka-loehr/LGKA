@@ -34,6 +34,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+pubspec.lock
 
 # Web related
 lib/generated_plugin_registrant.dart
@@ -78,6 +79,9 @@ app.*.map.json
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/Podfile.lock
+**/ios/**/*.xcworkspace/
+**/ios/**/*.xcodeproj/project.xcworkspace/
 
 # macOS/XCode related
 **/macos/**/*.mode1v3
