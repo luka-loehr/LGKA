@@ -125,7 +125,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       body: PdfView(
         controller: _pdfController,
         builders: PdfViewBuilders<DefaultBuilderOptions>(
-          options: const DefaultBuilderOptions(),
+          options: const DefaultBuilderOptions(
+            loaderSwitchDuration: Duration.zero, // Remove animation duration
+            transitionBuilder: _noTransition, // Use instant transition
+          ),
           documentLoaderBuilder: (_) =>
               const Center(child: CircularProgressIndicator()),
           pageLoaderBuilder: (_) =>
@@ -154,5 +157,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       initialScale: PhotoViewComputedScale.contained,
       heroAttributes: PhotoViewHeroAttributes(tag: '${document.id}-$index'),
     );
+  }
+
+  // Custom transition that removes all animations
+  static Widget _noTransition(Widget child, Animation<double> animation) {
+    return child; // Return the widget directly without any animation
   }
 } 
