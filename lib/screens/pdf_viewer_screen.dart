@@ -129,10 +129,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
             loaderSwitchDuration: Duration.zero, // Remove animation duration
             transitionBuilder: _noTransition, // Use instant transition
           ),
-          documentLoaderBuilder: (_) =>
-              const Center(child: CircularProgressIndicator()),
-          pageLoaderBuilder: (_) =>
-              const Center(child: CircularProgressIndicator()),
+          documentLoaderBuilder: (_) => const SizedBox.shrink(), // Remove document loading spinner
+          pageLoaderBuilder: (_) => const SizedBox.shrink(), // Remove page loading spinner
           errorBuilder: (_, error) => Center(child: Text(error.toString())),
           pageBuilder: _pageBuilder,
         ),
