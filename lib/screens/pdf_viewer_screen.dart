@@ -50,14 +50,14 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     await HapticService.subtle();
     
     try {
-      // Create a nice filename for sharing
-      String fileName;
-      if (widget.dayName != null && widget.dayName!.isNotEmpty) {
-        final dayFormatted = widget.dayName!.toLowerCase();
-        fileName = '${dayFormatted}_LGKA+.pdf';
-      } else {
-        fileName = 'vertretungsplan_LGKA+.pdf';
-      }
+          // Create a nice filename for sharing
+    String fileName;
+    if (widget.dayName != null && widget.dayName!.isNotEmpty) {
+      final dayFormatted = widget.dayName!.toLowerCase();
+      fileName = '${dayFormatted}_vertretungsplan.pdf';
+    } else {
+      fileName = 'vertretungsplan.pdf';
+    }
 
       // Create a temporary file with the nice name for sharing
       final tempDir = Directory.systemTemp;
