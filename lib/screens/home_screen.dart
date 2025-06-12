@@ -48,6 +48,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  late AnimationController _slowConnectionController;
+  late Animation<double> _slowConnectionAnimation;
 
   @override
   void initState() {
@@ -60,6 +62,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
+    );
+
+    // Initialize slow connection animation controller
+    _slowConnectionController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _slowConnectionAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _slowConnectionController, curve: Curves.easeIn),
     );
 
     // Preload PDFs when screen loads
@@ -76,6 +87,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   @override
   void dispose() {
     _fadeController.dispose();
+    _slowConnectionController.dispose();
     super.dispose();
   }
 
@@ -158,6 +170,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       _fadeController.forward();
     }
     
+    // Trigger slow connection animation when slow connection is detected
+    if (pdfRepo.hasSlowConnection && _slowConnectionController.status == AnimationStatus.dismissed) {
+      _slowConnectionController.forward();
+    } else if (!pdfRepo.hasSlowConnection && _slowConnectionController.status == AnimationStatus.completed) {
+      _slowConnectionController.reverse();
+    }
+    
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       appBar: AppBar(
@@ -218,10 +237,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                 ),
               )
             else if (pdfRepo.hasSlowConnection)
-              AnimatedOpacity(
-                opacity: 1.0,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeIn,
+              FadeTransition(
+                opacity: _slowConnectionAnimation,
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 8),
                   child: Container(
