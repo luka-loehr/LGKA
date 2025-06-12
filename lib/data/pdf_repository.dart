@@ -30,6 +30,7 @@ class PdfRepository extends ChangeNotifier {
   bool _isLoading = false;
   bool _hasSlowConnection = false;
   bool _showLoadingBar = false;
+  bool _isNoInternet = false;
 
   // Getters for accessing the data
   String get todayWeekday => _todayWeekday;
@@ -42,6 +43,7 @@ class PdfRepository extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get hasSlowConnection => _hasSlowConnection;
   bool get showLoadingBar => _showLoadingBar;
+  bool get isNoInternet => _isNoInternet;
   
   // Dynamic filename getters based on weekdays
   String get todayPdfFilename => _todayWeekday.isNotEmpty ? '${_todayWeekday.toLowerCase()}.pdf' : todayFilename;
@@ -294,6 +296,7 @@ class PdfRepository extends ChangeNotifier {
   Future<void> preloadPdfs({bool forceReload = false}) async {
     _isLoading = true;
     _hasSlowConnection = false;
+    _isNoInternet = false;
     _showLoadingBar = true;
     notifyListeners();
 
@@ -321,6 +324,7 @@ class PdfRepository extends ChangeNotifier {
       if (!hasConnection) {
         debugPrint('No internet connection detected - replacing loading bar with notification immediately');
         _hasSlowConnection = true;
+        _isNoInternet = true;
         _showLoadingBar = false; // Hide loading bar immediately
         notifyListeners();
         
@@ -340,6 +344,7 @@ class PdfRepository extends ChangeNotifier {
       if (results[0] != null || results[1] != null) {
         _showLoadingBar = false;
         _hasSlowConnection = false;
+        _isNoInternet = false;
         _isAutoRetrying = false; // Stop auto-retry if successful
         debugPrint('PDFs loaded successfully');
       } else {
@@ -409,6 +414,7 @@ class PdfRepository extends ChangeNotifier {
         // Check if download was successful
         if (results[0] != null || results[1] != null) {
           _hasSlowConnection = false;
+          _isNoInternet = false;
           _showLoadingBar = false;
           _isLoading = false;
           debugPrint('Auto-retry successful, PDFs downloaded');
