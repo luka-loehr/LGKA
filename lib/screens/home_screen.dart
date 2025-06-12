@@ -262,19 +262,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.2),
+                            color: pdfRepo.isNoInternet 
+                              ? Colors.red.withOpacity(0.2)
+                              : Colors.orange.withOpacity(0.2),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
-                            Icons.signal_wifi_off_outlined,
-                            color: Colors.orange,
+                          child: Icon(
+                            pdfRepo.isNoInternet 
+                              ? Icons.wifi_off_outlined
+                              : Icons.signal_wifi_bad_outlined,
+                            color: pdfRepo.isNoInternet ? Colors.red : Colors.orange,
                             size: 22,
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
                           child: Text(
-                            'Sieht so aus als hättest du gerade ziemlich schlechten Empfang.',
+                            pdfRepo.isNoInternet 
+                              ? 'Mach mal dein Internet an.'
+                              : 'Warte mal einen Moment, du hast gerade langsames Internet.',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: AppColors.primaryText,
                               height: 1.3,
