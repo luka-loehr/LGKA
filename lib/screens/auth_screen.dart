@@ -29,8 +29,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   bool _showSuccessFlash = false;
   bool _shouldShowOffset = false;
   
-  // Fixed animation values
-  static const double _contentOffsetY = -125.0; // Exactly 125px up
+  // Debug variables for testing perfect values
+  double _debugOffsetY = -125.0; // Current value to test
+  bool _useDebugValue = true; // Toggle for testing
+  bool _showDebugPanel = true; // Control visibility of debug panel
+  
+  // Adaptive offset calculation based on screen height
+  double _getAdaptiveOffset(BuildContext context) {
+    if (_useDebugValue) {
+      return _debugOffsetY; // Use debug value for testing
+    }
+    
+    // With textScaleFactor fixed to 1.0, a fixed offset works well
+    return -185.0;
+  }
+  
+  // Base offset for unfocused UI (to center it better)
+  static const double _baseOffset = -30.0;
+  
   static const Duration _animationDuration = Duration(milliseconds: 250);
   static const Duration _buttonAnimationDuration = Duration(milliseconds: 300);
   
@@ -246,6 +262,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       _updateOffsetState();
     });
     
+    // Get screen metrics for responsive design
+    final screenSize = MediaQuery.of(context).size;
+    // Force text scale factor to 1.0 for consistent UI across all devices
+    const textScaleFactor = 1.0;
+    
+    // Calculate responsive sizes
+    final bool isSmallScreen = screenSize.height < 700;
+    final double topSpacing = isSmallScreen ? 60 : 100;
+    final double formWidth = screenSize.width * 0.85;
+    final double maxFormWidth = 400; // Max width for larger screens
+    
     return Scaffold(
       backgroundColor: Colors.black,
       // This silences the overflow messages without changing behavior
@@ -261,220 +288,375 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           curve: Curves.easeOutQuad,
           transform: Matrix4.translationValues(
             0, 
-            _shouldShowOffset ? _contentOffsetY : 0.0, 
+            _shouldShowOffset ? _getAdaptiveOffset(context) : _baseOffset, 
             0
           ),
           child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
+            child: Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: topSpacing),
+                      
+                      // Title
+                      Text(
+                        'Anmeldung erforderlich',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28 / textScaleFactor, // Adjust for text scale factor
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(height: constraints.maxHeight > 700 ? 160 : 80), // Responsive spacer at top
-                  
-                  // Title
-                  const Text(
-                    'Anmeldung erforderlich',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Subtitle
-                  const Text(
-                    'Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst',
-                    style: TextStyle(
-                      color: Color(0xB3FFFFFF), // 70% white
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  
-                  const SizedBox(height: 70),
-                  
-                  // Card with form fields
-                  Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E1E),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      children: [
-                        // Username Field with rounded corners
-                        ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(16), 
-                            topRight: Radius.circular(16),
-                          ),
-                          child: TextField(
-                            controller: _usernameController,
-                            focusNode: _usernameFocusNode,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                            ),
-                            decoration: const InputDecoration(
-                              hintText: 'Benutzername',
-                              hintStyle: TextStyle(
-                                color: Color(0x80FFFFFF),
-                                fontSize: 18,
-                              ),
-                              prefixIcon: Icon(
-                                Icons.person_outline,
-                                color: Color(0xFF8E8E93),
-                                size: 24,
-                              ),
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 22,
-                              ),
-                              filled: true,
-                              fillColor: Color(0xFF1E1E1E),
-                            ),
-                            textInputAction: TextInputAction.next,
-                            onSubmitted: (_) => _passwordFocusNode.requestFocus(),
-                            onChanged: (_) => setState(() {}),
-                          ),
+                      
+                      const SizedBox(height: 12),
+                      
+                      // Subtitle
+                      Text(
+                        'Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst',
+                        style: TextStyle(
+                          color: const Color(0xB3FFFFFF), // 70% white
+                          fontSize: 14 / textScaleFactor, // Adjust for text scale factor
                         ),
-                        
-                        // Divider
-                        Container(
-                          height: 1,
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                          color: Colors.white.withValues(alpha: 0.1),
+                        textAlign: TextAlign.center,
+                      ),
+                      
+                      SizedBox(height: isSmallScreen ? 40 : 60),
+                      
+                      // Card with form fields
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: maxFormWidth,
                         ),
-                        
-                        // Password Field with rounded corners
-                        ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(16), 
-                            bottomRight: Radius.circular(16),
+                        child: Container(
+                          width: formWidth,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E1E1E),
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          child: TextField(
-                            controller: _passwordController,
-                            focusNode: _passwordFocusNode,
-                            obscureText: true,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                            ),
-                            decoration: const InputDecoration(
-                              hintText: 'Passwort',
-                              hintStyle: TextStyle(
-                                color: Color(0x80FFFFFF),
-                                fontSize: 18,
-                              ),
-                              prefixIcon: Icon(
-                                Icons.lock_outline,
-                                color: Color(0xFF8E8E93),
-                                size: 24,
-                              ),
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 22,
-                              ),
-                              filled: true,
-                              fillColor: Color(0xFF1E1E1E),
-                            ),
-                            textInputAction: TextInputAction.done,
-                            onSubmitted: (_) {
-                              if (_canLogin) _validateLogin();
-                            },
-                            onChanged: (_) => setState(() {}),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 42),
-                  
-                  // Login Button with animated color
-                  AnimatedBuilder(
-                    animation: Listenable.merge([_buttonColorAnimation, _successColorAnimation]),
-                    builder: (context, child) {
-                      return SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: Stack(
-                          children: [
-                            // Animated background button
-                            Positioned.fill(
-                              child: AnimatedContainer(
-                                duration: _buttonColorTransitionDuration,
-                                curve: Curves.easeInOut,
-                                decoration: BoxDecoration(
-                                  color: _currentButtonColor,
-                                  borderRadius: BorderRadius.circular(12),
+                          child: Column(
+                            children: [
+                              // Username Field with rounded corners
+                              ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(16), 
+                                  topRight: Radius.circular(16),
+                                ),
+                                child: TextField(
+                                  controller: _usernameController,
+                                  focusNode: _usernameFocusNode,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                  decoration: const InputDecoration(
+                                    hintText: 'Benutzername',
+                                    hintStyle: TextStyle(
+                                      color: Color(0x80FFFFFF),
+                                      fontSize: 16,
+                                    ),
+                                    prefixIcon: Icon(
+                                      Icons.person_outline,
+                                      color: Color(0xFF8E8E93),
+                                      size: 22,
+                                    ),
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 18,
+                                    ),
+                                    filled: true,
+                                    fillColor: Color(0xFF1E1E1E),
+                                  ),
+                                  textInputAction: TextInputAction.next,
+                                  onSubmitted: (_) => _passwordFocusNode.requestFocus(),
+                                  onChanged: (_) => setState(() {}),
                                 ),
                               ),
-                            ),
-                            
-                            // Clickable transparent button with always-white text
-                            SizedBox(
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: InkWell(
-                                onTap: _canLogin && !_showErrorFlash && !_showSuccessFlash ? _validateLogin : null,
-                                borderRadius: BorderRadius.circular(12),
-                                splashColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                child: Center(
-                                  child: _isLoading
-                                    ? const SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.5,
-                                          strokeCap: StrokeCap.round,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                        ),
-                                      )
-                                    : Text(
-                                        'Anmelden',
-                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                        ),
+                              
+                              // Divider
+                              Container(
+                                height: 1,
+                                margin: const EdgeInsets.symmetric(horizontal: 16),
+                                color: Colors.white.withOpacity(0.1),
+                              ),
+                              
+                              // Password Field with rounded corners
+                              ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(16), 
+                                  bottomRight: Radius.circular(16),
+                                ),
+                                child: TextField(
+                                  controller: _passwordController,
+                                  focusNode: _passwordFocusNode,
+                                  obscureText: true,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                  decoration: const InputDecoration(
+                                    hintText: 'Passwort',
+                                    hintStyle: TextStyle(
+                                      color: Color(0x80FFFFFF),
+                                      fontSize: 16,
+                                    ),
+                                    prefixIcon: Icon(
+                                      Icons.lock_outline,
+                                      color: Color(0xFF8E8E93),
+                                      size: 22,
+                                    ),
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 18,
+                                    ),
+                                    filled: true,
+                                    fillColor: Color(0xFF1E1E1E),
+                                  ),
+                                  textInputAction: TextInputAction.done,
+                                  onSubmitted: (_) {
+                                    if (_canLogin) _validateLogin();
+                                  },
+                                  onChanged: (_) => setState(() {}),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 32),
+                      
+                      // Login Button with animated color
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: maxFormWidth,
+                        ),
+                        child: AnimatedBuilder(
+                          animation: Listenable.merge([_buttonColorAnimation, _successColorAnimation]),
+                          builder: (context, child) {
+                            return SizedBox(
+                              width: formWidth,
+                              height: 46,
+                              child: Stack(
+                                children: [
+                                  // Animated background button
+                                  Positioned.fill(
+                                    child: AnimatedContainer(
+                                      duration: _buttonColorTransitionDuration,
+                                      curve: Curves.easeInOut,
+                                      decoration: BoxDecoration(
+                                        color: _currentButtonColor,
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                ),
+                                    ),
+                                  ),
+                                  
+                                  // Clickable transparent button with always-white text
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    child: InkWell(
+                                      onTap: _canLogin && !_showErrorFlash && !_showSuccessFlash ? _validateLogin : null,
+                                      borderRadius: BorderRadius.circular(12),
+                                      splashColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      child: Center(
+                                        child: _isLoading
+                                          ? const SizedBox(
+                                              width: 22,
+                                              height: 22,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2.5,
+                                                strokeCap: StrokeCap.round,
+                                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                              ),
+                                            )
+                                          : Text(
+                                              'Anmelden',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.white,
+                                                fontSize: 15 / textScaleFactor,
+                                              ),
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-                  
-                          SizedBox(height: constraints.maxHeight > 700 ? 160 : 80), // Responsive spacer at bottom
-                        ],
                       ),
-                    ),
-                  );
-                },
+                      
+                      SizedBox(height: isSmallScreen ? 40 : 60),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
         ),
       ),
+      
+      // Floating Debug Panel
+      floatingActionButton: FloatingActionButton.small(
+        onPressed: () => setState(() => _showDebugPanel = !_showDebugPanel),
+        backgroundColor: Colors.black.withOpacity(0.7),
+        child: Icon(_showDebugPanel ? Icons.visibility_off : Icons.bug_report, 
+          size: 20, color: _showDebugPanel ? Colors.orange : Colors.green),
+      ),
+      
+      // Debug Panel as overlay
+      bottomSheet: _showDebugPanel ? Container(
+        height: 220,
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.85),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${_useDebugValue ? "Debug" : "Formula"}: Offset Y = ${_useDebugValue ? _debugOffsetY.toStringAsFixed(1) : _getAdaptiveOffset(context).toStringAsFixed(1)}px',
+                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                ElevatedButton(
+                  onPressed: () => setState(() => _useDebugValue = !_useDebugValue),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _useDebugValue ? Colors.orange.withOpacity(0.5) : Colors.green.withOpacity(0.5),
+                    minimumSize: const Size(0, 30),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
+                  child: Text(
+                    _useDebugValue ? 'Use Formula' : 'Use Debug',
+                    style: const TextStyle(fontSize: 10),
+                  ),
+                ),
+              ],
+                          ),
+              const SizedBox(height: 10),
+              
+              // Device info
+              Builder(
+                builder: (context) {
+                  final mediaQuery = MediaQuery.of(context);
+                  return Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'SafeAreaTop: ${mediaQuery.padding.top.toStringAsFixed(1)}px',
+                                style: const TextStyle(color: Colors.cyan, fontSize: 11),
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                'ScreenH: ${mediaQuery.size.height.toStringAsFixed(1)}px',
+                                style: const TextStyle(color: Colors.yellow, fontSize: 11),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'KeyboardH: ${mediaQuery.viewInsets.bottom.toStringAsFixed(1)}px',
+                                style: const TextStyle(color: Colors.green, fontSize: 11),
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                'TextScale: ${mediaQuery.textScaleFactor.toStringAsFixed(2)}',
+                                style: const TextStyle(color: Colors.orange, fontSize: 11),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Adjustment buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => setState(() => _debugOffsetY -= 10),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.withOpacity(0.4),
+                      minimumSize: const Size(60, 30),
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: const Text('-10', style: TextStyle(fontSize: 10)),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => setState(() => _debugOffsetY -= 1),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange.withOpacity(0.4),
+                      minimumSize: const Size(50, 30),
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: const Text('-1', style: TextStyle(fontSize: 10)),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => setState(() => _debugOffsetY += 1),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.withOpacity(0.4),
+                      minimumSize: const Size(50, 30),
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: const Text('+1', style: TextStyle(fontSize: 10)),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => setState(() => _debugOffsetY += 10),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue.withOpacity(0.4),
+                      minimumSize: const Size(60, 30),
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: const Text('+10', style: TextStyle(fontSize: 10)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ) : null,
     );
   }
 } 
