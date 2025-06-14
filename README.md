@@ -1,65 +1,79 @@
-# LGKA-App – Digitaler Vertretungsplan des Lessing-Gymnasiums Karlsruhe
+# 📱 LGKA-App – Digitaler Vertretungsplan des Lessing-Gymnasiums Karlsruhe
 
-> **App-Größe**: Optimiert auf ~9.6MB (ursprünglich 130MB)
+![App Icon](https://raw.githubusercontent.com/luka-loehr/LGKA/main/assets/icon/icon.png)
 
-Eine Flutter-App zur digitalen Anzeige des Vertretungsplans des Lessing-Gymnasiums Karlsruhe. Entwickelt von Luka Löhr als nicht-kommerzielles Schulprojekt.
+> 🛠️ **Neu in Version 1.6.4**
+> 
+> - ✨ **Neues App-Icon** im modernen Look
+> - 📅 **Datumsauswahl-Funktion** in den Einstellungen
+> - 📄 **PDF-Viewer-Konfiguration**: intern oder extern anzeigen
+> - ⚡ Verbesserte Ladeanimation beim App-Start
+> - 🌐 Intelligentere Netzwerkerkennung mit Feedback
 
-## Funktionen
+---
 
-**Vertretungsplan-Anzeige**
-- Anzeige für heute und morgen
+## 🧩 Funktionen
+
+### 📆 Vertretungsplan-Anzeige
+- Anzeige für **heute und morgen**
 - Automatischer Download vom Schulserver
-- HTTP Basic Authentication
-- Offline-Verfügbarkeit durch lokales Caching
+- 🔒 HTTP Basic Authentication
+- 📂 Offline-Verfügbarkeit durch lokales Caching
 
-**PDF-Integration**
-- Integrierter PDF-Viewer (standardmäßig aktiviert)
-- Optional: Öffnen mit externen Apps (Google Drive, etc.)
-- PDF-Sharing-Funktion
-- Zoom- und Scroll-Funktionen
+### 📄 PDF-Integration
+- Integrierter PDF-Viewer *(standardmäßig aktiviert)*
+- Option zum Öffnen in externen Apps *(Google Drive, etc.)*
+- ✉️ **PDF-Sharing-Funktion**
+- 🔍 Zoom- & Scroll-Support
 
-**Benutzeroberfläche**
-- Dark Mode Design
-- Adaptive Keyboard-Animation
-- Erweiterte Einstellungen mit Datumsanzeige-Option und PDF-Viewer-Konfiguration
-- Willkommensbildschirm beim ersten Start
+### 🎨 Benutzeroberfläche
+- 🌙 Dark Mode Design
+- 🎹 Adaptive Keyboard-Animation
+- ⚙️ Erweiterte Einstellungen mit:
+  - Datumsauswahl (heute, morgen oder benutzerdefiniert)
+  - Internem/externem PDF-Viewer
+- 👋 Willkommensbildschirm beim ersten Start
 
-**Weitere Features**
-- Intelligente PDF-Metadaten-Extraktion (Datum, Uhrzeit, Wochentage)
-- Automatische Netzwerkerkennung
-- Haptisches Feedback
-- In-App-Review-System
+### 🚀 Weitere Features
+- 🧠 Intelligente PDF-Metadaten-Extraktion (Datum, Uhrzeit, Wochentage)
+- 🌐 Automatische Netzwerkerkennung & Statusanzeige
+- 📳 Haptisches Feedback
+- ⭐ In-App-Review-System
 
-## Technische Details
+---
 
-**Frameworks**
+## 🔧 Technische Details
+
+### 🧱 Frameworks
 - Flutter SDK (≥ 3.8.0)
 - Dart SDK (3.8.1)
 - Material Design 3
 
-**Hauptabhängigkeiten**
-- Riverpod (State Management)
-- Go Router (Navigation)
-- HTTP (Serververbindung)
-- Syncfusion Flutter PDF & PDFx (PDF-Verarbeitung)
-- Connectivity Plus (Netzwerkstatus)
-- Share Plus (PDF-Sharing)
+### 📦 Haupt-Abhängigkeiten
+- `riverpod` – State Management
+- `go_router` – Navigation
+- `http` – Netzwerkkommunikation
+- `syncfusion_flutter_pdf` & `pdfx` – PDF-Anzeige
+- `connectivity_plus` – Netzwerkstatus
+- `share_plus` – PDF-Sharing
 
-**Performance-Optimierungen**
-- ABI-Split APKs (~9.6MB pro Architektur)
-- R8 Full Mode und Resource Shrinking
-- Hintergrund-Isolate für PDF-Verarbeitung
-- Intelligentes Caching
+### ⚡ Performance-Optimierungen
+- 📦 ABI-Split APKs (~9.6 MB pro Architektur)
+- 🧹 R8 Full Mode & Resource Shrinking
+- 🧵 Hintergrund-Isolate für PDF-Verarbeitung
+- 🧠 Smartes Caching & Laderoutinen
 
-## Installation & Entwicklung
+---
 
-### Voraussetzungen
+## 🛠️ Installation & Entwicklung
+
+### 📋 Voraussetzungen
 ```bash
 Flutter SDK >= 3.8.0
 Dart SDK >= 3.8.0
 ```
 
-### Setup
+### 🚀 Setup
 ```bash
 git clone https://github.com/luka-loehr/LGKA.git
 cd LGKA
@@ -67,43 +81,49 @@ flutter pub get
 flutter run
 ```
 
-### Build
+### 📦 Build
 ```bash
-# Split APKs für optimale Größe
+# Split APKs für minimale App-Größe
 flutter build apk --release --split-per-abi
 
-# Installation
+# Beispiel: Installation via ADB
 adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
 
-Detaillierte Build-Anleitung: [BUILD_NOTES.md](BUILD_NOTES.md)
-
-## Datenschutz
-
-- Keine personenbezogenen Daten gespeichert
-- Keine Tracker oder Werbe-IDs
-- Lokale Datenspeicherung nur für PDFs
-- HTTPS-Verbindung zum Schulserver
-- Keine Datenübertragung an Drittanbieter
-
-[Vollständige Datenschutzerklärung](https://luka-loehr.github.io/LGKA/privacy.html)
-
-## Status
-
-**Aktuelle Version**: 1.6.4 (Build 21)
-
-Dieses Projekt ist ein Freizeitprojekt und steht in keinerlei offiziellem Zusammenhang mit dem Lessing-Gymnasium Karlsruhe.
-
-## Lizenz
-
-Creative Commons BY-NC-ND 4.0 Lizenz
-
-- ✅ Nutzung für private und bildende Zwecke
-- ❌ Kommerzielle Nutzung nicht gestattet
-- ❌ Veränderung und Weiterverbreitung nicht erlaubt
-
-[Vollständige Lizenz](LICENSE)
+📄 Weitere Details: [BUILD_NOTES.md](BUILD_NOTES.md)
 
 ---
 
-Entwickelt von Luka Löhr für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe
+## 🔐 Datenschutz
+
+- ✅ Keine personenbezogenen Daten
+- 🚫 Keine Tracker, Werbe-IDs oder Analytics
+- 💾 Lokale Speicherung ausschließlich für PDF-Dateien
+- 🔐 Nur verschlüsselte HTTPS-Verbindungen zum Schulserver
+- 👥 Keine Weitergabe an Dritte
+
+📄 [Vollständige Datenschutzerklärung](https://luka-loehr.github.io/LGKA/privacy.html)
+
+---
+
+## 📦 Status
+
+- **Version**: 1.6.4 (Build 21)
+- 🧪 *Privates Schülerprojekt von Luka Löhr*
+- 📍 *Keine offizielle Verbindung zum Lessing-Gymnasium Karlsruhe*
+
+---
+
+## 📜 Lizenz
+
+**Creative Commons BY-NC-ND 4.0**
+
+- ✅ Private & Bildungsnutzung erlaubt
+- ❌ Kommerzielle Nutzung untersagt
+- ❌ Veränderungen & Weiterverbreitung verboten
+
+📄 [Vollständige Lizenz anzeigen](LICENSE)
+
+---
+
+> Entwickelt mit ❤️ von Luka Löhr für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe.
