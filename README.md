@@ -1,7 +1,5 @@
 # 📱 LGKA-App – Digitaler Vertretungsplan des Lessing-Gymnasiums Karlsruhe
 
-![App Icon](https://raw.githubusercontent.com/luka-loehr/LGKA/main/assets/icon/icon.png)
-
 > 🛠️ **Neu in Version 1.6.4**
 > 
 > - ✨ **Neues App-Icon** im modernen Look
