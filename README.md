@@ -1,93 +1,65 @@
 # LGKA-App – Digitaler Vertretungsplan des Lessing-Gymnasiums Karlsruhe
 
-> **🎉 Neueste Verbesserung**: Die App-Größe wurde drastisch von **130MB auf nur noch 9MB** reduziert! Das bedeutet schnellere Downloads und weniger Speicherplatzverbrauch.  
+> **App-Größe**: Optimiert auf ~9.6MB (ursprünglich 130MB)
 
-> **📱 Und neu in Version 1.5.5**: Jetzt auch verfügbar für **iOS** – erstmals nutzbar auf iPhones und iPads!
+Eine Flutter-App zur digitalen Anzeige des Vertretungsplans des Lessing-Gymnasiums Karlsruhe. Entwickelt von Luka Löhr als nicht-kommerzielles Schulprojekt.
 
-Eine moderne Flutter-App zur digitalen Anzeige des Vertretungsplans des Lessing-Gymnasiums Karlsruhe. Entwickelt von Luka Löhr als nicht-kommerzielles Schulprojekt für Schüler, Lehrer und Eltern.
+## Funktionen
 
-## 🤔 Was macht diese App?
+**Vertretungsplan-Anzeige**
+- Anzeige für heute und morgen
+- Automatischer Download vom Schulserver
+- HTTP Basic Authentication
+- Offline-Verfügbarkeit durch lokales Caching
 
-Die LGKA-App ist ein **digitaler Vertretungsplan-Viewer**, der es ermöglicht, die tagesaktuellen Stundenplanänderungen des Lessing-Gymnasiums Karlsruhe direkt auf dem Smartphone oder Tablet anzuzeigen. Die App lädt automatisch die offiziellen PDF-Vertretungspläne vom Schulserver herunter und stellt sie in einer benutzerfreundlichen Oberfläche dar.
+**PDF-Integration**
+- Integrierter PDF-Viewer (standardmäßig aktiviert)
+- Optional: Öffnen mit externen Apps (Google Drive, etc.)
+- PDF-Sharing-Funktion
+- Zoom- und Scroll-Funktionen
 
-### 🔑 Hauptfunktionen
+**Benutzeroberfläche**
+- Dark Mode Design
+- Adaptive Keyboard-Animation
+- Erweiterte Einstellungen mit Datumsanzeige-Option und PDF-Viewer-Konfiguration
+- Willkommensbildschirm beim ersten Start
 
-**📅 Vertretungsplan-Anzeige**
-- Anzeige des Vertretungsplans für **heute** und **morgen**
-- Automatischer Download der aktuellen PDF-Dateien vom Schulserver
-- Sichere Verbindung mit HTTP Basic Authentication
-- Intelligente Dateibenennung basierend auf Wochentagen
+**Weitere Features**
+- Intelligente PDF-Metadaten-Extraktion (Datum, Uhrzeit, Wochentage)
+- Automatische Netzwerkerkennung
+- Haptisches Feedback
+- In-App-Review-System
 
-**💾 Offline-Verfügbarkeit**
-- Lokale Zwischenspeicherung aller heruntergeladenen PDFs
-- Zugriff auf Vertretungspläne auch ohne Internetverbindung
-- Automatische Erkennung von bereits gespeicherten Dateien
-- Hintergrund-Preloading für bessere Performance
+## Technische Details
 
-**📊 Intelligente Metadaten-Auswertung**
-- Automatische Extraktion von Datum und Uhrzeit aus den PDFs
-- Erkennung der Wochentage (Montag, Dienstag, etc.)
-- Anzeige der letzten Aktualisierung für jeden Plan
-- Optimierte Dateiverwaltung basierend auf Wochentagen
+**Frameworks**
+- Flutter SDK (≥ 3.8.0)
+- Dart SDK (3.8.1)
+- Material Design 3
 
-**🎨 Moderne Benutzeroberfläche**
-- Elegantes **Dark Mode Design** für angenehme Nutzung
-- **Haptisches Feedback** für bessere Benutzererfahrung
-- Interaktiver **Willkommensbildschirm** beim ersten Start
-- Responsive Design für verschiedene Bildschirmgrößen
+**Hauptabhängigkeiten**
+- Riverpod (State Management)
+- Go Router (Navigation)
+- HTTP (Serververbindung)
+- Syncfusion Flutter PDF & PDFx (PDF-Verarbeitung)
+- Connectivity Plus (Netzwerkstatus)
+- Share Plus (PDF-Sharing)
 
-**🔐 Benutzerauthentifizierung**
-- Sichere Anmeldung mit Schulzugangsdaten
-- Speicherung der Anmeldedaten für automatische Verbindung
-- Schutz der Daten durch lokale Verschlüsselung
+**Performance-Optimierungen**
+- ABI-Split APKs (~9.6MB pro Architektur)
+- R8 Full Mode und Resource Shrinking
+- Hintergrund-Isolate für PDF-Verarbeitung
+- Intelligentes Caching
 
-**📱 PDF-Integration**
-- Nahtlose PDF-Anzeige mit der Syncfusion PDF-Bibliothek
-- Zoom- und Scroll-Funktionen für bessere Lesbarkeit
-- Möglichkeit zum Öffnen der PDFs in externen Apps
-- Optimierte Darstellung für mobile Geräte
-
-## 🤖 Technische Details
-
-### Architektur & Frameworks
-- **Flutter SDK** (ab Version 3.8.0) für plattformübergreifende Entwicklung
-- **Dart SDK** (stable) als Programmiersprache
-- **Material Design 3** für moderne UI-Komponenten
-
-### State Management & Navigation
-- **Riverpod** für reaktives State Management
-- **Go Router** für deklarative Navigation
-- Provider-basierte Architektur für sauberen Code
-
-### Netzwerk & Datenverarbeitung
-- **HTTP** für sichere Serververbindungen mit Basic Auth
-- **Syncfusion Flutter PDF** für PDF-Verarbeitung und -Anzeige
-- **Path Provider** für plattformspezifische Dateipfade
-- **Shared Preferences** für lokale Datenspeicherung
-
-### System-Integration
-- **Package Info Plus** für App-Metadaten
-- **Open File X** für externe PDF-Viewer-Integration
-- **Permission Handler** für Dateizugriff-Berechtigungen
-- **Flutter Launcher Icons** für App-Icon-Generierung
-
-### Performance-Optimierungen
-- **Hintergrund-Isolate** für PDF-Textextraktion ohne UI-Blockierung
-- **Intelligentes Caching** mit weekday-basierter Dateibenennung
-- **Preloading-Mechanismus** für schnelle App-Starts
-- **ABI-Split APKs** für minimale App-Größe (~9MB pro Architektur)
-- **Komprimierte Assets** ohne Debug-Symbole für optimale Performance
-
-## 🚀 Installation & Entwicklung
+## Installation & Entwicklung
 
 ### Voraussetzungen
 ```bash
 Flutter SDK >= 3.8.0
-Dart SDK (stable)
-Android Studio oder VS Code mit Flutter-Plugins
+Dart SDK >= 3.8.0
 ```
 
-### Schnellstart
+### Setup
 ```bash
 git clone https://github.com/luka-loehr/LGKA.git
 cd LGKA
@@ -95,79 +67,43 @@ flutter pub get
 flutter run
 ```
 
-### Build-Prozess
+### Build
 ```bash
-# Split APKs für optimale Größe (~9MB pro ABI)
+# Split APKs für optimale Größe
 flutter build apk --release --split-per-abi
 
-# Installation auf verbundenem Gerät
+# Installation
 adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
 
-**🔧 Detaillierte Build-Anleitung**: Siehe [BUILD_NOTES.md](BUILD_NOTES.md) für vollständige Konfiguration und Troubleshooting.
+Detaillierte Build-Anleitung: [BUILD_NOTES.md](BUILD_NOTES.md)
 
-## 🛡️ Datenschutz & Sicherheit
+## Datenschutz
 
-Die LGKA-App wurde mit höchsten Datenschutzstandards entwickelt:
+- Keine personenbezogenen Daten gespeichert
+- Keine Tracker oder Werbe-IDs
+- Lokale Datenspeicherung nur für PDFs
+- HTTPS-Verbindung zum Schulserver
+- Keine Datenübertragung an Drittanbieter
 
-- **Keine personenbezogenen Daten** werden verarbeitet oder gespeichert
-- **Keine Tracker, Cookies oder Werbe-IDs** vorhanden
-- **Lokale Datenspeicherung** nur für Vertretungsplan-PDFs
-- **HTTPS-verschlüsselte Verbindung** zum Schulserver
-- **Keine Datenübertragung** an Drittanbieter
+[Vollständige Datenschutzerklärung](https://luka-loehr.github.io/LGKA/privacy.html)
 
-Vollständige Informationen in der [Datenschutzerklärung](https://luka-loehr.github.io/LGKA/privacy.html).
+## Status
 
-## 🎯 Zielgruppe
+**Aktuelle Version**: 1.6.4 (Build 21)
 
-Diese App richtet sich an:
-- **Schüler** des Lessing-Gymnasiums Karlsruhe
-- **Lehrkräfte** für schnellen Zugriff auf Vertretungen
-- **Eltern** zur Information über Stundenplanänderungen
-- **Verwaltung** für mobile Vertretungsplan-Einsicht
+Dieses Projekt ist ein Freizeitprojekt und steht in keinerlei offiziellem Zusammenhang mit dem Lessing-Gymnasium Karlsruhe.
 
-## 🌟 Besonderheiten
+## Lizenz
 
-### Warum diese App verwenden?
-- **Extrem kompakt**: Nur 9MB pro Gerät statt der ursprünglich 130MB
-- **Offline-fähig**: Funktioniert auch ohne Internet
-- **Benutzerfreundlich**: Modernes Design mit Dark Mode
-- **Zuverlässig**: Direkte Verbindung zum offiziellen Schulserver
-- **Schnell**: Hintergrund-Preloading für sofortige Verfügbarkeit
-- **Datenschutzkonform**: Keine unnötigen Berechtigungen oder Tracking
+Creative Commons BY-NC-ND 4.0 Lizenz
 
-### Innovation & Technik
-- Intelligente PDF-Metadaten-Extraktion
-- Weekday-basierte Dateiverwaltung
-- Isolate-basierte Verarbeitung für flüssige Performance
-- Responsive Material Design 3 Oberfläche
+- ✅ Nutzung für private und bildende Zwecke
+- ❌ Kommerzielle Nutzung nicht gestattet
+- ❌ Veränderung und Weiterverbreitung nicht erlaubt
 
-## 🔧 Status & Entwicklung
-
-**Aktuelle Version**: 1.5.5 (Build 18)
-
-Diese App ist ein **reines Freizeitprojekt** und steht in keinerlei offiziellem Zusammenhang mit dem Lessing-Gymnasium Karlsruhe. Sie wurde von einem Schüler für Schüler entwickelt, um den Schulalltag zu vereinfachen.
-
-### Entwicklungsgeschichte
-- **130MB → 9MB**: Massive Größenreduzierung durch Asset-Optimierung
-- Kontinuierliche Verbesserung der Benutzeroberfläche
-- Implementierung von Offline-Funktionalität
-- Einführung intelligenter PDF-Verarbeitung
-
-## ⚖️ Lizenz & Nutzungsrechte
-
-Dieses Projekt steht unter der **Creative Commons BY-NC-ND 4.0 Lizenz**.
-
-**Das bedeutet**:
-- ✅ **Nutzung** für private und bildende Zwecke erlaubt
-- ❌ **Kommerzielle Nutzung** nicht gestattet
-- ❌ **Veränderung und Weiterverbreitung** nicht erlaubt
-- ❌ **Neuveröffentlichung** unter anderem Namen nicht gestattet
-
-Nur der ursprüngliche Entwickler darf offizielle Versionen erstellen und veröffentlichen.
-
-**Vollständige Lizenz**: [LICENSE](LICENSE)
+[Vollständige Lizenz](LICENSE)
 
 ---
 
-**Entwickelt mit ❤️ von Luka Löhr für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe**
+Entwickelt von Luka Löhr für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe
