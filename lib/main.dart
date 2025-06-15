@@ -86,6 +86,38 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
       theme: AppTheme.darkTheme,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        // Wrap the entire app with proper edge-to-edge inset handling
+        return EdgeToEdgeWrapper(child: child ?? const SizedBox.shrink());
+      },
+    );
+  }
+}
+
+/// Wrapper widget that properly handles edge-to-edge display insets
+/// for Android 15+ compatibility
+class EdgeToEdgeWrapper extends StatelessWidget {
+  final Widget child;
+  
+  const EdgeToEdgeWrapper({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.light,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+      child: MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+          // Ensure proper padding is applied for system UI
+          padding: MediaQuery.of(context).viewPadding,
+        ),
+        child: child,
+      ),
     );
   }
 }
