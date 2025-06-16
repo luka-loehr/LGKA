@@ -146,7 +146,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     );
   }
 
-  void _showAboutBottomSheet() {
+  void _showLegalBottomSheet() {
     final pdfRepo = ref.read(pdfRepositoryProvider);
     showModalBottomSheet(
       context: context,
@@ -155,7 +155,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => _AboutSheetContent(
+      builder: (context) => _LegalSheetContent(
         todayPdfTimestamp: pdfRepo.todayLastUpdated,
       ),
     );
@@ -193,10 +193,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
           IconButton(
             onPressed: () {
               HapticService.subtle();
-              _showAboutBottomSheet();
+              _showLegalBottomSheet();
             },
             icon: const Icon(
-              Icons.privacy_tip_outlined,
+              Icons.gavel_outlined,
               color: AppColors.secondaryText,
             ),
           ),
@@ -887,10 +887,10 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
   }
 }
 
-class _AboutSheetContent extends StatelessWidget {
+class _LegalSheetContent extends StatelessWidget {
   final String todayPdfTimestamp;
 
-  const _AboutSheetContent({
+  const _LegalSheetContent({
     required this.todayPdfTimestamp,
   });
 
@@ -962,9 +962,9 @@ class _AboutSheetContent extends StatelessWidget {
                     const SizedBox(height: 8),
                     _buildLinkRow(
                       context,
-                      Icons.description_outlined, 
-                      'Lizenz', 
-                      'https://github.com/luka-loehr/LGKA/blob/main/LICENSE'
+                      Icons.info_outline, 
+                      'Impressum', 
+                      'https://luka-loehr.github.io/LGKA/impressum.html'
                     ),
                   ],
                 ),
