@@ -6,7 +6,7 @@ import '../screens/welcome_screen.dart';
 import '../screens/auth_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/settings_screen.dart';
-import '../screens/about_screen.dart';
+import '../screens/legal_screen.dart';
 import '../screens/pdf_viewer_screen.dart';
 
 class AppRouter {
@@ -15,7 +15,7 @@ class AppRouter {
   static const String home = '/';
   static const String pdfViewer = '/pdf-viewer';
   static const String settings = '/settings';
-  static const String about = '/about';
+  static const String legal = '/legal';
 
   static GoRouter createRouter({required String initialLocation}) {
     return GoRouter(
@@ -48,8 +48,8 @@ class AppRouter {
           builder: (context, state) => const SettingsScreen(),
         ),
         GoRoute(
-          path: about,
-          builder: (context, state) => const AboutScreen(),
+          path: legal,
+          builder: (context, state) => const LegalScreen(),
         ),
       ],
     );
