@@ -126,11 +126,9 @@ flutter:
 # Flutter Launcher Icons Configuration
 flutter_launcher_icons:
   android: true
-  ios: true
+  ios: false
   image_path: "assets/images/app-icons/app-logo.png"
-  # Using static logo with integrated background - no adaptive icons needed
-  # adaptive_icon_background: "assets/images/app-icons/app-logo-adaptive-background.png"
-  # adaptive_icon_foreground: "assets/images/app-icons/app-logo-adaptive-foreground.png"
-  # Uncomment and customize these if needed:
-  # min_sdk_android: 21
-  # remove_alpha_ios: true
+  adaptive_icon_background: "#00000000"
+  adaptive_icon_foreground: "assets/images/app-icons/app-logo.png"
+  # Force generation of legacy icons for better compatibility
+  min_sdk_android: 21
