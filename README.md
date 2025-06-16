@@ -100,7 +100,8 @@ adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 - 🔐 Nur verschlüsselte HTTPS-Verbindungen zum Schulserver
 - 👥 Keine Weitergabe an Dritte
 
-📄 [Vollständige Datenschutzerklärung](https://luka-loehr.github.io/LGKA/privacy.html)
+📄 [Vollständige Datenschutzerklärung](https://luka-loehr.github.io/LGKA/privacy.html)  
+📄 [Impressum](https://luka-loehr.github.io/LGKA/impressum.html)
 
 ---
 
