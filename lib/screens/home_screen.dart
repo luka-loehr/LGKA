@@ -196,7 +196,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
               _showLegalBottomSheet();
             },
             icon: const Icon(
-              Icons.gavel_outlined,
+              Icons.privacy_tip_outlined,
               color: AppColors.secondaryText,
             ),
           ),
