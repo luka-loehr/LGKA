@@ -11,17 +11,7 @@ import 'navigation/app_router.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Configure system UI for edge-to-edge display
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarIconBrightness: Brightness.light,
-    ),
-  );
-  
-  // Enable edge-to-edge display
+  // Enable edge-to-edge display - handled by native Android configuration now
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   
   // Initialize preferences manager
@@ -103,21 +93,13 @@ class EdgeToEdgeWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarIconBrightness: Brightness.light,
-        systemNavigationBarDividerColor: Colors.transparent,
+    // Use MediaQuery for proper inset handling instead of deprecated SystemUiOverlayStyle
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        // Ensure proper padding is applied for system UI
+        padding: MediaQuery.of(context).viewPadding,
       ),
-      child: MediaQuery(
-        data: MediaQuery.of(context).copyWith(
-          // Ensure proper padding is applied for system UI
-          padding: MediaQuery.of(context).viewPadding,
-        ),
-        child: child,
-      ),
+      child: child,
     );
   }
 }

@@ -94,5 +94,5 @@ flutter {
 
 dependencies {
     // AndroidX Core for edge-to-edge display support
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-ktx:1.15.0")
 }

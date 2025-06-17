@@ -9,9 +9,8 @@ class MainActivity : FlutterActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Enable edge-to-edge display for Android 15+ (API 35+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-        }
+        // Use consistent edge-to-edge approach across all Android versions
+        // This avoids deprecated API usage while maintaining compatibility
+        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 } 

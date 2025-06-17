@@ -1,6 +1,6 @@
 # 📱 LGKA-App – Digitaler Vertretungsplan des Lessing-Gymnasiums Karlsruhe
 
-> 🛠️ **Neu in Version 1.6.4**
+> 🛠️ **Neu in Version 2.0.0**
 > 
 > - ✨ **Neues App-Icon** im modernen Look
 > - 📅 **Datumsauswahl-Funktion** in den Einstellungen
@@ -107,7 +107,7 @@ adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 
 ## 📦 Status
 
-- **Version**: 1.6.4 (Build 21)
+- **Version**: 2.0.0 (Build 27)
 - 🧪 *Privates Schülerprojekt von Luka Löhr*
 - 📍 *Keine offizielle Verbindung zum Lessing-Gymnasium Karlsruhe*
 
