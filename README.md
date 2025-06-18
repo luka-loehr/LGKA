@@ -47,11 +47,11 @@
 - **🔧 Wartbarkeit**: Saubere Architektur und umfassende Dokumentation
 
 ### 🏆 **Alleinstellungsmerkmale**
-- **Zero-Tracking Policy**: Keine Datensammlung oder Analytics
-- **Intelligent Caching**: Automatische Offline-Verfügbarkeit
-- **Material Design 3**: Moderne, konsistente Benutzeroberfläche
-- **Cross-Platform**: Native Performance auf Android und iOS
-- **Open Source**: Transparente Entwicklung und Community-Beiträge
+- **🚫 Zero-Tracking Policy**: Keine Datensammlung oder Analytics
+- **💾 Intelligentes Caching**: Automatische Offline-Verfügbarkeit
+- **🎨 Material Design 3**: Modernes Dark Theme für alle Lichtverhältnisse  
+- **📱 Cross-Platform**: Native Performance auf Android und iOS
+- **🔓 Open Source**: Transparente Entwicklung unter Creative Commons Lizenz
 
 ---
 
@@ -73,12 +73,12 @@
 - **🎯 Adaptive Anzeige** für verschiedene Bildschirmgrößen
 
 ### 🎨 **Benutzeroberfläche**
-- **🎭 Material Design 3** mit konsistentem Dark Mode
+- **🎭 Material Design 3** mit modernem Dark Mode
 - **📱 Edge-to-Edge Display** (Android 15+ kompatibel)
 - **⌨️ Adaptive Keyboard-Animation** für optimale UX
 - **🌊 Flüssige Navigation** mit benutzerdefinierten Animationen
 - **📳 Haptisches Feedback** für bessere Interaktion
-- **🌙 Automatischer Dark/Light Mode** basierend auf Systemeinstellungen
+- **🌙 Konsistentes Dark Theme** optimiert für alle Lichtverhältnisse
 
 ### ⚙️ **Erweiterte Einstellungen**
 - **📅 Flexible Datumsauswahl** (heute, morgen, benutzerdefiniert)
@@ -96,11 +96,11 @@
 
 ### 🎁 **Zusätzliche Features**
 - **👋 Willkommensbildschirm** beim ersten Start mit App-Tour
-- **⭐ In-App-Review-System** für direktes Nutzerfeedback
+- **⭐ In-App-Review-System** für direktes Nutzerfeedback (nach 20 Öffnungen)
 - **🎨 Adaptive App-Icons** für Android und iOS
 - **🛡️ Umfassende Error-Behandlung** mit nutzerfreundlichen Meldungen
-- **🔔 Smart Notifications** bei verfügbaren Updates
-- **📊 Performance-Monitoring** für optimale App-Geschwindigkeit
+- **🔄 Auto-Retry-Mechanismus** bei Verbindungsproblemen
+- **📊 Debug-Modi** für Entwickler und Fehlerdiagnose
 
 ---
 
@@ -172,9 +172,9 @@ ios/                     # iOS-spezifische Konfiguration
 #### **App-Größen**
 | Build-Typ | Größe | Verwendung |
 |-----------|-------|------------|
-| App Bundle | ~45MB | Google Play Store (optimiert auf ~9MB) |
-| ARM64 APK | ~9.9MB | Development/Testing |
-| ARMv7 APK | ~9.5MB | Legacy-Geräte |
+| App Bundle | ~15-20MB | Google Play Store (automatisch optimiert) |
+| ARM64 APK | ~9.9MB | Moderne Android-Geräte |
+| ARMv7 APK | ~9.5MB | Legacy-Geräte (Android 5.0+) |
 | x86_64 APK | ~10.0MB | Emulator/Testing |
 
 ---
@@ -400,17 +400,19 @@ flutter run --release
 | Komponente | Status | Beschreibung |
 |------------|--------|--------------|
 | **Core App** | ✅ Produktiv | Alle Grundfunktionen implementiert |
-| **PDF Integration** | ✅ Produktiv | Vollständig funktional |
-| **Network Layer** | ✅ Produktiv | Mit Auto-Retry Mechanismus |
-| **UI/UX** | ✅ Produktiv | Material Design 3 implementiert |
-| **iOS Support** | ✅ Produktiv | Vollständig kompatibel |
-| **Android 15+** | ✅ Produktiv | Edge-to-Edge unterstützt |
+| **PDF Integration** | ✅ Produktiv | Integrierter und externer PDF-Viewer |
+| **Network Layer** | ✅ Produktiv | Mit intelligentem Auto-Retry |
+| **UI/UX** | ✅ Produktiv | Material Design 3 Dark Theme |
+| **iOS Support** | ✅ Produktiv | Vollständig kompatibel (iOS 12.0+) |
+| **Android Support** | ✅ Produktiv | Edge-to-Edge bis Android 15+ |
 
 ### 📈 **Aktuelle Version**
 - **Version**: 2.0.1 (Build 28)
 - **Release Date**: Januar 2025
 - **Flutter Version**: 3.8.0+
-- **Target Platforms**: Android 5.0+, iOS 12.0+
+- **Dart Version**: 3.8.1+
+- **Target Platforms**: Android 5.0+ (API 21), iOS 12.0+
+- **Repository**: [luka-loehr/LGKA](https://github.com/luka-loehr/LGKA)
 
 ---
 
