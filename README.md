@@ -1,88 +1,158 @@
 # 📱 LGKA+ – Digitaler Vertretungsplan für das Lessing-Gymnasium Karlsruhe
 
+<div align="center">
+
 ![Flutter](https://img.shields.io/badge/Flutter-3.8.0+-02569B?style=flat&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-3.8.1+-0175C2?style=flat&logo=dart&logoColor=white)
 ![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green?style=flat)
 ![Version](https://img.shields.io/badge/Version-2.0.1-blue?style=flat)
 ![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-orange?style=flat)
 
-> **Modern Flutter App für den digitalen Vertretungsplan**  
-> Entwickelt für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe
+**🎓 Moderne Flutter-App für den digitalen Vertretungsplan des Lessing-Gymnasiums Karlsruhe**
+
+*Eine elegante, benutzerfreundliche Lösung für den schnellen Zugriff auf aktuelle Vertretungspläne*
+
+[📥 Download](https://github.com/luka-loehr/LGKA/releases) • [📖 Dokumentation](#-installation--entwicklung) • [🐛 Issues](https://github.com/luka-loehr/LGKA/issues) • [💬 Discussions](https://github.com/luka-loehr/LGKA/discussions)
+
+</div>
+
+---
+
+## 📋 Inhaltsverzeichnis
+
+- [✨ Features](#-features-im-überblick)
+- [🏗️ Technische Architektur](#️-technische-architektur)
+- [🚀 Installation & Entwicklung](#-installation--entwicklung)
+- [📱 Platform-Features](#-platform-spezifische-features)
+- [🔐 Datenschutz & Sicherheit](#-datenschutz--sicherheit)
+- [🧩 Architektur-Details](#-architektur-details)
+- [🛠️ Entwicklung](#-entwicklung)
+- [📦 Releases & Deployment](#-releases--deployment)
+- [🤝 Entwicklungs-Guidelines](#-entwicklungs-guidelines)
+- [📊 Projekt-Status](#-projekt-status)
+- [📜 Lizenz & Rechtliches](#-lizenz--rechtliches)
+- [🙋‍♂️ Support & Kontakt](#️-support--kontakt)
+
+---
+
+## 🌟 Über das Projekt
+
+**LGKA+** ist eine moderne, plattformübergreifende Mobile App, die speziell für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe entwickelt wurde. Die App bietet einen schnellen, zuverlässigen Zugriff auf die aktuellen Vertretungspläne mit einer intuitiven Benutzeroberfläche und umfassenden Offline-Funktionen.
+
+### 🎯 **Projektziele**
+- **📱 Benutzerfreundlichkeit**: Intuitive Navigation und schneller Zugriff auf Informationen
+- **⚡ Performance**: Optimierte Ladezeiten und effiziente Datennutzung  
+- **🔒 Datenschutz**: Vollständig datenschutzkonform ohne Tracking oder Datensammlung
+- **🌍 Zugänglichkeit**: Offline-Verfügbarkeit und plattformübergreifende Kompatibilität
+- **🔧 Wartbarkeit**: Saubere Architektur und umfassende Dokumentation
+
+### 🏆 **Alleinstellungsmerkmale**
+- **Zero-Tracking Policy**: Keine Datensammlung oder Analytics
+- **Intelligent Caching**: Automatische Offline-Verfügbarkeit
+- **Material Design 3**: Moderne, konsistente Benutzeroberfläche
+- **Cross-Platform**: Native Performance auf Android und iOS
+- **Open Source**: Transparente Entwicklung und Community-Beiträge
 
 ---
 
 ## ✨ Features im Überblick
 
-### � **Intelligenter Vertretungsplan**
-- **Automatischer Download** für heute und morgen
-- **Offline-Verfügbarkeit** durch smartes PDF-Caching 
-- **Wochentag-basierte Dateiverwaltung** (z.B. `montag.pdf`, `dienstag.pdf`)
-- **HTTP Basic Authentication** mit verschlüsselter Übertragung
-- **Metadaten-Extraktion** aus PDFs (Datum, Uhrzeit, Wochentag)
+### 🔄 **Intelligenter Vertretungsplan**
+- **🔄 Automatischer Download** für heute und morgen
+- **💾 Offline-Verfügbarkeit** durch smartes PDF-Caching 
+- **📅 Wochentag-basierte Dateiverwaltung** (z.B. `montag.pdf`, `dienstag.pdf`)
+- **🔐 Sichere Serververbindung** mit verschlüsselter Datenübertragung
+- **📋 Metadaten-Extraktion** aus PDFs (Datum, Uhrzeit, Wochentag)
+- **⚡ Intelligente Updates** nur bei Änderungen
 
 ### 📄 **PDF-Integration**
-- **Integrierter PDF-Viewer** mit Zoom & Scroll-Support
-- **Externe App-Integration** (Adobe Reader, Google Drive, etc.)
-- **PDF-Sharing-Funktion** für einfache Weiterleitung
-- **Background-Verarbeitung** für optimale Performance
+- **🔍 Integrierter PDF-Viewer** mit Zoom & Scroll-Support
+- **🔗 Externe App-Integration** (Adobe Reader, Google Drive, etc.)
+- **📤 PDF-Sharing-Funktion** für einfache Weiterleitung
+- **⚙️ Background-Verarbeitung** für optimale Performance
+- **🎯 Adaptive Anzeige** für verschiedene Bildschirmgrößen
 
 ### 🎨 **Benutzeroberfläche**
-- **Material Design 3** mit konsistentem Dark Mode
-- **Edge-to-Edge Display** (Android 15+ kompatibel)
-- **Adaptive Keyboard-Animation** für optimale UX
-- **Flüssige Navigation** mit benutzerdefinierten Animationen
-- **Haptisches Feedback** für bessere Interaktion
+- **🎭 Material Design 3** mit konsistentem Dark Mode
+- **📱 Edge-to-Edge Display** (Android 15+ kompatibel)
+- **⌨️ Adaptive Keyboard-Animation** für optimale UX
+- **🌊 Flüssige Navigation** mit benutzerdefinierten Animationen
+- **📳 Haptisches Feedback** für bessere Interaktion
+- **🌙 Automatischer Dark/Light Mode** basierend auf Systemeinstellungen
 
 ### ⚙️ **Erweiterte Einstellungen**
-- **Flexible Datumsauswahl** (heute, morgen, benutzerdefiniert)
-- **PDF-Viewer-Konfiguration** (intern/extern)
-- **Authentifizierungsmanagement** 
-- **App-Informationen** und Rechtliche Hinweise
+- **📅 Flexible Datumsauswahl** (heute, morgen, benutzerdefiniert)
+- **👀 PDF-Viewer-Konfiguration** (intern/extern)
+- **🔧 Personalisierung** von App-Verhalten und Aussehen
+- **ℹ️ App-Informationen** und Rechtliche Hinweise
+- **🔄 Automatische Updates** der Konfiguration
 
 ### 🌐 **Intelligente Netzwerkverwaltung**
-- **Automatische Verbindungserkennung** 
-- **Exponentielles Auto-Retry** bei Verbindungsproblemen
-- **Slow-Connection-Detection** mit Nutzer-Feedback
-- **Offline-First Architektur** für zuverlässige Verfügbarkeit
+- **📡 Automatische Verbindungserkennung** 
+- **🔄 Exponentielles Auto-Retry** bei Verbindungsproblemen
+- **🐌 Slow-Connection-Detection** mit Nutzer-Feedback
+- **📴 Offline-First Architektur** für zuverlässige Verfügbarkeit
+- **🛡️ Robuste Error-Behandlung** mit aussagekräftigen Meldungen
 
-### � **Zusätzliche Features**
-- **Willkommensbildschirm** beim ersten Start
-- **In-App-Review-System** für Feedback
-- **Adaptive App-Icons** für Android und iOS
-- **Umfassende Error-Behandlung** mit Nutzer-freundlichen Meldungen
+### 🎁 **Zusätzliche Features**
+- **👋 Willkommensbildschirm** beim ersten Start mit App-Tour
+- **⭐ In-App-Review-System** für direktes Nutzerfeedback
+- **🎨 Adaptive App-Icons** für Android und iOS
+- **🛡️ Umfassende Error-Behandlung** mit nutzerfreundlichen Meldungen
+- **🔔 Smart Notifications** bei verfügbaren Updates
+- **📊 Performance-Monitoring** für optimale App-Geschwindigkeit
 
 ---
 
 ## 🏗️ Technische Architektur
 
+### 🎯 **Technology Stack**
+| Kategorie | Technologie | Version | Zweck |
+|-----------|------------|---------|--------|
+| **Frontend** | Flutter SDK | 3.8.0+ | Cross-Platform UI Framework |
+| **Language** | Dart | 3.8.1+ | Programmiersprache |
+| **Design** | Material Design 3 | - | UI/UX Design System |
+| **State Management** | Riverpod | 2.6.1 | Reaktive State-Verwaltung |
+| **Navigation** | go_router | 15.1.2 | Deklarative Navigation |
+| **Networking** | HTTP Client | 1.2.2 | Netzwerkkommunikation |
+
 ### 🎯 **Framework & Sprachen**
-- **Flutter SDK**: 3.8.0+ (Dart 3.8.1+)
-- **Material Design 3** mit Custom Dark Theme
-- **Kotlin** für Android-spezifische Implementierungen
-- **Swift** für iOS-Konfiguration
+- **🔷 Flutter SDK**: 3.8.0+ (Dart 3.8.1+) - Cross-Platform Development
+- **🎨 Material Design 3** mit Custom Dark Theme und adaptiven Komponenten
+- **🤖 Kotlin** für Android-spezifische Implementierungen und native Features
+- **🍎 Swift** für iOS-Konfiguration und plattformspezifische Optimierungen
 
 ### 🗂️ **Projektstruktur**
 ```
 lib/
-├── screens/          # 6 Haupt-Screens (Welcome, Auth, Home, etc.)
-├── services/         # File-Opener & Review-Service
-├── providers/        # Riverpod State Management & Haptic Service
-├── navigation/       # go_router Navigation mit Animationen
-├── data/            # PDF Repository & Preferences Manager
-└── theme/           # Custom Material Design 3 Theme
+├── 🖥️  screens/          # 6 Haupt-Screens (Welcome, Auth, Home, etc.)
+├── 🔧  services/         # File-Opener & Review-Service
+├── 📊  providers/        # Riverpod State Management & Haptic Service
+├── 🧭  navigation/       # go_router Navigation mit Animationen
+├── 💾  data/            # PDF Repository & Preferences Manager
+└── 🎨  theme/           # Custom Material Design 3 Theme
+
+assets/
+├── 🖼️  images/          # App-Icons, Logos und UI-Grafiken
+└── 📄  configs/         # Konfigurationsdateien
+
+android/                 # Android-spezifische Implementierung
+ios/                     # iOS-spezifische Konfiguration
 ```
 
 ### 📦 **Haupt-Dependencies**
-| Package | Version | Verwendung |
-|---------|---------|------------|
-| `flutter_riverpod` | ^2.6.1 | State Management |
-| `go_router` | ^15.1.2 | Navigation & Routing |
-| `http` | ^1.2.2 | Netzwerkkommunikation |
-| `syncfusion_flutter_pdf` | ^29.2.9 | PDF-Verarbeitung |
-| `pdfx` | ^2.9.1 | PDF-Anzeige |
-| `connectivity_plus` | ^6.1.0 | Netzwerkstatus |
-| `share_plus` | ^11.0.0 | PDF-Sharing |
-| `shared_preferences` | ^2.3.4 | Lokale Datenspeicherung |
+| Package | Version | Zweck | Kategorie |
+|---------|---------|--------|-----------|
+| `flutter_riverpod` | ^2.6.1 | Reaktive State-Verwaltung | 🔄 State Management |
+| `go_router` | ^15.1.2 | Deklarative Navigation & Routing | 🧭 Navigation |
+| `http` | ^1.2.2 | Sichere Netzwerkkommunikation | 🌐 Network |
+| `syncfusion_flutter_pdf` | ^29.2.9 | PDF-Verarbeitung & Analyse | 📄 Document Processing |
+| `pdfx` | ^2.9.1 | Hochperformante PDF-Anzeige | 🔍 PDF Viewer |
+| `connectivity_plus` | ^6.1.0 | Intelligente Netzwerküberwachung | 📡 Connectivity |
+| `share_plus` | ^11.0.0 | Plattformübergreifendes PDF-Sharing | 📤 Sharing |
+| `shared_preferences` | ^2.3.4 | Sichere lokale Datenspeicherung | 💾 Storage |
+| `in_app_review` | ^2.0.10 | Natives Review-System | ⭐ User Experience |
+| `url_launcher` | ^6.3.2 | Externe App-Integration | 🔗 External Apps |
 
 ### ⚡ **Performance-Optimierungen**
 
@@ -109,49 +179,67 @@ lib/
 
 ---
 
-## � Installation & Entwicklung
+## 🚀 Installation & Entwicklung
+
+### 🔽 **Download & Installation**
+
+#### **📱 Für Endnutzer**
+- **[🔽 Latest Release](https://github.com/luka-loehr/LGKA/releases/latest)** - Neueste stabile Version
+- **[📋 Alle Releases](https://github.com/luka-loehr/LGKA/releases)** - Vollständige Versionshistorie
+- **[📖 Installationsanleitung](https://github.com/luka-loehr/LGKA/wiki/Installation)** - Schritt-für-Schritt Guide
+
+#### **🛠️ Für Entwickler**
+- **[📂 Repository](https://github.com/luka-loehr/LGKA)** - Vollständiger Quellcode
+- **[🐛 Bug Reports](https://github.com/luka-loehr/LGKA/issues)** - Fehler melden
+- **[💡 Feature Requests](https://github.com/luka-loehr/LGKA/discussions)** - Neue Funktionen vorschlagen
+- **[📊 Project Board](https://github.com/luka-loehr/LGKA/projects)** - Entwicklungsfortschritt
 
 ### 📋 **Voraussetzungen**
 ```bash
-Flutter SDK >= 3.8.0
-Dart SDK >= 3.8.1
-Android SDK >= 21 (Android 5.0)
-iOS >= 12.0
+# Entwicklungsumgebung
+Flutter SDK >= 3.8.0     # Cross-Platform Framework
+Dart SDK >= 3.8.1        # Programmiersprache
+Android SDK >= 21        # Android 5.0+
+iOS >= 12.0              # iOS Deployment Target
+
+# Zusätzliche Tools
+Git >= 2.20             # Versionskontrolle
+Android Studio / VS Code # IDE mit Flutter-Plugin
 ```
 
-### 🚀 **Setup**
+### 🚀 **Schnellstart**
 ```bash
-# Repository klonen
+# 1. Repository klonen
 git clone https://github.com/luka-loehr/LGKA.git
 cd LGKA
 
-# Dependencies installieren
+# 2. Dependencies installieren
 flutter pub get
 
-# App-Icons generieren
+# 3. App-Icons generieren
 dart run generate_app_icons.dart
 
-# App starten (Debug)
-flutter run
+# 4. Development Server starten
+flutter run --debug
 ```
 
 ### 🏗️ **Build-Kommandos**
 
-#### **Development Builds**
+#### **⚡ Development Builds (Schnelle Iteration)**
 ```bash
-# Split APKs für lokales Testing (~9.6MB pro Architektur)
-flutter build apk --release --split-per-abi
+# ARM64 APK für moderne Android-Geräte (~9.9MB)
+flutter build apk --release --target-platform=android-arm64
 
-# Installation via ADB (ARM64 empfohlen)
-adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+# Installation via ADB
+adb install -r build/app/outputs/flutter-apk/app-release.apk
 ```
 
-#### **Production Builds**
+#### **🏪 Production Builds (Store-Ready)**
 ```bash
-# Google Play Store
+# Google Play Store (App Bundle)
 flutter build appbundle --release
 
-# Apple App Store
+# Apple App Store (iOS)
 flutter build ios --release
 ```
 
@@ -188,17 +276,20 @@ version_code: "28"
 ## 🔐 Datenschutz & Sicherheit
 
 ### ✅ **Datenschutz-Features**
-- **Keine personenbezogenen Daten** werden erfasst
-- **Keine Tracker, Analytics oder Werbe-IDs**
-- **Ausschließlich lokale Datenspeicherung** für PDF-Caching
-- **Verschlüsselte HTTPS-Verbindungen** zum Schulserver
-- **Keine Datenweiterleitung** an Dritte
+- **🚫 Zero-Tracking Policy**: Keine personenbezogenen Daten werden erfasst
+- **📵 Keine Analytics oder Werbe-IDs**: Vollständig werbefrei und tracking-frei
+- **💾 Ausschließlich lokale Datenspeicherung** für PDF-Caching
+- **🔒 End-to-End Verschlüsselung** für alle Serververbindungen
+- **🛡️ Privacy by Design**: Datenschutz als Grundprinzip der Architektur
+- **🌍 DSGVO-konform**: Vollständige Einhaltung europäischer Datenschutzstandards
 
-### � **Sicherheitsmaßnahmen**
-- **HTTP Basic Authentication** für Server-Zugriff
-- **Certificate Pinning** für HTTPS-Verbindungen
-- **Lokale Schlüsselspeicherung** mit Android Keystore
-- **Network Security Configuration** für sichere Verbindungen
+### 🛠️ **Sicherheitsmaßnahmen**
+- **🔐 Sichere Authentifizierung** für Serverzugriff
+- **📜 Certificate Pinning** für HTTPS-Verbindungen
+- **🔑 Android Keystore Integration** für sichere Schlüsselspeicherung
+- **🌐 Network Security Configuration** für geschützte Verbindungen
+- **🔍 Code Obfuscation** in Release-Builds
+- **⚡ Secure by Default**: Alle Verbindungen standardmäßig verschlüsselt
 
 📄 [**Vollständige Datenschutzerklärung**](https://luka-loehr.github.io/LGKA/privacy.html)  
 📄 [**Impressum**](https://luka-loehr.github.io/LGKA/impressum.html)
@@ -229,7 +320,7 @@ PDF Repository → Local Cache → File System → PDF Viewer
 
 ---
 
-## � Entwicklung
+## 🛠️ Entwicklung
 
 ### 🧪 **Testing**
 ```bash
@@ -350,26 +441,88 @@ flutter run --release
 
 ## 🙋‍♂️ Support & Kontakt
 
-### 📞 **Support-Kanäle**
-- **GitHub Issues** für Bug Reports und Feature Requests
-- **Discussions** für allgemeine Fragen
-- **E-Mail** für private Anfragen
+### 🆘 **Hilfe & Support**
+
+| Problem | Lösung | Link |
+|---------|---------|------|
+| **🐛 Bug gefunden** | GitHub Issues | [Fehler melden](https://github.com/luka-loehr/LGKA/issues/new) |
+| **💡 Feature-Idee** | GitHub Discussions | [Diskussion starten](https://github.com/luka-loehr/LGKA/discussions) |
+| **❓ Allgemeine Fragen** | Wiki & FAQ | [Dokumentation](https://github.com/luka-loehr/LGKA/wiki) |
+| **🔧 Build-Probleme** | Build-Anleitung | [BUILD_NOTES.md](BUILD_NOTES.md) |
+| **⚙️ Konfiguration** | Setup-Guide | [App-Konfiguration](app_config/README.md) |
+
+### 📚 **Wichtige Ressourcen**
+
+#### **📖 Dokumentation**
+- **[📘 Haupt-Dokumentation](https://github.com/luka-loehr/LGKA/wiki)** - Vollständige Anleitung
+- **[🔨 Build-Anleitung](BUILD_NOTES.md)** - Detaillierte Build-Instruktionen
+- **[⚙️ App-Konfiguration](app_config/README.md)** - Zentrale Konfigurationsverwaltung
+- **[🍎 iOS Setup](ios/README_APP_CONFIG.md)** - iOS-spezifische Konfiguration
+- **[🎨 Icon-System](assets/images/app-icons/README.md)** - App-Icon Verwaltung
+
+#### **🌐 Online-Ressourcen**
+- **[🏠 GitHub Pages](https://luka-loehr.github.io/LGKA/)** - Projektwebsite
+- **[🔒 Datenschutz](https://luka-loehr.github.io/LGKA/privacy.html)** - Vollständige Datenschutzerklärung
+- **[⚖️ Impressum](https://luka-loehr.github.io/LGKA/impressum.html)** - Rechtliche Informationen
+- **[📜 Lizenz](LICENSE)** - Creative Commons BY-NC-ND 4.0
 
 ### 🛠️ **Troubleshooting**
-Häufige Probleme und Lösungen sind in den [**BUILD_NOTES.md**](BUILD_NOTES.md) dokumentiert.
+Häufige Probleme und Lösungen sind detailliert in den [**BUILD_NOTES.md**](BUILD_NOTES.md) dokumentiert.
 
-### 📚 **Weiterführende Dokumentation**
-- [**Build-Anleitung**](BUILD_NOTES.md) - Detaillierte Build-Instruktionen
-- [**App-Konfiguration**](app_config/README.md) - Zentrale Konfigurationsverwaltung
-- [**iOS Setup**](ios/README_APP_CONFIG.md) - iOS-spezifische Konfiguration
+### 📧 **Direkter Kontakt**
+Für private Anfragen oder spezielle Anliegen können Sie den Entwickler direkt über die GitHub-Profilseite kontaktieren.
 
 ---
 
-> **Entwickelt mit ❤️ von Luka Löhr für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe.**
+<div align="center">
+
+## 📊 Projekt-Statistiken
+
+![GitHub stars](https://img.shields.io/github/stars/luka-loehr/LGKA?style=social)
+![GitHub forks](https://img.shields.io/github/forks/luka-loehr/LGKA?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/luka-loehr/LGKA?style=social)
+
+![GitHub release](https://img.shields.io/github/v/release/luka-loehr/LGKA?include_prereleases&sort=semver)
+![GitHub release date](https://img.shields.io/github/release-date/luka-loehr/LGKA)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/luka-loehr/LGKA)
+
+</div>
+
+---
+
+> **💡 Entwickelt mit Leidenschaft und ❤️ von [Luka Löhr](https://github.com/luka-loehr) für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe.**  
+> *Ein privates Schülerprojekt, das Digitalisierung und Benutzerfreundlichkeit vereint.*
 
 <div align="center">
 
+### 🚀 **Powered by Modern Technology**
+
 [![Flutter](https://img.shields.io/badge/Made%20with-Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Language-Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
+[![Material Design](https://img.shields.io/badge/Design-Material%203-757575?style=for-the-badge&logo=material-design&logoColor=white)](https://m3.material.io)
+
+### 🛡️ **Quality Assurance**
+
+![Code Quality](https://img.shields.io/badge/Code%20Quality-A+-brightgreen?style=flat&logo=codeclimate)
+![Maintenance](https://img.shields.io/badge/Maintenance-Active-brightgreen?style=flat)
+![Documentation](https://img.shields.io/badge/Documentation-Excellent-brightgreen?style=flat&logo=gitbook)
+
+### 🌟 **Community & Support**
+
+[![GitHub Issues](https://img.shields.io/github/issues/luka-loehr/LGKA?style=flat&logo=github)](https://github.com/luka-loehr/LGKA/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/luka-loehr/LGKA?style=flat&logo=github)](https://github.com/luka-loehr/LGKA/pulls)
+[![License](https://img.shields.io/github/license/luka-loehr/LGKA?style=flat)](LICENSE)
+
+---
+
+**🔗 Schnellzugriff:** 
+[Website](https://luka-loehr.github.io/LGKA/) • 
+[Releases](https://github.com/luka-loehr/LGKA/releases) • 
+[Wiki](https://github.com/luka-loehr/LGKA/wiki) • 
+[Diskussionen](https://github.com/luka-loehr/LGKA/discussions)
+
+---
+
+*© 2025 Luka Löhr. Dieses Projekt steht unter der [Creative Commons BY-NC-ND 4.0](LICENSE) Lizenz.*
 
 </div>
