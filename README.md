@@ -1,19 +1,46 @@
 # 📱 LGKA+ – Digitaler Vertretungsplan für das Lessing-Gymnasium Karlsruhe
 
-![Flutter](https://img.shields.io/badge/Flutter-3.8.0+-02569B?style=flat&logo=flutter&logoColor=white)
-![Dart](https://img.shields.io/badge/Dart-3.8.1+-0175C2?style=flat&logo=dart&logoColor=white)
-![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green?style=flat)
-![Version](https://img.shields.io/badge/Version-2.0.1-blue?style=flat)
-![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-orange?style=flat)
+<div align="center">
 
-> **Modern Flutter App für den digitalen Vertretungsplan**  
-> Entwickelt für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe
+![LGKA+ Logo](assets/images/app-icons/app-logo.png)
+
+**🏫 Moderne Flutter-App für den digitalen Vertretungsplan**  
+*Entwickelt für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe*
+
+[![Flutter](https://img.shields.io/badge/Flutter-3.8.0+-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.8.1+-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
+[![Android](https://img.shields.io/badge/Android-5.0+-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com)
+[![iOS](https://img.shields.io/badge/iOS-12.0+-000000?style=for-the-badge&logo=ios&logoColor=white)](https://developer.apple.com/ios)
+
+[![Version](https://img.shields.io/badge/Version-2.0.1-blue?style=flat-square)](https://github.com/luka-loehr/LGKA/releases)
+[![Build](https://img.shields.io/badge/Build-28-brightgreen?style=flat-square)](#)
+[![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-orange?style=flat-square)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/luka-loehr/LGKA?style=flat-square&color=yellow)](https://github.com/luka-loehr/LGKA/stargazers)
+
+**📱 [Download für Android](https://github.com/luka-loehr/LGKA/releases/latest) • 🍎 iOS (Coming Soon) • 📚 [Dokumentation](#-dokumentation) • 🐛 [Issues](https://github.com/luka-loehr/LGKA/issues)**
+
+</div>
+
+---
+
+## 🎯 Über die App
+
+LGKA+ ist eine **hochmoderne Flutter-Anwendung**, die speziell für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe entwickelt wurde. Die App bietet **nahtlosen Zugriff** auf den digitalen Vertretungsplan mit **intelligenter Offline-Funktionalität** und einer **benutzerfreundlichen Material Design 3 Oberfläche**.
+
+### 🚀 Warum LGKA+?
+
+- **🔄 Automatische Updates** - Vertretungspläne werden automatisch heruntergeladen
+- **📱 Offline-First** - Funktioniert auch ohne Internetverbindung  
+- **🎨 Modern Design** - Material Design 3 mit Dark Mode Support
+- **⚡ Performance** - Optimiert für schnelle Ladezeiten und geringen Speicherverbrauch
+- **🔐 Datenschutz** - Keine Tracker, keine Werbung, keine Datensammlung
+- **🌍 Open Source** - Transparenter und vertrauenswürdiger Code
 
 ---
 
 ## ✨ Features im Überblick
 
-### � **Intelligenter Vertretungsplan**
+### 🔄 **Intelligenter Vertretungsplan**
 - **Automatischer Download** für heute und morgen
 - **Offline-Verfügbarkeit** durch smartes PDF-Caching 
 - **Wochentag-basierte Dateiverwaltung** (z.B. `montag.pdf`, `dienstag.pdf`)
@@ -45,7 +72,7 @@
 - **Slow-Connection-Detection** mit Nutzer-Feedback
 - **Offline-First Architektur** für zuverlässige Verfügbarkeit
 
-### � **Zusätzliche Features**
+### 🎯 **Zusätzliche Features**
 - **Willkommensbildschirm** beim ersten Start
 - **In-App-Review-System** für Feedback
 - **Adaptive App-Icons** für Android und iOS
@@ -109,9 +136,7 @@ lib/
 
 ---
 
-## � Installation & Entwicklung
-
-### 📋 **Voraussetzungen**
+## 📋 **Voraussetzungen**
 ```bash
 Flutter SDK >= 3.8.0
 Dart SDK >= 3.8.1
@@ -194,7 +219,7 @@ version_code: "28"
 - **Verschlüsselte HTTPS-Verbindungen** zum Schulserver
 - **Keine Datenweiterleitung** an Dritte
 
-### � **Sicherheitsmaßnahmen**
+### 🛠️ **Sicherheitsmaßnahmen**
 - **HTTP Basic Authentication** für Server-Zugriff
 - **Certificate Pinning** für HTTPS-Verbindungen
 - **Lokale Schlüsselspeicherung** mit Android Keystore
@@ -229,9 +254,7 @@ PDF Repository → Local Cache → File System → PDF Viewer
 
 ---
 
-## � Entwicklung
-
-### 🧪 **Testing**
+## 🧪 **Testing**
 ```bash
 # Unit Tests ausführen
 flutter test
