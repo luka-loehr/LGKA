@@ -66,8 +66,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
       final result = await Share.shareXFiles(
         [XFile(tempFile.path)],
-        text: 'LGKA+ Vertretungsplan',
-        subject: 'Vertretungsplan - Lessing Gymnasium Karlsruhe',
+        subject: 'LGKA+ Vertretungsplan',
       );
 
       // Clean up temporary file

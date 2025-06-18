@@ -126,7 +126,7 @@ flutter:
 # Flutter Launcher Icons Configuration
 flutter_launcher_icons:
   android: true
-  ios: false
+  ios: true
   image_path: "assets/images/app-icons/app-logo.png"
   adaptive_icon_background: "#00000000"
   adaptive_icon_foreground: "assets/images/app-icons/app-logo.png"
