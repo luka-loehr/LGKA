@@ -56,7 +56,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Zeigt das Datum nach dem Wochentag an',
+                      'Datum nach Wochentag anzeigen',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppColors.secondaryText,
                           ),
