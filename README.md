@@ -170,12 +170,10 @@ ios/                     # iOS-spezifische Konfiguration
 - **Connection Pooling** für Netzwerk-Requests
 
 #### **App-Größen**
-| Build-Typ | Größe | Verwendung |
-|-----------|-------|------------|
-| App Bundle | ~15-20MB | Google Play Store (automatisch optimiert) |
-| ARM64 APK | ~9.9MB | Moderne Android-Geräte |
-| ARMv7 APK | ~9.5MB | Legacy-Geräte (Android 5.0+) |
-| x86_64 APK | ~10.0MB | Emulator/Testing |
+| Build-Typ | Größe | Installiert | Verwendung |
+|-----------|-------|-------------|------------|
+| App Bundle | ~45MB | ~23MB | Google Play Store |
+| ARM64 APK | ~9MB | ~23MB | Direktinstallation |
 
 ---
 
@@ -476,22 +474,6 @@ Für private Anfragen oder spezielle Anliegen können Sie den Entwickler direkt 
 
 ---
 
-<div align="center">
-
-## 📊 Projekt-Statistiken
-
-![GitHub stars](https://img.shields.io/github/stars/luka-loehr/LGKA?style=social)
-![GitHub forks](https://img.shields.io/github/forks/luka-loehr/LGKA?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/luka-loehr/LGKA?style=social)
-
-![GitHub release](https://img.shields.io/github/v/release/luka-loehr/LGKA?include_prereleases&sort=semver)
-![GitHub release date](https://img.shields.io/github/release-date/luka-loehr/LGKA)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/luka-loehr/LGKA)
-
-</div>
-
----
-
 > **💡 Entwickelt mit Leidenschaft und ❤️ von [Luka Löhr](https://github.com/luka-loehr) für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe.**  
 > *Ein privates Schülerprojekt, das Digitalisierung und Benutzerfreundlichkeit vereint.*
 
@@ -511,8 +493,6 @@ Für private Anfragen oder spezielle Anliegen können Sie den Entwickler direkt 
 
 ### 🌟 **Community & Support**
 
-[![GitHub Issues](https://img.shields.io/github/issues/luka-loehr/LGKA?style=flat&logo=github)](https://github.com/luka-loehr/LGKA/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/luka-loehr/LGKA?style=flat&logo=github)](https://github.com/luka-loehr/LGKA/pulls)
 [![License](https://img.shields.io/github/license/luka-loehr/LGKA?style=flat)](LICENSE)
 
 ---
