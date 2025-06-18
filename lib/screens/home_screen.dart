@@ -799,7 +799,7 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Zeigt das Datum nach dem Wochentag an',
+                                'Datum nach Wochentag anzeigen',
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                   color: AppColors.secondaryText,
                                 ),
@@ -853,7 +853,7 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'PDFs einfach direkt in der App öffnen',
+                                'PDFs in der App öffnen (schneller)',
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                   color: AppColors.secondaryText,
                                 ),
