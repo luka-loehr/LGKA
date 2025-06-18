@@ -8,8 +8,8 @@ app_description: "LGKA+ App - Digitaler Vertretungsplan"
 package_name: "com.lgka"
 
 # Version Configuration
-version_name: "1.6.0"
-version_code: "19"
+version_name: "2.0.1"
+version_code: "28"
 
 # App Icon Configuration
 app_icon_path: "assets/images/app-icons/app-logo.png"
