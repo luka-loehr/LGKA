@@ -515,6 +515,7 @@ class _PlanOptions extends StatelessWidget {
           showDate: showDates,
           icon: Icons.calendar_today,
           onClick: onTodayClick,
+          fallbackText: 'Heute',
         ),
         const SizedBox(height: 16),
         _PlanOptionButton(
@@ -523,6 +524,7 @@ class _PlanOptions extends StatelessWidget {
           showDate: showDates,
           icon: Icons.calendar_today,
           onClick: onTomorrowClick,
+          fallbackText: 'Morgen',
         ),
       ],
     );
@@ -535,6 +537,7 @@ class _PlanOptionButton extends StatefulWidget {
   final bool showDate;
   final IconData icon;
   final VoidCallback onClick;
+  final String fallbackText;
 
   const _PlanOptionButton({
     required this.weekday,
@@ -542,6 +545,7 @@ class _PlanOptionButton extends StatefulWidget {
     required this.showDate,
     required this.icon,
     required this.onClick,
+    required this.fallbackText,
   });
 
   @override
@@ -612,13 +616,16 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
 
   @override
   Widget build(BuildContext context) {
+    // Check if this button should be disabled (empty PDF)
+    final isDisabled = widget.weekday == 'weekend';
+    
     return GestureDetector(
-      onPanDown: (details) {
+      onPanDown: isDisabled ? null : (details) {
         setState(() => _isPressed = true);
         _scaleController.forward();
         HapticService.subtle(); // Add haptic feedback on press
       },
-      onPanUpdate: (details) {
+      onPanUpdate: isDisabled ? null : (details) {
         // Check if finger is still within button bounds
         final RenderBox renderBox = context.findRenderObject() as RenderBox;
         final localPosition = renderBox.globalToLocal(details.globalPosition);
@@ -633,7 +640,7 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
           _scaleController.reverse();
         }
       },
-      onPanEnd: (details) {
+      onPanEnd: isDisabled ? null : (details) {
         if (_isPressed) {
           // Only trigger click if finger was still on button when released
           final RenderBox renderBox = context.findRenderObject() as RenderBox;
@@ -647,7 +654,7 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
         setState(() => _isPressed = false);
         _scaleController.reverse();
       },
-      onPanCancel: () {
+      onPanCancel: isDisabled ? null : () {
         setState(() => _isPressed = false);
         _scaleController.reverse();
       },
@@ -655,17 +662,19 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
         animation: _scaleAnimation,
         builder: (context, child) {
           return Transform.scale(
-            scale: _isPressed ? _scaleAnimation.value : 1.0,
+            scale: (_isPressed && !isDisabled) ? _scaleAnimation.value : 1.0,
             child: AnimatedContainer(
               duration: Duration(milliseconds: _isPressed ? 150 : 300), // Slower when releasing
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               decoration: BoxDecoration(
-                color: _isPressed 
-                    ? AppColors.appSurface.withOpacity(0.8)
-                    : AppColors.appSurface,
+                color: isDisabled 
+                    ? AppColors.appSurface.withOpacity(0.5) // Dimmed for disabled state
+                    : _isPressed 
+                        ? AppColors.appSurface.withOpacity(0.8)
+                        : AppColors.appSurface,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: _isPressed 
+                boxShadow: (_isPressed || isDisabled)
                     ? []
                     : [
                         BoxShadow(
@@ -680,13 +689,15 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
                   Container(
                     width: 40,
                     height: 40,
-                    decoration: const BoxDecoration(
-                      color: AppColors.calendarIconBackground,
+                    decoration: BoxDecoration(
+                      color: isDisabled 
+                          ? AppColors.calendarIconBackground.withOpacity(0.5)
+                          : AppColors.calendarIconBackground,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       widget.icon,
-                      color: Colors.white,
+                      color: isDisabled ? Colors.white.withOpacity(0.5) : Colors.white,
                       size: 24,
                     ),
                   ),
@@ -695,15 +706,21 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
                     child: Row(
                       children: [
                         Text(
-                          widget.weekday,
+                          widget.weekday.isEmpty 
+                            ? widget.fallbackText
+                            : widget.weekday == 'weekend'
+                              ? (widget.fallbackText == 'Heute' ? 'Heute' : 'Noch keine Infos')
+                              : widget.weekday,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: AppColors.appOnSurface,
+                                color: isDisabled 
+                                    ? AppColors.appOnSurface.withOpacity(0.5)
+                                    : AppColors.appOnSurface,
                                 fontWeight: FontWeight.w500,
                               ),
                         ),
                         const SizedBox(width: 8),
                         // Animiertes Datum
-                        if (widget.date.isNotEmpty)
+                        if (widget.date.isNotEmpty && !isDisabled)
                           FadeTransition(
                             opacity: _dateOpacityAnimation,
                             child: Text(
