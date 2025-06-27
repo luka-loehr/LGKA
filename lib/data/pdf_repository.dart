@@ -453,6 +453,15 @@ Map<String, String> _extractPdfData(List<int> bytes) {
     final text = textExtractor.extractText(startPageIndex: 0, endPageIndex: 0);
     document.dispose();
 
+    // DEBUG: Print the first 500 characters of the PDF text
+    debugPrint('PDF Text Content (first 500 chars): ${text.length > 500 ? text.substring(0, 500) : text}');
+
+    // Check if PDF is empty or has very little content (likely weekend/holiday)
+    if (text.trim().length < 50) {
+      debugPrint('PDF appears to be empty or minimal content (likely weekend/holiday)');
+      return {'weekday': 'weekend', 'dateTime': '', 'date': ''};
+    }
+
     // Extract "last updated" timestamp
     final dateTimePattern = RegExp(r'(\d{1,2}\.\d{1,2}\.\d{4}\s+\d{1,2}:\d{2})');
     final dateTimeMatch = dateTimePattern.firstMatch(text);
@@ -480,8 +489,11 @@ Map<String, String> _extractPdfData(List<int> bytes) {
       } else {
         date = partialDate; // Fallback to partial date if no year is found
       }
+      
+      debugPrint('Found weekday using main pattern: $weekday, date: $date');
     } else {
       // Fallback to old method if new pattern fails
+      debugPrint('Main pattern failed, trying fallback pattern');
       final weekdayPattern = RegExp(r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)', caseSensitive: false);
       final weekdayMatch = weekdayPattern.firstMatch(text);
       weekday = weekdayMatch?.group(1) ?? '';
@@ -489,6 +501,8 @@ Map<String, String> _extractPdfData(List<int> bytes) {
       final fallbackDatePattern = RegExp(r'(\d{1,2}\.\d{1,2}\.\d{4})');
       final fallbackDateMatch = fallbackDatePattern.firstMatch(text);
       date = fallbackDateMatch?.group(1) ?? '';
+      
+      debugPrint('Fallback pattern result - weekday: $weekday, date: $date');
     }
 
     return {'weekday': weekday, 'dateTime': dateTime, 'date': date};
