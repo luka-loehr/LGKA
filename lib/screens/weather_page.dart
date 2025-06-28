@@ -514,26 +514,26 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   String _getYAxisTitle() {
     switch (_selectedChart) {
       case ChartType.temperature:
-        return 'Temperatur (°C)';
+        return 'Grad °C';
       case ChartType.humidity:
-        return 'Luftfeuchtigkeit (%)';
+        return 'Feuchtigkeit %';
       case ChartType.windSpeed:
-        return 'Windgeschwindigkeit (km/h)';
+        return 'Wind km/h';
       case ChartType.pressure:
-        return 'Luftdruck (hPa)';
+        return 'Druck hPa';
     }
   }
   
   String _getChartTitle() {
     switch (_selectedChart) {
       case ChartType.temperature:
-        return 'Temperaturverlauf heute';
+        return '🌡️ Wie warm war es heute?';
       case ChartType.humidity:
-        return 'Luftfeuchtigkeit heute';
+        return '💧 Wie feucht war die Luft?';
       case ChartType.windSpeed:
-        return 'Windgeschwindigkeit heute';
+        return '💨 Wie windig war es?';
       case ChartType.pressure:
-        return 'Luftdruckverlauf heute';
+        return '🌪️ Luftdruck heute';
     }
   }
   
