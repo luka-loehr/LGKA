@@ -709,7 +709,7 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
                           widget.weekday.isEmpty 
                             ? widget.fallbackText
                             : widget.weekday == 'weekend'
-                              ? (widget.fallbackText == 'Heute' ? 'Heute' : 'Noch keine Infos')
+                              ? 'Noch keine Infos'
                               : widget.weekday,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 color: isDisabled 
