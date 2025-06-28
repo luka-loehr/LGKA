@@ -209,29 +209,39 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          // Weather station explanation
+                          // Weather station explanation or waiting message
                           Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: AppColors.appBlueAccent.withOpacity(0.1),
+                              color: _weatherData.length < 10 
+                                ? Colors.orange.withOpacity(0.1)
+                                : AppColors.appBlueAccent.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: AppColors.appBlueAccent.withOpacity(0.3),
+                                color: _weatherData.length < 10 
+                                  ? Colors.orange.withOpacity(0.3)
+                                  : AppColors.appBlueAccent.withOpacity(0.3),
                                 width: 1,
                               ),
                             ),
                             child: Row(
                               children: [
                                 Icon(
-                                  Icons.info_outline,
-                                  color: AppColors.appBlueAccent,
+                                  _weatherData.length < 10 
+                                    ? Icons.access_time
+                                    : Icons.info_outline,
+                                  color: _weatherData.length < 10 
+                                    ? Colors.orange
+                                    : AppColors.appBlueAccent,
                                   size: 20,
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    'Diese Wetterdaten kommen direkt von der schuleigenen Wetterstation auf dem Dach. Du siehst hier live Wetterdaten von deiner Schule!',
+                                    _weatherData.length < 10
+                                      ? 'Warte noch ein paar Minuten - die Wetterstation sammelt gerade neue Daten für heute. Normalerweise sind ab 0:30 Uhr genügend Werte verfügbar.'
+                                      : 'Diese Wetterdaten kommen direkt von der schuleigenen Wetterstation auf dem Dach. Du siehst hier live Wetterdaten von deiner Schule!',
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: AppColors.primaryText,
                                       height: 1.4,
@@ -255,8 +265,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       });
                                     },
                                     child: Container(
-                                      height: 100,
-                                      padding: const EdgeInsets.all(18),
+                                      height: 85,
+                                      padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
                                         color: AppColors.appSurface,
                                         borderRadius: BorderRadius.circular(16),
@@ -279,16 +289,16 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                         children: [
                                           Text(
                                             'Temperatur',
-                                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                               color: _selectedChart == ChartType.temperature
                                                   ? AppColors.appBlueAccent
                                                   : AppColors.secondaryText,
                                             ),
                                           ),
-                                          const SizedBox(height: 8),
+                                          const SizedBox(height: 4),
                                           Text(
                                             '${_weatherData.last.temperature.toStringAsFixed(1)}°C',
-                                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                               color: AppColors.appBlueAccent,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -307,8 +317,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       });
                                     },
                                     child: Container(
-                                      height: 100,
-                                      padding: const EdgeInsets.all(18),
+                                      height: 85,
+                                      padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
                                         color: AppColors.appSurface,
                                         borderRadius: BorderRadius.circular(16),
@@ -331,16 +341,16 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                         children: [
                                           Text(
                                             'Luftfeuchtigkeit',
-                                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                               color: _selectedChart == ChartType.humidity
                                                   ? AppColors.appBlueAccent
                                                   : AppColors.secondaryText,
                                             ),
                                           ),
-                                          const SizedBox(height: 8),
+                                          const SizedBox(height: 4),
                                           Text(
                                             '${_weatherData.last.humidity.toStringAsFixed(0)}%',
-                                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                               color: AppColors.appBlueAccent,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -358,8 +368,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                               children: [
                                 Expanded(
                                   child: Container(
-                                    height: 100,
-                                    padding: const EdgeInsets.all(18),
+                                    height: 85,
+                                    padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
                                       color: AppColors.appSurface,
                                       borderRadius: BorderRadius.circular(16),
@@ -378,14 +388,14 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       children: [
                                         Text(
                                           'Wind',
-                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                             color: AppColors.secondaryText,
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 4),
                                         Text(
                                           '${_weatherData.last.windSpeed.toStringAsFixed(1)} km/h',
-                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                             color: AppColors.primaryText,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -397,8 +407,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Container(
-                                    height: 100,
-                                    padding: const EdgeInsets.all(18),
+                                    height: 85,
+                                    padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
                                       color: AppColors.appSurface,
                                       borderRadius: BorderRadius.circular(16),
@@ -417,14 +427,14 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       children: [
                                         Text(
                                           'Luftdruck',
-                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                             color: AppColors.secondaryText,
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 4),
                                         Text(
                                           '${_weatherData.last.pressure.toStringAsFixed(0)} hPa',
-                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                             color: AppColors.primaryText,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -437,7 +447,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                             ),
                           ],
                           const SizedBox(height: 20),
-                          // Chart
+                          // Chart or insufficient data message
                           Expanded(
                             child: Container(
                               padding: const EdgeInsets.all(20),
@@ -452,109 +462,138 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                   ),
                                 ],
                               ),
-                              child: Column(
-                                children: [
-                                  // Chart title
-                                  Text(
-                                    _getChartTitle(),
-                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                      color: AppColors.primaryText,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  // Professional chart
-                                  Expanded(
-                                    child: SfCartesianChart(
-                                      backgroundColor: Colors.transparent,
-                                      plotAreaBackgroundColor: Colors.transparent,
-                                      primaryXAxis: DateTimeAxis(
-                                        dateFormat: DateFormat.Hm(),
-                                        intervalType: DateTimeIntervalType.hours,
-                                        interval: 2,
-                                        majorGridLines: MajorGridLines(
-                                          color: AppColors.secondaryText.withOpacity(0.2),
-                                          width: 0.5,
+                              child: _weatherData.length < 3
+                                ? Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.hourglass_empty,
+                                          size: 48,
+                                          color: AppColors.secondaryText.withOpacity(0.5),
                                         ),
-                                        minorGridLines: const MinorGridLines(width: 0),
-                                        axisLine: AxisLine(
-                                          color: AppColors.secondaryText.withOpacity(0.3),
-                                          width: 1,
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          'Zu wenig Daten für Diagramm',
+                                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                            color: AppColors.primaryText,
+                                          ),
+                                          textAlign: TextAlign.center,
                                         ),
-                                        majorTickLines: MajorTickLines(
-                                          color: AppColors.secondaryText.withOpacity(0.3),
-                                          width: 1,
-                                        ),
-                                        labelStyle: TextStyle(
-                                          color: AppColors.secondaryText,
-                                          fontSize: 11,
-                                        ),
-                                        title: AxisTitle(
-                                          text: 'Uhrzeit',
-                                          textStyle: TextStyle(
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          'Die Wetterstation sammelt gerade Daten.\nDiagramme sind verfügbar, sobald mehr\nMesswerte vorliegen.',
+                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                             color: AppColors.secondaryText,
-                                            fontSize: 12,
                                           ),
-                                        ),
-                                      ),
-                                      primaryYAxis: NumericAxis(
-                                        title: AxisTitle(
-                                          text: _getYAxisTitle(),
-                                          textStyle: TextStyle(
-                                            color: AppColors.secondaryText,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        majorGridLines: MajorGridLines(
-                                          color: AppColors.secondaryText.withOpacity(0.2),
-                                          width: 0.5,
-                                        ),
-                                        minorGridLines: const MinorGridLines(width: 0),
-                                        axisLine: AxisLine(
-                                          color: AppColors.secondaryText.withOpacity(0.3),
-                                          width: 1,
-                                        ),
-                                        majorTickLines: MajorTickLines(
-                                          color: AppColors.secondaryText.withOpacity(0.3),
-                                          width: 1,
-                                        ),
-                                        labelStyle: TextStyle(
-                                          color: AppColors.secondaryText,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                      margin: const EdgeInsets.all(8),
-                                      legend: const Legend(isVisible: false),
-                                      tooltipBehavior: TooltipBehavior(
-                                        enable: true,
-                                        color: AppColors.appSurface,
-                                        textStyle: const TextStyle(
-                                          color: AppColors.primaryText,
-                                          fontSize: 12,
-                                        ),
-                                        borderColor: AppColors.appBlueAccent,
-                                        borderWidth: 1,
-                                        format: _getTooltipFormat(),
-                                      ),
-                                      series: <CartesianSeries<dynamic, dynamic>>[
-                                        SplineSeries<WeatherData, DateTime>(
-                                          dataSource: _weatherData,
-                                          xValueMapper: (WeatherData data, _) => data.time,
-                                          yValueMapper: (WeatherData data, _) => _getYValue(data),
-                                          color: AppColors.appBlueAccent,
-                                          width: 3,
-                                          splineType: SplineType.cardinal,
-                                          cardinalSplineTension: 0.7,
-                                          markerSettings: const MarkerSettings(
-                                            isVisible: false,
-                                          ),
+                                          textAlign: TextAlign.center,
                                         ),
                                       ],
                                     ),
+                                  )
+                                : Column(
+                                    children: [
+                                      // Chart title
+                                      Text(
+                                        _getChartTitle(),
+                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                          color: AppColors.primaryText,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      // Professional chart
+                                      Expanded(
+                                        child: SfCartesianChart(
+                                          backgroundColor: Colors.transparent,
+                                          plotAreaBackgroundColor: Colors.transparent,
+                                          primaryXAxis: DateTimeAxis(
+                                            dateFormat: DateFormat.Hm(),
+                                            intervalType: DateTimeIntervalType.hours,
+                                            interval: 2,
+                                            majorGridLines: MajorGridLines(
+                                              color: AppColors.secondaryText.withOpacity(0.2),
+                                              width: 0.5,
+                                            ),
+                                            minorGridLines: const MinorGridLines(width: 0),
+                                            axisLine: AxisLine(
+                                              color: AppColors.secondaryText.withOpacity(0.3),
+                                              width: 1,
+                                            ),
+                                            majorTickLines: MajorTickLines(
+                                              color: AppColors.secondaryText.withOpacity(0.3),
+                                              width: 1,
+                                            ),
+                                            labelStyle: TextStyle(
+                                              color: AppColors.secondaryText,
+                                              fontSize: 11,
+                                            ),
+                                            title: AxisTitle(
+                                              text: 'Uhrzeit',
+                                              textStyle: TextStyle(
+                                                color: AppColors.secondaryText,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                          primaryYAxis: NumericAxis(
+                                            title: AxisTitle(
+                                              text: _getYAxisTitle(),
+                                              textStyle: TextStyle(
+                                                color: AppColors.secondaryText,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            majorGridLines: MajorGridLines(
+                                              color: AppColors.secondaryText.withOpacity(0.2),
+                                              width: 0.5,
+                                            ),
+                                            minorGridLines: const MinorGridLines(width: 0),
+                                            axisLine: AxisLine(
+                                              color: AppColors.secondaryText.withOpacity(0.3),
+                                              width: 1,
+                                            ),
+                                            majorTickLines: MajorTickLines(
+                                              color: AppColors.secondaryText.withOpacity(0.3),
+                                              width: 1,
+                                            ),
+                                            labelStyle: TextStyle(
+                                              color: AppColors.secondaryText,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                          margin: const EdgeInsets.all(8),
+                                          legend: const Legend(isVisible: false),
+                                          tooltipBehavior: TooltipBehavior(
+                                            enable: true,
+                                            color: AppColors.appSurface,
+                                            textStyle: const TextStyle(
+                                              color: AppColors.primaryText,
+                                              fontSize: 12,
+                                            ),
+                                            borderColor: AppColors.appBlueAccent,
+                                            borderWidth: 1,
+                                            format: _getTooltipFormat(),
+                                          ),
+                                          series: <CartesianSeries<dynamic, dynamic>>[
+                                            SplineSeries<WeatherData, DateTime>(
+                                              dataSource: _weatherData,
+                                              xValueMapper: (WeatherData data, _) => data.time,
+                                              yValueMapper: (WeatherData data, _) => _getYValue(data),
+                                              color: AppColors.appBlueAccent,
+                                              width: 3,
+                                              splineType: SplineType.cardinal,
+                                              cardinalSplineTension: 0.7,
+                                              markerSettings: const MarkerSettings(
+                                                isVisible: false,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
                             ),
                           ),
                         ],
