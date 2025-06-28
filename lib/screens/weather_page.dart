@@ -22,6 +22,7 @@ enum ChartType {
 
 class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAliveClientMixin {
   List<WeatherData> _weatherData = [];
+  WeatherData? _latestWeatherData;
   bool _isLoading = true;
   bool _isUpdating = false; // Track if we're updating in background
   DateTime? _lastUpdateTime;
@@ -42,47 +43,37 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     
     final weatherService = ref.read(weatherServiceProvider);
     
-    // First, try to load cached data
-    final cachedData = await weatherService.getCachedData();
-    final cacheTime = await weatherService.getLastCacheTime();
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
     
-    if (cachedData != null && cachedData.isNotEmpty) {
-      print('📱 [WeatherPage] Using cached data');
-      setState(() {
-        _weatherData = cachedData;
-        _lastUpdateTime = cacheTime;
-        _isLoading = false;
-        _error = null;
-      });
+    try {
+      // Load both chart data and latest real-time data
+      final chartDataFuture = weatherService.fetchWeatherData();
+      final latestDataFuture = weatherService.getLatestWeatherData();
       
-      // Update data in background
-      _updateDataInBackground();
-    } else {
-      // No cache, need to fetch fresh data
-      setState(() {
-        _isLoading = true;
-        _error = null;
-      });
+      final results = await Future.wait([chartDataFuture, latestDataFuture]);
+      final chartData = results[0] as List<WeatherData>;
+      final latestData = results[1] as WeatherData?;
       
-      try {
-        print('📱 [WeatherPage] No cache, fetching fresh data');
-        final data = await weatherService.fetchWeatherData();
-        
-        if (mounted) {
-          setState(() {
-            _weatherData = data;
-            _lastUpdateTime = DateTime.now();
-            _isLoading = false;
-          });
-        }
-      } catch (e) {
-        print('❌ [WeatherPage] Error loading data: $e');
-        if (mounted) {
-          setState(() {
-            _error = e.toString();
-            _isLoading = false;
-          });
-        }
+      if (mounted) {
+        setState(() {
+          _weatherData = chartData;
+          _latestWeatherData = latestData ?? (chartData.isNotEmpty ? chartData.last : null);
+          _lastUpdateTime = DateTime.now();
+          _isLoading = false;
+        });
+      }
+      
+      print('📱 [WeatherPage] Data loaded successfully - Chart: ${chartData.length} points, Latest: ${latestData?.temperature}°C');
+    } catch (e) {
+      print('❌ [WeatherPage] Error loading data: $e');
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
       }
     }
   }
@@ -96,12 +87,20 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     () async {
       try {
         final weatherService = ref.read(weatherServiceProvider);
-        final freshData = await weatherService.fetchWeatherData();
         
-        if (mounted && freshData.isNotEmpty) {
+        // Update both chart data and latest real-time data
+        final chartDataFuture = weatherService.fetchWeatherData();
+        final latestDataFuture = weatherService.getLatestWeatherData();
+        
+        final results = await Future.wait([chartDataFuture, latestDataFuture]);
+        final chartData = results[0] as List<WeatherData>;
+        final latestData = results[1] as WeatherData?;
+        
+        if (mounted && chartData.isNotEmpty) {
           print('📱 [WeatherPage] Background update successful');
           setState(() {
-            _weatherData = freshData;
+            _weatherData = chartData;
+            _latestWeatherData = latestData ?? chartData.last;
             _lastUpdateTime = DateTime.now();
             _isUpdating = false;
           });
@@ -253,7 +252,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                           ),
                           const SizedBox(height: 20),
                           // Current weather data cards
-                          if (_weatherData.isNotEmpty) ...[
+                          if (_latestWeatherData != null) ...[
                             // Temperature and humidity row
                             Row(
                               children: [
@@ -297,7 +296,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            '${_weatherData.last.temperature.toStringAsFixed(1)}°C',
+                                            '${_latestWeatherData!.temperature.toStringAsFixed(1)}°C',
                                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                               color: AppColors.appBlueAccent,
                                               fontWeight: FontWeight.bold,
@@ -349,7 +348,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            '${_weatherData.last.humidity.toStringAsFixed(0)}%',
+                                            '${_latestWeatherData!.humidity.toStringAsFixed(0)}%',
                                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                               color: AppColors.appBlueAccent,
                                               fontWeight: FontWeight.bold,
@@ -394,7 +393,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          '${_weatherData.last.windSpeed.toStringAsFixed(1)} km/h',
+                                          '${_latestWeatherData!.windSpeed.toStringAsFixed(1)} km/h',
                                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                             color: AppColors.primaryText,
                                             fontWeight: FontWeight.w600,
@@ -433,7 +432,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          '${_weatherData.last.pressure.toStringAsFixed(0)} hPa',
+                                          '${_latestWeatherData!.pressure.toStringAsFixed(0)} hPa',
                                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                             color: AppColors.primaryText,
                                             fontWeight: FontWeight.w600,
