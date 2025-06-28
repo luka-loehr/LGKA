@@ -188,16 +188,14 @@ class WeatherService {
         print('🌤️ [WeatherService] Header row length: ${csvData[0].length}');
       }
 
-      final List<WeatherData> weatherDataList = [];
+      // Parse all data first
+      final List<WeatherData> allWeatherData = [];
       int successfulRows = 0;
       int skippedRows = 0;
       int errorRows = 0;
       
-      // Sample every 10th data point for performance (about 144 points per day instead of 1440)
-      const int samplingInterval = 10;
-      
-      // Skip header row and process data
-      for (int i = 1; i < csvData.length; i += samplingInterval) {
+      // Skip header row and process all data
+      for (int i = 1; i < csvData.length; i++) {
         final row = csvData[i];
         
         if (row.length < 7) {
@@ -234,7 +232,7 @@ class WeatherService {
             radiation: radiation,
           );
           
-          weatherDataList.add(weatherData);
+          allWeatherData.add(weatherData);
           successfulRows++;
           
           // Only log first 3 successful rows to avoid spam
@@ -249,30 +247,102 @@ class WeatherService {
         }
       }
       
+      // Apply smart sampling for chart data
+      final List<WeatherData> sampledData;
+      if (allWeatherData.length < 200) {
+        // Use all data if less than 200 points
+        sampledData = allWeatherData;
+        print('🌤️ [WeatherService] Using all ${allWeatherData.length} data points (< 200)');
+      } else {
+        // Sample every 10th point if 200 or more points
+        sampledData = [];
+        for (int i = 0; i < allWeatherData.length; i += 10) {
+          sampledData.add(allWeatherData[i]);
+        }
+        print('🌤️ [WeatherService] Sampled ${sampledData.length} points from ${allWeatherData.length} total (every 10th)');
+      }
+      
       print('🌤️ [WeatherService] Processing complete:');
       print('    Total rows in CSV: ${csvData.length - 1}');
-      print('    Sampling interval: every ${samplingInterval}th row');
       print('    Successful rows: $successfulRows');
       print('    Skipped rows: $skippedRows');
       print('    Error rows: $errorRows');
-      print('    Final weather data list size: ${weatherDataList.length}');
+      print('    All data points: ${allWeatherData.length}');
+      print('    Sampled data points: ${sampledData.length}');
       
-      if (weatherDataList.isNotEmpty) {
-        print('🌤️ [WeatherService] First data point: ${weatherDataList.first.time} - ${weatherDataList.first.temperature}°C');
-        print('🌤️ [WeatherService] Last data point: ${weatherDataList.last.time} - ${weatherDataList.last.temperature}°C');
+      if (sampledData.isNotEmpty) {
+        print('🌤️ [WeatherService] First data point: ${sampledData.first.time} - ${sampledData.first.temperature}°C');
+        print('🌤️ [WeatherService] Last data point: ${sampledData.last.time} - ${sampledData.last.temperature}°C');
       }
       
-      // Cache the data in memory and persistent storage
-      _cachedWeatherData = weatherDataList;
+      // Cache the sampled data in memory and persistent storage
+      _cachedWeatherData = sampledData;
       _lastFetchTime = DateTime.now();
-      await _saveToCache(weatherDataList);
+      await _saveToCache(sampledData);
       print('🌤️ [WeatherService] Data cached successfully');
       
-      return weatherDataList;
+      return sampledData;
     } catch (e) {
       print('❌ [WeatherService] Fatal error in fetchWeatherData: $e');
       print('❌ [WeatherService] Stack trace: ${StackTrace.current}');
       throw Exception('Error fetching weather data: $e');
+    }
+  }
+
+  /// Get the latest weather data point for real-time display
+  Future<WeatherData?> getLatestWeatherData() async {
+    print('🌤️ [WeatherService] Getting latest weather data');
+    
+    try {
+      print('🌤️ [WeatherService] Making HTTP request for latest data...');
+      final response = await http.get(Uri.parse(csvUrl));
+      
+      if (response.statusCode != 200) {
+        print('❌ [WeatherService] HTTP error: ${response.statusCode}');
+        throw Exception('Failed to load weather data: ${response.statusCode}');
+      }
+
+      final csvString = utf8.decode(response.bodyBytes);
+      final List<List<dynamic>> csvData = const CsvToListConverter(
+        eol: '\n',
+        fieldDelimiter: ';',
+      ).convert(csvString);
+      
+      if (csvData.length < 2) {
+        print('❌ [WeatherService] Not enough data in CSV');
+        return null;
+      }
+
+      // Get the last row (most recent data)
+      final lastRow = csvData.last;
+      
+      if (lastRow.length < 7) {
+        print('❌ [WeatherService] Last row incomplete');
+        return null;
+      }
+      
+      // Calculate time for the last row
+      final minutesSinceMidnight = csvData.length - 2; // -1 for header, -1 for 0-based index
+      final now = DateTime.now();
+      final time = DateTime(now.year, now.month, now.day, 0, 0)
+          .add(Duration(minutes: minutesSinceMidnight));
+      
+      final weatherData = WeatherData(
+        time: time,
+        windSpeed: _parseDouble(lastRow[0]),
+        windDirection: lastRow[1].toString(),
+        temperature: _parseDouble(lastRow[2]),
+        humidity: _parseDouble(lastRow[3]),
+        precipitation: _parseDouble(lastRow[4]),
+        pressure: _parseDouble(lastRow[5]),
+        radiation: _parseDouble(lastRow[6]),
+      );
+      
+      print('🌤️ [WeatherService] Latest data: ${weatherData.time} - ${weatherData.temperature}°C');
+      return weatherData;
+    } catch (e) {
+      print('❌ [WeatherService] Error getting latest weather data: $e');
+      return null;
     }
   }
 
