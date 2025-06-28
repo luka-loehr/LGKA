@@ -671,43 +671,21 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
     final isDisabled = widget.weekday == 'weekend';
     
     return GestureDetector(
-      onPanDown: isDisabled ? null : (details) {
+      onTapDown: isDisabled ? null : (details) {
         setState(() => _isPressed = true);
         _scaleController.forward();
         HapticService.subtle(); // Add haptic feedback on press
       },
-      onPanUpdate: isDisabled ? null : (details) {
-        // Check if finger is still within button bounds
-        final RenderBox renderBox = context.findRenderObject() as RenderBox;
-        final localPosition = renderBox.globalToLocal(details.globalPosition);
-        final buttonRect = Offset.zero & renderBox.size;
-        
-        final isInside = buttonRect.contains(localPosition);
-        if (isInside && !_isPressed) {
-          setState(() => _isPressed = true);
-          _scaleController.forward();
-        } else if (!isInside && _isPressed) {
-          setState(() => _isPressed = false);
-          _scaleController.reverse();
-        }
-      },
-      onPanEnd: isDisabled ? null : (details) {
-        if (_isPressed) {
-          // Only trigger click if finger was still on button when released
-          final RenderBox renderBox = context.findRenderObject() as RenderBox;
-          final localPosition = renderBox.globalToLocal(details.globalPosition);
-          final buttonRect = Offset.zero & renderBox.size;
-          
-          if (buttonRect.contains(localPosition)) {
-            widget.onClick();
-          }
-        }
+      onTapUp: isDisabled ? null : (details) {
         setState(() => _isPressed = false);
         _scaleController.reverse();
       },
-      onPanCancel: isDisabled ? null : () {
+      onTapCancel: isDisabled ? null : () {
         setState(() => _isPressed = false);
         _scaleController.reverse();
+      },
+      onTap: isDisabled ? null : () {
+        widget.onClick();
       },
       child: AnimatedBuilder(
         animation: _scaleAnimation,
