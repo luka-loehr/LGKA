@@ -324,105 +324,79 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                             Row(
                               children: [
                                 Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedChart = ChartType.windSpeed;
-                                      });
-                                    },
-                                    child: Container(
-                                      height: 100,
-                                      padding: const EdgeInsets.all(18),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.appSurface,
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: _selectedChart == ChartType.windSpeed
-                                            ? Border.all(color: AppColors.appBlueAccent, width: 2)
-                                            : Border.all(color: Colors.transparent, width: 2),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: _selectedChart == ChartType.windSpeed
-                                                ? AppColors.appBlueAccent.withOpacity(0.3)
-                                                : AppColors.appBlueAccent.withOpacity(0.1),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 4),
+                                  child: Container(
+                                    height: 100,
+                                    padding: const EdgeInsets.all(18),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.appSurface,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(color: Colors.transparent, width: 2),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.appBlueAccent.withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Wind',
+                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            color: AppColors.secondaryText,
                                           ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Wind',
-                                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                              color: _selectedChart == ChartType.windSpeed
-                                                  ? AppColors.appBlueAccent
-                                                  : AppColors.secondaryText,
-                                            ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          '${_weatherData.last.windSpeed.toStringAsFixed(1)} km/h',
+                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                            color: AppColors.primaryText,
+                                            fontWeight: FontWeight.w600,
                                           ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            '${_weatherData.last.windSpeed.toStringAsFixed(1)} km/h',
-                                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                              color: AppColors.primaryText,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedChart = ChartType.pressure;
-                                      });
-                                    },
-                                    child: Container(
-                                      height: 100,
-                                      padding: const EdgeInsets.all(18),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.appSurface,
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: _selectedChart == ChartType.pressure
-                                            ? Border.all(color: AppColors.appBlueAccent, width: 2)
-                                            : Border.all(color: Colors.transparent, width: 2),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: _selectedChart == ChartType.pressure
-                                                ? AppColors.appBlueAccent.withOpacity(0.3)
-                                                : AppColors.appBlueAccent.withOpacity(0.1),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 4),
+                                  child: Container(
+                                    height: 100,
+                                    padding: const EdgeInsets.all(18),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.appSurface,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(color: Colors.transparent, width: 2),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.appBlueAccent.withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Luftdruck',
+                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            color: AppColors.secondaryText,
                                           ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Luftdruck',
-                                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                              color: _selectedChart == ChartType.pressure
-                                                  ? AppColors.appBlueAccent
-                                                  : AppColors.secondaryText,
-                                            ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          '${_weatherData.last.pressure.toStringAsFixed(0)} hPa',
+                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                            color: AppColors.primaryText,
+                                            fontWeight: FontWeight.w600,
                                           ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            '${_weatherData.last.pressure.toStringAsFixed(0)} hPa',
-                                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                              color: AppColors.primaryText,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -529,9 +503,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.humidity:
         return '💧 Wie feucht war die Luft?';
       case ChartType.windSpeed:
-        return '💨 Wie windig war es?';
       case ChartType.pressure:
-        return '🌪️ Luftdruck heute';
+        return '🌡️ Wie warm war es heute?'; // Fallback to temperature
     }
   }
   
@@ -542,9 +515,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.humidity:
         return 'point.x : point.y%';
       case ChartType.windSpeed:
-        return 'point.x : point.y km/h';
       case ChartType.pressure:
-        return 'point.x : point.y hPa';
+        return 'point.x : point.y°C'; // Fallback to temperature
     }
   }
   
@@ -555,9 +527,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.humidity:
         return data.humidity;
       case ChartType.windSpeed:
-        return data.windSpeed;
       case ChartType.pressure:
-        return data.pressure;
+        return data.temperature; // Fallback to temperature
     }
   }
 } 
