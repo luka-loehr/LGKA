@@ -117,8 +117,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     }();
   }
 
-
-
   String _formatUpdateTime(DateTime time) {
     final now = DateTime.now();
     final difference = now.difference(time);
@@ -211,47 +209,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          // Last update indicator
-                          if (_lastUpdateTime != null) ...[
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              margin: const EdgeInsets.only(bottom: 16),
-                              decoration: BoxDecoration(
-                                color: AppColors.appSurface,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  if (_isUpdating) ...[
-                                    SizedBox(
-                                      width: 12,
-                                      height: 12,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                          AppColors.appBlueAccent.withOpacity(0.7),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                  ],
-                                  Text(
-                                    _isUpdating 
-                                      ? 'Aktualisiere...'
-                                      : 'Letzte Aktualisierung: ${_formatUpdateTime(_lastUpdateTime!)}',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.secondaryText,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
                           // Current weather data cards
                           if (_weatherData.isNotEmpty) ...[
-                            // Temperature and time header
+                            // Temperature and humidity row
                             Row(
                               children: [
                                 Expanded(
@@ -262,13 +222,14 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       });
                                     },
                                     child: Container(
-                                      padding: const EdgeInsets.all(20),
+                                      height: 100,
+                                      padding: const EdgeInsets.all(18),
                                       decoration: BoxDecoration(
                                         color: AppColors.appSurface,
                                         borderRadius: BorderRadius.circular(16),
                                         border: _selectedChart == ChartType.temperature
                                             ? Border.all(color: AppColors.appBlueAccent, width: 2)
-                                            : null,
+                                            : Border.all(color: Colors.transparent, width: 2),
                                         boxShadow: [
                                           BoxShadow(
                                             color: _selectedChart == ChartType.temperature
@@ -281,6 +242,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       ),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             'Temperatur',
@@ -312,13 +274,14 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       });
                                     },
                                     child: Container(
-                                      padding: const EdgeInsets.all(20),
+                                      height: 100,
+                                      padding: const EdgeInsets.all(18),
                                       decoration: BoxDecoration(
                                         color: AppColors.appSurface,
                                         borderRadius: BorderRadius.circular(16),
                                         border: _selectedChart == ChartType.humidity
                                             ? Border.all(color: AppColors.appBlueAccent, width: 2)
-                                            : null,
+                                            : Border.all(color: Colors.transparent, width: 2),
                                         boxShadow: [
                                           BoxShadow(
                                             color: _selectedChart == ChartType.humidity
@@ -331,6 +294,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       ),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             'Luftfeuchtigkeit',
@@ -356,7 +320,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                               ],
                             ),
                             const SizedBox(height: 12),
-                            // Wind and pressure
+                            // Wind and pressure row
                             Row(
                               children: [
                                 Expanded(
@@ -367,13 +331,14 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       });
                                     },
                                     child: Container(
-                                      padding: const EdgeInsets.all(20),
+                                      height: 100,
+                                      padding: const EdgeInsets.all(18),
                                       decoration: BoxDecoration(
                                         color: AppColors.appSurface,
                                         borderRadius: BorderRadius.circular(16),
                                         border: _selectedChart == ChartType.windSpeed
                                             ? Border.all(color: AppColors.appBlueAccent, width: 2)
-                                            : null,
+                                            : Border.all(color: Colors.transparent, width: 2),
                                         boxShadow: [
                                           BoxShadow(
                                             color: _selectedChart == ChartType.windSpeed
@@ -386,6 +351,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       ),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             'Wind',
@@ -403,12 +369,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
-                                          Text(
-                                            _weatherData.last.windDirection,
-                                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                              color: AppColors.secondaryText,
-                                            ),
-                                          ),
                                         ],
                                       ),
                                     ),
@@ -423,13 +383,14 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       });
                                     },
                                     child: Container(
-                                      padding: const EdgeInsets.all(20),
+                                      height: 100,
+                                      padding: const EdgeInsets.all(18),
                                       decoration: BoxDecoration(
                                         color: AppColors.appSurface,
                                         borderRadius: BorderRadius.circular(16),
                                         border: _selectedChart == ChartType.pressure
                                             ? Border.all(color: AppColors.appBlueAccent, width: 2)
-                                            : null,
+                                            : Border.all(color: Colors.transparent, width: 2),
                                         boxShadow: [
                                           BoxShadow(
                                             color: _selectedChart == ChartType.pressure
@@ -442,6 +403,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       ),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             'Luftdruck',
@@ -465,14 +427,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                   ),
                                 ),
                               ],
-                            ),
-                            const SizedBox(height: 12),
-                            // Last update info
-                            Text(
-                              'Letzte Aktualisierung: ${DateFormat('HH:mm').format(_weatherData.last.time)}',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppColors.secondaryText.withOpacity(0.7),
-                              ),
                             ),
                           ],
                           const SizedBox(height: 20),
