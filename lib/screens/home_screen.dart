@@ -14,6 +14,7 @@ import '../providers/haptic_service.dart';
 import '../services/file_opener_service.dart';
 import '../navigation/app_router.dart';
 import 'package:open_filex/open_filex.dart';
+import 'weather_page.dart';
 
 // Helper function for robust navigation bar detection across all Android devices
 bool _isButtonNavigation(BuildContext context) {
@@ -50,6 +51,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   late Animation<double> _fadeAnimation;
   late AnimationController _slowConnectionController;
   late Animation<double> _slowConnectionAnimation;
+  
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
 
   @override
   void initState() {
@@ -88,6 +92,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   void dispose() {
     _fadeController.dispose();
     _slowConnectionController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -181,7 +186,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       backgroundColor: AppColors.appBackground,
       appBar: AppBar(
         title: Text(
-          'Vertretungsplan',
+          _currentPage == 0 ? 'Vertretungsplan' : 'Wetter',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.primaryText,
@@ -212,275 +217,321 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-                        const SizedBox(height: 24),
-            
-            // Loading bar or network notification - they replace each other at the same position
-            if (pdfRepo.showLoadingBar)
-              AnimatedOpacity(
-                opacity: 1.0,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeIn,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 64, vertical: 24),
-                  height: 5,
-                  child: LinearProgressIndicator(
-                    backgroundColor:
-                        AppColors.appBlueAccent.withOpacity(0.2),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppColors.appBlueAccent),
+      body: Column(
+        children: [
+          // Page indicators
+          Container(
+            height: 40,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                2,
+                (index) => AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  height: 8,
+                  width: _currentPage == index ? 24 : 8,
+                  decoration: BoxDecoration(
+                    color: _currentPage == index
+                        ? AppColors.appBlueAccent
+                        : AppColors.secondaryText.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                 ),
-              )
-            else if (pdfRepo.hasSlowConnection)
-              FadeTransition(
-                opacity: _slowConnectionAnimation,
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    decoration: BoxDecoration(
-                      color: AppColors.appSurface,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.appBlueAccent.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: pdfRepo.isNoInternet 
-                              ? Colors.red.withOpacity(0.2)
-                              : Colors.orange.withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            pdfRepo.isNoInternet 
-                              ? Icons.wifi_off_outlined
-                              : Icons.signal_wifi_bad_outlined,
-                            color: pdfRepo.isNoInternet ? Colors.red : Colors.orange,
-                            size: 22,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Text(
-                            pdfRepo.isNoInternet 
-                              ? 'Mach mal dein Internet an.'
-                              : 'Warte mal einen Moment, du hast gerade langsames Internet.',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.primaryText,
-                              height: 1.3,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            else
-              const SizedBox(height: 8),
-            
-            if (pdfRepo.weekdaysLoaded)
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: Consumer(
-                  builder: (context, ref, child) {
-                    final preferencesManager =
-                        ref.watch(preferencesManagerProvider);
-                    final showDates =
-                        preferencesManager.showDatesWithWeekdays;
+              ),
+            ),
+          ),
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentPage = index;
+                });
+                HapticService.subtle();
+              },
+              children: [
+                // Vertretungsplan Page
+                _buildVertretungsplanPage(pdfRepo),
+                // Weather Page
+                const WeatherPage(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                    // Verwende die direkten Wochentage aus pdfRepo
-                    final todayWeekday = pdfRepo.todayWeekday;
-                    final tomorrowWeekday = pdfRepo.tomorrowWeekday;
-                    final todayDate = pdfRepo.todayDate;
-                    final tomorrowDate = pdfRepo.tomorrowDate;
-
-                    return Column(
-                      children: [
-                        _PlanOptions(
-                          todayWeekday: todayWeekday,
-                          tomorrowWeekday: tomorrowWeekday,
-                          todayDate: todayDate,
-                          tomorrowDate: tomorrowDate,
-                          showDates: showDates,
-                          onTodayClick: () => _openPdf(true),
-                          onTomorrowClick: () => _openPdf(false),
-                        ),
-                        
-                        // Debug navigation mode detection (only show if enabled in preferences)
-                        if (ref.watch(preferencesManagerProvider).showNavigationDebug) ...[
-                          const SizedBox(height: 16),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: AppColors.appSurface.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: AppColors.appBlueAccent.withOpacity(0.3),
-                                width: 1,
-                              ),
-                            ),
-                            child: Builder(
-                              builder: (context) {
-                                final mediaQuery = MediaQuery.of(context);
-                                final gestureInsets = mediaQuery.systemGestureInsets.bottom;
-                                final viewPadding = mediaQuery.viewPadding.bottom;
-                                final padding = mediaQuery.padding.bottom;
-                                
-                                // More robust detection logic that should work across devices
-                                // Primary: systemGestureInsets.bottom - button nav usually has higher values
-                                // Secondary: viewPadding.bottom - as additional indicator
-                                // Fallback: Use conservative approach if values are ambiguous
-                                bool isButtonNavigation;
-                                String detectionMethod;
-                                
-                                if (gestureInsets >= 45) {
-                                  // Very likely button navigation
-                                  isButtonNavigation = true;
-                                  detectionMethod = "High gesture insets (≥45)";
-                                } else if (gestureInsets <= 25) {
-                                  // Very likely gesture navigation
-                                  isButtonNavigation = false;
-                                  detectionMethod = "Low gesture insets (≤25)";
-                                } else {
-                                  // Ambiguous range (26-44) - use viewPadding as secondary indicator
-                                  isButtonNavigation = viewPadding > 50;
-                                  detectionMethod = "Ambiguous range, using viewPadding";
-                                }
-                                
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Debug: Navigation Mode Detection',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: AppColors.appBlueAccent,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'systemGestureInsets.bottom: $gestureInsets',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: AppColors.secondaryText,
-                                      ),
-                                    ),
-                                    Text(
-                                      'viewPadding.bottom: $viewPadding',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: AppColors.secondaryText,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Detection: $detectionMethod',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: AppColors.secondaryText.withOpacity(0.7),
-                                      ),
-                                    ),
-                                    Text(
-                                      'Detected Mode: ${isButtonNavigation ? "Button Navigation (3 buttons)" : "Gesture Navigation (white bar)"}',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: isButtonNavigation ? Colors.orange : Colors.green,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Footer Padding: ${isButtonNavigation ? "34.0px" : "8.0px"}',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: AppColors.secondaryText,
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ],
-                    );
-                  },
+  Widget _buildVertretungsplanPage(PdfRepository pdfRepo) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          const SizedBox(height: 24),
+          
+          // Loading bar or network notification - they replace each other at the same position
+          if (pdfRepo.showLoadingBar)
+            AnimatedOpacity(
+              opacity: 1.0,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeIn,
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                    horizontal: 64, vertical: 24),
+                height: 5,
+                child: LinearProgressIndicator(
+                  backgroundColor:
+                      AppColors.appBlueAccent.withOpacity(0.2),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                      AppColors.appBlueAccent),
                 ),
               ),
-            if (_error != null) ...[
-              const SizedBox(height: 16),
-              AnimatedOpacity(
-                opacity: 1.0,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeIn,
-                child: Card(
-                  color: const Color(0xFF442727),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      _error!,
-                      style:
-                          Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: const Color(0xFFCF6679),
-                              ),
-                    ),
+            )
+          else if (pdfRepo.hasSlowConnection)
+            FadeTransition(
+              opacity: _slowConnectionAnimation,
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                child: Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.appSurface,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.appBlueAccent.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-            ],
-            
-            // Add footer with version and copyright at bottom of home screen
-            const Spacer(),
-            Padding(
-              padding: EdgeInsets.only(
-                bottom: _isButtonNavigation(context)
-                  ? 34.0  // Button navigation (3 buttons) - 26px higher than gesture nav
-                  : 8.0,   // Gesture navigation (white bar) - perfect position
-              ),
-              child: FutureBuilder<PackageInfo>(
-                future: PackageInfo.fromPlatform(),
-                builder: (context, snapshot) {
-                  final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Row(
                     children: [
-                      Text(
-                        '© 2025 ',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.secondaryText.withOpacity(0.5),
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: pdfRepo.isNoInternet 
+                            ? Colors.red.withOpacity(0.2)
+                            : Colors.orange.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          pdfRepo.isNoInternet 
+                            ? Icons.wifi_off_outlined
+                            : Icons.signal_wifi_bad_outlined,
+                          color: pdfRepo.isNoInternet ? Colors.red : Colors.orange,
+                          size: 22,
                         ),
                       ),
-                      Text(
-                        'Luka Löhr',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.appBlueAccent.withOpacity(0.7),
-                          fontWeight: FontWeight.w500,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          pdfRepo.isNoInternet 
+                            ? 'Mach mal dein Internet an.'
+                            : 'Warte mal einen Moment, du hast gerade langsames Internet.',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.primaryText,
+                            height: 1.3,
+                          ),
                         ),
                       ),
-                      Text(
-                        ' • v$version',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.secondaryText.withOpacity(0.5),
-                        ),
+                    ],
+                  ),
+                ),
+              ),
+            )
+          else
+            const SizedBox(height: 8),
+          
+          if (pdfRepo.weekdaysLoaded)
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final preferencesManager =
+                      ref.watch(preferencesManagerProvider);
+                  final showDates =
+                      preferencesManager.showDatesWithWeekdays;
+
+                  // Verwende die direkten Wochentage aus pdfRepo
+                  final todayWeekday = pdfRepo.todayWeekday;
+                  final tomorrowWeekday = pdfRepo.tomorrowWeekday;
+                  final todayDate = pdfRepo.todayDate;
+                  final tomorrowDate = pdfRepo.tomorrowDate;
+
+                  return Column(
+                    children: [
+                      _PlanOptions(
+                        todayWeekday: todayWeekday,
+                        tomorrowWeekday: tomorrowWeekday,
+                        todayDate: todayDate,
+                        tomorrowDate: tomorrowDate,
+                        showDates: showDates,
+                        onTodayClick: () => _openPdf(true),
+                        onTomorrowClick: () => _openPdf(false),
                       ),
+                      
+                      // Debug navigation mode detection (only show if enabled in preferences)
+                      if (ref.watch(preferencesManagerProvider).showNavigationDebug) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.appSurface.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: AppColors.appBlueAccent.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Builder(
+                            builder: (context) {
+                              final mediaQuery = MediaQuery.of(context);
+                              final gestureInsets = mediaQuery.systemGestureInsets.bottom;
+                              final viewPadding = mediaQuery.viewPadding.bottom;
+                              final padding = mediaQuery.padding.bottom;
+                              
+                              // More robust detection logic that should work across devices
+                              // Primary: systemGestureInsets.bottom - button nav usually has higher values
+                              // Secondary: viewPadding.bottom - as additional indicator
+                              // Fallback: Use conservative approach if values are ambiguous
+                              bool isButtonNavigation;
+                              String detectionMethod;
+                              
+                              if (gestureInsets >= 45) {
+                                // Very likely button navigation
+                                isButtonNavigation = true;
+                                detectionMethod = "High gesture insets (≥45)";
+                              } else if (gestureInsets <= 25) {
+                                // Very likely gesture navigation
+                                isButtonNavigation = false;
+                                detectionMethod = "Low gesture insets (≤25)";
+                              } else {
+                                // Ambiguous range (26-44) - use viewPadding as secondary indicator
+                                isButtonNavigation = viewPadding > 50;
+                                detectionMethod = "Ambiguous range, using viewPadding";
+                              }
+                              
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Debug: Navigation Mode Detection',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.appBlueAccent,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'systemGestureInsets.bottom: $gestureInsets',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.secondaryText,
+                                    ),
+                                  ),
+                                  Text(
+                                    'viewPadding.bottom: $viewPadding',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.secondaryText,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Detection: $detectionMethod',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.secondaryText.withOpacity(0.7),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Detected Mode: ${isButtonNavigation ? "Button Navigation (3 buttons)" : "Gesture Navigation (white bar)"}',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: isButtonNavigation ? Colors.orange : Colors.green,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Footer Padding: ${isButtonNavigation ? "34.0px" : "8.0px"}',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.secondaryText,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ],
                   );
                 },
               ),
             ),
+          if (_error != null) ...[
+            const SizedBox(height: 16),
+            AnimatedOpacity(
+              opacity: 1.0,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeIn,
+              child: Card(
+                color: const Color(0xFF442727),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    _error!,
+                    style:
+                        Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: const Color(0xFFCF6679),
+                            ),
+                  ),
+                ),
+              ),
+            ),
           ],
-        ),
+          
+          // Add footer with version and copyright at bottom of home screen
+          const Spacer(),
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: _isButtonNavigation(context)
+                ? 34.0  // Button navigation (3 buttons) - 26px higher than gesture nav
+                : 8.0,   // Gesture navigation (white bar) - perfect position
+            ),
+            child: FutureBuilder<PackageInfo>(
+              future: PackageInfo.fromPlatform(),
+              builder: (context, snapshot) {
+                final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '© 2025 ',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.secondaryText.withOpacity(0.5),
+                      ),
+                    ),
+                    Text(
+                      'Luka Löhr',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.appBlueAccent.withOpacity(0.7),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      ' • v$version',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.secondaryText.withOpacity(0.5),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
