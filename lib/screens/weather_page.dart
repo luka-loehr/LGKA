@@ -269,9 +269,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       decoration: BoxDecoration(
                                         color: AppColors.appSurface,
                                         borderRadius: BorderRadius.circular(16),
-                                        border: _selectedChart == ChartType.temperature
-                                            ? Border.all(color: AppColors.appBlueAccent, width: 2)
-                                            : Border.all(color: Colors.transparent, width: 2),
+                                        border: Border.all(color: Colors.transparent, width: 2),
                                         boxShadow: [
                                           BoxShadow(
                                             color: _selectedChart == ChartType.temperature
@@ -309,53 +307,40 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedChart = ChartType.humidity;
-                                      });
-                                    },
-                                    child: Container(
-                                      height: 85,
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.appSurface,
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: _selectedChart == ChartType.humidity
-                                            ? Border.all(color: AppColors.appBlueAccent, width: 2)
-                                            : Border.all(color: Colors.transparent, width: 2),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: _selectedChart == ChartType.humidity
-                                                ? AppColors.appBlueAccent.withOpacity(0.3)
-                                                : AppColors.appBlueAccent.withOpacity(0.1),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 4),
+                                  child: Container(
+                                    height: 85,
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.appSurface,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(color: Colors.transparent, width: 2),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.appBlueAccent.withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Luftfeuchtigkeit',
+                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                            color: AppColors.secondaryText,
                                           ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Luftfeuchtigkeit',
-                                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                              color: _selectedChart == ChartType.humidity
-                                                  ? AppColors.appBlueAccent
-                                                  : AppColors.secondaryText,
-                                            ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '${_latestWeatherData!.humidity.toStringAsFixed(0)}%',
+                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                            color: AppColors.primaryText,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${_latestWeatherData!.humidity.toStringAsFixed(0)}%',
-                                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                              color: AppColors.appBlueAccent,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -594,10 +579,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.temperature:
         return 'Temperaturverlauf heute';
       case ChartType.humidity:
-        return 'Luftfeuchtigkeit heute';
       case ChartType.windSpeed:
       case ChartType.pressure:
-        return 'Temperaturverlauf heute'; // Fallback to temperature
+        return 'Temperaturverlauf heute'; // Always fallback to temperature
     }
   }
   
@@ -606,22 +590,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.temperature:
         return 'point.x : point.y°C';
       case ChartType.humidity:
-        return 'point.x : point.y%';
       case ChartType.windSpeed:
       case ChartType.pressure:
-        return 'point.x : point.y°C'; // Fallback to temperature
-    }
-  }
-  
-  double _getYValue(WeatherData data) {
-    switch (_selectedChart) {
-      case ChartType.temperature:
-        return data.temperature;
-      case ChartType.humidity:
-        return data.humidity;
-      case ChartType.windSpeed:
-      case ChartType.pressure:
-        return data.temperature; // Fallback to temperature
+        return 'point.x : point.y°C'; // Always fallback to temperature
     }
   }
   
@@ -630,11 +601,20 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.temperature:
         return 'Temperatur (°C)';
       case ChartType.humidity:
-        return 'Luftfeuchtigkeit (%)';
       case ChartType.windSpeed:
-        return 'Windgeschwindigkeit (km/h)';
       case ChartType.pressure:
-        return 'Luftdruck (hPa)';
+        return 'Temperatur (°C)'; // Always fallback to temperature
+    }
+  }
+  
+  double _getYValue(WeatherData data) {
+    switch (_selectedChart) {
+      case ChartType.temperature:
+        return data.temperature;
+      case ChartType.humidity:
+      case ChartType.windSpeed:
+      case ChartType.pressure:
+        return data.temperature; // Always fallback to temperature
     }
   }
 
