@@ -214,34 +214,34 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                             width: double.infinity,
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: _weatherData.length < 10 
-                                ? Colors.orange.withOpacity(0.1)
-                                : AppColors.appBlueAccent.withOpacity(0.1),
+                              color: _isChartAvailable() 
+                                ? AppColors.appBlueAccent.withOpacity(0.1)
+                                : Colors.orange.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: _weatherData.length < 10 
-                                  ? Colors.orange.withOpacity(0.3)
-                                  : AppColors.appBlueAccent.withOpacity(0.3),
+                                color: _isChartAvailable() 
+                                  ? AppColors.appBlueAccent.withOpacity(0.3)
+                                  : Colors.orange.withOpacity(0.3),
                                 width: 1,
                               ),
                             ),
                             child: Row(
                               children: [
                                 Icon(
-                                  _weatherData.length < 10 
-                                    ? Icons.access_time
-                                    : Icons.info_outline,
-                                  color: _weatherData.length < 10 
-                                    ? Colors.orange
-                                    : AppColors.appBlueAccent,
+                                  _isChartAvailable() 
+                                    ? Icons.info_outline
+                                    : Icons.access_time,
+                                  color: _isChartAvailable() 
+                                    ? AppColors.appBlueAccent
+                                    : Colors.orange,
                                   size: 20,
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    _weatherData.length < 10
-                                      ? 'Warte noch ein paar Minuten - die Wetterstation sammelt gerade neue Daten für heute. Normalerweise sind ab 0:30 Uhr genügend Werte verfügbar.'
-                                      : 'Diese Wetterdaten kommen direkt von der schuleigenen Wetterstation auf dem Dach. Du siehst hier live Wetterdaten von deiner Schule!',
+                                    _isChartAvailable()
+                                      ? 'Diese Wetterdaten kommen direkt von der schuleigenen Wetterstation auf dem Dach. Du siehst hier live Wetterdaten von deiner Schule!'
+                                      : 'Warte noch ein paar Minuten - die Wetterstation sammelt gerade neue Daten für heute. Diagramme sind ab 0:30 Uhr verfügbar.',
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: AppColors.primaryText,
                                       height: 1.4,
@@ -447,7 +447,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                             ),
                           ],
                           const SizedBox(height: 20),
-                          // Chart or insufficient data message
+                          // Chart or time-based message
                           Expanded(
                             child: Container(
                               padding: const EdgeInsets.all(20),
@@ -462,36 +462,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                   ),
                                 ],
                               ),
-                              child: _weatherData.length < 3
-                                ? Center(
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.hourglass_empty,
-                                          size: 48,
-                                          color: AppColors.secondaryText.withOpacity(0.5),
-                                        ),
-                                        const SizedBox(height: 16),
-                                        Text(
-                                          'Zu wenig Daten für Diagramm',
-                                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                            color: AppColors.primaryText,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          'Die Wetterstation sammelt gerade Daten.\nDiagramme sind verfügbar, sobald mehr\nMesswerte vorliegen.',
-                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                            color: AppColors.secondaryText,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : Column(
+                              child: _isChartAvailable()
+                                ? Column(
                                     children: [
                                       // Chart title
                                       Text(
@@ -593,6 +565,23 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                         ),
                                       ),
                                     ],
+                                  )
+                                : Column(
+                                    children: [
+                                      Icon(
+                                        Icons.hourglass_empty,
+                                        size: 48,
+                                        color: AppColors.secondaryText.withOpacity(0.5),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        _getChartUnavailableMessage(),
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          color: AppColors.primaryText,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
                                   ),
                             ),
                           ),
@@ -648,5 +637,20 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.pressure:
         return 'Luftdruck (hPa)';
     }
+  }
+
+  bool _isChartAvailable() {
+    final now = DateTime.now();
+    // Charts are available after 0:30 (00:30)
+    return now.hour > 0 || (now.hour == 0 && now.minute >= 30);
+  }
+  
+  String _getChartUnavailableMessage() {
+    final now = DateTime.now();
+    if (now.hour == 0 && now.minute < 30) {
+      final minutesLeft = 30 - now.minute;
+      return 'Diagramme sind ab 0:30 Uhr verfügbar.\nNoch $minutesLeft Minute${minutesLeft == 1 ? '' : 'n'} warten.';
+    }
+    return 'Diagramme sind ab 0:30 Uhr verfügbar.';
   }
 } 
