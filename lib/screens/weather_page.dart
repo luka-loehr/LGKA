@@ -430,13 +430,13 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                             ),
                           ],
                           const SizedBox(height: 20),
-                          // Temperature chart
+                          // Chart
                           Expanded(
                             child: Container(
-                              padding: const EdgeInsets.all(16),
+                              padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
                                 color: AppColors.appSurface,
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
                                     color: AppColors.appBlueAccent.withOpacity(0.1),
@@ -445,62 +445,78 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                   ),
                                 ],
                               ),
-                              child: SfCartesianChart(
-                                primaryXAxis: DateTimeAxis(
-                                  dateFormat: DateFormat.Hm(),
-                                  intervalType: DateTimeIntervalType.hours,
-                                  interval: 2,
-                                  majorGridLines: const MajorGridLines(width: 0),
-                                  labelStyle: const TextStyle(
-                                    color: AppColors.secondaryText,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                primaryYAxis: NumericAxis(
-                                  title: AxisTitle(
-                                    text: _getYAxisTitle(),
-                                    textStyle: const TextStyle(
-                                      color: AppColors.secondaryText,
-                                      fontSize: 12,
+                              child: Column(
+                                children: [
+                                  // Chart title
+                                  Text(
+                                    _getChartTitle(),
+                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                      color: AppColors.primaryText,
+                                      fontWeight: FontWeight.w600,
                                     ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  majorGridLines: MajorGridLines(
-                                    color: AppColors.secondaryText.withOpacity(0.2),
-                                    width: 0.5,
-                                  ),
-                                  labelStyle: const TextStyle(
-                                    color: AppColors.secondaryText,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                title: ChartTitle(
-                                  text: _getChartTitle(),
-                                  textStyle: const TextStyle(
-                                    color: AppColors.primaryText,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                legend: const Legend(isVisible: false),
-                                tooltipBehavior: TooltipBehavior(
-                                  enable: true,
-                                  color: AppColors.appSurface,
-                                  textStyle: const TextStyle(
-                                    color: AppColors.primaryText,
-                                  ),
-                                  borderColor: AppColors.appBlueAccent,
-                                  borderWidth: 1,
-                                  format: _getTooltipFormat(),
-                                ),
-                                series: <CartesianSeries<dynamic, dynamic>>[
-                                  SplineSeries<WeatherData, DateTime>(
-                                    dataSource: _weatherData,
-                                    xValueMapper: (WeatherData data, _) => data.time,
-                                    yValueMapper: (WeatherData data, _) => _getYValue(data),
-                                    color: AppColors.appBlueAccent,
-                                    width: 3,
-                                    splineType: SplineType.cardinal,
-                                    cardinalSplineTension: 0.8,
+                                  const SizedBox(height: 16),
+                                  // Simplified chart
+                                  Expanded(
+                                    child: SfCartesianChart(
+                                      backgroundColor: Colors.transparent,
+                                      plotAreaBackgroundColor: Colors.transparent,
+                                      primaryXAxis: DateTimeAxis(
+                                        dateFormat: DateFormat.Hm(),
+                                        intervalType: DateTimeIntervalType.hours,
+                                        interval: 3,
+                                        majorGridLines: const MajorGridLines(width: 0),
+                                        minorGridLines: const MinorGridLines(width: 0),
+                                        axisLine: const AxisLine(width: 0),
+                                        majorTickLines: const MajorTickLines(width: 0),
+                                        labelStyle: TextStyle(
+                                          color: AppColors.secondaryText.withOpacity(0.8),
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      primaryYAxis: NumericAxis(
+                                        majorGridLines: const MajorGridLines(width: 0),
+                                        minorGridLines: const MinorGridLines(width: 0),
+                                        axisLine: const AxisLine(width: 0),
+                                        majorTickLines: const MajorTickLines(width: 0),
+                                        labelStyle: TextStyle(
+                                          color: AppColors.secondaryText.withOpacity(0.8),
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      margin: const EdgeInsets.all(0),
+                                      legend: const Legend(isVisible: false),
+                                      tooltipBehavior: TooltipBehavior(
+                                        enable: true,
+                                        color: AppColors.appBlueAccent,
+                                        textStyle: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                        ),
+                                        borderWidth: 0,
+                                        format: _getTooltipFormat(),
+                                      ),
+                                      series: <CartesianSeries<dynamic, dynamic>>[
+                                        SplineSeries<WeatherData, DateTime>(
+                                          dataSource: _weatherData,
+                                          xValueMapper: (WeatherData data, _) => data.time,
+                                          yValueMapper: (WeatherData data, _) => _getYValue(data),
+                                          color: AppColors.appBlueAccent,
+                                          width: 4,
+                                          splineType: SplineType.cardinal,
+                                          cardinalSplineTension: 0.9,
+                                          markerSettings: MarkerSettings(
+                                            isVisible: true,
+                                            color: AppColors.appBlueAccent,
+                                            borderColor: Colors.white,
+                                            borderWidth: 2,
+                                            height: 6,
+                                            width: 6,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
@@ -509,19 +525,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                         ],
                       ),
                     );
-  }
-  
-  String _getYAxisTitle() {
-    switch (_selectedChart) {
-      case ChartType.temperature:
-        return 'Grad °C';
-      case ChartType.humidity:
-        return 'Feuchtigkeit %';
-      case ChartType.windSpeed:
-        return 'Wind km/h';
-      case ChartType.pressure:
-        return 'Druck hPa';
-    }
   }
   
   String _getChartTitle() {
