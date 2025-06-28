@@ -505,7 +505,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                           color: AppColors.appBlueAccent,
                                           width: 3,
                                           splineType: SplineType.cardinal,
-                                          cardinalSplineTension: 0.95,
+                                          cardinalSplineTension: 0.7,
                                           markerSettings: const MarkerSettings(
                                             isVisible: false,
                                           ),
