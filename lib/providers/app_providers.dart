@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/preferences_manager.dart';
 import '../data/pdf_repository.dart';
 import '../services/review_service.dart';
+import '../services/weather_service.dart';
 
 // Preferences Manager Provider
 final preferencesManagerProvider = Provider<PreferencesManager>((ref) {
@@ -27,4 +28,9 @@ final currentRouteProvider = StateProvider<String>((ref) => '/welcome');
 final reviewServiceProvider = Provider<ReviewService>((ref) {
   final preferencesManager = ref.watch(preferencesManagerProvider);
   return ReviewService(preferencesManager);
+});
+
+// Weather Service Provider
+final weatherServiceProvider = Provider<WeatherService>((ref) {
+  return WeatherService();
 });

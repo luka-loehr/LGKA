@@ -77,15 +77,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       CurvedAnimation(parent: _slowConnectionController, curve: Curves.easeIn),
     );
 
-    // Preload PDFs when screen loads
+    // Preload PDFs and weather data when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refreshPlans(forceReload: false);
+      // Run weather preloading in background without blocking UI
+      _preloadWeatherData();
     });
   }
 
   Future<void> _refreshPlans({bool forceReload = true}) async {
     final pdfRepo = ref.read(pdfRepositoryProvider);
     await pdfRepo.preloadPdfs(forceReload: forceReload);
+  }
+
+  void _preloadWeatherData() {
+    // Run in background without blocking UI
+    () async {
+      try {
+        final weatherService = ref.read(weatherServiceProvider);
+        
+        // Check if we already have cached data
+        final cachedData = await weatherService.getCachedData();
+        if (cachedData != null && cachedData.isNotEmpty) {
+          print('🌤️ [HomeScreen] Weather data already cached, no need to fetch');
+          return;
+        }
+        
+        // Fetch fresh data in background
+        print('🌤️ [HomeScreen] Starting background weather data fetch');
+        await weatherService.fetchWeatherData();
+        print('🌤️ [HomeScreen] Weather data preloaded successfully');
+      } catch (e) {
+        print('❌ [HomeScreen] Failed to preload weather data: $e');
+        // Don't show error to user since this is background preloading
+      }
+    }();
   }
 
   @override
@@ -927,43 +953,15 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Legal Section
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.appSurface,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.shield_outlined,
-                          color: AppColors.appBlueAccent,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Rechtliches',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.appBlueAccent,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                    
+                    // Divider
+                    Container(
+                      height: 1,
+                      margin: const EdgeInsets.symmetric(vertical: 16),
+                      color: Colors.white.withValues(alpha: 0.1),
                     ),
                     
-                    const SizedBox(height: 16),
-                    
+                    // Legal Links
                     _buildLegalLinkRow(
                       context,
                       Icons.privacy_tip_outlined, 
