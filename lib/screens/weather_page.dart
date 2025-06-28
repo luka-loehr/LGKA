@@ -209,6 +209,39 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
+                          // Weather station explanation
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: AppColors.appBlueAccent.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.appBlueAccent.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  color: AppColors.appBlueAccent,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Diese Wetterdaten kommen direkt von der schuleigenen Wetterstation auf dem Dach. Du siehst hier live Wetterdaten von deiner Schule!',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.primaryText,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
                           // Current weather data cards
                           if (_weatherData.isNotEmpty) ...[
                             // Temperature and humidity row
@@ -404,39 +437,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                             ),
                           ],
                           const SizedBox(height: 20),
-                          // Weather station explanation
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: AppColors.appBlueAccent.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: AppColors.appBlueAccent.withOpacity(0.3),
-                                width: 1,
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.info_outline,
-                                  color: AppColors.appBlueAccent,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    'Diese Wetterdaten kommen direkt von der schuleigenen Wetterstation auf dem Dach. Du siehst hier live Wetterdaten von deiner Schule!',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.primaryText,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
                           // Chart
                           Expanded(
                             child: Container(
@@ -464,7 +464,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                     textAlign: TextAlign.center,
                                   ),
                                   const SizedBox(height: 16),
-                                  // Simplified chart
+                                  // Professional chart
                                   Expanded(
                                     child: SfCartesianChart(
                                       backgroundColor: Colors.transparent,
@@ -472,36 +472,69 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       primaryXAxis: DateTimeAxis(
                                         dateFormat: DateFormat.Hm(),
                                         intervalType: DateTimeIntervalType.hours,
-                                        interval: 3,
-                                        majorGridLines: const MajorGridLines(width: 0),
+                                        interval: 2,
+                                        majorGridLines: MajorGridLines(
+                                          color: AppColors.secondaryText.withOpacity(0.2),
+                                          width: 0.5,
+                                        ),
                                         minorGridLines: const MinorGridLines(width: 0),
-                                        axisLine: const AxisLine(width: 0),
-                                        majorTickLines: const MajorTickLines(width: 0),
+                                        axisLine: AxisLine(
+                                          color: AppColors.secondaryText.withOpacity(0.3),
+                                          width: 1,
+                                        ),
+                                        majorTickLines: MajorTickLines(
+                                          color: AppColors.secondaryText.withOpacity(0.3),
+                                          width: 1,
+                                        ),
                                         labelStyle: TextStyle(
-                                          color: AppColors.secondaryText.withOpacity(0.8),
+                                          color: AppColors.secondaryText,
                                           fontSize: 11,
+                                        ),
+                                        title: AxisTitle(
+                                          text: 'Uhrzeit',
+                                          textStyle: TextStyle(
+                                            color: AppColors.secondaryText,
+                                            fontSize: 12,
+                                          ),
                                         ),
                                       ),
                                       primaryYAxis: NumericAxis(
-                                        majorGridLines: const MajorGridLines(width: 0),
+                                        title: AxisTitle(
+                                          text: _getYAxisTitle(),
+                                          textStyle: TextStyle(
+                                            color: AppColors.secondaryText,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        majorGridLines: MajorGridLines(
+                                          color: AppColors.secondaryText.withOpacity(0.2),
+                                          width: 0.5,
+                                        ),
                                         minorGridLines: const MinorGridLines(width: 0),
-                                        axisLine: const AxisLine(width: 0),
-                                        majorTickLines: const MajorTickLines(width: 0),
+                                        axisLine: AxisLine(
+                                          color: AppColors.secondaryText.withOpacity(0.3),
+                                          width: 1,
+                                        ),
+                                        majorTickLines: MajorTickLines(
+                                          color: AppColors.secondaryText.withOpacity(0.3),
+                                          width: 1,
+                                        ),
                                         labelStyle: TextStyle(
-                                          color: AppColors.secondaryText.withOpacity(0.8),
+                                          color: AppColors.secondaryText,
                                           fontSize: 11,
                                         ),
                                       ),
-                                      margin: const EdgeInsets.all(0),
+                                      margin: const EdgeInsets.all(8),
                                       legend: const Legend(isVisible: false),
                                       tooltipBehavior: TooltipBehavior(
                                         enable: true,
-                                        color: AppColors.appBlueAccent,
+                                        color: AppColors.appSurface,
                                         textStyle: const TextStyle(
-                                          color: Colors.white,
+                                          color: AppColors.primaryText,
                                           fontSize: 12,
                                         ),
-                                        borderWidth: 0,
+                                        borderColor: AppColors.appBlueAccent,
+                                        borderWidth: 1,
                                         format: _getTooltipFormat(),
                                       ),
                                       series: <CartesianSeries<dynamic, dynamic>>[
@@ -532,12 +565,12 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   String _getChartTitle() {
     switch (_selectedChart) {
       case ChartType.temperature:
-        return '🌡️ Wie warm war es heute?';
+        return 'Temperaturverlauf heute';
       case ChartType.humidity:
-        return '💧 Wie feucht war die Luft?';
+        return 'Luftfeuchtigkeit heute';
       case ChartType.windSpeed:
       case ChartType.pressure:
-        return '🌡️ Wie warm war es heute?'; // Fallback to temperature
+        return 'Temperaturverlauf heute'; // Fallback to temperature
     }
   }
   
@@ -562,6 +595,19 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.windSpeed:
       case ChartType.pressure:
         return data.temperature; // Fallback to temperature
+    }
+  }
+  
+  String _getYAxisTitle() {
+    switch (_selectedChart) {
+      case ChartType.temperature:
+        return 'Temperatur (°C)';
+      case ChartType.humidity:
+        return 'Luftfeuchtigkeit (%)';
+      case ChartType.windSpeed:
+        return 'Windgeschwindigkeit (km/h)';
+      case ChartType.pressure:
+        return 'Luftdruck (hPa)';
     }
   }
 } 
