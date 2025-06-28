@@ -188,7 +188,7 @@ class WeatherService {
         print('🌤️ [WeatherService] Header row length: ${csvData[0].length}');
       }
 
-      // Parse all data first
+      // Parse all data - no sampling, use every data point for maximum accuracy
       final List<WeatherData> allWeatherData = [];
       int successfulRows = 0;
       int skippedRows = 0;
@@ -247,41 +247,25 @@ class WeatherService {
         }
       }
       
-      // Apply smart sampling for chart data
-      final List<WeatherData> sampledData;
-      if (allWeatherData.length < 200) {
-        // Use all data if less than 200 points
-        sampledData = allWeatherData;
-        print('🌤️ [WeatherService] Using all ${allWeatherData.length} data points (< 200)');
-      } else {
-        // Sample every 10th point if 200 or more points
-        sampledData = [];
-        for (int i = 0; i < allWeatherData.length; i += 10) {
-          sampledData.add(allWeatherData[i]);
-        }
-        print('🌤️ [WeatherService] Sampled ${sampledData.length} points from ${allWeatherData.length} total (every 10th)');
-      }
-      
       print('🌤️ [WeatherService] Processing complete:');
       print('    Total rows in CSV: ${csvData.length - 1}');
       print('    Successful rows: $successfulRows');
       print('    Skipped rows: $skippedRows');
       print('    Error rows: $errorRows');
-      print('    All data points: ${allWeatherData.length}');
-      print('    Sampled data points: ${sampledData.length}');
+      print('    Final weather data points: ${allWeatherData.length}');
       
-      if (sampledData.isNotEmpty) {
-        print('🌤️ [WeatherService] First data point: ${sampledData.first.time} - ${sampledData.first.temperature}°C');
-        print('🌤️ [WeatherService] Last data point: ${sampledData.last.time} - ${sampledData.last.temperature}°C');
+      if (allWeatherData.isNotEmpty) {
+        print('🌤️ [WeatherService] First data point: ${allWeatherData.first.time} - ${allWeatherData.first.temperature}°C');
+        print('🌤️ [WeatherService] Last data point: ${allWeatherData.last.time} - ${allWeatherData.last.temperature}°C');
       }
       
-      // Cache the sampled data in memory and persistent storage
-      _cachedWeatherData = sampledData;
+      // Cache all data in memory and persistent storage
+      _cachedWeatherData = allWeatherData;
       _lastFetchTime = DateTime.now();
-      await _saveToCache(sampledData);
+      await _saveToCache(allWeatherData);
       print('🌤️ [WeatherService] Data cached successfully');
       
-      return sampledData;
+      return allWeatherData;
     } catch (e) {
       print('❌ [WeatherService] Fatal error in fetchWeatherData: $e');
       print('❌ [WeatherService] Stack trace: ${StackTrace.current}');
