@@ -151,20 +151,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     );
   }
 
-  void _showLegalBottomSheet() {
-    final pdfRepo = ref.read(pdfRepositoryProvider);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1E1E1E), // Lighter than main background
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => _LegalSheetContent(
-        todayPdfTimestamp: pdfRepo.todayLastUpdated,
-      ),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -203,16 +190,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            onPressed: () {
-              HapticService.subtle();
-              _showLegalBottomSheet();
-            },
-            icon: const Icon(
-              Icons.privacy_tip_outlined,
-              color: AppColors.secondaryText,
-            ),
-          ),
           IconButton(
             onPressed: () {
               HapticService.subtle();
@@ -953,72 +930,13 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _LegalSheetContent extends StatelessWidget {
-  final String todayPdfTimestamp;
-
-  const _LegalSheetContent({
-    required this.todayPdfTimestamp,
-  });
-
-  void _launchURL(String url) async {
-    try {
-      Uri uri = Uri.parse(url);
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } catch (e) {
-      debugPrint('Could not launch URL: $e');
-    }
-  }
-
-  void _triggerReview() async {
-    final InAppReview inAppReview = InAppReview.instance;
-    
-    if (await inAppReview.isAvailable()) {
-      inAppReview.requestReview();
-    } else {
-      // Fallback: Öffne Play Store Seite
-      inAppReview.openStoreListing();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(
-            16, 
-            16, 
-            16, 
-            _isButtonNavigation(context)
-              ? 54.0  // Button navigation (3 buttons) - 10px higher position
-              : 8.0,   // Gesture navigation (white bar) - matches footer padding
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Rechtliches',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: AppColors.appOnSurface,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               
-              const SizedBox(height: 1),
+              const SizedBox(height: 16),
               
+              // Legal Section
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: AppColors.appSurface,
                   borderRadius: BorderRadius.circular(16),
@@ -1026,15 +944,34 @@ class _LegalSheetContent extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.shield_outlined,
+                          color: AppColors.appBlueAccent,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Rechtliches',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.appBlueAccent,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                     
-                    _buildLinkRow(
+                    const SizedBox(height: 16),
+                    
+                    _buildLegalLinkRow(
                       context,
-                      Icons.shield_outlined, 
+                      Icons.privacy_tip_outlined, 
                       'Datenschutzerklärung', 
                       'https://luka-loehr.github.io/LGKA/privacy.html'
                     ),
-                    const SizedBox(height: 8),
-                    _buildLinkRow(
+                    const SizedBox(height: 12),
+                    _buildLegalLinkRow(
                       context,
                       Icons.info_outline, 
                       'Impressum', 
@@ -1046,12 +983,11 @@ class _LegalSheetContent extends StatelessWidget {
             ],
           ),
         ),
-
       ],
     );
   }
   
-  Widget _buildLinkRow(BuildContext context, IconData icon, String text, String url) {
+  Widget _buildLegalLinkRow(BuildContext context, IconData icon, String text, String url) {
     return InkWell(
       onTap: () {
         HapticService.subtle();
@@ -1064,16 +1000,23 @@ class _LegalSheetContent extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: AppColors.appBlueAccent,
-              size: 20,
+              color: AppColors.secondaryText,
+              size: 18,
             ),
             const SizedBox(width: 12),
-            Text(
-              text,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.appBlueAccent,
-                fontWeight: FontWeight.w500,
+            Expanded(
+              child: Text(
+                text,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.secondaryText,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
+            ),
+            Icon(
+              Icons.open_in_new,
+              color: AppColors.secondaryText.withOpacity(0.6),
+              size: 16,
             ),
           ],
         ),
@@ -1081,23 +1024,12 @@ class _LegalSheetContent extends StatelessWidget {
     );
   }
   
-  Widget _buildFeatureRow(BuildContext context, IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          color: const Color(0xFF78A5F9),
-          size: 18,
-        ),
-        const SizedBox(width: 12),
-        Text(
-          text,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.secondaryText,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ],
-    );
+  void _launchURL(String url) async {
+    try {
+      Uri uri = Uri.parse(url);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Could not launch URL: $e');
+    }
   }
-} 
+}
