@@ -185,15 +185,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       appBar: AppBar(
-        title: Text(
-          _currentPage == 0 ? 'Vertretungsplan' : 'Wetter',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppColors.primaryText,
-          ),
-        ),
         backgroundColor: AppColors.appBackground,
         elevation: 0,
+        title: Container(
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppColors.appSurface.withOpacity(0.6),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildSegmentedButton(0, 'Vertretungsplan', Icons.calendar_today),
+              _buildSegmentedButton(1, 'Wetter', Icons.wb_sunny_outlined),
+            ],
+          ),
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: () {
@@ -217,47 +225,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
           ),
         ],
       ),
-      body: Column(
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _currentPage = index;
+          });
+          HapticService.subtle();
+        },
         children: [
-          // Page indicators
-          Container(
-            height: 40,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                2,
-                (index) => AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  height: 8,
-                  width: _currentPage == index ? 24 : 8,
-                  decoration: BoxDecoration(
-                    color: _currentPage == index
-                        ? AppColors.appBlueAccent
-                        : AppColors.secondaryText.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPage = index;
-                });
-                HapticService.subtle();
-              },
-              children: [
-                // Vertretungsplan Page
-                _buildVertretungsplanPage(pdfRepo),
-                // Weather Page
-                const WeatherPage(),
-              ],
-            ),
-          ),
+          // Vertretungsplan Page
+          _buildVertretungsplanPage(pdfRepo),
+          // Weather Page
+          const WeatherPage(),
         ],
       ),
     );
@@ -532,6 +512,54 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSegmentedButton(int index, String title, IconData icon) {
+    final isSelected = _currentPage == index;
+    return GestureDetector(
+      onTap: () {
+        if (_currentPage != index) {
+          HapticService.subtle();
+          _pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? AppColors.appBlueAccent 
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected 
+                  ? Colors.white 
+                  : AppColors.secondaryText,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: isSelected 
+                    ? Colors.white 
+                    : AppColors.secondaryText,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
