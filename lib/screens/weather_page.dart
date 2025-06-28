@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../services/weather_service.dart';
 import '../theme/app_theme.dart';
+import '../providers/app_providers.dart';
 import 'package:intl/intl.dart';
 
-class WeatherPage extends StatefulWidget {
+class WeatherPage extends ConsumerStatefulWidget {
   const WeatherPage({super.key});
 
   @override
-  State<WeatherPage> createState() => _WeatherPageState();
+  ConsumerState<WeatherPage> createState() => _WeatherPageState();
 }
 
 enum ChartType {
@@ -18,10 +20,11 @@ enum ChartType {
   pressure,
 }
 
-class _WeatherPageState extends State<WeatherPage> with AutomaticKeepAliveClientMixin {
-  final WeatherService _weatherService = WeatherService();
+class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAliveClientMixin {
   List<WeatherData> _weatherData = [];
   bool _isLoading = true;
+  bool _isUpdating = false; // Track if we're updating in background
+  DateTime? _lastUpdateTime;
   String? _error;
   ChartType _selectedChart = ChartType.temperature;
   
@@ -37,47 +40,97 @@ class _WeatherPageState extends State<WeatherPage> with AutomaticKeepAliveClient
   Future<void> _loadWeatherData() async {
     print('📱 [WeatherPage] Starting _loadWeatherData()');
     
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      print('📱 [WeatherPage] Calling weatherService.fetchWeatherData()');
-      final data = await _weatherService.fetchWeatherData();
+    final weatherService = ref.read(weatherServiceProvider);
+    
+    // First, try to load cached data
+    final cachedData = await weatherService.getCachedData();
+    final cacheTime = await weatherService.getLastCacheTime();
+    
+    if (cachedData != null && cachedData.isNotEmpty) {
+      print('📱 [WeatherPage] Using cached data');
+      setState(() {
+        _weatherData = cachedData;
+        _lastUpdateTime = cacheTime;
+        _isLoading = false;
+        _error = null;
+      });
       
-      print('📱 [WeatherPage] Received data from service:');
-      print('    Data length: ${data.length}');
+      // Update data in background
+      _updateDataInBackground();
+    } else {
+      // No cache, need to fetch fresh data
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
       
-      if (data.isNotEmpty) {
-        print('    First item: ${data.first.time} - ${data.first.temperature}°C');
-        print('    Last item: ${data.last.time} - ${data.last.temperature}°C');
-      } else {
-        print('    Data is empty!');
+      try {
+        print('📱 [WeatherPage] No cache, fetching fresh data');
+        final data = await weatherService.fetchWeatherData();
+        
+        if (mounted) {
+          setState(() {
+            _weatherData = data;
+            _lastUpdateTime = DateTime.now();
+            _isLoading = false;
+          });
+        }
+      } catch (e) {
+        print('❌ [WeatherPage] Error loading data: $e');
+        if (mounted) {
+          setState(() {
+            _error = e.toString();
+            _isLoading = false;
+          });
+        }
       }
-      
-      setState(() {
-        _weatherData = data;
-        _isLoading = false;
-      });
-      
-      print('📱 [WeatherPage] State updated successfully');
-      print('📱 [WeatherPage] _weatherData.length = ${_weatherData.length}');
-      print('📱 [WeatherPage] _isLoading = $_isLoading');
-      print('📱 [WeatherPage] _error = $_error');
-      
-    } catch (e) {
-      print('❌ [WeatherPage] Error in _loadWeatherData: $e');
-      print('❌ [WeatherPage] Stack trace: ${StackTrace.current}');
-      
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
-      });
-      
-      print('📱 [WeatherPage] Error state updated');
-      print('📱 [WeatherPage] _error = $_error');
-      print('📱 [WeatherPage] _isLoading = $_isLoading');
+    }
+  }
+
+  void _updateDataInBackground() {
+    print('📱 [WeatherPage] Starting background update');
+    setState(() {
+      _isUpdating = true;
+    });
+    
+    () async {
+      try {
+        final weatherService = ref.read(weatherServiceProvider);
+        final freshData = await weatherService.fetchWeatherData();
+        
+        if (mounted && freshData.isNotEmpty) {
+          print('📱 [WeatherPage] Background update successful');
+          setState(() {
+            _weatherData = freshData;
+            _lastUpdateTime = DateTime.now();
+            _isUpdating = false;
+          });
+        }
+      } catch (e) {
+        print('❌ [WeatherPage] Background update failed: $e');
+        if (mounted) {
+          setState(() {
+            _isUpdating = false;
+          });
+        }
+      }
+    }();
+  }
+
+
+
+  String _formatUpdateTime(DateTime time) {
+    final now = DateTime.now();
+    final difference = now.difference(time);
+    
+    if (difference.inMinutes < 1) {
+      return 'Gerade eben';
+    } else if (difference.inMinutes < 60) {
+      return 'vor ${difference.inMinutes} Minute${difference.inMinutes == 1 ? '' : 'n'}';
+    } else if (difference.inHours < 24) {
+      return 'vor ${difference.inHours} Stunde${difference.inHours == 1 ? '' : 'n'}';
+    } else {
+      return DateFormat('dd.MM. HH:mm').format(time);
     }
   }
 
@@ -158,6 +211,44 @@ class _WeatherPageState extends State<WeatherPage> with AutomaticKeepAliveClient
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
+                          // Last update indicator
+                          if (_lastUpdateTime != null) ...[
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              margin: const EdgeInsets.only(bottom: 16),
+                              decoration: BoxDecoration(
+                                color: AppColors.appSurface,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (_isUpdating) ...[
+                                    SizedBox(
+                                      width: 12,
+                                      height: 12,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                          AppColors.appBlueAccent.withOpacity(0.7),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                  ],
+                                  Text(
+                                    _isUpdating 
+                                      ? 'Aktualisiere...'
+                                      : 'Letzte Aktualisierung: ${_formatUpdateTime(_lastUpdateTime!)}',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.secondaryText,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                           // Current weather data cards
                           if (_weatherData.isNotEmpty) ...[
                             // Temperature and time header
