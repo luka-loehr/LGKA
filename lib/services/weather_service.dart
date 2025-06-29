@@ -341,15 +341,19 @@ class WeatherService {
     final length = fullData.length;
     int samplingRate = 1; // Show every nth value
     
-    // Progressive downsampling based on data size
-    if (length >= 1000) {
-      samplingRate = 50; // Show every 50th value
+    // More aggressive downsampling for better UI performance
+    if (length >= 2000) {
+      samplingRate = 100; // Show every 100th value for very large datasets
+    } else if (length >= 1000) {
+      samplingRate = 60; // Show every 60th value
     } else if (length >= 600) {
-      samplingRate = 30; // Show every 30th value  
+      samplingRate = 40; // Show every 40th value  
     } else if (length >= 300) {
-      samplingRate = 20; // Show every 20th value
+      samplingRate = 25; // Show every 25th value
     } else if (length >= 150) {
-      samplingRate = 10; // Show every 10th value
+      samplingRate = 15; // Show every 15th value
+    } else if (length >= 100) {
+      samplingRate = 8; // Show every 8th value
     }
     
     if (samplingRate == 1) {
@@ -362,7 +366,7 @@ class WeatherService {
     // Always include the first data point
     sampledData.add(fullData.first);
     
-    // Sample intermediate points
+    // Sample intermediate points with better distribution
     for (int i = samplingRate; i < length - samplingRate; i += samplingRate) {
       sampledData.add(fullData[i]);
     }
