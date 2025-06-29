@@ -54,10 +54,18 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
   void initState() {
     super.initState();
     
-    // Preload PDFs in background
+    // Preload PDFs and weather data in background
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _preloadPdfs();
+      _preloadData();
     });
+  }
+
+  Future<void> _preloadData() async {
+    // Run both preloading operations in parallel for faster startup
+    await Future.wait([
+      _preloadPdfs(),
+      _preloadWeatherData(),
+    ]);
   }
 
   Future<void> _preloadPdfs() async {
@@ -66,6 +74,15 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
       await pdfRepo.preloadPdfs();
     } catch (e) {
       debugPrint('Error preloading PDFs: $e');
+    }
+  }
+
+  Future<void> _preloadWeatherData() async {
+    try {
+      final weatherDataNotifier = ref.read(weatherDataProvider.notifier);
+      await weatherDataNotifier.preloadWeatherData();
+    } catch (e) {
+      debugPrint('Error preloading weather data: $e');
     }
   }
 
