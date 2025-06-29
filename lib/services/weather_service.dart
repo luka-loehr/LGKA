@@ -56,13 +56,7 @@ class WeatherService {
   static const String csvUrl = 'https://lessing-gymnasium-karlsruhe.de/wetter/lg_wetter_heute.csv';
   static const String _cacheKey = 'weather_data_cache';
   static const String _cacheTimeKey = 'weather_data_cache_time';
-  static const String _latestDataKey = 'weather_latest_data';
-  static const String _latestDataTimeKey = 'weather_latest_data_time';
-  
-  // Cache durations
-  static const Duration _memoryValidDuration = Duration(minutes: 10);     // In-memory cache
-  static const Duration _persistentValidDuration = Duration(hours: 6);     // Persistent cache for instant startup
-  static const Duration _showOldDataDuration = Duration(hours: 24);        // Show old data if no internet
+  static const Duration _cacheValidDuration = Duration(minutes: 10);
   
   // In-memory cache
   List<WeatherData>? _cachedWeatherData;
@@ -82,59 +76,14 @@ class WeatherService {
     return null;
   }
 
-  /// Load persistent cache immediately for instant app startup display
-  /// This always returns data if available, regardless of age, for instant loading
-  Future<List<WeatherData>?> getInstantStartupData() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final cachedJson = prefs.getString(_cacheKey);
-      
-      if (cachedJson != null) {
-        print('🚀 [WeatherService] Loading instant startup data from persistent cache');
-        final List<dynamic> jsonList = jsonDecode(cachedJson);
-        final weatherData = jsonList.map((json) => WeatherData.fromJson(json)).toList();
-        
-        // Update in-memory cache
-        _cachedWeatherData = weatherData;
-        final cacheTimeMs = prefs.getInt(_cacheTimeKey);
-        if (cacheTimeMs != null) {
-          _lastFetchTime = DateTime.fromMillisecondsSinceEpoch(cacheTimeMs);
-        }
-        
-        return weatherData;
-      }
-    } catch (e) {
-      print('❌ [WeatherService] Error loading instant startup data: $e');
-    }
-    
-    return null;
-  }
 
-  /// Get latest weather data from persistent cache for instant display
-  Future<WeatherData?> getInstantLatestData() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final latestDataJson = prefs.getString(_latestDataKey);
-      
-      if (latestDataJson != null) {
-        print('🚀 [WeatherService] Loading instant latest data from persistent cache');
-        final Map<String, dynamic> json = jsonDecode(latestDataJson);
-        return WeatherData.fromJson(json);
-      }
-    } catch (e) {
-      print('❌ [WeatherService] Error loading instant latest data: $e');
-    }
-    
-    return null;
-  }
 
   /// Returns cached data if available and valid, null otherwise
-  /// This respects cache duration for regular operations
   Future<List<WeatherData>?> getCachedData() async {
     // First check in-memory cache
     if (_cachedWeatherData != null && _lastFetchTime != null) {
       final timeSinceLastFetch = DateTime.now().difference(_lastFetchTime!);
-      if (timeSinceLastFetch < _memoryValidDuration) {
+      if (timeSinceLastFetch < _cacheValidDuration) {
         print('🌤️ [WeatherService] Returning in-memory cached data');
         return _cachedWeatherData;
       }
@@ -150,8 +99,8 @@ class WeatherService {
         final cacheTime = DateTime.fromMillisecondsSinceEpoch(cacheTimeMs);
         final timeSinceCache = DateTime.now().difference(cacheTime);
         
-        if (timeSinceCache < _persistentValidDuration) {
-          print('🌤️ [WeatherService] Loading data from valid persistent cache');
+        if (timeSinceCache < _cacheValidDuration) {
+          print('🌤️ [WeatherService] Loading data from persistent cache');
           final List<dynamic> jsonList = jsonDecode(cachedJson);
           final weatherData = jsonList.map((json) => WeatherData.fromJson(json)).toList();
           
@@ -160,11 +109,8 @@ class WeatherService {
           _lastFetchTime = cacheTime;
           
           return weatherData;
-        } else if (timeSinceCache < _showOldDataDuration) {
-          print('🌤️ [WeatherService] Cache expired but within showable range');
-          // Don't return expired data here - let the caller decide
         } else {
-          print('🌤️ [WeatherService] Persistent cache too old, ignoring');
+          print('🌤️ [WeatherService] Persistent cache expired');
         }
       }
     } catch (e) {
@@ -190,20 +136,7 @@ class WeatherService {
     }
   }
 
-  /// Save latest data to persistent cache for instant display
-  Future<void> _saveLatestToCache(WeatherData data) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(data.toJson());
-      
-      await prefs.setString(_latestDataKey, jsonString);
-      await prefs.setInt(_latestDataTimeKey, DateTime.now().millisecondsSinceEpoch);
-      
-      print('🌤️ [WeatherService] Latest data saved to persistent cache');
-    } catch (e) {
-      print('❌ [WeatherService] Error saving latest data to persistent cache: $e');
-    }
-  }
+
 
   Future<List<WeatherData>> fetchWeatherData() async {
     print('🌤️ [WeatherService] Starting fetchWeatherData()');
@@ -334,12 +267,6 @@ class WeatherService {
       _cachedWeatherData = allWeatherData;
       _lastFetchTime = DateTime.now();
       await _saveToCache(allWeatherData);
-      
-      // Also cache the latest data point for instant display
-      if (allWeatherData.isNotEmpty) {
-        await _saveLatestToCache(allWeatherData.last);
-      }
-      
       print('🌤️ [WeatherService] Data cached successfully');
       
       return allWeatherData;
@@ -400,10 +327,6 @@ class WeatherService {
       );
       
       print('🌤️ [WeatherService] Latest data: ${weatherData.time} - ${weatherData.temperature}°C');
-      
-      // Cache the latest data for instant display next time
-      await _saveLatestToCache(weatherData);
-      
       return weatherData;
     } catch (e) {
       print('❌ [WeatherService] Error getting latest weather data: $e');
