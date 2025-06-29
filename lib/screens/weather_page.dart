@@ -6,6 +6,25 @@ import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
 import 'package:intl/intl.dart';
 
+// Helper function for robust navigation bar detection across all Android devices
+bool _isButtonNavigation(BuildContext context) {
+  final mediaQuery = MediaQuery.of(context);
+  final gestureInsets = mediaQuery.systemGestureInsets.bottom;
+  final viewPadding = mediaQuery.viewPadding.bottom;
+  
+  if (gestureInsets >= 45) {
+    // Very likely button navigation - high confidence
+    return true;
+  } else if (gestureInsets <= 25) {
+    // Very likely gesture navigation - high confidence
+    return false;
+  } else {
+    // Ambiguous range (26-44) - use viewPadding as secondary indicator
+    // Button navigation typically has higher viewPadding
+    return viewPadding > 50;
+  }
+}
+
 class WeatherPage extends ConsumerStatefulWidget {
   const WeatherPage({super.key});
 
@@ -205,7 +224,14 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                       ),
                     )
                   : Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: EdgeInsets.only(
+                        left: 16.0,
+                        right: 16.0,
+                        top: 16.0,
+                        bottom: _isButtonNavigation(context)
+                          ? 50.0  // Button navigation (3 buttons) - more space needed
+                          : 24.0, // Gesture navigation (white bar) - less space needed
+                      ),
                       child: Column(
                         children: [
                           // Weather station explanation or waiting message
