@@ -99,8 +99,9 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
       if (cachedData != null && cachedData.isNotEmpty) {
         print('🌤️ [WeatherDataNotifier] Loaded cached data (${cachedData.length} points)');
         final latestData = await _weatherService.getLatestWeatherData();
+        final downsampledData = _weatherService.downsampleForChart(cachedData);
         state = state.copyWith(
-          chartData: cachedData,
+          chartData: downsampledData,
           latestData: latestData ?? (cachedData.isNotEmpty ? cachedData.last : null),
           isLoading: false,
           isPreloaded: true,
@@ -114,18 +115,19 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
       final latestDataFuture = _weatherService.getLatestWeatherData();
       
       final results = await Future.wait([chartDataFuture, latestDataFuture]);
-      final chartData = results[0] as List<WeatherData>;
+      final fullData = results[0] as List<WeatherData>;
       final latestData = results[1] as WeatherData?;
+      final downsampledData = _weatherService.downsampleForChart(fullData);
       
       state = state.copyWith(
-        chartData: chartData,
-        latestData: latestData ?? (chartData.isNotEmpty ? chartData.last : null),
+        chartData: downsampledData,
+        latestData: latestData ?? (fullData.isNotEmpty ? fullData.last : null),
         isLoading: false,
         isPreloaded: true,
         lastUpdateTime: DateTime.now(),
       );
       
-      print('🌤️ [WeatherDataNotifier] Preload completed successfully (${chartData.length} points)');
+      print('🌤️ [WeatherDataNotifier] Preload completed successfully (${fullData.length} points, ${downsampledData.length} for chart)');
     } catch (e) {
       print('❌ [WeatherDataNotifier] Preload failed: $e');
       state = state.copyWith(
@@ -146,18 +148,19 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
       final latestDataFuture = _weatherService.getLatestWeatherData();
       
       final results = await Future.wait([chartDataFuture, latestDataFuture]);
-      final chartData = results[0] as List<WeatherData>;
+      final fullData = results[0] as List<WeatherData>;
       final latestData = results[1] as WeatherData?;
+      final downsampledData = _weatherService.downsampleForChart(fullData);
       
       state = state.copyWith(
-        chartData: chartData,
-        latestData: latestData ?? (chartData.isNotEmpty ? chartData.last : null),
+        chartData: downsampledData,
+        latestData: latestData ?? (fullData.isNotEmpty ? fullData.last : null),
         isLoading: false,
         isPreloaded: true,
         lastUpdateTime: DateTime.now(),
       );
       
-      print('🌤️ [WeatherDataNotifier] Refresh completed successfully');
+      print('🌤️ [WeatherDataNotifier] Refresh completed successfully (${fullData.length} points, ${downsampledData.length} for chart)');
     } catch (e) {
       print('❌ [WeatherDataNotifier] Refresh failed: $e');
       state = state.copyWith(
@@ -176,16 +179,17 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
       final latestDataFuture = _weatherService.getLatestWeatherData();
       
       final results = await Future.wait([chartDataFuture, latestDataFuture]);
-      final chartData = results[0] as List<WeatherData>;
+      final fullData = results[0] as List<WeatherData>;
       final latestData = results[1] as WeatherData?;
       
-      if (chartData.isNotEmpty) {
+      if (fullData.isNotEmpty) {
+        final downsampledData = _weatherService.downsampleForChart(fullData);
         state = state.copyWith(
-          chartData: chartData,
-          latestData: latestData ?? chartData.last,
+          chartData: downsampledData,
+          latestData: latestData ?? fullData.last,
           lastUpdateTime: DateTime.now(),
         );
-        print('🌤️ [WeatherDataNotifier] Background update completed successfully');
+        print('🌤️ [WeatherDataNotifier] Background update completed successfully (${fullData.length} points, ${downsampledData.length} for chart)');
       }
     } catch (e) {
       print('❌ [WeatherDataNotifier] Background update failed: $e');

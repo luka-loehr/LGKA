@@ -334,6 +334,48 @@ class WeatherService {
     }
   }
 
+  /// Downsample data for chart performance while preserving latest data for display boxes
+  List<WeatherData> downsampleForChart(List<WeatherData> fullData) {
+    if (fullData.isEmpty) return fullData;
+    
+    final length = fullData.length;
+    int samplingRate = 1; // Show every nth value
+    
+    // Progressive downsampling based on data size
+    if (length >= 1000) {
+      samplingRate = 50; // Show every 50th value
+    } else if (length >= 600) {
+      samplingRate = 30; // Show every 30th value  
+    } else if (length >= 300) {
+      samplingRate = 20; // Show every 20th value
+    } else if (length >= 150) {
+      samplingRate = 10; // Show every 10th value
+    }
+    
+    if (samplingRate == 1) {
+      print('📊 [WeatherService] No downsampling needed for ${length} data points');
+      return fullData;
+    }
+    
+    final List<WeatherData> sampledData = [];
+    
+    // Always include the first data point
+    sampledData.add(fullData.first);
+    
+    // Sample intermediate points
+    for (int i = samplingRate; i < length - samplingRate; i += samplingRate) {
+      sampledData.add(fullData[i]);
+    }
+    
+    // Always include the last data point (most recent)
+    if (fullData.length > 1) {
+      sampledData.add(fullData.last);
+    }
+    
+    print('📊 [WeatherService] Downsampled ${length} points to ${sampledData.length} (every ${samplingRate}th value)');
+    return sampledData;
+  }
+
   double _parseDouble(dynamic value) {
     if (value == null) {
       return 0.0;
