@@ -82,7 +82,7 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
 
   WeatherDataNotifier(this._weatherService) : super(const WeatherDataState());
 
-  /// Preload weather data in background when app starts
+  /// Preload weather data for instant app startup with background refresh
   Future<void> preloadWeatherData() async {
     if (state.isPreloaded && state.chartData.isNotEmpty) {
       print('🌤️ [WeatherDataNotifier] Data already preloaded, skipping');
@@ -91,13 +91,37 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
 
     print('🌤️ [WeatherDataNotifier] Starting weather data preload');
     
+    // First, load instant startup data from persistent cache (regardless of age)
+    try {
+      final instantData = await _weatherService.getInstantStartupData();
+      final instantLatest = await _weatherService.getInstantLatestData();
+      
+      if (instantData != null && instantData.isNotEmpty) {
+        print('🚀 [WeatherDataNotifier] Showing instant data (${instantData.length} points)');
+        state = state.copyWith(
+          chartData: instantData,
+          latestData: instantLatest ?? instantData.last,
+          isLoading: false,
+          isPreloaded: true,
+          lastUpdateTime: DateTime.now(),
+        );
+        
+        // Start background refresh without blocking UI
+        _backgroundRefresh();
+        return;
+      }
+    } catch (e) {
+      print('❌ [WeatherDataNotifier] Error loading instant data: $e');
+    }
+    
+    // If no instant data available, show loading and fetch fresh data
     state = state.copyWith(isLoading: true, error: null);
     
     try {
-      // Try to load from cache first
+      // Try to load from valid cache first
       final cachedData = await _weatherService.getCachedData();
       if (cachedData != null && cachedData.isNotEmpty) {
-        print('🌤️ [WeatherDataNotifier] Loaded cached data (${cachedData.length} points)');
+        print('🌤️ [WeatherDataNotifier] Loaded valid cached data (${cachedData.length} points)');
         final latestData = await _weatherService.getLatestWeatherData();
         state = state.copyWith(
           chartData: cachedData,
@@ -135,6 +159,33 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
     }
   }
 
+  /// Background refresh without UI indicators
+  Future<void> _backgroundRefresh() async {
+    print('🔄 [WeatherDataNotifier] Starting background refresh');
+    
+    try {
+      final chartDataFuture = _weatherService.fetchWeatherData();
+      final latestDataFuture = _weatherService.getLatestWeatherData();
+      
+      final results = await Future.wait([chartDataFuture, latestDataFuture]);
+      final chartData = results[0] as List<WeatherData>;
+      final latestData = results[1] as WeatherData?;
+      
+      if (chartData.isNotEmpty) {
+        state = state.copyWith(
+          chartData: chartData,
+          latestData: latestData ?? chartData.last,
+          lastUpdateTime: DateTime.now(),
+          error: null, // Clear any previous errors
+        );
+        print('🔄 [WeatherDataNotifier] Background refresh completed successfully');
+      }
+    } catch (e) {
+      print('❌ [WeatherDataNotifier] Background refresh failed: $e');
+      // Don't update error state for background updates to avoid disrupting UI
+    }
+  }
+
   /// Refresh weather data (called from weather page)
   Future<void> refreshWeatherData() async {
     print('🌤️ [WeatherDataNotifier] Starting weather data refresh');
@@ -167,29 +218,8 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
     }
   }
 
-  /// Update data in background (silent refresh)
+  /// Update data in background (silent refresh) - same as _backgroundRefresh
   Future<void> updateDataInBackground() async {
-    print('🌤️ [WeatherDataNotifier] Starting background update');
-    
-    try {
-      final chartDataFuture = _weatherService.fetchWeatherData();
-      final latestDataFuture = _weatherService.getLatestWeatherData();
-      
-      final results = await Future.wait([chartDataFuture, latestDataFuture]);
-      final chartData = results[0] as List<WeatherData>;
-      final latestData = results[1] as WeatherData?;
-      
-      if (chartData.isNotEmpty) {
-        state = state.copyWith(
-          chartData: chartData,
-          latestData: latestData ?? chartData.last,
-          lastUpdateTime: DateTime.now(),
-        );
-        print('🌤️ [WeatherDataNotifier] Background update completed successfully');
-      }
-    } catch (e) {
-      print('❌ [WeatherDataNotifier] Background update failed: $e');
-      // Don't update error state for background updates to avoid disrupting UI
-    }
+    await _backgroundRefresh();
   }
 }

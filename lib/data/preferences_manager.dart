@@ -11,6 +11,12 @@ class PreferencesManager {
   static const String _keyHasRequestedReview = 'has_requested_review';
   static const String _keyShowNavigationDebug = 'show_navigation_debug';
   static const String _keyUseBuiltInPdfViewer = 'use_built_in_pdf_viewer';
+  
+  // Weather cache keys (for reference - actual caching is managed by WeatherService)
+  static const String _weatherCacheKey = 'weather_data_cache';
+  static const String _weatherCacheTimeKey = 'weather_data_cache_time';
+  static const String _weatherLatestDataKey = 'weather_latest_data';
+  static const String _weatherLatestDataTimeKey = 'weather_latest_data_time';
 
   late final SharedPreferences _prefs;
 
@@ -79,5 +85,13 @@ class PreferencesManager {
   // Clear all preferences
   Future<void> clearAllPreferences() async {
     await _prefs.clear();
+  }
+  
+  // Clear weather cache (useful for debugging)
+  Future<void> clearWeatherCache() async {
+    await _prefs.remove(_weatherCacheKey);
+    await _prefs.remove(_weatherCacheTimeKey);
+    await _prefs.remove(_weatherLatestDataKey);
+    await _prefs.remove(_weatherLatestDataTimeKey);
   }
 } 
