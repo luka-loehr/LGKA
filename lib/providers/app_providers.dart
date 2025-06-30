@@ -43,6 +43,7 @@ class WeatherDataState {
   final bool isPreloaded;
   final String? error;
   final DateTime? lastUpdateTime;
+  final DateTime? cacheTime;
 
   const WeatherDataState({
     this.chartData = const [],
@@ -51,6 +52,7 @@ class WeatherDataState {
     this.isPreloaded = false,
     this.error,
     this.lastUpdateTime,
+    this.cacheTime,
   });
 
   WeatherDataState copyWith({
@@ -60,6 +62,7 @@ class WeatherDataState {
     bool? isPreloaded,
     String? error,
     DateTime? lastUpdateTime,
+    DateTime? cacheTime,
   }) {
     return WeatherDataState(
       chartData: chartData ?? this.chartData,
@@ -68,6 +71,7 @@ class WeatherDataState {
       isPreloaded: isPreloaded ?? this.isPreloaded,
       error: error ?? this.error,
       lastUpdateTime: lastUpdateTime ?? this.lastUpdateTime,
+      cacheTime: cacheTime ?? this.cacheTime,
     );
   }
 }
@@ -96,6 +100,7 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
     try {
       // Try to load from cache first
       final cachedData = await _weatherService.getCachedData();
+      final cacheTime = await _weatherService.getLastCacheTime();
       if (cachedData != null && cachedData.isNotEmpty) {
         print('🌤️ [WeatherDataNotifier] Loaded cached data (${cachedData.length} points)');
         final latestData = await _weatherService.getLatestWeatherData();
@@ -106,6 +111,7 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
           isLoading: false,
           isPreloaded: true,
           lastUpdateTime: DateTime.now(),
+          cacheTime: cacheTime,
         );
         return;
       }

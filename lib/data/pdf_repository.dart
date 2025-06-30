@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import '../services/offline_cache_service.dart';
 
 class PdfRepository extends ChangeNotifier {
   static const String _username = 'vertretungsplan';
@@ -31,6 +32,8 @@ class PdfRepository extends ChangeNotifier {
   bool _hasSlowConnection = false;
   bool _showLoadingBar = false;
   bool _isNoInternet = false;
+  bool _isOfflineMode = false;
+  DateTime? _offlineDataTime;
 
   // Getters for accessing the data
   String get todayWeekday => _todayWeekday;
@@ -44,6 +47,8 @@ class PdfRepository extends ChangeNotifier {
   bool get hasSlowConnection => _hasSlowConnection;
   bool get showLoadingBar => _showLoadingBar;
   bool get isNoInternet => _isNoInternet;
+  bool get isOfflineMode => _isOfflineMode;
+  DateTime? get offlineDataTime => _offlineDataTime;
   
   // Dynamic filename getters based on weekdays
   String get todayPdfFilename => _todayWeekday.isNotEmpty ? '${_todayWeekday.toLowerCase()}.pdf' : todayFilename;
@@ -182,6 +187,13 @@ class PdfRepository extends ChangeNotifier {
         }
       }
 
+      // Save to offline cache
+      if (isToday) {
+        await OfflineCache.savePdf(finalFile, _todayWeekday, _todayDate, true);
+      } else {
+        await OfflineCache.savePdf(finalFile, _tomorrowWeekday, _tomorrowDate, false);
+      }
+
       _checkIfBothDaysLoaded();
       notifyListeners();
 
@@ -260,6 +272,15 @@ class PdfRepository extends ChangeNotifier {
 
   /// Gets cached PDF using weekday-based naming with fallback to legacy names
   Future<File?> getCachedPdfByDay(bool isToday) async {
+    // If in offline mode, try offline cache first
+    if (_isOfflineMode) {
+      final offlineFile = await OfflineCache.getPdf(isToday);
+      if (offlineFile != null) {
+        debugPrint('Using PDF from offline cache');
+        return offlineFile;
+      }
+    }
+    
     // Try weekday-named file first
     final weekdayFilename = isToday ? todayPdfFilename : tomorrowPdfFilename;
     File? file = await getCachedPdf(weekdayFilename);
@@ -276,6 +297,45 @@ class PdfRepository extends ChangeNotifier {
   /// Checks if both days are loaded and updates state
   void _checkIfBothDaysLoaded() {
     _weekdaysLoaded = _todayWeekday.isNotEmpty && _tomorrowWeekday.isNotEmpty;
+  }
+
+  /// Load PDFs from offline cache
+  Future<bool> loadFromOfflineCache() async {
+    try {
+      debugPrint('💾 [PdfRepository] Attempting to load from offline cache');
+      
+      // Try to load today's PDF info
+      final todayInfo = await OfflineCache.getPdfInfo(true);
+      if (todayInfo != null) {
+        _todayWeekday = todayInfo['weekday'] ?? '';
+        _todayDate = todayInfo['date'] ?? '';
+        final savedAt = todayInfo['savedAt'] as int?;
+        if (savedAt != null) {
+          _offlineDataTime = DateTime.fromMillisecondsSinceEpoch(savedAt);
+        }
+      }
+      
+      // Try to load tomorrow's PDF info
+      final tomorrowInfo = await OfflineCache.getPdfInfo(false);
+      if (tomorrowInfo != null) {
+        _tomorrowWeekday = tomorrowInfo['weekday'] ?? '';
+        _tomorrowDate = tomorrowInfo['date'] ?? '';
+      }
+      
+      // Check if we have at least one PDF
+      final hasOfflineData = todayInfo != null || tomorrowInfo != null;
+      if (hasOfflineData) {
+        _isOfflineMode = true;
+        _checkIfBothDaysLoaded();
+        debugPrint('💾 [PdfRepository] Loaded from offline cache successfully');
+        return true;
+      }
+      
+      return false;
+    } catch (e) {
+      debugPrint('❌ [PdfRepository] Error loading from offline cache: $e');
+      return false;
+    }
   }
 
   /// Check if device has internet connectivity
@@ -322,17 +382,33 @@ class PdfRepository extends ChangeNotifier {
       debugPrint('Network connection available: $hasConnection');
       
       if (!hasConnection) {
-        debugPrint('No internet connection detected - replacing loading bar with notification immediately');
-        _hasSlowConnection = true;
-        _isNoInternet = true;
-        _showLoadingBar = false; // Hide loading bar immediately
-        notifyListeners();
+        debugPrint('No internet connection detected - checking offline cache');
         
-        // Start auto-retry if not already retrying
-        if (!_isAutoRetrying) {
-          _startAutoRetry(forceReload);
+        // Try to load from offline cache
+        final hasOfflineData = await loadFromOfflineCache();
+        
+        if (hasOfflineData) {
+          debugPrint('Loaded PDFs from offline cache, entering offline mode');
+          _hasSlowConnection = false;
+          _isNoInternet = false;
+          _showLoadingBar = false;
+          _isOfflineMode = true;
+          notifyListeners();
+          return;
+        } else {
+          // No offline data available, show internet error
+          debugPrint('No offline data available - showing internet error');
+          _hasSlowConnection = true;
+          _isNoInternet = true;
+          _showLoadingBar = false;
+          notifyListeners();
+          
+          // Start auto-retry if not already retrying
+          if (!_isAutoRetrying) {
+            _startAutoRetry(forceReload);
+          }
+          return;
         }
-        return;
       }
 
       final results = await Future.wait([
@@ -345,6 +421,8 @@ class PdfRepository extends ChangeNotifier {
         _showLoadingBar = false;
         _hasSlowConnection = false;
         _isNoInternet = false;
+        _isOfflineMode = false; // Exit offline mode on successful download
+        _offlineDataTime = null;
         _isAutoRetrying = false; // Stop auto-retry if successful
         debugPrint('PDFs loaded successfully');
       } else {
@@ -415,6 +493,8 @@ class PdfRepository extends ChangeNotifier {
         if (results[0] != null || results[1] != null) {
           _hasSlowConnection = false;
           _isNoInternet = false;
+          _isOfflineMode = false;
+          _offlineDataTime = null;
           _showLoadingBar = false;
           _isLoading = false;
           debugPrint('Auto-retry successful, PDFs downloaded');
