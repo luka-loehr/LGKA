@@ -202,6 +202,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       ),
     );
   }
+  
+  String _formatOfflineTime(DateTime time) {
+    final now = DateTime.now();
+    final difference = now.difference(time);
+    
+    if (difference.inMinutes < 60) {
+      return 'vor ${difference.inMinutes} Minuten';
+    } else if (difference.inHours < 24) {
+      return 'vor ${difference.inHours} Stunden';
+    } else {
+      return '${time.day}.${time.month}. um ${time.hour}:${time.minute.toString().padLeft(2, '0')} Uhr';
+    }
+  }
 
 
 
@@ -389,6 +402,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         onTodayClick: () => _openPdf(true),
                         onTomorrowClick: () => _openPdf(false),
                       ),
+                      
+                      // Offline mode indicator
+                      if (pdfRepo.isOfflineMode && pdfRepo.offlineDataTime != null) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.orange.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.access_time_outlined,
+                                color: Colors.orange.shade700,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Offline-Modus • Daten vom ${_formatOfflineTime(pdfRepo.offlineDataTime!)}',
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.orange.shade700,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       
                       // Debug navigation mode detection (only show if enabled in preferences)
                       if (ref.watch(preferencesManagerProvider).showNavigationDebug) ...[
