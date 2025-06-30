@@ -148,6 +148,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     super.build(context);
     
     final weatherState = ref.watch(weatherDataProvider);
+    final pdfRepo = ref.watch(pdfRepositoryProvider);
     
     // Trigger chart rendering when data becomes available
     if (!_isChartRendered && weatherState.chartData.isNotEmpty && _isInitialRenderComplete) {
@@ -176,7 +177,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                 ],
               ),
             )
-          : weatherState.error != null && weatherState.chartData.isEmpty && !weatherState.isOfflineMode
+          : weatherState.error != null && weatherState.chartData.isEmpty && !weatherState.isOfflineMode && !pdfRepo.isOfflineMode
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(32.0),
@@ -222,7 +223,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                     ),
                   ),
                 )
-              : weatherState.chartData.isEmpty && weatherState.isOfflineMode
+              : weatherState.chartData.isEmpty && (weatherState.isOfflineMode || pdfRepo.isOfflineMode)
                   ? Center(
                       child: Padding(
                         padding: const EdgeInsets.all(32.0),
@@ -243,14 +244,25 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 8),
-                            Text(
-                              weatherState.offlineDataTime != null
-                                ? 'Keine aktuellen Wetterdaten verfügbar\nLetztes Update: ${_formatUpdateTime(weatherState.offlineDataTime!)}'
-                                : 'Keine Offline-Wetterdaten verfügbar',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.secondaryText,
-                              ),
-                              textAlign: TextAlign.center,
+                            Builder(
+                              builder: (context) {
+                                DateTime? offlineTime;
+                                if (weatherState.isOfflineMode && weatherState.offlineDataTime != null) {
+                                  offlineTime = weatherState.offlineDataTime;
+                                } else if (pdfRepo.isOfflineMode && pdfRepo.offlineDataTime != null) {
+                                  offlineTime = pdfRepo.offlineDataTime;
+                                }
+                                
+                                return Text(
+                                  offlineTime != null
+                                    ? 'Keine aktuellen Wetterdaten verfügbar\nLetztes Update: ${_formatUpdateTime(offlineTime)}'
+                                    : 'Keine Offline-Wetterdaten verfügbar',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.secondaryText,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                );
+                              }
                             ),
                             const SizedBox(height: 24),
                             ElevatedButton.icon(
@@ -292,9 +304,23 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                           FutureBuilder<DateTime?>(
                             future: OfflineCache.getWeatherLastUpdateTime(),
                             builder: (context, snapshot) {
-                              final isOffline = snapshot.hasData && weatherState.cacheTime != null &&
-                                  snapshot.data!.isBefore(weatherState.cacheTime!);
-                              final offlineTime = snapshot.data;
+                              // Check for offline mode - either weather system or PDF system
+                              final isWeatherOffline = weatherState.isOfflineMode && weatherState.offlineDataTime != null;
+                              final isPdfOffline = pdfRepo.isOfflineMode && pdfRepo.offlineDataTime != null;
+                              final isOffline = isWeatherOffline || isPdfOffline;
+                              
+                              // Use the most recent offline time for display
+                              DateTime? offlineTime;
+                              if (isWeatherOffline && isPdfOffline) {
+                                // Use the more recent of the two
+                                offlineTime = weatherState.offlineDataTime!.isAfter(pdfRepo.offlineDataTime!) 
+                                  ? weatherState.offlineDataTime 
+                                  : pdfRepo.offlineDataTime;
+                              } else if (isWeatherOffline) {
+                                offlineTime = weatherState.offlineDataTime;
+                              } else if (isPdfOffline) {
+                                offlineTime = pdfRepo.offlineDataTime;
+                              }
                               
                               return Container(
                                 width: double.infinity,
