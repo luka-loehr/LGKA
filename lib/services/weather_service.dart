@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:csv/csv.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'offline_cache_service.dart';
 
 class WeatherData {
   final DateTime time;
@@ -267,12 +268,25 @@ class WeatherService {
       _cachedWeatherData = allWeatherData;
       _lastFetchTime = DateTime.now();
       await _saveToCache(allWeatherData);
+      
+      // Also save to offline cache
+      await OfflineCache.saveWeatherData(allWeatherData);
+      
       print('🌤️ [WeatherService] Data cached successfully');
       
       return allWeatherData;
     } catch (e) {
       print('❌ [WeatherService] Fatal error in fetchWeatherData: $e');
       print('❌ [WeatherService] Stack trace: ${StackTrace.current}');
+      
+      // Try to load from offline cache if network fails
+      print('🌤️ [WeatherService] Attempting to load from offline cache');
+      final offlineData = await OfflineCache.getWeatherData();
+      if (offlineData != null && offlineData.isNotEmpty) {
+        print('🌤️ [WeatherService] Loaded ${offlineData.length} items from offline cache');
+        return offlineData;
+      }
+      
       throw Exception('Error fetching weather data: $e');
     }
   }
