@@ -357,14 +357,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: Text(
-                          pdfRepo.isNoInternet 
-                            ? 'Mach mal dein Internet an.'
-                            : 'Warte mal einen Moment, du hast gerade langsames Internet.',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.primaryText,
-                            height: 1.3,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              pdfRepo.isNoInternet 
+                                ? 'Um die aktuellsten Daten zu erhalten, schalte bitte dein Internet an.'
+                                : 'Du hast gerade schlechtes Internet, um die aktuellsten Daten zu erhalten, warte bitte noch einen Moment...',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppColors.primaryText,
+                                height: 1.3,
+                              ),
+                            ),
+                            if (pdfRepo.offlineDataTime != null) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                'Zuletzt aktualisiert ${_formatOfflineTime(pdfRepo.offlineDataTime!)}',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.secondaryText,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     ],
@@ -426,12 +441,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                               ),
                               const SizedBox(width: 8),
                               Expanded(
-                                child: Text(
-                                  'Offline-Modus • Daten vom ${_formatOfflineTime(pdfRepo.offlineDataTime!)}',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Colors.orange.shade700,
-                                    fontSize: 13,
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Um die aktuellsten Daten zu erhalten, schalte bitte dein Internet an.',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: Colors.orange.shade700,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Zuletzt aktualisiert ${_formatOfflineTime(pdfRepo.offlineDataTime!)}',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: Colors.orange.shade600,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
