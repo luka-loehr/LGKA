@@ -313,7 +313,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                       ),
                       child: Column(
                         children: [
-                          // Offline notification (if applicable)
+                          // Weather station explanation, offline mode, or waiting message
                           FutureBuilder<DateTime?>(
                             future: OfflineCache.getWeatherLastUpdateTime(),
                             builder: (context, snapshot) {
@@ -326,116 +326,114 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                               final hasSlowConnection = pdfRepo.hasSlowConnection;
                               final isNoInternet = pdfRepo.isNoInternet;
                               
-                              if (!isOffline && !hasSlowConnection) {
-                                return const SizedBox.shrink();
+                              // If offline or slow connection, show offline message instead of weather station info
+                              if (isOffline || hasSlowConnection) {
+                                // Use the most recent offline time for display
+                                DateTime? offlineTime;
+                                if (isWeatherOffline && isPdfOffline) {
+                                  // Use the more recent of the two
+                                  offlineTime = weatherState.offlineDataTime!.isAfter(pdfRepo.offlineDataTime!) 
+                                    ? weatherState.offlineDataTime 
+                                    : pdfRepo.offlineDataTime;
+                                } else if (isWeatherOffline) {
+                                  offlineTime = weatherState.offlineDataTime;
+                                } else if (isPdfOffline) {
+                                  offlineTime = pdfRepo.offlineDataTime;
+                                }
+                                
+                                return Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.orange.withOpacity(0.3),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        isNoInternet ? Icons.wifi_off_outlined : Icons.signal_wifi_bad_outlined,
+                                        color: Colors.orange.shade700,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              isNoInternet
+                                                ? 'Um die aktuellsten Daten zu erhalten, schalte bitte dein Internet an.'
+                                                : 'Du hast gerade schlechtes Internet, um die aktuellsten Daten zu erhalten, warte bitte noch einen Moment...',
+                                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                color: Colors.orange.shade700,
+                                                height: 1.3,
+                                              ),
+                                            ),
+                                            if (offlineTime != null) ...[
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                'Zuletzt aktualisiert ${_formatUpdateTime(offlineTime)}',
+                                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                  color: Colors.orange.shade600,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               }
                               
-                              // Use the most recent offline time for display
-                              DateTime? offlineTime;
-                              if (isWeatherOffline && isPdfOffline) {
-                                // Use the more recent of the two
-                                offlineTime = weatherState.offlineDataTime!.isAfter(pdfRepo.offlineDataTime!) 
-                                  ? weatherState.offlineDataTime 
-                                  : pdfRepo.offlineDataTime;
-                              } else if (isWeatherOffline) {
-                                offlineTime = weatherState.offlineDataTime;
-                              } else if (isPdfOffline) {
-                                offlineTime = pdfRepo.offlineDataTime;
-                              }
-                              
+                              // Otherwise show normal weather station explanation
                               return Container(
                                 width: double.infinity,
-                                margin: const EdgeInsets.only(bottom: 16),
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: Colors.orange.withOpacity(0.1),
+                                  color: _isChartAvailable() 
+                                    ? AppColors.appBlueAccent.withOpacity(0.1)
+                                    : Colors.orange.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: Colors.orange.withOpacity(0.3),
+                                    color: _isChartAvailable() 
+                                      ? AppColors.appBlueAccent.withOpacity(0.3)
+                                      : Colors.orange.withOpacity(0.3),
                                     width: 1,
                                   ),
                                 ),
                                 child: Row(
                                   children: [
                                     Icon(
-                                      isNoInternet ? Icons.wifi_off_outlined : Icons.signal_wifi_bad_outlined,
-                                      color: Colors.orange.shade700,
+                                      _isChartAvailable() 
+                                        ? Icons.info_outline
+                                        : Icons.access_time,
+                                      color: _isChartAvailable() 
+                                        ? AppColors.appBlueAccent
+                                        : Colors.orange,
                                       size: 20,
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            isNoInternet
-                                              ? 'Um die aktuellsten Daten zu erhalten, schalte bitte dein Internet an.'
-                                              : 'Du hast gerade schlechtes Internet, um die aktuellsten Daten zu erhalten, warte bitte noch einen Moment...',
-                                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                              color: Colors.orange.shade700,
-                                              height: 1.3,
-                                            ),
-                                          ),
-                                          if (offlineTime != null) ...[
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              'Zuletzt aktualisiert ${_formatUpdateTime(offlineTime)}',
-                                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                color: Colors.orange.shade600,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ],
+                                      child: Text(
+                                        _isChartAvailable()
+                                          ? 'Diese Wetterdaten kommen direkt von der schuleigenen Wetterstation auf dem Dach. Du siehst hier live Wetterdaten von deiner Schule!'
+                                          : 'Warte noch ein paar Minuten - die Wetterstation sammelt gerade neue Daten für heute. Diagramme sind ab 0:30 Uhr verfügbar.',
+                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                          color: AppColors.primaryText,
+                                          height: 1.4,
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
                               );
                             },
-                          ),
-                          
-                          // Weather station explanation or waiting message
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: _isChartAvailable() 
-                                ? AppColors.appBlueAccent.withOpacity(0.1)
-                                : Colors.orange.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: _isChartAvailable() 
-                                  ? AppColors.appBlueAccent.withOpacity(0.3)
-                                  : Colors.orange.withOpacity(0.3),
-                                width: 1,
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  _isChartAvailable() 
-                                    ? Icons.info_outline
-                                    : Icons.access_time,
-                                  color: _isChartAvailable() 
-                                    ? AppColors.appBlueAccent
-                                    : Colors.orange,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    _isChartAvailable()
-                                      ? 'Diese Wetterdaten kommen direkt von der schuleigenen Wetterstation auf dem Dach. Du siehst hier live Wetterdaten von deiner Schule!'
-                                      : 'Warte noch ein paar Minuten - die Wetterstation sammelt gerade neue Daten für heute. Diagramme sind ab 0:30 Uhr verfügbar.',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.primaryText,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
                           ),
                           const SizedBox(height: 20),
                           // Current weather data cards
