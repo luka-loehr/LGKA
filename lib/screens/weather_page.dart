@@ -148,7 +148,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     super.build(context);
     
     final weatherState = ref.watch(weatherDataProvider);
-    final pdfRepo = ref.watch(pdfRepositoryProvider);
     
     // Trigger chart rendering when data becomes available
     if (!_isChartRendered && weatherState.chartData.isNotEmpty && _isInitialRenderComplete) {
@@ -177,7 +176,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                 ],
               ),
             )
-          : weatherState.error != null && weatherState.chartData.isEmpty && !weatherState.isOfflineMode && !pdfRepo.isOfflineMode
+          : weatherState.error != null && weatherState.chartData.isEmpty && !weatherState.isOfflineMode
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(32.0),
@@ -223,7 +222,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                     ),
                   ),
                 )
-              : weatherState.chartData.isEmpty && (weatherState.isOfflineMode || pdfRepo.isOfflineMode)
+              : weatherState.chartData.isEmpty && weatherState.isOfflineMode
                   ? Center(
                       child: Padding(
                         padding: const EdgeInsets.all(32.0),
@@ -244,38 +243,27 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 8),
-                            Builder(
-                              builder: (context) {
-                                DateTime? offlineTime;
-                                if (weatherState.isOfflineMode && weatherState.offlineDataTime != null) {
-                                  offlineTime = weatherState.offlineDataTime;
-                                } else if (pdfRepo.isOfflineMode && pdfRepo.offlineDataTime != null) {
-                                  offlineTime = pdfRepo.offlineDataTime;
-                                }
-                                
-                                return Column(
-                                  children: [
-                                    Text(
-                                      'Um die aktuellsten Daten zu erhalten, schalte bitte dein Internet an.',
-                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                        color: AppColors.secondaryText,
-                                      ),
-                                      textAlign: TextAlign.center,
+                            Column(
+                              children: [
+                                Text(
+                                  'Um die aktuellsten Daten zu erhalten, schalte bitte dein Internet an.',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.secondaryText,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                if (weatherState.offlineDataTime != null) ...[
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Zuletzt aktualisiert ${_formatUpdateTime(weatherState.offlineDataTime!)}',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.secondaryText.withOpacity(0.7),
+                                      fontSize: 12,
                                     ),
-                                    if (offlineTime != null) ...[
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Zuletzt aktualisiert ${_formatUpdateTime(offlineTime)}',
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: AppColors.secondaryText.withOpacity(0.7),
-                                          fontSize: 12,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ],
-                                );
-                              }
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ],
                             ),
                             const SizedBox(height: 24),
                             ElevatedButton.icon(
@@ -313,119 +301,47 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                       ),
                       child: Column(
                         children: [
-                          // Weather station explanation, offline mode, or waiting message
-                          FutureBuilder<DateTime?>(
-                            future: OfflineCache.getWeatherLastUpdateTime(),
-                            builder: (context, snapshot) {
-                              // Use exact same logic as home screen
-                              final showOfflineMessage = pdfRepo.hasSlowConnection || pdfRepo.isOfflineMode;
-                              
-                              if (showOfflineMessage) {
-                                return Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.orange.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.orange.withOpacity(0.3),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          color: pdfRepo.isNoInternet 
-                                            ? Colors.red.withOpacity(0.2)
-                                            : Colors.orange.withOpacity(0.2),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          pdfRepo.isNoInternet 
-                                            ? Icons.wifi_off_outlined
-                                            : Icons.signal_wifi_bad_outlined,
-                                          color: pdfRepo.isNoInternet ? Colors.red : Colors.orange,
-                                          size: 22,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              pdfRepo.isNoInternet 
-                                                ? 'Um die aktuellsten Daten zu erhalten, schalte bitte dein Internet an.'
-                                                : 'Du hast gerade schlechtes Internet, um die aktuellsten Daten zu erhalten, warte bitte noch einen Moment...',
-                                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                color: AppColors.primaryText,
-                                                height: 1.3,
-                                              ),
-                                            ),
-                                            if (pdfRepo.offlineDataTime != null) ...[
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                'Zuletzt aktualisiert ${_formatUpdateTime(pdfRepo.offlineDataTime!)}',
-                                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                  color: AppColors.secondaryText,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
-                              
-                              // Otherwise show normal weather station explanation
-                              return Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
+                          // Weather station explanation or waiting message
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: _isChartAvailable() 
+                                ? AppColors.appBlueAccent.withOpacity(0.1)
+                                : Colors.orange.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: _isChartAvailable() 
+                                  ? AppColors.appBlueAccent.withOpacity(0.3)
+                                  : Colors.orange.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  _isChartAvailable() 
+                                    ? Icons.info_outline
+                                    : Icons.access_time,
                                   color: _isChartAvailable() 
-                                    ? AppColors.appBlueAccent.withOpacity(0.1)
-                                    : Colors.orange.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: _isChartAvailable() 
-                                      ? AppColors.appBlueAccent.withOpacity(0.3)
-                                      : Colors.orange.withOpacity(0.3),
-                                    width: 1,
+                                    ? AppColors.appBlueAccent
+                                    : Colors.orange,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    _isChartAvailable()
+                                      ? 'Diese Wetterdaten kommen direkt von der schuleigenen Wetterstation auf dem Dach. Du siehst hier live Wetterdaten von deiner Schule!'
+                                      : 'Warte noch ein paar Minuten - die Wetterstation sammelt gerade neue Daten für heute. Diagramme sind ab 0:30 Uhr verfügbar.',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.primaryText,
+                                      height: 1.4,
+                                    ),
                                   ),
                                 ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      _isChartAvailable() 
-                                        ? Icons.info_outline
-                                        : Icons.access_time,
-                                      color: _isChartAvailable() 
-                                        ? AppColors.appBlueAccent
-                                        : Colors.orange,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Text(
-                                        _isChartAvailable()
-                                          ? 'Diese Wetterdaten kommen direkt von der schuleigenen Wetterstation auf dem Dach. Du siehst hier live Wetterdaten von deiner Schule!'
-                                          : 'Warte noch ein paar Minuten - die Wetterstation sammelt gerade neue Daten für heute. Diagramme sind ab 0:30 Uhr verfügbar.',
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: AppColors.primaryText,
-                                          height: 1.4,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 20),
                           // Current weather data cards
