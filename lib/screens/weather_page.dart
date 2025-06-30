@@ -317,30 +317,10 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                           FutureBuilder<DateTime?>(
                             future: OfflineCache.getWeatherLastUpdateTime(),
                             builder: (context, snapshot) {
-                              // Check for offline mode - either weather system or PDF system
-                              final isWeatherOffline = weatherState.isOfflineMode && weatherState.offlineDataTime != null;
-                              final isPdfOffline = pdfRepo.isOfflineMode && pdfRepo.offlineDataTime != null;
-                              final isOffline = isWeatherOffline || isPdfOffline;
+                              // Use exact same logic as home screen
+                              final showOfflineMessage = pdfRepo.hasSlowConnection || pdfRepo.isOfflineMode;
                               
-                              // Check for slow connection
-                              final hasSlowConnection = pdfRepo.hasSlowConnection;
-                              final isNoInternet = pdfRepo.isNoInternet;
-                              
-                              // If offline or slow connection, show offline message instead of weather station info
-                              if (isOffline || hasSlowConnection) {
-                                // Use the most recent offline time for display
-                                DateTime? offlineTime;
-                                if (isWeatherOffline && isPdfOffline) {
-                                  // Use the more recent of the two
-                                  offlineTime = weatherState.offlineDataTime!.isAfter(pdfRepo.offlineDataTime!) 
-                                    ? weatherState.offlineDataTime 
-                                    : pdfRepo.offlineDataTime;
-                                } else if (isWeatherOffline) {
-                                  offlineTime = weatherState.offlineDataTime;
-                                } else if (isPdfOffline) {
-                                  offlineTime = pdfRepo.offlineDataTime;
-                                }
-                                
+                              if (showOfflineMessage) {
                                 return Container(
                                   width: double.infinity,
                                   padding: const EdgeInsets.all(16),
@@ -354,31 +334,43 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                   ),
                                   child: Row(
                                     children: [
-                                      Icon(
-                                        pdfRepo.isNoInternet ? Icons.wifi_off_outlined : Icons.signal_wifi_bad_outlined,
-                                        color: Colors.orange.shade700,
-                                        size: 20,
+                                      Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: pdfRepo.isNoInternet 
+                                            ? Colors.red.withOpacity(0.2)
+                                            : Colors.orange.withOpacity(0.2),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          pdfRepo.isNoInternet 
+                                            ? Icons.wifi_off_outlined
+                                            : Icons.signal_wifi_bad_outlined,
+                                          color: pdfRepo.isNoInternet ? Colors.red : Colors.orange,
+                                          size: 22,
+                                        ),
                                       ),
-                                      const SizedBox(width: 12),
+                                      const SizedBox(width: 16),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              pdfRepo.isNoInternet
+                                              pdfRepo.isNoInternet 
                                                 ? 'Um die aktuellsten Daten zu erhalten, schalte bitte dein Internet an.'
                                                 : 'Du hast gerade schlechtes Internet, um die aktuellsten Daten zu erhalten, warte bitte noch einen Moment...',
                                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                color: Colors.orange.shade700,
+                                                color: AppColors.primaryText,
                                                 height: 1.3,
                                               ),
                                             ),
-                                            if (offlineTime != null) ...[
+                                            if (pdfRepo.offlineDataTime != null) ...[
                                               const SizedBox(height: 4),
                                               Text(
-                                                'Zuletzt aktualisiert ${_formatUpdateTime(offlineTime)}',
+                                                'Zuletzt aktualisiert ${_formatUpdateTime(pdfRepo.offlineDataTime!)}',
                                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                  color: Colors.orange.shade600,
+                                                  color: AppColors.secondaryText,
                                                   fontSize: 12,
                                                 ),
                                               ),
