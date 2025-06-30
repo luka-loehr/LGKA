@@ -355,7 +355,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                   child: Row(
                                     children: [
                                       Icon(
-                                        isNoInternet ? Icons.wifi_off_outlined : Icons.signal_wifi_bad_outlined,
+                                        pdfRepo.isNoInternet ? Icons.wifi_off_outlined : Icons.signal_wifi_bad_outlined,
                                         color: Colors.orange.shade700,
                                         size: 20,
                                       ),
@@ -365,7 +365,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              isNoInternet
+                                              pdfRepo.isNoInternet
                                                 ? 'Um die aktuellsten Daten zu erhalten, schalte bitte dein Internet an.'
                                                 : 'Du hast gerade schlechtes Internet, um die aktuellsten Daten zu erhalten, warte bitte noch einen Moment...',
                                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
