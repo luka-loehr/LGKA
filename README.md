@@ -67,6 +67,13 @@ lib/
 - Alle Daten bleiben lokal auf dem Gerät
 - Sichere Verbindung zum Schulserver
 
+**[📋 Datenschutzerklärung](privacy.html)** | **[ℹ️ Impressum](impressum.html)**
+
+## Rechtliches
+
+- **[Datenschutzerklärung](privacy.html)** – Datenschutz und Nutzerdaten
+- **[Impressum](impressum.html)** – Rechtliche Angaben zum Projekt
+
 ## Lizenz
 
 [Creative Commons BY-NC-ND 4.0](LICENSE) – Privates Schülerprojekt
