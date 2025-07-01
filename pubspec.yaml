@@ -141,3 +141,6 @@ flutter_launcher_icons:
   adaptive_icon_foreground: "assets/images/app-icons/app-logo.png"
   # Force generation of legacy icons for better compatibility
   min_sdk_android: 21
+
+# Custom Flutter build variables
+flutter.targetSdkVersion: 36
