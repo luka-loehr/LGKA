@@ -113,6 +113,7 @@ app.*.map.json
 # Sensitive files - Keys and credentials
 /keystore/
 /android/key.properties
+key.properties
 *.jks
 *.keystore
 *.p8
