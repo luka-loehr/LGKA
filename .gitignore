@@ -142,3 +142,18 @@ run_macos.sh
 # Personal documentation (helpful but not for repository)
 APP_STORE_SUBMISSION_CHECKLIST.md
 APP_STORE_DESCRIPTION.md
+
+# Data files and temporary content (not for repository)
+*.csv
+*.xlsx
+*.xls
+Weather*.csv
+Weather*.xlsx
+data/*.csv
+data/*.xlsx
+
+# Redundant documentation files
+README.txt
+NOTES.txt
+TEMP*.md
+TODO.txt
