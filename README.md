@@ -1,34 +1,34 @@
-# LGKA+ – Digitaler Vertretungsplan
+# LGKA+ – Digital Substitution Schedule
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.8.0+-02569B?style=flat&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green?style=flat)](https://github.com/luka-loehr/LGKA/releases)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-orange?style=flat)](LICENSE)
 
-Mobile App für den digitalen Vertretungsplan des Lessing-Gymnasiums Karlsruhe.
+Mobile app for the digital substitution schedule of Lessing-Gymnasium Karlsruhe.
 
 ## Features
 
-- **Vertretungsplan**: Automatischer Download für heute und morgen mit Offline-Verfügbarkeit
-- **PDF-Viewer**: Integrierte Anzeige mit Zoom, Sharing und externer App-Integration  
-- **Wetterdaten**: Live-Daten von der Schulwetterstation mit Diagrammen
-- **Dark Mode**: Augenschonendes Material Design 3 Theme
-- **Offline-First**: Intelligentes Caching mit automatischer Netzwerkerkennung
+- **Substitution Schedule**: Automatic download for today and tomorrow with offline availability
+- **PDF Viewer**: Integrated display with zoom, sharing and external app integration  
+- **Weather Data**: Live data from the school weather station with charts
+- **Dark Mode**: Eye-friendly Material Design 3 theme
+- **Offline-First**: Intelligent caching with automatic network detection
 
 ## Installation
 
-### Endnutzer
-**[Latest Release](https://github.com/luka-loehr/LGKA/releases/latest)** – ARM64 APK für Android 5.0+
+### End Users
+**[Latest Release](https://github.com/luka-loehr/LGKA/releases/latest)** – ARM64 APK for Android 5.0+
 
-### Entwickler
+### Developers
 ```bash
-# Repository klonen
+# Clone repository
 git clone https://github.com/luka-loehr/LGKA.git
 cd lgka_flutter
 
-# Dependencies installieren
+# Install dependencies
 flutter pub get
 
-# App starten
+# Start app
 flutter run
 ```
 
@@ -38,7 +38,7 @@ flutter run
 # Development (ARM64 APK ~10MB)
 flutter build apk --release --target-platform=android-arm64
 
-# Production (App Bundle für Play Store)
+# Production (App Bundle for Play Store)
 flutter build appbundle --release
 ```
 
@@ -50,7 +50,7 @@ flutter build appbundle --release
 - **PDF**: Syncfusion PDF + pdfx
 - **Charts**: Syncfusion Charts
 
-## Projektstruktur
+## Project Structure
 
 ```
 lib/
@@ -61,32 +61,32 @@ lib/
 └── theme/        # Material Theme
 ```
 
-## Datenschutz
+## Privacy
 
-- Keine Datensammlung oder Tracking
-- Alle Daten bleiben lokal auf dem Gerät
-- Sichere Verbindung zum Schulserver
+- No data collection or tracking
+- All data remains local on the device
+- Secure connection to school server
 
-**[📋 Datenschutzerklärung](privacy.html)** | **[ℹ️ Impressum](impressum.html)**
+**[📋 Privacy Policy](privacy.html)** | **[ℹ️ Legal Notice](impressum.html)**
 
-## Rechtliches
+## Legal
 
-- **[Datenschutzerklärung](privacy.html)** – Datenschutz und Nutzerdaten
-- **[Impressum](impressum.html)** – Rechtliche Angaben zum Projekt
+- **[Privacy Policy](privacy.html)** – Privacy and user data
+- **[Legal Notice](impressum.html)** – Legal information about the project
 
-## Lizenz
+## License
 
-[Creative Commons BY-NC-ND 4.0](LICENSE) – Privates Schülerprojekt
+[Creative Commons BY-NC-ND 4.0](LICENSE) – Private student project
 
-**Erlaubt**: Private Nutzung, Code-Studium  
-**Nicht erlaubt**: Kommerzielle Nutzung, Veröffentlichung durch Dritte
+**Allowed**: Private use, code study  
+**Not allowed**: Commercial use, publication by third parties
 
 ## Support
 
 - **Bugs**: [Issues](https://github.com/luka-loehr/LGKA/issues)
-- **Fragen**: [Discussions](https://github.com/luka-loehr/LGKA/discussions)
+- **Questions**: [Discussions](https://github.com/luka-loehr/LGKA/discussions)
 - **Docs**: [Wiki](https://github.com/luka-loehr/LGKA/wiki)
 
 ---
 
-Entwickelt von [Luka Löhr](https://github.com/luka-loehr) für die Schulgemeinschaft des Lessing-Gymnasiums Karlsruhe.
+Developed by [Luka Löhr](https://github.com/luka-loehr) for the school community of Lessing-Gymnasium Karlsruhe.
