@@ -14,6 +14,8 @@ import '../providers/haptic_service.dart';
 import '../services/file_opener_service.dart';
 import '../navigation/app_router.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:async';
 import 'weather_page.dart';
 
 // Custom scroll physics for enhanced swipe sensitivity
@@ -72,11 +74,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   bool _isTodayLoading = false;
   bool _isTomorrowLoading = false;
   String? _error;
+  bool _hasNoInternet = false;
   
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   late AnimationController _slowConnectionController;
   late Animation<double> _slowConnectionAnimation;
+  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
   
   final PageController _pageController = PageController();
   int _currentPage = 0;
@@ -108,7 +112,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       _refreshPlans(forceReload: false);
       // Run weather preloading in background without blocking UI
       _preloadWeatherData();
+      // Check network connectivity
+      _checkConnectivity();
+      
+      // Listen for connectivity changes
+      _connectivitySubscription = Connectivity().onConnectivityChanged.listen((result) {
+        setState(() {
+          _hasNoInternet = result.contains(ConnectivityResult.none);
+        });
+      });
     });
+  }
+
+  Future<void> _checkConnectivity() async {
+    try {
+      final connectivityResult = await Connectivity().checkConnectivity();
+      setState(() {
+        _hasNoInternet = connectivityResult.contains(ConnectivityResult.none);
+      });
+    } catch (e) {
+      debugPrint('Error checking connectivity: $e');
+    }
   }
 
   Future<void> _refreshPlans({bool forceReload = true}) async {
@@ -145,6 +169,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     _fadeController.dispose();
     _slowConnectionController.dispose();
     _pageController.dispose();
+    _connectivitySubscription.cancel();
     super.dispose();
   }
 
@@ -415,18 +440,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.1),
+                            color: _hasNoInternet 
+                              ? Colors.red.withOpacity(0.1)
+                              : Colors.orange.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: Colors.orange.withOpacity(0.3),
+                              color: _hasNoInternet 
+                                ? Colors.red.withOpacity(0.3)
+                                : Colors.orange.withOpacity(0.3),
                               width: 1,
                             ),
                           ),
                           child: Row(
                             children: [
                               Icon(
-                                Icons.access_time_outlined,
-                                color: Colors.orange.shade700,
+                                _hasNoInternet 
+                                  ? Icons.wifi_off_outlined
+                                  : Icons.signal_wifi_bad_outlined,
+                                color: _hasNoInternet 
+                                  ? Colors.red.shade700
+                                  : Colors.orange.shade700,
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
@@ -435,18 +468,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Sobald du wieder Internet hast, aktualisiere ich alles automatisch für dich!',
+                                      _hasNoInternet 
+                                        ? 'Hey, du hast gerade kein Internet. Deswegen zeige ich dir hier den Vertretungsplan von ${_formatOfflineTime(pdfRepo.offlineDataTime!)}. Wenn du dein WLAN oder die mobilen Daten einschaltest, kann ich dir den aktuellsten Plan anzeigen.'
+                                        : 'Hey, du hast gerade bisschen schlechtes Internet. Deswegen zeige ich dir hier den Vertretungsplan von ${_formatOfflineTime(pdfRepo.offlineDataTime!)}. Wenn das Internet besser wird, aktualisiere ich automatisch.',
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: Colors.orange.shade700,
+                                        color: _hasNoInternet 
+                                          ? Colors.red.shade700
+                                          : Colors.orange.shade700,
                                         fontSize: 13,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      'Zuletzt aktualisiert ${_formatOfflineTime(pdfRepo.offlineDataTime!)}',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: Colors.orange.shade600,
-                                        fontSize: 11,
                                       ),
                                     ),
                                   ],
