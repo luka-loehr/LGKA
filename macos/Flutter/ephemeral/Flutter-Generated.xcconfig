@@ -1,10 +1,10 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/Luka/flutter
-FLUTTER_APPLICATION_PATH=/Users/Luka/Documents/LGKA+/main/lgka_flutter
+FLUTTER_ROOT=/home/luka/snap/flutter/common/flutter
+FLUTTER_APPLICATION_PATH=/home/luka/Documents/LGKA+/lgka_flutter
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_BUILD_DIR=build
-FLUTTER_BUILD_NAME=2.0.1
-FLUTTER_BUILD_NUMBER=28
+FLUTTER_BUILD_NAME=2.0.4
+FLUTTER_BUILD_NUMBER=40
 DART_OBFUSCATION=false
 TRACK_WIDGET_CREATION=true
 TREE_SHAKE_ICONS=false
