@@ -11,7 +11,7 @@ Mobile app for the digital substitution schedule of Lessing-Gymnasium Karlsruhe.
 - **Substitution Schedule**: Automatic download for today and tomorrow with offline availability
 - **PDF Viewer**: Integrated display with zoom, sharing and external app integration
 - **Weather Data**: Live data from the school weather station with charts
-- **Dark Mode**: Eye-friendly Material Design 3 theme
+- **Dark-Only Design**: Eye-friendly Material Design 3 theme
 - **Offline-First**: Intelligent caching with automatic network detection
 
 ## Quick Start
@@ -106,34 +106,38 @@ The app follows clean architecture principles with clear separation of concerns:
 
 ### Key Implementation Details
 
-#### Offline-First Design
-- Intelligent caching with network detection and automatic fallback
-- Preloading of PDFs and weather data on app start
-- 5-second retry intervals for weather data when offline
+#### Offline-First Architecture
+- **Smart caching**: 3-second slow connection detection with automatic offline fallback
+- **Dual cache system**: Temporary cache + persistent offline cache via `OfflineCache` service
+- **Preloading**: Parallel PDF and weather data loading on app start
+- **Network detection**: `connectivity_plus` integration with automatic retry timers
 
-#### PDF Management
-- Automatic download and caching for today/tomorrow schedules
-- Syncfusion Flutter PDF for processing, pdfx for viewing
-- Date-tracked caching in app documents directory
+#### PDF Management System
+- **Processing**: Syncfusion Flutter PDF for metadata extraction and text parsing in isolates
+- **Viewing**: pdfx with PhotoView for zoom/pan capabilities and custom transitions
+- **Caching**: Weekday-based naming with legacy fallback, stored in temporary directory
+- **Authentication**: HTTP Basic Auth for school server access
 
-#### Weather Integration
-- Real-time data from school weather station API
-- Data downsampling for chart performance optimization
-- Syncfusion Charts with Material 3 theming
+#### Weather Data Pipeline
+- **Source**: School weather station CSV data (`;` delimited, UTF-8 encoded)
+- **Caching**: 10-minute cache validity with in-memory + persistent storage
+- **Processing**: Data downsampling for chart performance (adaptive sampling rates)
+- **Visualization**: Syncfusion SplineSeries charts with Material 3 theming and tooltips
 
 #### Authentication & Security
-- Password-based authentication with secure preference storage
+- Simple credential-based authentication (hardcoded for school use)
 - Session management with automatic logout
+- Secure preference storage for user settings
 
-### State Management
+### State Management & Providers
 
-The app uses Riverpod throughout for dependency injection and reactive state. Main providers are located in `lib/providers/app_providers.dart`:
+**Riverpod-based architecture** with dependency injection and reactive state:
 
-- `preferencesManagerProvider`: Manages user preferences
-- `pdfRepositoryProvider`: Handles PDF state and caching
-- `weatherDataProvider`: StateNotifier for weather data with offline fallback
-- `reviewServiceProvider`: Manages app review prompts
-- Authentication and navigation state providers
+- **`preferencesManagerProvider`**: User settings and authentication state
+- **`pdfRepositoryProvider`**: ChangeNotifier for PDF download/cache state with loading indicators
+- **`weatherDataProvider`**: StateNotifier managing weather data, offline mode, and retry logic
+- **`reviewServiceProvider`**: In-app review prompts based on usage patterns
+- **`connectivityProvider`**: Network state monitoring with automatic reconnection
 
 ### Navigation Flow
 
@@ -156,21 +160,26 @@ Routes are defined in `lib/navigation/app_router.dart`:
 - **path_provider** - File system access
 
 ### PDF & Documents
-- **syncfusion_flutter_pdf** - PDF processing
-- **pdfx** - PDF viewing
-- **file_picker** - File selection
+- **syncfusion_flutter_pdf** ^29.2.9 - PDF processing and text extraction
+- **pdfx** ^2.9.1 - PDF viewing with zoom/pan capabilities
+- **photo_view** ^0.15.0 - Image viewing for PDF pages
+- **open_filex** ^4.5.0 - Cross-platform file opening
+- **share_plus** ^11.0.0 - System share functionality
 
-### Charts & Visualization
-- **syncfusion_flutter_charts** - Weather data charts
+### Charts & Data Visualization
+- **syncfusion_flutter_charts** ^29.2.9 - Weather data charts (SplineSeries)
+- **csv** ^6.0.0 - CSV parsing for weather data
+- **intl** ^0.19.0 - Date/time formatting and internationalization
 
 ### Network & Connectivity
-- **http** - HTTP requests
-- **connectivity_plus** - Network detection
+- **http** ^1.2.2 - HTTP requests with Basic Auth
+- **connectivity_plus** ^6.1.0 - Network state monitoring
 
-### UI & Design
-- **google_fonts** - Typography
-- **flutter_svg** - SVG support
-- **shimmer** - Loading animations
+### Development & Tooling
+- **flutter_launcher_icons** ^0.14.1 - Automated icon generation
+- **yaml** ^3.1.2 - Configuration file parsing
+- **package_info_plus** ^8.3.0 - App version information
+- **in_app_review** ^2.0.8 - App Store review prompts
 
 ## Project Structure
 
@@ -191,31 +200,33 @@ App settings are centralized in `app_config/app_config.yaml`:
 - App identity (name, package, description)
 - Version management (version_name, version_code)
 - Platform-specific settings:
-  - Android: min_sdk: 21, target_sdk: 34
-  - iOS: deployment_target: 12.0
+  - **Android**: min_sdk: 21, target_sdk: 34, compile_sdk: 34
+  - **iOS**: deployment_target: 12.0
 - Icon configuration with automatic generation
 
 Apply changes with: `dart run scripts/apply_app_config.dart`
 
 ### Build Configuration
-- Minimum Dart SDK: 3.8.0
-- Android: Min SDK 21, Target SDK 36
-- iOS: Deployment target 12.0
-- R8 optimization enabled for smaller APK sizes
-- Split APKs reduce download size to ~10MB per architecture
-- ProGuard rules configured for release builds
+- **Dart SDK**: 3.8.0+
+- **Android**: Min SDK 21, Target SDK 34 (configurable via app_config.yaml)
+- **iOS**: Deployment target 12.0
+- **Optimizations**: R8 full mode enabled, resource optimization, tree-shaking
+- **APK Size**: Split APKs reduce download to ~10MB per architecture
+- **Performance**: Parallel builds, configuration caching, D8 desugaring enabled
 
 ## Development Guidelines
 
-### Theme
-- Dark-only Material Design 3 theme defined in `lib/theme/app_theme.dart`
-- Consistent color scheme throughout the app
-- Haptic feedback abstracted through `HapticService`
+### Theme & UX
+- **Dark-only Material Design 3** theme with `useMaterial3: true`
+- **Custom color scheme** based on pure black background (#000000) and blue accents (#3770D4)
+- **Haptic feedback** abstracted through `HapticService` for cross-platform tactile responses
+- **Edge-to-edge display** with proper inset handling for Android 15+ compatibility
 
 ### File Operations
-- `FileOpenerService` handles PDF opening and sharing
-- Support for both internal viewer and external apps
-- Graceful error handling with user feedback
+- **`FileOpenerService`** handles cross-platform PDF opening (macOS: `open`, mobile: `open_filex`)
+- **Dual PDF viewing modes**: Built-in viewer (pdfx) or external apps (user preference)
+- **PDF processing**: Syncfusion Flutter PDF for metadata extraction and text parsing
+- **Sharing capabilities**: Share PDFs via system share sheet
 
 ### Error Handling
 - Graceful degradation with offline fallbacks throughout
