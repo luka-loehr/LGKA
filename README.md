@@ -1,6 +1,6 @@
 # LGKA+ – Digital Substitution Schedule
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.8.0+-02569B?style=flat&logo=flutter&logoColor=white)](https://flutter.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-Latest-02569B?style=flat&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green?style=flat)](https://github.com/luka-loehr/LGKA/releases)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-orange?style=flat)](LICENSE)
 
@@ -19,7 +19,7 @@ Mobile app for the digital substitution schedule of Lessing-Gymnasium Karlsruhe.
 ### Prerequisites
 - Flutter SDK (latest stable version)
 - Dart SDK 3.8.0+
-- Android Studio / VS Code with Flutter extensions
+- Android Studio or VS Code with Flutter extensions
 - For iOS development: Xcode and CocoaPods
 
 ### Installation & Setup
@@ -104,30 +104,25 @@ The app follows clean architecture principles with clear separation of concerns:
 - **Presentation** (`lib/screens/`): UI screens with Material Design 3 dark theme
 - **Navigation** (`lib/navigation/`): GoRouter-based declarative routing
 
-### Key Features
+### Key Implementation Details
 
-#### 1. Offline-First Design
-- Intelligent caching with network detection
-- Automatic fallback to cached data when offline
+#### Offline-First Design
+- Intelligent caching with network detection and automatic fallback
 - Preloading of PDFs and weather data on app start
-- Weather data includes retry timer when offline (5-second intervals)
+- 5-second retry intervals for weather data when offline
 
-#### 2. PDF Management
-- Automatic download and caching for today/tomorrow PDFs
-- Uses Syncfusion Flutter PDF for processing and pdfx for viewing
-- PDFs cached in app documents directory with date tracking
-- Sharing capabilities for external apps
+#### PDF Management
+- Automatic download and caching for today/tomorrow schedules
+- Syncfusion Flutter PDF for processing, pdfx for viewing
+- Date-tracked caching in app documents directory
 
-#### 3. Weather Integration
+#### Weather Integration
 - Real-time data from school weather station API
-- Automatic retries and offline mode support
-- Data downsampling for chart performance
-- Charts displayed using Syncfusion Charts with Material 3 theming
-- Offline cache persists last known weather data
+- Data downsampling for chart performance optimization
+- Syncfusion Charts with Material 3 theming
 
-#### 4. Authentication & Security
-- Password-based authentication system
-- Secure storage of user preferences
+#### Authentication & Security
+- Password-based authentication with secure preference storage
 - Session management with automatic logout
 
 ### State Management
@@ -154,10 +149,10 @@ Routes are defined in `lib/navigation/app_router.dart`:
 ## Tech Stack
 
 ### Core Framework
-- **Flutter 3.8.0+** / Dart 3.8.1+
-- **flutter_riverpod** ^2.6.1 - State management
-- **go_router** ^15.1.2 - Navigation
-- **shared_preferences** ^2.3.4 - Local storage
+- **Flutter** (latest stable) / **Dart 3.8.0+**
+- **flutter_riverpod** - State management
+- **go_router** - Navigation
+- **shared_preferences** - Local storage
 - **path_provider** - File system access
 
 ### PDF & Documents
@@ -169,8 +164,8 @@ Routes are defined in `lib/navigation/app_router.dart`:
 - **syncfusion_flutter_charts** - Weather data charts
 
 ### Network & Connectivity
-- **http** ^1.2.2 - HTTP requests
-- **connectivity_plus** ^6.1.0 - Network detection
+- **http** - HTTP requests
+- **connectivity_plus** - Network detection
 
 ### UI & Design
 - **google_fonts** - Typography
@@ -235,16 +230,15 @@ Apply changes with: `dart run scripts/apply_app_config.dart`
 ## Troubleshooting
 
 ### Common Issues
-1. **Build failures**: Run `flutter clean` and `flutter pub get`
+1. **Build failures**: Run `flutter clean && flutter pub get`
 2. **iOS build issues**: Update CocoaPods with `pod repo update`
 3. **Android build issues**: Check SDK versions in `android/app/build.gradle`
 4. **Network issues**: Verify API endpoints and network permissions
 
-### Performance Optimization
-- Use `flutter analyze` to identify performance issues
+### Performance Tips
+- Use `flutter analyze` for code quality checks
 - Monitor memory usage during PDF operations
-- Optimize chart rendering for large datasets
-- Implement proper disposal of resources
+- Optimize chart rendering for large weather datasets
 
 ## Contributing
 
@@ -254,18 +248,13 @@ Apply changes with: `dart run scripts/apply_app_config.dart`
 4. Use conventional commit messages
 5. Ensure all builds pass before submitting PRs
 
-## Privacy
+## Privacy & Legal
 
 - No data collection or tracking
 - All data remains local on the device
 - Secure connection to school server
 
 **[📋 Privacy Policy](privacy.html)** | **[ℹ️ Legal Notice](impressum.html)**
-
-## Legal
-
-- **[Privacy Policy](privacy.html)** – Privacy and user data
-- **[Legal Notice](impressum.html)** – Legal information about the project
 
 ## License
 
@@ -277,8 +266,7 @@ Apply changes with: `dart run scripts/apply_app_config.dart`
 ## Support
 
 - **Bugs**: [Issues](https://github.com/luka-loehr/LGKA/issues)
-- **Questions**: [Discussions](https://github.com/luka-loehr/LGKA/discussions)
-- **Docs**: [Wiki](https://github.com/luka-loehr/LGKA/wiki)
+- **Questions**: [Email](mailto:lgka.vertretungsplan@gmail.com)
 
 ---
 
