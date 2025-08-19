@@ -19,7 +19,6 @@ This folder contains all assets needed for app store submissions.
 - **Format:** PNG or JPEG, up to 8MB each
 
 ### Tablet Screenshots
-- **7-inch Tablet:** Up to 8 screenshots
 - **10-inch Tablet:** Up to 8 screenshots
 - **Dimensions:** 16:9 or 9:16 aspect ratio, 320-3840px per side
 
