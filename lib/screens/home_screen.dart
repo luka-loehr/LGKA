@@ -18,31 +18,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:async';
 import 'weather_page.dart';
 
-// Custom scroll physics for enhanced swipe sensitivity
-class CustomPageScrollPhysics extends PageScrollPhysics {
-  const CustomPageScrollPhysics({super.parent});
 
-  @override
-  CustomPageScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return CustomPageScrollPhysics(parent: buildParent(ancestor));
-  }
-
-  @override
-  SpringDescription get spring => const SpringDescription(
-    mass: 40, // Further reduced mass for faster response
-    stiffness: 120, // Increased stiffness for quicker settling
-    damping: 0.7, // Lower damping for smoother motion
-  );
-
-  @override
-  double get minFlingVelocity => 100.0; // Very low threshold for small swipes (default: 400)
-
-  @override
-  double get minFlingDistance => 15.0; // Very low distance threshold (default: 50)
-
-  @override
-  double get dragStartDistanceMotionThreshold => 3.0; // Lower drag start threshold (default: 5.0)
-}
 
 // Helper function for robust navigation bar detection across all Android devices
 bool _isButtonNavigation(BuildContext context) {
@@ -300,12 +276,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
           });
           HapticService.subtle();
         },
-        // Enhanced gesture detection for small swipes
-        pageSnapping: true,
-        allowImplicitScrolling: false,
-        padEnds: false,
-        physics: const CustomPageScrollPhysics(),
-        clipBehavior: Clip.none, // Ensure no clipping interferes with gestures
         children: [
           // Vertretungsplan Page
           _buildVertretungsplanPage(pdfRepo),
