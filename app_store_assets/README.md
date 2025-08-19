@@ -23,6 +23,13 @@ This folder contains all assets needed for app store submissions.
 - **10-inch Tablet:** Up to 8 screenshots
 - **Dimensions:** 16:9 or 9:16 aspect ratio, 320-3840px per side
 
+## Banners
+
+### App Store Banners
+- **Feature Graphic (Google Play):** 1024 × 500 pixels
+- **App Preview Banner:** Various sizes for promotional use
+- **Format:** PNG with transparency support
+
 ## Current Status
 
 ✅ **iOS Screenshots:** Ready for App Store Connect
@@ -30,9 +37,14 @@ This folder contains all assets needed for app store submissions.
 - iPad 13" screenshots created
 - All properly sized and organized
 
-🔄 **Android Screenshots:** Ready for creation
-- Folder structure prepared
-- Awaiting screenshot capture and processing
+✅ **Android Screenshots:** Ready for Google Play Console
+- Phone screenshots (1080×2400) - native quality
+- 10-inch tablet screenshots (2560×1600) - native quality
+- All properly sized and organized
+
+✅ **Banners:** Ready for promotional use
+- Feature graphic banner (1024×500) created
+- Suitable for Google Play Console feature graphic
 
 ## Usage
 
