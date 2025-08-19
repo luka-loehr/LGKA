@@ -1,3 +1,5 @@
+![LGKA+ Banner](app_store_assets/banners/lgka_banner_1024x500.png)
+
 # LGKA+ – Digital Substitution Schedule
 
 [![Flutter](https://img.shields.io/badge/Flutter-Latest-02569B?style=flat&logo=flutter&logoColor=white)](https://flutter.dev)
