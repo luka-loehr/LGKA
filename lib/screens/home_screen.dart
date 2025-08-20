@@ -184,11 +184,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   String _formatOfflineTime(DateTime time) {
     final now = DateTime.now();
     final difference = now.difference(time);
-    
+
     if (difference.inMinutes < 60) {
-      return 'vor ${difference.inMinutes} Minuten';
+      return 'vor ${difference.inMinutes} Minute${difference.inMinutes == 1 ? '' : 'n'}';
     } else if (difference.inHours < 24) {
-      return 'vor ${difference.inHours} Stunden';
+      return 'vor ${difference.inHours} Stunde${difference.inHours == 1 ? '' : 'n'}';
     } else {
       return '${time.day}.${time.month}. um ${time.hour}:${time.minute.toString().padLeft(2, '0')} Uhr';
     }
@@ -330,7 +330,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                           children: [
                             Text(
                               pdfRepo.offlineDataTime != null
-                                ? 'Kein Internet. Vertretungsplan zuletzt ${_formatOfflineTime(pdfRepo.offlineDataTime!)} aktualisiert.'
+                                ? 'Kein Internet. Daten zuletzt ${_formatOfflineTime(pdfRepo.offlineDataTime!)} aktualisiert.'
                                 : 'Kein Internet.',
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 color: AppColors.primaryText,
@@ -403,7 +403,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Kein Internet. Vertretungsplan zuletzt ${_formatOfflineTime(pdfRepo.offlineDataTime!)} aktualisiert.',
+                                      'Kein Internet. Daten zuletzt ${_formatOfflineTime(pdfRepo.offlineDataTime!)} aktualisiert.',
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                         color: Colors.red.shade700,
                                         fontSize: 13,
