@@ -20,6 +20,7 @@ class PDFViewerScreen extends StatefulWidget {
 class _PDFViewerScreenState extends State<PDFViewerScreen> {
   late final PdfController _pdfController;
   bool _hasTriggeredLoadedHaptic = false;
+  final GlobalKey _shareButtonKey = GlobalKey(); // Key for share button position
 
   @override
   void initState() {
@@ -64,9 +65,25 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       final tempFile = File('${tempDir.path}/$fileName');
       await widget.pdfFile.copy(tempFile.path);
 
+      // Calculate share button position for iPad popover positioning
+      Rect? sharePositionOrigin;
+      if (Platform.isIOS) {
+        final RenderBox? renderBox = _shareButtonKey.currentContext?.findRenderObject() as RenderBox?;
+        if (renderBox != null) {
+          final position = renderBox.localToGlobal(Offset.zero);
+          sharePositionOrigin = Rect.fromLTWH(
+            position.dx,
+            position.dy,
+            renderBox.size.width,
+            renderBox.size.height,
+          );
+        }
+      }
+
       final result = await Share.shareXFiles(
         [XFile(tempFile.path)],
         subject: 'LGKA+ Vertretungsplan',
+        sharePositionOrigin: sharePositionOrigin,
       );
 
       // Clean up temporary file
@@ -112,6 +129,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         ),
         actions: [
           IconButton(
+            key: _shareButtonKey, // Add key for position calculation
             onPressed: _sharePdf,
             icon: const Icon(
               Icons.share_outlined,
