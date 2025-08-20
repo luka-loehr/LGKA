@@ -7,10 +7,7 @@ class PreferencesManager {
   static const String _keyAuthenticated = 'is_authenticated';
   static const String _keyDebugMode = 'is_debug_mode';
   static const String _keyShowDates = 'show_dates_with_weekdays';
-  static const String _keyPlanOpenCount = 'plan_open_count';
-  static const String _keyHasRequestedReview = 'has_requested_review';
   static const String _keyShowNavigationDebug = 'show_navigation_debug';
-  static const String _keyUseBuiltInPdfViewer = 'use_built_in_pdf_viewer';
 
   late final SharedPreferences _prefs;
 
@@ -52,28 +49,6 @@ class PreferencesManager {
 
   Future<void> setShowNavigationDebug(bool value) async {
     await _prefs.setBool(_keyShowNavigationDebug, value);
-  }
-  
-  // Use built-in PDF viewer (enabled by default)
-  bool get useBuiltInPdfViewer => _prefs.getBool(_keyUseBuiltInPdfViewer) ?? true;
-
-  Future<void> setUseBuiltInPdfViewer(bool value) async {
-    await _prefs.setBool(_keyUseBuiltInPdfViewer, value);
-  }
-  
-  // Plan open count
-  int get planOpenCount => _prefs.getInt(_keyPlanOpenCount) ?? 0;
-  
-  Future<void> incrementPlanOpenCount() async {
-    final currentCount = planOpenCount;
-    await _prefs.setInt(_keyPlanOpenCount, currentCount + 1);
-  }
-  
-  // Review request status
-  bool get hasRequestedReview => _prefs.getBool(_keyHasRequestedReview) ?? false;
-  
-  Future<void> setHasRequestedReview(bool value) async {
-    await _prefs.setBool(_keyHasRequestedReview, value);
   }
 
   // Clear all preferences

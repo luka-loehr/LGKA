@@ -50,7 +50,6 @@ dependencies:
   
   # File Handling
   path_provider: ^2.1.5
-  open_filex: ^4.5.0
   share_plus: ^11.0.0
   
   # PDF Processing
@@ -70,7 +69,6 @@ dependencies:
   # App Info
   package_info_plus: ^8.3.0
   url_launcher: ^6.2.5
-  in_app_review: ^2.0.8
 
 dev_dependencies:
   flutter_test:

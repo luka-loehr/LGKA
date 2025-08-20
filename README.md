@@ -138,7 +138,6 @@ The app follows clean architecture principles with clear separation of concerns:
 - **`preferencesManagerProvider`**: User settings and authentication state
 - **`pdfRepositoryProvider`**: ChangeNotifier for PDF download/cache state with loading indicators
 - **`weatherDataProvider`**: StateNotifier managing weather data, offline mode, and retry logic
-- **`reviewServiceProvider`**: In-app review prompts based on usage patterns
 - **`connectivityProvider`**: Network state monitoring with automatic reconnection
 
 ### Navigation Flow
@@ -165,7 +164,6 @@ Routes are defined in `lib/navigation/app_router.dart`:
 - **syncfusion_flutter_pdf** ^29.2.9 - PDF processing and text extraction
 - **pdfx** ^2.9.1 - PDF viewing with zoom/pan capabilities
 - **photo_view** ^0.15.0 - Image viewing for PDF pages
-- **open_filex** ^4.5.0 - Cross-platform file opening
 - **share_plus** ^11.0.0 - System share functionality
 
 ### Charts & Data Visualization
@@ -181,7 +179,6 @@ Routes are defined in `lib/navigation/app_router.dart`:
 - **flutter_launcher_icons** ^0.14.1 - Automated icon generation
 - **yaml** ^3.1.2 - Configuration file parsing
 - **package_info_plus** ^8.3.0 - App version information
-- **in_app_review** ^2.0.8 - App Store review prompts
 
 ## Project Structure
 
@@ -225,8 +222,7 @@ Apply changes with: `dart run scripts/apply_app_config.dart`
 - **Edge-to-edge display** with proper inset handling for Android 15+ compatibility
 
 ### File Operations
-- **`FileOpenerService`** handles cross-platform PDF opening (macOS: `open`, mobile: `open_filex`)
-- **Dual PDF viewing modes**: Built-in viewer (pdfx) or external apps (user preference)
+- **Built-in PDF viewer**: Uses pdfx for consistent PDF viewing experience
 - **PDF processing**: Syncfusion Flutter PDF for metadata extraction and text parsing
 - **Sharing capabilities**: Share PDFs via system share sheet
 

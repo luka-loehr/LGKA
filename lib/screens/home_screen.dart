@@ -1,19 +1,16 @@
 // Copyright Luka Löhr 2025
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:in_app_review/in_app_review.dart';
 import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
 import '../data/pdf_repository.dart';
 import '../providers/haptic_service.dart';
-import '../services/file_opener_service.dart';
 import '../navigation/app_router.dart';
-import 'package:open_filex/open_filex.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:async';
 import 'weather_page.dart';
@@ -47,8 +44,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStateMixin {
-  bool _isTodayLoading = false;
-  bool _isTomorrowLoading = false;
+
   String? _error;
   bool _hasNoInternet = false;
   
@@ -157,31 +153,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     final file = await pdfRepo.getCachedPdfByDay(isToday);
 
     if (file != null && mounted) {
-      final preferencesManager = ref.read(preferencesManagerProvider);
-      
-      if (preferencesManager.useBuiltInPdfViewer) {
-        // Use built-in PDF viewer
-        final dayName = isToday ? pdfRepo.todayWeekday : pdfRepo.tomorrowWeekday;
-        context.push(AppRouter.pdfViewer, extra: {
-          'file': file,
-          'dayName': dayName,
-        });
-      } else {
-        // Use external PDF app via OpenFileX
-        try {
-          final result = await OpenFilex.open(file.path);
-          if (result.type != ResultType.done) {
-            // If external app failed, show error
-            setState(() => _error = 'PDF konnte nicht mit externer App geöffnet werden.');
-          }
-        } catch (e) {
-          setState(() => _error = 'Fehler beim Öffnen der PDF: ${e.toString()}');
-        }
-      }
-      
-      // Track plan opening and possibly trigger review
-      final reviewService = ref.read(reviewServiceProvider);
-      await reviewService.trackPlanOpenAndRequestReviewIfNeeded();
+      // Use built-in PDF viewer
+      final dayName = isToday ? pdfRepo.todayWeekday : pdfRepo.tomorrowWeekday;
+      context.push(AppRouter.pdfViewer, extra: {
+        'file': file,
+        'dayName': dayName,
+      });
     } else {
       setState(() => _error = 'PDF konnte nicht geladen werden.');
     }
@@ -987,60 +964,6 @@ class _SettingsSheetContentState extends ConsumerState<_SettingsSheetContent> {
                           value: preferencesManager.showDatesWithWeekdays,
                           onChanged: (value) async {
                             await preferencesManager.setShowDatesWithWeekdays(value);
-                            HapticService.subtle();
-                            setState(() {});
-                            
-                            // Benachrichtigung an den HomeScreen, dass sich die Einstellung geändert hat
-                            widget.onSettingsChanged();
-                          },
-                          activeColor: AppColors.appBlueAccent,
-                        ),
-                      ],
-                    ),
-                    
-                    // Divider
-                    Container(
-                      height: 1,
-                      margin: const EdgeInsets.symmetric(vertical: 16),
-                      color: Colors.white.withValues(alpha: 0.1),
-                    ),
-                    
-                    // PDF Viewer Setting
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(
-                          Icons.picture_as_pdf_outlined,
-                          color: AppColors.appBlueAccent,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Integrierter PDF-Viewer',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: AppColors.appBlueAccent,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'PDFs in der App öffnen (schneller)',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.secondaryText,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        
-                        Switch(
-                          value: preferencesManager.useBuiltInPdfViewer,
-                          onChanged: (value) async {
-                            await preferencesManager.setUseBuiltInPdfViewer(value);
                             HapticService.subtle();
                             setState(() {});
                             

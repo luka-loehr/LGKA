@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/preferences_manager.dart';
 import '../data/pdf_repository.dart';
-import '../services/review_service.dart';
+
 import '../services/weather_service.dart';
 import '../services/offline_cache_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -27,11 +27,7 @@ final isLoadingProvider = StateProvider<bool>((ref) => false);
 // Navigation State Provider
 final currentRouteProvider = StateProvider<String>((ref) => '/welcome');
 
-// Review Service Provider
-final reviewServiceProvider = Provider<ReviewService>((ref) {
-  final preferencesManager = ref.watch(preferencesManagerProvider);
-  return ReviewService(preferencesManager);
-});
+
 
 // Weather Service Provider
 final weatherServiceProvider = Provider<WeatherService>((ref) {
