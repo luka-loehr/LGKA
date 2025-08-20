@@ -139,23 +139,25 @@ class WeatherService {
 
 
 
-  Future<List<WeatherData>> fetchWeatherData() async {
-    print('🌤️ [WeatherService] Starting fetchWeatherData()');
-    
-    // Check cache first
-    final cachedData = await getCachedData();
-    if (cachedData != null) {
-      print('🌤️ [WeatherService] Returning cached data (${cachedData.length} items)');
-      return cachedData;
+  Future<List<WeatherData>> fetchWeatherData({bool forceNetwork = false}) async {
+    print('🌤️ [WeatherService] Starting fetchWeatherData(forceNetwork: $forceNetwork)');
+
+    // Check cache first (unless forcing network fetch)
+    if (!forceNetwork) {
+      final cachedData = await getCachedData();
+      if (cachedData != null) {
+        print('🌤️ [WeatherService] Returning cached data (${cachedData.length} items)');
+        return cachedData;
+      }
     }
-    
-    print('🌤️ [WeatherService] No valid cache, fetching fresh data');
+
+    print('🌤️ [WeatherService] ${forceNetwork ? 'Force fetching' : 'No valid cache, fetching'} fresh data');
     
     print('🌤️ [WeatherService] URL: $csvUrl');
     
     try {
       print('🌤️ [WeatherService] Making HTTP request...');
-      final response = await http.get(Uri.parse(csvUrl));
+      final response = await http.get(Uri.parse(csvUrl)).timeout(const Duration(seconds: 5));
       
       print('🌤️ [WeatherService] Response status code: ${response.statusCode}');
       print('🌤️ [WeatherService] Response headers: ${response.headers}');
@@ -297,7 +299,7 @@ class WeatherService {
     
     try {
       print('🌤️ [WeatherService] Making HTTP request for latest data...');
-      final response = await http.get(Uri.parse(csvUrl));
+      final response = await http.get(Uri.parse(csvUrl)).timeout(const Duration(seconds: 5));
       
       if (response.statusCode != 200) {
         print('❌ [WeatherService] HTTP error: ${response.statusCode}');

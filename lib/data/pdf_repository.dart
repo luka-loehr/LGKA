@@ -147,7 +147,7 @@ class PdfRepository extends ChangeNotifier {
           'Authorization': 'Basic $credentials',
           'User-Agent': 'LGKA-Flutter-App/1.0',
         },
-      ).timeout(const Duration(seconds: 10));
+      ).timeout(const Duration(seconds: 5));
 
       if (response.statusCode != 200) {
         debugPrint('Failed to download PDF: ${response.statusCode}');
@@ -359,23 +359,25 @@ class PdfRepository extends ChangeNotifier {
   }
 
   /// Start retry timer that checks every second for connection
+  /// Always forces fresh reload when connection is restored
   void _startRetryTimer(bool forceReload) {
     _retryTimer?.cancel();
     debugPrint('🔄 [PdfRepository] Starting retry timer (1 second intervals)');
-    
+
     _retryTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       if (!_isOfflineMode && !_hasSlowConnection) {
         timer.cancel();
         return;
       }
-      
+
       debugPrint('🔄 [PdfRepository] Checking for internet connection...');
       final hasConnection = await hasInternetConnection();
-      
+
       if (hasConnection) {
-        debugPrint('✅ [PdfRepository] Connection restored, attempting to reload PDFs');
+        debugPrint('✅ [PdfRepository] Connection restored, forcing fresh reload');
         timer.cancel();
-        await preloadPdfs(forceReload: forceReload);
+        // Always force reload when reconnecting, with smooth transition
+        await preloadPdfs(forceReload: true, isReconnecting: true);
       }
     });
   }
@@ -386,137 +388,139 @@ class PdfRepository extends ChangeNotifier {
     debugPrint('⏹️ [PdfRepository] Retry timer stopped');
   }
   
-  /// Preload both PDFs using weekday-based naming with network monitoring
-  Future<void> preloadPdfs({bool forceReload = false}) async {
+  /// Preload both PDFs using fresh-first strategy
+  /// Online: Show loading → download fresh → display fresh
+  /// Offline: Immediately show cached + offline notification
+  Future<void> preloadPdfs({bool forceReload = false, bool isReconnecting = false}) async {
     _isLoading = true;
     _hasSlowConnection = false;
     _isNoInternet = false;
     notifyListeners();
 
-    // Always try to load from cache first to get weekdays
-    await loadWeekdaysFromCachedPdfs();
-
     // Check connectivity first
     final hasConnection = await hasInternetConnection();
-    debugPrint('Network connection available: $hasConnection');
-    
+    debugPrint('🌐 [PdfRepository] Network connection available: $hasConnection');
+
     if (!hasConnection) {
-      debugPrint('No internet connection detected - instantly showing offline cache');
-      
+      debugPrint('📱 [PdfRepository] OFFLINE MODE: Instantly showing cached PDFs');
+
+      // Load weekdays from any existing cache for display
+      await loadWeekdaysFromCachedPdfs();
+
       // Instantly load from offline cache
       final hasOfflineData = await loadFromOfflineCache();
-      
+
       if (hasOfflineData) {
-        debugPrint('Instantly showing PDFs from offline cache, entering offline mode');
+        debugPrint('💾 [PdfRepository] Showing PDFs from offline cache');
         _hasSlowConnection = false;
         _isNoInternet = false;
         _showLoadingBar = false;
         _isOfflineMode = true;
         _isLoading = false;
         notifyListeners();
-        _startRetryTimer(forceReload); // Start retry timer for offline mode
+        _startRetryTimer(true); // Always force reload when reconnecting
         return;
       } else {
         // No offline data available, show internet error
-        debugPrint('No offline data available - showing internet error');
+        debugPrint('❌ [PdfRepository] No offline data available');
         _hasSlowConnection = true;
         _isNoInternet = true;
         _showLoadingBar = false;
         _isLoading = false;
         notifyListeners();
-        _startRetryTimer(forceReload); // Start retry timer for no internet
+        _startRetryTimer(true); // Always force reload when reconnecting
         return;
       }
     }
 
-    // We have connection - show loading bar
+    // ONLINE MODE: Fresh-first strategy
+    debugPrint('🌐 [PdfRepository] ONLINE MODE: Loading fresh PDFs${isReconnecting ? ' (reconnecting)' : ''}');
+
+    // Show loading bar - we will wait for fresh download
     _showLoadingBar = true;
+    _isOfflineMode = false;
+    _offlineDataTime = null;
+
+    // When reconnecting, immediately clear offline/slow connection states for smooth transition
+    if (isReconnecting) {
+      _hasSlowConnection = false;
+      _isNoInternet = false;
+    }
+
     notifyListeners();
 
-    bool slowConnectionTimerTriggered = false;
-    Timer? slowConnectionTimer;
-
-    // Start a timer to detect slow connection after 3-4 seconds
-    slowConnectionTimer = Timer(const Duration(seconds: 3), () async {
-      if (_isLoading && !slowConnectionTimerTriggered) {
-        slowConnectionTimerTriggered = true;
-        debugPrint('Slow connection detected after 3 seconds - switching to offline cache');
-        
-        // Try to load from offline cache
-        final hasOfflineData = await loadFromOfflineCache();
-        
-        if (hasOfflineData) {
-          _hasSlowConnection = false;
-          _isNoInternet = false;
-          _showLoadingBar = false;
-          _isOfflineMode = true;
-          notifyListeners();
-          debugPrint('Showing cached data due to slow connection');
-        } else {
-          _hasSlowConnection = true;
-          _showLoadingBar = false;
-          notifyListeners();
-          debugPrint('Slow connection and no cached data available');
-        }
-      }
-    });
-
     try {
+      // Always force reload when online to ensure fresh data
       final results = await Future.wait([
-        downloadPdfWithWeekdayName(todayUrl, true, forceReload: forceReload),
-        downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: forceReload),
+        downloadPdfWithWeekdayName(todayUrl, true, forceReload: true),
+        downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: true),
       ]);
-      
-      // Cancel slow connection timer if we're done
-      slowConnectionTimer?.cancel();
-      
-      // Only clear slow connection notification if at least one PDF was successfully downloaded
+
+      // Check if at least one PDF was successfully downloaded
       if (results[0] != null || results[1] != null) {
+        debugPrint('✅ [PdfRepository] Fresh PDFs downloaded successfully');
         _showLoadingBar = false;
         _hasSlowConnection = false;
         _isNoInternet = false;
-        _isOfflineMode = false; // Exit offline mode on successful download
+        _isOfflineMode = false;
         _offlineDataTime = null;
-        _stopRetryTimer(); // Stop retry timer if successful
-        debugPrint('PDFs loaded successfully');
+        _stopRetryTimer();
       } else {
-        // Keep slow connection notification if no PDFs were downloaded
+        debugPrint('❌ [PdfRepository] Failed to download fresh PDFs, trying offline cache');
         _showLoadingBar = false;
-        
+
+        // Load weekdays from any existing cache for display
+        await loadWeekdaysFromCachedPdfs();
+
         // Try offline cache as fallback
         final hasOfflineData = await loadFromOfflineCache();
         if (hasOfflineData) {
           _hasSlowConnection = false;
           _isNoInternet = false;
           _isOfflineMode = true;
-          debugPrint('Failed to download new PDFs, showing offline cache');
+          debugPrint('💾 [PdfRepository] Showing offline cache as fallback');
         } else {
-          _hasSlowConnection = true;
-          debugPrint('Failed to download PDFs and no offline cache available');
+          // When reconnecting, don't show "bad internet" message - keep trying silently
+          if (isReconnecting) {
+            _hasSlowConnection = false;
+            _isNoInternet = false;
+            debugPrint('🔄 [PdfRepository] Reconnecting failed, will retry silently');
+          } else {
+            _hasSlowConnection = true;
+            debugPrint('❌ [PdfRepository] No offline cache available');
+          }
         }
-        
-        // Start retry timer if not already started
-        _startRetryTimer(forceReload);
+
+        _startRetryTimer(true); // Always force reload when reconnecting
       }
-      
+
     } catch (e) {
-      debugPrint('Error preloading PDFs: $e');
-      slowConnectionTimer?.cancel();
-      
+      debugPrint('❌ [PdfRepository] Error downloading fresh PDFs: $e');
+      _showLoadingBar = false;
+
+      // Load weekdays from any existing cache for display
+      await loadWeekdaysFromCachedPdfs();
+
       // On error, try offline cache
       final hasOfflineData = await loadFromOfflineCache();
       if (hasOfflineData) {
         _hasSlowConnection = false;
         _isNoInternet = false;
-        _showLoadingBar = false;
         _isOfflineMode = true;
-        debugPrint('Error loading PDFs, showing offline cache');
+        debugPrint('💾 [PdfRepository] Error fallback: showing offline cache');
       } else {
-        _hasSlowConnection = true;
-        _showLoadingBar = false;
+        // When reconnecting, don't show "bad internet" message - keep trying silently
+        if (isReconnecting) {
+          _hasSlowConnection = false;
+          _isNoInternet = false;
+          debugPrint('🔄 [PdfRepository] Reconnecting error, will retry silently');
+        } else {
+          _hasSlowConnection = true;
+          debugPrint('❌ [PdfRepository] Error fallback: no offline cache available');
+        }
       }
-      
-      _startRetryTimer(forceReload); // Start retry timer on error
+
+      _startRetryTimer(true); // Always force reload when reconnecting
       notifyListeners();
     } finally {
       _isLoading = false;

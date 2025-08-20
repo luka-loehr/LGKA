@@ -172,7 +172,9 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
     }
   }
 
-  /// Preload weather data in background when app starts
+  /// Preload weather data using fresh-first strategy
+  /// Online: Show loading → download fresh → display fresh
+  /// Offline: Immediately show cached + offline notification
   Future<void> preloadWeatherData() async {
     if (state.isPreloaded && state.chartData.isNotEmpty) {
       print('🌤️ [WeatherDataNotifier] Data already preloaded, skipping');
@@ -180,15 +182,15 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
     }
 
     print('🌤️ [WeatherDataNotifier] Starting weather data preload');
-    
+
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       // Check internet connection first
       final hasConnection = await hasInternetConnection();
-      
+
       if (!hasConnection) {
-        print('🌤️ [WeatherDataNotifier] No internet connection, trying offline cache');
+        print('📱 [WeatherDataNotifier] OFFLINE MODE: Loading cached weather data');
         final success = await _loadFromOfflineCache();
         if (success) {
           return;
@@ -201,36 +203,19 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
           return;
         }
       }
-      
-      // Try to load from cache first
-      final cachedData = await _weatherService.getCachedData();
-      final cacheTime = await _weatherService.getLastCacheTime();
-      if (cachedData != null && cachedData.isNotEmpty) {
-        print('🌤️ [WeatherDataNotifier] Loaded cached data (${cachedData.length} points)');
-        final latestData = await _weatherService.getLatestWeatherData();
-        final downsampledData = _weatherService.downsampleForChart(cachedData);
-        state = state.copyWith(
-          chartData: downsampledData,
-          latestData: latestData ?? (cachedData.isNotEmpty ? cachedData.last : null),
-          isLoading: false,
-          isPreloaded: true,
-          isOfflineMode: false,
-          lastUpdateTime: DateTime.now(),
-          cacheTime: cacheTime,
-        );
-        _stopRetryTimer(); // Stop retry timer if we have fresh data
-        return;
-      }
 
-      // Load fresh data if no cache available
-      final chartDataFuture = _weatherService.fetchWeatherData();
+      // ONLINE MODE: Fresh-first strategy
+      print('🌐 [WeatherDataNotifier] ONLINE MODE: Loading fresh weather data');
+
+      // Always fetch fresh data when online (force network to bypass 10-minute cache)
+      final chartDataFuture = _weatherService.fetchWeatherData(forceNetwork: true);
       final latestDataFuture = _weatherService.getLatestWeatherData();
-      
+
       final results = await Future.wait([chartDataFuture, latestDataFuture]);
       final fullData = results[0] as List<WeatherData>;
       final latestData = results[1] as WeatherData?;
       final downsampledData = _weatherService.downsampleForChart(fullData);
-      
+
       state = state.copyWith(
         chartData: downsampledData,
         latestData: latestData ?? (fullData.isNotEmpty ? fullData.last : null),
@@ -239,12 +224,12 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
         isOfflineMode: false,
         lastUpdateTime: DateTime.now(),
       );
-      
+
       _stopRetryTimer(); // Stop retry timer if we have fresh data
-      print('🌤️ [WeatherDataNotifier] Preload completed successfully (${fullData.length} points, ${downsampledData.length} for chart)');
+      print('✅ [WeatherDataNotifier] Fresh weather data loaded successfully (${fullData.length} points, ${downsampledData.length} for chart)');
     } catch (e) {
       print('❌ [WeatherDataNotifier] Preload failed: $e');
-      
+
       // Try offline cache as fallback
       final success = await _loadFromOfflineCache();
       if (!success) {
@@ -257,20 +242,22 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
   }
 
   /// Refresh weather data (called from weather page)
+  /// Always forces fresh network fetch to ensure latest data
   Future<void> refreshWeatherData() async {
     print('🌤️ [WeatherDataNotifier] Starting weather data refresh');
-    
+
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
-      final chartDataFuture = _weatherService.fetchWeatherData();
+      // Always force network fetch for refresh to bypass 10-minute cache
+      final chartDataFuture = _weatherService.fetchWeatherData(forceNetwork: true);
       final latestDataFuture = _weatherService.getLatestWeatherData();
-      
+
       final results = await Future.wait([chartDataFuture, latestDataFuture]);
       final fullData = results[0] as List<WeatherData>;
       final latestData = results[1] as WeatherData?;
       final downsampledData = _weatherService.downsampleForChart(fullData);
-      
+
       state = state.copyWith(
         chartData: downsampledData,
         latestData: latestData ?? (fullData.isNotEmpty ? fullData.last : null),
@@ -280,12 +267,12 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
         offlineDataTime: null,
         lastUpdateTime: DateTime.now(),
       );
-      
+
       _stopRetryTimer(); // Stop retry timer if refresh was successful
-      print('🌤️ [WeatherDataNotifier] Refresh completed successfully (${fullData.length} points, ${downsampledData.length} for chart)');
+      print('✅ [WeatherDataNotifier] Fresh weather data refresh completed (${fullData.length} points, ${downsampledData.length} for chart)');
     } catch (e) {
       print('❌ [WeatherDataNotifier] Refresh failed: $e');
-      
+
       // If we're not in offline mode yet, try to load from offline cache
       if (!state.isOfflineMode) {
         final success = await _loadFromOfflineCache();
@@ -303,17 +290,19 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
   }
 
   /// Update data in background (silent refresh)
+  /// Forces fresh network fetch for background updates
   Future<void> updateDataInBackground() async {
     print('🌤️ [WeatherDataNotifier] Starting background update');
-    
+
     try {
-      final chartDataFuture = _weatherService.fetchWeatherData();
+      // Force network fetch for background updates to ensure fresh data
+      final chartDataFuture = _weatherService.fetchWeatherData(forceNetwork: true);
       final latestDataFuture = _weatherService.getLatestWeatherData();
-      
+
       final results = await Future.wait([chartDataFuture, latestDataFuture]);
       final fullData = results[0] as List<WeatherData>;
       final latestData = results[1] as WeatherData?;
-      
+
       if (fullData.isNotEmpty) {
         final downsampledData = _weatherService.downsampleForChart(fullData);
         state = state.copyWith(
@@ -324,7 +313,7 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
           lastUpdateTime: DateTime.now(),
         );
         _stopRetryTimer(); // Stop retry timer if background update was successful
-        print('🌤️ [WeatherDataNotifier] Background update completed successfully (${fullData.length} points, ${downsampledData.length} for chart)');
+        print('✅ [WeatherDataNotifier] Fresh background update completed (${fullData.length} points, ${downsampledData.length} for chart)');
       }
     } catch (e) {
       print('❌ [WeatherDataNotifier] Background update failed: $e');
