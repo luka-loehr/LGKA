@@ -176,7 +176,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                 ],
               ),
             )
-          : weatherState.error != null && weatherState.chartData.isEmpty && !weatherState.isOfflineMode
+          : weatherState.error != null && weatherState.chartData.isEmpty
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(32.0),
@@ -222,67 +222,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                     ),
                   ),
                 )
-              : weatherState.chartData.isEmpty && weatherState.isOfflineMode
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.access_time_outlined,
-                              size: 64,
-                              color: Colors.orange.withOpacity(0.7),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Offline-Modus',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: AppColors.primaryText,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 8),
-                            Column(
-                              children: [
-                                Text(
-                                  'Um die aktuellsten Daten zu erhalten, schalte bitte dein Internet an.',
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: AppColors.secondaryText,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                if (weatherState.offlineDataTime != null) ...[
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Zuletzt aktualisiert ${_formatUpdateTime(weatherState.offlineDataTime!)}',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.secondaryText.withOpacity(0.7),
-                                      fontSize: 12,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ],
-                            ),
-                            const SizedBox(height: 24),
-                            ElevatedButton.icon(
-                              onPressed: _refreshData,
-                              icon: const Icon(Icons.refresh),
-                              label: const Text('Erneut versuchen'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
               : weatherState.chartData.isEmpty
                   ? const Center(
                       child: Text(

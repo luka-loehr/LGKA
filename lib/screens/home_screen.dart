@@ -205,10 +205,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       _fadeController.forward();
     }
     
-    // Trigger slow connection animation when slow connection is detected
-    if (pdfRepo.hasSlowConnection && _slowConnectionController.status == AnimationStatus.dismissed) {
+    // Trigger banner animation when offline state changes
+    if (pdfRepo.isNoInternet && _slowConnectionController.status == AnimationStatus.dismissed) {
       _slowConnectionController.forward();
-    } else if (!pdfRepo.hasSlowConnection && _slowConnectionController.status == AnimationStatus.completed) {
+    } else if (!pdfRepo.isNoInternet && _slowConnectionController.status == AnimationStatus.completed) {
       _slowConnectionController.reverse();
     }
     
@@ -288,7 +288,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                 ),
               ),
             )
-          else if (pdfRepo.hasSlowConnection)
+          else if (pdfRepo.isNoInternet)
             FadeTransition(
               opacity: _slowConnectionAnimation,
               child: Container(
@@ -314,16 +314,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: pdfRepo.isNoInternet 
-                            ? Colors.red.withOpacity(0.2)
-                            : Colors.orange.withOpacity(0.2),
+                          color: Colors.red.withOpacity(0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
-                          pdfRepo.isNoInternet 
-                            ? Icons.wifi_off_outlined
-                            : Icons.signal_wifi_bad_outlined,
-                          color: pdfRepo.isNoInternet ? Colors.red : Colors.orange,
+                        child: const Icon(
+                          Icons.wifi_off_outlined,
+                          color: Colors.red,
                           size: 22,
                         ),
                       ),
@@ -333,9 +329,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              pdfRepo.isNoInternet 
-                                ? 'Hey, du hast gerade kein Internet. Deswegen zeige ich dir hier den Vertretungsplan von ${pdfRepo.offlineDataTime != null ? _formatOfflineTime(pdfRepo.offlineDataTime!) : "vorher"}. Wenn du dein WLAN oder die mobilen Daten einschaltest, kann ich dir den aktuellsten Plan anzeigen.'
-                                : 'Hey, du hast gerade bisschen schlechtes Internet. Deswegen zeige ich dir hier den Vertretungsplan von ${pdfRepo.offlineDataTime != null ? _formatOfflineTime(pdfRepo.offlineDataTime!) : "vorher"}. Wenn das Internet besser wird, aktualisiere ich automatisch.',
+                              pdfRepo.offlineDataTime != null
+                                ? 'Kein Internet. Vertretungsplan zuletzt ${_formatOfflineTime(pdfRepo.offlineDataTime!)} aktualisiert.'
+                                : 'Kein Internet.',
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 color: AppColors.primaryText,
                                 height: 1.3,
@@ -387,26 +383,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
-                            color: _hasNoInternet 
-                              ? Colors.red.withOpacity(0.1)
-                              : Colors.orange.withOpacity(0.1),
+                            color: Colors.red.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: _hasNoInternet 
-                                ? Colors.red.withOpacity(0.3)
-                                : Colors.orange.withOpacity(0.3),
+                              color: Colors.red.withOpacity(0.3),
                               width: 1,
                             ),
                           ),
                           child: Row(
                             children: [
-                              Icon(
-                                _hasNoInternet 
-                                  ? Icons.wifi_off_outlined
-                                  : Icons.signal_wifi_bad_outlined,
-                                color: _hasNoInternet 
-                                  ? Colors.red.shade700
-                                  : Colors.orange.shade700,
+                              const Icon(
+                                Icons.wifi_off_outlined,
+                                color: Colors.red,
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
@@ -415,13 +403,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      _hasNoInternet 
-                                        ? 'Hey, du hast gerade kein Internet. Deswegen zeige ich dir hier den Vertretungsplan von ${_formatOfflineTime(pdfRepo.offlineDataTime!)}. Wenn du dein WLAN oder die mobilen Daten einschaltest, kann ich dir den aktuellsten Plan anzeigen.'
-                                        : 'Hey, du hast gerade bisschen schlechtes Internet. Deswegen zeige ich dir hier den Vertretungsplan von ${_formatOfflineTime(pdfRepo.offlineDataTime!)}. Wenn das Internet besser wird, aktualisiere ich automatisch.',
+                                      'Kein Internet. Vertretungsplan zuletzt ${_formatOfflineTime(pdfRepo.offlineDataTime!)} aktualisiert.',
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: _hasNoInternet 
-                                          ? Colors.red.shade700
-                                          : Colors.orange.shade700,
+                                        color: Colors.red.shade700,
                                         fontSize: 13,
                                       ),
                                     ),
