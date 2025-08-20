@@ -275,7 +275,7 @@ Apply changes with: `dart run scripts/apply_app_config.dart`
 ## Support
 
 - **Bugs**: [Issues](https://github.com/luka-loehr/LGKA/issues)
-- **Questions**: [Email](mailto:lgka.vertretungsplan@gmail.com)
+- **Questions**: [Email](mailto:contact@lukaloehr.de)
 
 ---
 
