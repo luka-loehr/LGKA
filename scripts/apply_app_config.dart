@@ -17,11 +17,18 @@ void main() async {
     final configContent = await configFile.readAsString();
     final config = loadYaml(configContent);
 
+    // Read version from pubspec.yaml (single source of truth)
+    final versionInfo = await getVersionFromPubspec();
+    final configWithVersion = Map.from(config);
+    configWithVersion['version_name'] = versionInfo['version_name'];
+    configWithVersion['version_code'] = versionInfo['version_code'];
+
+    print('📋 Using version from pubspec.yaml: ${versionInfo['version_name']}+${versionInfo['version_code']}');
+
     // Apply configuration to all platforms
-    await updatePubspecYaml(config);
-    await updateAndroidConfig(config);
-    await updateiOSConfig(config);
-    await updateFlutterLauncherIcons(config);
+    await updateAndroidConfig(configWithVersion);
+    await updateiOSConfig(configWithVersion);
+    await updateFlutterLauncherIcons(configWithVersion);
 
     print('\n✅ App configuration applied successfully!');
     print('\nNext steps:');
@@ -35,25 +42,42 @@ void main() async {
   }
 }
 
-Future<void> updatePubspecYaml(Map config) async {
-  print('📝 Updating pubspec.yaml...');
-  
+Future<Map<String, String>> getVersionFromPubspec() async {
+  final pubspecFile = File('pubspec.yaml');
+  if (!pubspecFile.existsSync()) {
+    throw Exception('pubspec.yaml not found');
+  }
+
+  final content = await pubspecFile.readAsString();
+  final pubspec = loadYaml(content);
+
+  final versionString = pubspec['version'] as String;
+  final versionParts = versionString.split('+');
+
+  if (versionParts.length != 2) {
+    throw Exception('Invalid version format in pubspec.yaml. Expected format: "1.0.0+1"');
+  }
+
+  return {
+    'version_name': versionParts[0],
+    'version_code': versionParts[1],
+  };
+}
+
+Future<void> updatePubspecDescription(Map config) async {
+  print('📝 Updating pubspec.yaml description...');
+
   final pubspecFile = File('pubspec.yaml');
   final content = await pubspecFile.readAsString();
-  
-  // Update version
-  final version = '${config['version_name']}+${config['version_code']}';
+
+  // Only update description, version is managed directly in pubspec.yaml
   final updatedContent = content.replaceAll(
-    RegExp(r'version:\s+[\d\.]+\+\d+'),
-    'version: $version'
-  ).replaceAll(
     RegExp(r'description:\s+"[^"]*"'),
     'description: "${config['app_description']}"'
   );
-  
+
   await pubspecFile.writeAsString(updatedContent);
-  print('   ✓ Version updated to $version');
-  print('   ✓ Description updated');
+  print('   ✓ Description updated (version managed directly in pubspec.yaml)');
 }
 
 Future<void> updateAndroidConfig(Map config) async {
