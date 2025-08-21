@@ -1,15 +1,14 @@
 // Copyright Luka Löhr 2025
 
-import 'dart:async';
+
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math' show min;
+
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import '../services/offline_cache_service.dart';
+
 
 class PdfRepository extends ChangeNotifier {
   static const String _username = 'vertretungsplan';
@@ -30,11 +29,7 @@ class PdfRepository extends ChangeNotifier {
   String _tomorrowDate = '';
   bool _weekdaysLoaded = false;
   bool _isLoading = false;
-  bool _hasSlowConnection = false;
-  bool _showLoadingBar = false;
-  bool _isNoInternet = false;
-  bool _isOfflineMode = false;
-  DateTime? _offlineDataTime;
+
 
   // Getters for accessing the data
   String get todayWeekday => _todayWeekday;
@@ -45,11 +40,7 @@ class PdfRepository extends ChangeNotifier {
   String get tomorrowDate => _tomorrowDate;
   bool get weekdaysLoaded => _weekdaysLoaded;
   bool get isLoading => _isLoading;
-  bool get hasSlowConnection => _hasSlowConnection;
-  bool get showLoadingBar => _showLoadingBar;
-  bool get isNoInternet => _isNoInternet;
-  bool get isOfflineMode => _isOfflineMode;
-  DateTime? get offlineDataTime => _offlineDataTime;
+
   
   // Dynamic filename getters based on weekdays
   String get todayPdfFilename => _todayWeekday.isNotEmpty ? '${_todayWeekday.toLowerCase()}.pdf' : todayFilename;
@@ -188,12 +179,7 @@ class PdfRepository extends ChangeNotifier {
         }
       }
 
-      // Save to offline cache
-      if (isToday) {
-        await OfflineCache.savePdf(finalFile, _todayWeekday, _todayDate, true);
-      } else {
-        await OfflineCache.savePdf(finalFile, _tomorrowWeekday, _tomorrowDate, false);
-      }
+
 
       _checkIfBothDaysLoaded();
       notifyListeners();
@@ -273,25 +259,16 @@ class PdfRepository extends ChangeNotifier {
 
   /// Gets cached PDF using weekday-based naming with fallback to legacy names
   Future<File?> getCachedPdfByDay(bool isToday) async {
-    // If in offline mode, try offline cache first
-    if (_isOfflineMode) {
-      final offlineFile = await OfflineCache.getPdf(isToday);
-      if (offlineFile != null) {
-        debugPrint('Using PDF from offline cache');
-        return offlineFile;
-      }
-    }
-    
     // Try weekday-named file first
     final weekdayFilename = isToday ? todayPdfFilename : tomorrowPdfFilename;
     File? file = await getCachedPdf(weekdayFilename);
-    
+
     // Fall back to legacy name if weekday file doesn't exist
     if (file == null) {
       final legacyFilename = isToday ? todayFilename : tomorrowFilename;
       file = await getCachedPdf(legacyFilename);
     }
-    
+
     return file;
   }
 
@@ -300,235 +277,36 @@ class PdfRepository extends ChangeNotifier {
     _weekdaysLoaded = _todayWeekday.isNotEmpty && _tomorrowWeekday.isNotEmpty;
   }
 
-  /// Load PDFs from offline cache
-  Future<bool> loadFromOfflineCache() async {
-    try {
-      debugPrint('💾 [PdfRepository] Attempting to load from offline cache');
-      
-      // Try to load today's PDF info
-      final todayInfo = await OfflineCache.getPdfInfo(true);
-      if (todayInfo != null) {
-        _todayWeekday = todayInfo['weekday'] ?? '';
-        _todayDate = todayInfo['date'] ?? '';
-        final savedAt = todayInfo['savedAt'] as int?;
-        if (savedAt != null) {
-          _offlineDataTime = DateTime.fromMillisecondsSinceEpoch(savedAt);
-        }
-      }
-      
-      // Try to load tomorrow's PDF info
-      final tomorrowInfo = await OfflineCache.getPdfInfo(false);
-      if (tomorrowInfo != null) {
-        _tomorrowWeekday = tomorrowInfo['weekday'] ?? '';
-        _tomorrowDate = tomorrowInfo['date'] ?? '';
-      }
-      
-      // Check if we have at least one PDF
-      final hasOfflineData = todayInfo != null || tomorrowInfo != null;
-      if (hasOfflineData) {
-        _isOfflineMode = true;
-        _checkIfBothDaysLoaded();
-        debugPrint('💾 [PdfRepository] Loaded from offline cache successfully');
-        return true;
-      }
-      
-      return false;
-    } catch (e) {
-      debugPrint('❌ [PdfRepository] Error loading from offline cache: $e');
-      return false;
-    }
-  }
 
-  /// Check if device has internet connectivity
-  Future<bool> hasInternetConnection() async {
-    try {
-      final connectivityResult = await Connectivity().checkConnectivity();
-      return !connectivityResult.contains(ConnectivityResult.none);
-    } catch (e) {
-      debugPrint('Error checking connectivity: $e');
-      return false;
-    }
-  }
 
-  Timer? _retryTimer;
-
-  @override
-  void dispose() {
-    _retryTimer?.cancel();
-    super.dispose();
-  }
-
-  /// Start retry timer that checks every second for connection
-  /// Always forces fresh reload when connection is restored
-  void _startRetryTimer(bool forceReload) {
-    _retryTimer?.cancel();
-    debugPrint('🔄 [PdfRepository] Starting retry timer (1 second intervals)');
-
-    _retryTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      if (!_isOfflineMode && !_hasSlowConnection) {
-        timer.cancel();
-        return;
-      }
-
-      debugPrint('🔄 [PdfRepository] Checking for internet connection...');
-      final hasConnection = await hasInternetConnection();
-
-      if (hasConnection) {
-        debugPrint('✅ [PdfRepository] Connection restored, forcing fresh reload');
-        timer.cancel();
-        // Always force reload when reconnecting, with smooth transition
-        await preloadPdfs(forceReload: true, isReconnecting: true);
-      }
-    });
-  }
-
-  /// Stop retry timer
-  void _stopRetryTimer() {
-    _retryTimer?.cancel();
-    debugPrint('⏹️ [PdfRepository] Retry timer stopped');
-  }
   
-  /// Preload both PDFs using fresh-first strategy
-  /// Online: Show loading → download fresh → display fresh
-  /// Offline: Immediately show cached + offline notification
-  Future<void> preloadPdfs({bool forceReload = false, bool isReconnecting = false}) async {
+  /// Preload both PDFs from network
+  Future<void> preloadPdfs({bool forceReload = false}) async {
     _isLoading = true;
-    _hasSlowConnection = false;
-    _isNoInternet = false;
     notifyListeners();
 
-    // Check connectivity first
-    final hasConnection = await hasInternetConnection();
-    debugPrint('🌐 [PdfRepository] Network connection available: $hasConnection');
-
-    if (!hasConnection) {
-      debugPrint('📱 [PdfRepository] OFFLINE MODE: Instantly showing cached PDFs');
-
-      // Load weekdays from any existing cache for display
-      await loadWeekdaysFromCachedPdfs();
-
-      // Instantly load from offline cache
-      final hasOfflineData = await loadFromOfflineCache();
-
-      if (hasOfflineData) {
-        debugPrint('💾 [PdfRepository] Showing PDFs from offline cache');
-        _hasSlowConnection = false;
-        _isNoInternet = false;
-        _showLoadingBar = false;
-        _isOfflineMode = true;
-        _isLoading = false;
-        notifyListeners();
-        _startRetryTimer(true); // Always force reload when reconnecting
-        return;
-      } else {
-        // No offline data available, show internet error
-        debugPrint('❌ [PdfRepository] No offline data available');
-        _hasSlowConnection = true;
-        _isNoInternet = true;
-        _showLoadingBar = false;
-        _isLoading = false;
-        notifyListeners();
-        _startRetryTimer(true); // Always force reload when reconnecting
-        return;
-      }
-    }
-
-    // ONLINE MODE: Fresh-first strategy
-    debugPrint('🌐 [PdfRepository] ONLINE MODE: Loading fresh PDFs${isReconnecting ? ' (reconnecting)' : ''}');
-
-    // Show loading bar - we will wait for fresh download
-    _showLoadingBar = true;
-    _isOfflineMode = false;
-    _offlineDataTime = null;
-
-    // When reconnecting, immediately clear offline/slow connection states for smooth transition
-    if (isReconnecting) {
-      _hasSlowConnection = false;
-      _isNoInternet = false;
-    }
-
-    notifyListeners();
+    debugPrint('🌐 [PdfRepository] Loading fresh PDFs from network');
 
     try {
-      // Always force reload when online to ensure fresh data
+      // Download fresh PDFs from network
       final results = await Future.wait([
-        downloadPdfWithWeekdayName(todayUrl, true, forceReload: true),
-        downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: true),
+        downloadPdfWithWeekdayName(todayUrl, true, forceReload: forceReload),
+        downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: forceReload),
       ]);
 
       // Check if at least one PDF was successfully downloaded
       if (results[0] != null || results[1] != null) {
         debugPrint('✅ [PdfRepository] Fresh PDFs downloaded successfully');
-        _showLoadingBar = false;
-        _hasSlowConnection = false;
-        _isNoInternet = false;
-        _isOfflineMode = false;
-        _offlineDataTime = null;
-        _stopRetryTimer();
       } else {
-        debugPrint('❌ [PdfRepository] Failed to download fresh PDFs, trying offline cache');
-        _showLoadingBar = false;
-
-        // Load weekdays from any existing cache for display
-        await loadWeekdaysFromCachedPdfs();
-
-        // Try offline cache as fallback
-        final hasOfflineData = await loadFromOfflineCache();
-        if (hasOfflineData) {
-          _hasSlowConnection = false;
-          _isNoInternet = false;
-          _isOfflineMode = true;
-          debugPrint('💾 [PdfRepository] Showing offline cache as fallback');
-        } else {
-          // When reconnecting, don't show "bad internet" message - keep trying silently
-          if (isReconnecting) {
-            _hasSlowConnection = false;
-            _isNoInternet = false;
-            debugPrint('🔄 [PdfRepository] Reconnecting failed, will retry silently');
-          } else {
-            _hasSlowConnection = true;
-            debugPrint('❌ [PdfRepository] No offline cache available');
-          }
-        }
-
-        _startRetryTimer(true); // Always force reload when reconnecting
+        debugPrint('❌ [PdfRepository] Failed to download PDFs');
       }
-
     } catch (e) {
-      debugPrint('❌ [PdfRepository] Error downloading fresh PDFs: $e');
-      _showLoadingBar = false;
-
-      // Load weekdays from any existing cache for display
-      await loadWeekdaysFromCachedPdfs();
-
-      // On error, try offline cache
-      final hasOfflineData = await loadFromOfflineCache();
-      if (hasOfflineData) {
-        _hasSlowConnection = false;
-        _isNoInternet = false;
-        _isOfflineMode = true;
-        debugPrint('💾 [PdfRepository] Error fallback: showing offline cache');
-      } else {
-        // When reconnecting, don't show "bad internet" message - keep trying silently
-        if (isReconnecting) {
-          _hasSlowConnection = false;
-          _isNoInternet = false;
-          debugPrint('🔄 [PdfRepository] Reconnecting error, will retry silently');
-        } else {
-          _hasSlowConnection = true;
-          debugPrint('❌ [PdfRepository] Error fallback: no offline cache available');
-        }
-      }
-
-      _startRetryTimer(true); // Always force reload when reconnecting
-      notifyListeners();
+      debugPrint('❌ [PdfRepository] Error downloading PDFs: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
-  
-
 }
 
 // Function to run PDF text extraction in isolate

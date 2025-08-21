@@ -11,7 +11,7 @@ import '../providers/app_providers.dart';
 import '../data/pdf_repository.dart';
 import '../providers/haptic_service.dart';
 import '../navigation/app_router.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+
 import 'dart:async';
 import 'weather_page.dart';
 
@@ -46,13 +46,9 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStateMixin {
 
   String? _error;
-  bool _hasNoInternet = false;
-  
+
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
-  late AnimationController _slowConnectionController;
-  late Animation<double> _slowConnectionAnimation;
-  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
   
   final PageController _pageController = PageController();
   int _currentPage = 0;
@@ -70,41 +66,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
     );
 
-    // Initialize slow connection animation controller
-    _slowConnectionController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _slowConnectionAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _slowConnectionController, curve: Curves.easeIn),
-    );
-
     // Preload PDFs and weather data when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refreshPlans(forceReload: false);
       // Run weather preloading in background without blocking UI
       _preloadWeatherData();
-      // Check network connectivity
-      _checkConnectivity();
-      
-      // Listen for connectivity changes
-      _connectivitySubscription = Connectivity().onConnectivityChanged.listen((result) {
-        setState(() {
-          _hasNoInternet = result.contains(ConnectivityResult.none);
-        });
-      });
     });
-  }
-
-  Future<void> _checkConnectivity() async {
-    try {
-      final connectivityResult = await Connectivity().checkConnectivity();
-      setState(() {
-        _hasNoInternet = connectivityResult.contains(ConnectivityResult.none);
-      });
-    } catch (e) {
-      debugPrint('Error checking connectivity: $e');
-    }
   }
 
   Future<void> _refreshPlans({bool forceReload = true}) async {
@@ -116,17 +83,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     // Run in background without blocking UI
     () async {
       try {
-        final weatherService = ref.read(weatherServiceProvider);
-        
-        // Check if we already have cached data
-        final cachedData = await weatherService.getCachedData();
-        if (cachedData != null && cachedData.isNotEmpty) {
-          print('🌤️ [HomeScreen] Weather data already cached, no need to fetch');
-          return;
-        }
-        
-        // Fetch fresh data in background
+        // Preload weather data in background
         print('🌤️ [HomeScreen] Starting background weather data fetch');
+        final weatherService = ref.read(weatherServiceProvider);
         await weatherService.fetchWeatherData();
         print('🌤️ [HomeScreen] Weather data preloaded successfully');
       } catch (e) {
@@ -139,9 +98,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   @override
   void dispose() {
     _fadeController.dispose();
-    _slowConnectionController.dispose();
     _pageController.dispose();
-    _connectivitySubscription.cancel();
     super.dispose();
   }
 
@@ -181,18 +138,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     );
   }
   
-  String _formatOfflineTime(DateTime time) {
-    final now = DateTime.now();
-    final difference = now.difference(time);
 
-    if (difference.inMinutes < 60) {
-      return 'vor ${difference.inMinutes} Minute${difference.inMinutes == 1 ? '' : 'n'}';
-    } else if (difference.inHours < 24) {
-      return 'vor ${difference.inHours} Stunde${difference.inHours == 1 ? '' : 'n'}';
-    } else {
-      return '${time.day}.${time.month}. um ${time.hour}:${time.minute.toString().padLeft(2, '0')} Uhr';
-    }
-  }
 
 
 
@@ -205,12 +151,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       _fadeController.forward();
     }
     
-    // Trigger banner animation when offline state changes
-    if (pdfRepo.isNoInternet && _slowConnectionController.status == AnimationStatus.dismissed) {
-      _slowConnectionController.forward();
-    } else if (!pdfRepo.isNoInternet && _slowConnectionController.status == AnimationStatus.completed) {
-      _slowConnectionController.reverse();
-    }
+
     
     return Scaffold(
       backgroundColor: AppColors.appBackground,
@@ -270,83 +211,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         children: [
           const SizedBox(height: 24),
           
-          // Loading bar or network notification - they replace each other at the same position
-          if (pdfRepo.showLoadingBar)
-            AnimatedOpacity(
-              opacity: 1.0,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeIn,
-              child: Container(
-                margin: const EdgeInsets.symmetric(
-                    horizontal: 64, vertical: 24),
-                height: 5,
-                child: LinearProgressIndicator(
-                  backgroundColor:
-                      AppColors.appBlueAccent.withOpacity(0.2),
-                  valueColor: const AlwaysStoppedAnimation<Color>(
-                      AppColors.appBlueAccent),
-                ),
-              ),
-            )
-          else if (pdfRepo.isNoInternet)
-            FadeTransition(
-              opacity: _slowConnectionAnimation,
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                child: Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  decoration: BoxDecoration(
-                    color: AppColors.appSurface,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.appBlueAccent.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.wifi_off_outlined,
-                          color: Colors.red,
-                          size: 22,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              pdfRepo.offlineDataTime != null
-                                ? 'Kein Internet. Daten zuletzt ${_formatOfflineTime(pdfRepo.offlineDataTime!)} aktualisiert.'
-                                : 'Kein Internet.',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.primaryText,
-                                height: 1.3,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            )
-          else
-            const SizedBox(height: 8),
+          const SizedBox(height: 8),
           
           if (pdfRepo.weekdaysLoaded)
             FadeTransition(
@@ -376,46 +241,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         onTomorrowClick: () => _openPdf(false),
                       ),
                       
-                      // Offline mode indicator
-                      if (pdfRepo.isOfflineMode && pdfRepo.offlineDataTime != null) ...[
-                        const SizedBox(height: 16),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.red.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.wifi_off_outlined,
-                                color: Colors.red,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Kein Internet. Daten zuletzt ${_formatOfflineTime(pdfRepo.offlineDataTime!)} aktualisiert.',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: Colors.red.shade700,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+
                       
                       // Debug navigation mode detection (only show if enabled in preferences)
                       if (ref.watch(preferencesManagerProvider).showNavigationDebug) ...[

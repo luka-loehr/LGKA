@@ -5,7 +5,7 @@ import '../services/weather_service.dart';
 import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
 import 'package:intl/intl.dart';
-import '../services/offline_cache_service.dart';
+
 
 // Helper function for robust navigation bar detection across all Android devices
 bool _isButtonNavigation(BuildContext context) {
