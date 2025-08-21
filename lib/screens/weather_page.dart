@@ -216,12 +216,11 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
           : weatherState.error != null && weatherState.chartData.isEmpty
               ? FadeTransition(
                   opacity: _errorAnimation,
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                  child: Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
                         Icon(
                           Icons.cloud_off,
                           size: 64,
@@ -260,8 +259,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                         ],
                       ),
                     ),
-                  ),
-                )
+                  )
               : weatherState.chartData.isEmpty
                   ? const Center(
                       child: Text(

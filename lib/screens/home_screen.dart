@@ -267,15 +267,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
           // Error state - same format as weather page (show error even during retry)
           if (pdfRepo.shouldShowError)
-            Expanded(
-              child: FadeTransition(
-                opacity: _errorAnimation,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+            FadeTransition(
+              opacity: _errorAnimation,
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
                       Icon(
                         Icons.description_outlined,
                         size: 64,
@@ -314,9 +312,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ],
                     ),
                   ),
-                ),
-              ),
-            )
+                )
           else if (pdfRepo.weekdaysLoaded)
             FadeTransition(
               opacity: _fadeAnimation,
