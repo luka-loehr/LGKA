@@ -10,11 +10,11 @@ Mobile app for the digital substitution schedule of Lessing-Gymnasium Karlsruhe.
 
 ## Features
 
-- **Substitution Schedule**: Automatic download for today and tomorrow with offline availability
+- **Substitution Schedule**: Automatic download for today and tomorrow
 - **PDF Viewer**: Integrated display with zoom, sharing and external app integration
 - **Weather Data**: Live data from the school weather station with charts
 - **Dark-Only Design**: Eye-friendly Material Design 3 theme
-- **Offline-First**: Intelligent caching with automatic network detection
+- **Network-Dependent**: Always fetches fresh data from the network
 
 ## Quick Start
 
@@ -102,22 +102,21 @@ The app follows clean architecture principles with clear separation of concerns:
 
 - **Data Layer** (`lib/data/`): Repositories and preference management
 - **State Management** (`lib/providers/`): Riverpod providers for reactive state
-- **Services** (`lib/services/`): Business logic for offline caching, weather data, and file handling
+- **Services** (`lib/services/`): Business logic for weather data and file handling
 - **Presentation** (`lib/screens/`): UI screens with Material Design 3 dark theme
 - **Navigation** (`lib/navigation/`): GoRouter-based declarative routing
 
 ### Key Implementation Details
 
-#### Offline-First Architecture
-- **Smart caching**: 3-second slow connection detection with automatic offline fallback
-- **Dual cache system**: Temporary cache + persistent offline cache via `OfflineCache` service
+#### Network-Dependent Architecture
+- **Fresh data**: Always fetches the latest data from network sources
 - **Preloading**: Parallel PDF and weather data loading on app start
-- **Network detection**: `connectivity_plus` integration with automatic retry timers
+- **Loading states**: Shows loading spinners until network requests complete
 
 #### PDF Management System
 - **Processing**: Syncfusion Flutter PDF for metadata extraction and text parsing in isolates
 - **Viewing**: pdfx with PhotoView for zoom/pan capabilities and custom transitions
-- **Caching**: Weekday-based naming with legacy fallback, stored in temporary directory
+- **Storage**: Weekday-based naming with legacy fallback, stored in temporary directory
 - **Authentication**: HTTP Basic Auth for school server access
 
 #### Weather Data Pipeline
@@ -136,9 +135,8 @@ The app follows clean architecture principles with clear separation of concerns:
 **Riverpod-based architecture** with dependency injection and reactive state:
 
 - **`preferencesManagerProvider`**: User settings and authentication state
-- **`pdfRepositoryProvider`**: ChangeNotifier for PDF download/cache state with loading indicators
-- **`weatherDataProvider`**: StateNotifier managing weather data, offline mode, and retry logic
-- **`connectivityProvider`**: Network state monitoring with automatic reconnection
+- **`pdfRepositoryProvider`**: ChangeNotifier for PDF download state with loading indicators
+- **`weatherDataProvider`**: StateNotifier managing weather data and loading states
 
 ### Navigation Flow
 

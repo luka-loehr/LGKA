@@ -1,8 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:csv/csv.dart';
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'offline_cache_service.dart';
 
 class WeatherData {
   final DateTime time;
@@ -55,103 +53,10 @@ class WeatherData {
 
 class WeatherService {
   static const String csvUrl = 'https://lessing-gymnasium-karlsruhe.de/wetter/lg_wetter_heute.csv';
-  static const String _cacheKey = 'weather_data_cache';
-  static const String _cacheTimeKey = 'weather_data_cache_time';
-  static const Duration _cacheValidDuration = Duration(minutes: 10);
-  
-  // In-memory cache
-  List<WeatherData>? _cachedWeatherData;
-  DateTime? _lastFetchTime;
-
-  /// Get the last cache update time
-  Future<DateTime?> getLastCacheTime() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final cacheTimeMs = prefs.getInt(_cacheTimeKey);
-      if (cacheTimeMs != null) {
-        return DateTime.fromMillisecondsSinceEpoch(cacheTimeMs);
-      }
-    } catch (e) {
-      print('❌ [WeatherService] Error getting cache time: $e');
-    }
-    return null;
-  }
 
 
-
-  /// Returns cached data if available and valid, null otherwise
-  Future<List<WeatherData>?> getCachedData() async {
-    // First check in-memory cache
-    if (_cachedWeatherData != null && _lastFetchTime != null) {
-      final timeSinceLastFetch = DateTime.now().difference(_lastFetchTime!);
-      if (timeSinceLastFetch < _cacheValidDuration) {
-        print('🌤️ [WeatherService] Returning in-memory cached data');
-        return _cachedWeatherData;
-      }
-    }
-    
-    // Check persistent cache
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final cachedJson = prefs.getString(_cacheKey);
-      final cacheTimeMs = prefs.getInt(_cacheTimeKey);
-      
-      if (cachedJson != null && cacheTimeMs != null) {
-        final cacheTime = DateTime.fromMillisecondsSinceEpoch(cacheTimeMs);
-        final timeSinceCache = DateTime.now().difference(cacheTime);
-        
-        if (timeSinceCache < _cacheValidDuration) {
-          print('🌤️ [WeatherService] Loading data from persistent cache');
-          final List<dynamic> jsonList = jsonDecode(cachedJson);
-          final weatherData = jsonList.map((json) => WeatherData.fromJson(json)).toList();
-          
-          // Update in-memory cache
-          _cachedWeatherData = weatherData;
-          _lastFetchTime = cacheTime;
-          
-          return weatherData;
-        } else {
-          print('🌤️ [WeatherService] Persistent cache expired');
-        }
-      }
-    } catch (e) {
-      print('❌ [WeatherService] Error loading from persistent cache: $e');
-    }
-    
-    return null;
-  }
-
-  /// Save data to persistent cache
-  Future<void> _saveToCache(List<WeatherData> data) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final jsonList = data.map((item) => item.toJson()).toList();
-      final jsonString = jsonEncode(jsonList);
-      
-      await prefs.setString(_cacheKey, jsonString);
-      await prefs.setInt(_cacheTimeKey, DateTime.now().millisecondsSinceEpoch);
-      
-      print('🌤️ [WeatherService] Data saved to persistent cache');
-    } catch (e) {
-      print('❌ [WeatherService] Error saving to persistent cache: $e');
-    }
-  }
-
-
-
-  Future<List<WeatherData>> fetchWeatherData({bool forceNetwork = false}) async {
-    print('🌤️ [WeatherService] Starting fetchWeatherData(forceNetwork: $forceNetwork)');
-
-    // Check cache first (unless forcing network fetch)
-    if (!forceNetwork) {
-      final cachedData = await getCachedData();
-      if (cachedData != null) {
-        print('🌤️ [WeatherService] Returning cached data (${cachedData.length} items)');
-        return cachedData;
-      }
-    }
-
-    print('🌤️ [WeatherService] ${forceNetwork ? 'Force fetching' : 'No valid cache, fetching'} fresh data');
+  Future<List<WeatherData>> fetchWeatherData() async {
+    print('🌤️ [WeatherService] Starting fetchWeatherData - fetching fresh data from network');
     
     print('🌤️ [WeatherService] URL: $csvUrl');
     
@@ -266,29 +171,12 @@ class WeatherService {
         print('🌤️ [WeatherService] Last data point: ${allWeatherData.last.time} - ${allWeatherData.last.temperature}°C');
       }
       
-      // Cache all data in memory and persistent storage
-      _cachedWeatherData = allWeatherData;
-      _lastFetchTime = DateTime.now();
-      await _saveToCache(allWeatherData);
-      
-      // Also save to offline cache
-      await OfflineCache.saveWeatherData(allWeatherData);
-      
-      print('🌤️ [WeatherService] Data cached successfully');
+      print('🌤️ [WeatherService] Data fetched successfully');
       
       return allWeatherData;
     } catch (e) {
       print('❌ [WeatherService] Fatal error in fetchWeatherData: $e');
       print('❌ [WeatherService] Stack trace: ${StackTrace.current}');
-      
-      // Try to load from offline cache if network fails
-      print('🌤️ [WeatherService] Attempting to load from offline cache');
-      final offlineData = await OfflineCache.getWeatherData();
-      if (offlineData != null && offlineData.isNotEmpty) {
-        print('🌤️ [WeatherService] Loaded ${offlineData.length} items from offline cache');
-        return offlineData;
-      }
-      
       throw Exception('Error fetching weather data: $e');
     }
   }

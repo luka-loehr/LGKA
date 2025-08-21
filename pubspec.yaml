@@ -46,7 +46,6 @@ dependencies:
   
   # Network
   http: ^1.2.2
-  connectivity_plus: ^6.1.0
   
   # File Handling
   path_provider: ^2.1.5
