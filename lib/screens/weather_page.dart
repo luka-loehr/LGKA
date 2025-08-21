@@ -40,10 +40,13 @@ enum ChartType {
   pressure,
 }
 
-class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAliveClientMixin {
+class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   ChartType _selectedChart = ChartType.temperature;
   bool _isChartRendered = false;
   bool _isInitialRenderComplete = false;
+
+  late AnimationController _errorAnimationController;
+  late Animation<double> _errorAnimation;
   
   @override
   bool get wantKeepAlive => true;
@@ -51,6 +54,16 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   @override
   void initState() {
     super.initState();
+
+    // Initialize error animation controller
+    _errorAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _errorAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _errorAnimationController, curve: Curves.easeInOut),
+    );
+
     // Check if data needs to be loaded (fallback for edge cases)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final weatherState = ref.read(weatherDataProvider);
@@ -85,8 +98,21 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     });
   }
 
+  @override
+  void dispose() {
+    _errorAnimationController.dispose();
+    super.dispose();
+  }
+
   void _refreshData() {
-    ref.read(weatherDataProvider.notifier).refreshWeatherData();
+    // Refresh both weather and PDF data simultaneously
+    final weatherNotifier = ref.read(weatherDataProvider.notifier);
+    final pdfRepo = ref.read(pdfRepositoryProvider);
+
+    Future.wait([
+      weatherNotifier.refreshWeatherData(),
+      pdfRepo.retryLoadPdfs(),
+    ]);
   }
 
   void _updateDataInBackground() {
@@ -146,9 +172,20 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    
+
     final weatherState = ref.watch(weatherDataProvider);
-    
+
+    // Control error animation based on error state
+    if (weatherState.error != null && weatherState.chartData.isEmpty) {
+      if (_errorAnimationController.status == AnimationStatus.dismissed) {
+        _errorAnimationController.forward();
+      }
+    } else {
+      if (_errorAnimationController.status == AnimationStatus.completed) {
+        _errorAnimationController.reverse();
+      }
+    }
+
     // Trigger chart rendering when data becomes available
     if (!_isChartRendered && weatherState.chartData.isNotEmpty && _isInitialRenderComplete) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -177,12 +214,14 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
               ),
             )
           : weatherState.error != null && weatherState.chartData.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+              ? FadeTransition(
+                  opacity: _errorAnimation,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
                         Icon(
                           Icons.cloud_off,
                           size: 64,
@@ -218,7 +257,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                             ),
                           ),
                         ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 )

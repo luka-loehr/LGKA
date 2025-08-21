@@ -49,6 +49,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  late AnimationController _errorAnimationController;
+  late Animation<double> _errorAnimation;
   
   final PageController _pageController = PageController();
   int _currentPage = 0;
@@ -66,6 +68,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
     );
 
+    // Initialize error animation controller
+    _errorAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _errorAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _errorAnimationController, curve: Curves.easeInOut),
+    );
+
     // Preload PDFs and weather data when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refreshPlans(forceReload: false);
@@ -77,6 +88,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   Future<void> _refreshPlans({bool forceReload = true}) async {
     final pdfRepo = ref.read(pdfRepositoryProvider);
     await pdfRepo.preloadPdfs(forceReload: forceReload);
+  }
+
+  /// Unified retry method that refreshes both weather and PDF data
+  Future<void> _retryAll() async {
+    // Refresh both weather and PDF data simultaneously
+    final pdfRepo = ref.read(pdfRepositoryProvider);
+    final weatherNotifier = ref.read(weatherDataProvider.notifier);
+
+    await Future.wait([
+      pdfRepo.retryLoadPdfs(),
+      weatherNotifier.refreshWeatherData(),
+    ]);
   }
 
   void _preloadWeatherData() {
@@ -98,6 +121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   @override
   void dispose() {
     _fadeController.dispose();
+    _errorAnimationController.dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -150,9 +174,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     if (pdfRepo.weekdaysLoaded && _fadeController.status == AnimationStatus.dismissed) {
       _fadeController.forward();
     }
-    
 
-    
+    // Control error animation based on error state (keep error visible during retry)
+    if (pdfRepo.error != null && !pdfRepo.weekdaysLoaded) {
+      if (_errorAnimationController.status == AnimationStatus.dismissed) {
+        _errorAnimationController.forward();
+      }
+    } else {
+      if (_errorAnimationController.status == AnimationStatus.completed) {
+        _errorAnimationController.reverse();
+      }
+    }
+
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       appBar: AppBar(
@@ -211,9 +244,80 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         children: [
           const SizedBox(height: 24),
           
-          const SizedBox(height: 8),
-          
-          if (pdfRepo.weekdaysLoaded)
+          // Loading bar for PDF downloads
+          if (pdfRepo.showLoadingBar)
+            AnimatedOpacity(
+              opacity: 1.0,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeIn,
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                    horizontal: 64, vertical: 24),
+                height: 5,
+                child: LinearProgressIndicator(
+                  backgroundColor:
+                      AppColors.appBlueAccent.withOpacity(0.2),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                      AppColors.appBlueAccent),
+                ),
+              ),
+            )
+          else
+            const SizedBox(height: 8),
+
+          // Error state - same format as weather page (show error even during retry)
+          if (pdfRepo.error != null && !pdfRepo.weekdaysLoaded)
+            Expanded(
+              child: FadeTransition(
+                opacity: _errorAnimation,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                      Icon(
+                        Icons.description_outlined,
+                        size: 64,
+                        color: AppColors.secondaryText.withOpacity(0.5),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Vertretungspläne konnten nicht geladen werden',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: AppColors.primaryText,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Überprüfe deine Internetverbindung',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.secondaryText,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: _retryAll,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Erneut versuchen'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.appBlueAccent,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            )
+          else if (pdfRepo.weekdaysLoaded)
             FadeTransition(
               opacity: _fadeAnimation,
               child: Consumer(
