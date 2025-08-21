@@ -105,14 +105,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
 
   void _refreshData() {
-    // Refresh both weather and PDF data simultaneously
+    // Refresh only weather data - PDFs work independently
     final weatherNotifier = ref.read(weatherDataProvider.notifier);
-    final pdfRepo = ref.read(pdfRepositoryProvider);
-
-    Future.wait([
-      weatherNotifier.refreshWeatherData(),
-      pdfRepo.retryLoadPdfs(),
-    ]);
+    weatherNotifier.refreshWeatherData();
   }
 
   void _updateDataInBackground() {

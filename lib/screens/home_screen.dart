@@ -45,8 +45,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStateMixin {
 
-  String? _error;
-
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   late AnimationController _errorAnimationController;
@@ -90,16 +88,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     await pdfRepo.preloadPdfs(forceReload: forceReload);
   }
 
-  /// Unified retry method that refreshes both weather and PDF data
+  /// Retry method for global PDF errors (when both PDFs fail)
   Future<void> _retryAll() async {
-    // Refresh both weather and PDF data simultaneously
+    // Refresh only PDF data - weather works independently
     final pdfRepo = ref.read(pdfRepositoryProvider);
-    final weatherNotifier = ref.read(weatherDataProvider.notifier);
+    await pdfRepo.retryLoadPdfs();
+  }
 
-    await Future.wait([
-      pdfRepo.retryLoadPdfs(),
-      weatherNotifier.refreshWeatherData(),
-    ]);
+  /// Retry only today's PDF
+  Future<void> _retryTodayPdf() async {
+    final pdfRepo = ref.read(pdfRepositoryProvider);
+    await pdfRepo.retryTodayPdf();
+  }
+
+  /// Retry only tomorrow's PDF
+  Future<void> _retryTomorrowPdf() async {
+    final pdfRepo = ref.read(pdfRepositoryProvider);
+    await pdfRepo.retryTomorrowPdf();
   }
 
   void _preloadWeatherData() {
@@ -141,7 +146,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         'dayName': dayName,
       });
     } else {
-      setState(() => _error = 'PDF konnte nicht geladen werden.');
+      // PDF could not be loaded - no error state needed since buttons are already greyed out
+      debugPrint('PDF could not be loaded for ${isToday ? 'today' : 'tomorrow'}');
     }
   }
 
@@ -281,7 +287,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Vertretungspläne konnten nicht geladen werden',
+                        'Vertretungspläne nicht verfügbar',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: AppColors.primaryText,
                         ),
@@ -289,7 +295,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Überprüfe deine Internetverbindung',
+                        'Der Schulserver ist momentan nicht erreichbar',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppColors.secondaryText,
                         ),
@@ -339,6 +345,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         showDates: showDates,
                         onTodayClick: () => _openPdf(true),
                         onTomorrowClick: () => _openPdf(false),
+                        // Error states
+                        todayError: pdfRepo.todayError,
+                        tomorrowError: pdfRepo.tomorrowError,
+                        todayLoading: pdfRepo.todayLoading,
+                        tomorrowLoading: pdfRepo.tomorrowLoading,
+                        // Retry functions
+                        onTodayRetry: _retryTodayPdf,
+                        onTomorrowRetry: _retryTomorrowPdf,
                       ),
                       
 
@@ -438,27 +452,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                 },
               ),
             ),
-          if (_error != null) ...[
-            const SizedBox(height: 16),
-            AnimatedOpacity(
-              opacity: 1.0,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeIn,
-              child: Card(
-                color: const Color(0xFF442727),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    _error!,
-                    style:
-                        Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: const Color(0xFFCF6679),
-                            ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+
           
           // Add footer with version and copyright at bottom of home screen
           const Spacer(),
@@ -561,6 +555,12 @@ class _PlanOptions extends StatelessWidget {
   final String todayDate;
   final String tomorrowDate;
   final bool showDates;
+  final String? todayError;
+  final String? tomorrowError;
+  final bool todayLoading;
+  final bool tomorrowLoading;
+  final VoidCallback onTodayRetry;
+  final VoidCallback onTomorrowRetry;
 
   const _PlanOptions({
     required this.todayWeekday,
@@ -570,6 +570,12 @@ class _PlanOptions extends StatelessWidget {
     required this.todayDate,
     required this.tomorrowDate,
     required this.showDates,
+    required this.todayError,
+    required this.tomorrowError,
+    required this.todayLoading,
+    required this.tomorrowLoading,
+    required this.onTodayRetry,
+    required this.onTomorrowRetry,
   });
 
   @override
@@ -583,6 +589,9 @@ class _PlanOptions extends StatelessWidget {
           icon: Icons.calendar_today,
           onClick: onTodayClick,
           fallbackText: 'Heute',
+          error: todayError,
+          isLoading: todayLoading,
+          onRetry: onTodayRetry,
         ),
         const SizedBox(height: 16),
         _PlanOptionButton(
@@ -592,6 +601,9 @@ class _PlanOptions extends StatelessWidget {
           icon: Icons.calendar_today,
           onClick: onTomorrowClick,
           fallbackText: 'Morgen',
+          error: tomorrowError,
+          isLoading: tomorrowLoading,
+          onRetry: onTomorrowRetry,
         ),
       ],
     );
@@ -605,6 +617,9 @@ class _PlanOptionButton extends StatefulWidget {
   final IconData icon;
   final VoidCallback onClick;
   final String fallbackText;
+  final String? error;
+  final bool isLoading;
+  final VoidCallback onRetry;
 
   const _PlanOptionButton({
     required this.weekday,
@@ -613,6 +628,9 @@ class _PlanOptionButton extends StatefulWidget {
     required this.icon,
     required this.onClick,
     required this.fallbackText,
+    required this.error,
+    required this.isLoading,
+    required this.onRetry,
   });
 
   @override
@@ -683,9 +701,13 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
 
   @override
   Widget build(BuildContext context) {
-    // Check if this button should be disabled (empty PDF)
-    final isDisabled = widget.weekday == 'weekend';
-    
+    // Check if this button should be disabled (empty PDF, failed to load, or parser failed)
+    final hasError = widget.error != null;
+    final hasData = widget.weekday.isNotEmpty && widget.weekday != 'weekend';
+    final isDisabled = widget.weekday.isEmpty || widget.weekday == 'weekend' || (hasError && !hasData);
+
+    // Don't show error state anymore - treat failed PDFs like empty PDFs
+
     return GestureDetector(
       onTapDown: isDisabled ? null : (details) {
         setState(() => _isPressed = true);
@@ -751,11 +773,9 @@ class _PlanOptionButtonState extends State<_PlanOptionButton>
                     child: Row(
                       children: [
                         Text(
-                          widget.weekday.isEmpty 
-                            ? widget.fallbackText
-                            : widget.weekday == 'weekend'
-                              ? 'Noch keine Infos'
-                              : widget.weekday,
+                          widget.weekday.isEmpty || widget.weekday == 'weekend' || (hasError && !hasData)
+                            ? 'Noch keine Infos'
+                            : widget.weekday,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 color: isDisabled 
                                     ? AppColors.appOnSurface.withOpacity(0.5)
