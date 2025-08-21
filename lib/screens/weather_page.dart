@@ -105,9 +105,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
 
   void _refreshData() {
-    // Refresh only weather data - PDFs work independently
-    final weatherNotifier = ref.read(weatherDataProvider.notifier);
-    weatherNotifier.refreshWeatherData();
+    // Use unified retry service to retry both weather and PDFs simultaneously
+    final retryService = ref.read(globalRetryServiceProvider);
+    retryService.retryAll();
   }
 
   void _updateDataInBackground() {
@@ -169,9 +169,11 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     super.build(context);
 
     final weatherState = ref.watch(weatherDataProvider);
+    final connectivityState = ref.watch(connectivityProvider);
 
-    // Control error animation based on error state
-    if (weatherState.error != null && weatherState.chartData.isEmpty) {
+    // Control error animation based on intelligent error state
+    final shouldShowWeatherError = connectivityState.shouldShowWeatherConnectionError;
+    if (shouldShowWeatherError) {
       if (_errorAnimationController.status == AnimationStatus.dismissed) {
         _errorAnimationController.forward();
       }
@@ -208,7 +210,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                 ],
               ),
             )
-          : weatherState.error != null && weatherState.chartData.isEmpty
+          : shouldShowWeatherError
               ? FadeTransition(
                   opacity: _errorAnimation,
                   child: Padding(
@@ -223,17 +225,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Wetterdaten konnten nicht geladen werden',
+                          'Serververbindung fehlgeschlagen',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: AppColors.primaryText,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Überprüfe deine Internetverbindung',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.secondaryText,
                           ),
                           textAlign: TextAlign.center,
                         ),

@@ -5,17 +5,23 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
+import '../providers/app_providers.dart';
 
 
 class PdfRepository extends ChangeNotifier {
+  final Ref _ref;
+
+  PdfRepository(this._ref);
+
   static const String _username = 'vertretungsplan';
   static const String _password = 'ephraim';
   static const String todayUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_heute.pdf';
   static const String tomorrowUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_morgen.pdf';
-  
+
   // Keep legacy filenames for backwards compatibility during migration
   static const String todayFilename = 'today.pdf';
   static const String tomorrowFilename = 'tomorrow.pdf';
@@ -59,7 +65,11 @@ class PdfRepository extends ChangeNotifier {
 
   // Derived state for UI logic
   bool get hasAnyData => _todayWeekday.isNotEmpty || _tomorrowWeekday.isNotEmpty;
-  bool get shouldShowError => false; // Never show global error - just grey out buttons
+  bool get shouldShowError {
+    // Use intelligent error logic: only show global PDF error when ALL PDFs fail AND no weather data
+    final connectivityState = _ref.read(connectivityProvider);
+    return connectivityState.shouldShowPdfConnectionError;
+  }
   bool get hasTodayData => _todayWeekday.isNotEmpty;
   bool get hasTomorrowData => _tomorrowWeekday.isNotEmpty;
 
@@ -285,15 +295,33 @@ class PdfRepository extends ChangeNotifier {
       if (todayResult == null && tomorrowResult == null) {
         debugPrint('❌ [PdfRepository] Both PDFs failed to download');
         _error = 'Server nicht erreichbar';
+
+        // Update connectivity state - all PDFs failed
+        _ref.read(connectivityProvider.notifier).updatePdfState(
+          hasData: false,
+          allHaveError: true,
+        );
       } else {
         _error = null; // Clear global error if at least one succeeded
         debugPrint('✅ [PdfRepository] At least one PDF downloaded successfully');
+
+        // Update connectivity state - at least one PDF succeeded
+        _ref.read(connectivityProvider.notifier).updatePdfState(
+          hasData: true,
+          allHaveError: false,
+        );
       }
     } catch (e) {
       debugPrint('❌ [PdfRepository] Error downloading PDFs: $e');
       _error = 'Server nicht erreichbar';
       _todayError = 'Server nicht erreichbar';
       _tomorrowError = 'Server nicht erreichbar';
+
+      // Update connectivity state - all PDFs failed due to exception
+      _ref.read(connectivityProvider.notifier).updatePdfState(
+        hasData: false,
+        allHaveError: true,
+      );
     } finally {
       _isLoading = false;
       _showLoadingBar = false;
@@ -328,6 +356,17 @@ class PdfRepository extends ChangeNotifier {
       debugPrint('❌ [PdfRepository] Today PDF retry error: $e');
     } finally {
       _todayLoading = false;
+
+      // Update connectivity state based on current PDF status
+      final hasAnyPdfData = _todayWeekday.isNotEmpty || _tomorrowWeekday.isNotEmpty;
+      final allPdfsHaveError = (_todayError != null || _todayWeekday.isEmpty) &&
+                               (_tomorrowError != null || _tomorrowWeekday.isEmpty);
+
+      _ref.read(connectivityProvider.notifier).updatePdfState(
+        hasData: hasAnyPdfData,
+        allHaveError: allPdfsHaveError,
+      );
+
       notifyListeners();
     }
   }
@@ -352,6 +391,17 @@ class PdfRepository extends ChangeNotifier {
       debugPrint('❌ [PdfRepository] Tomorrow PDF retry error: $e');
     } finally {
       _tomorrowLoading = false;
+
+      // Update connectivity state based on current PDF status
+      final hasAnyPdfData = _todayWeekday.isNotEmpty || _tomorrowWeekday.isNotEmpty;
+      final allPdfsHaveError = (_todayError != null || _todayWeekday.isEmpty) &&
+                               (_tomorrowError != null || _tomorrowWeekday.isEmpty);
+
+      _ref.read(connectivityProvider.notifier).updatePdfState(
+        hasData: hasAnyPdfData,
+        allHaveError: allPdfsHaveError,
+      );
+
       notifyListeners();
     }
   }
