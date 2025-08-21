@@ -32,6 +32,12 @@ class PdfRepository extends ChangeNotifier {
   bool _showLoadingBar = false;
   String? _error;
 
+  // Individual PDF states
+  bool _todayLoading = false;
+  bool _tomorrowLoading = false;
+  String? _todayError;
+  String? _tomorrowError;
+
 
   // Getters for accessing the data
   String get todayWeekday => _todayWeekday;
@@ -45,73 +51,24 @@ class PdfRepository extends ChangeNotifier {
   bool get showLoadingBar => _showLoadingBar;
   String? get error => _error;
 
+  // Individual PDF getters
+  bool get todayLoading => _todayLoading;
+  bool get tomorrowLoading => _tomorrowLoading;
+  String? get todayError => _todayError;
+  String? get tomorrowError => _tomorrowError;
+
   // Derived state for UI logic
   bool get hasAnyData => _todayWeekday.isNotEmpty || _tomorrowWeekday.isNotEmpty;
-  bool get shouldShowError => _error != null && !hasAnyData;
+  bool get shouldShowError => false; // Never show global error - just grey out buttons
+  bool get hasTodayData => _todayWeekday.isNotEmpty;
+  bool get hasTomorrowData => _tomorrowWeekday.isNotEmpty;
 
   
   // Dynamic filename getters based on weekdays
   String get todayPdfFilename => _todayWeekday.isNotEmpty ? '${_todayWeekday.toLowerCase()}.pdf' : todayFilename;
   String get tomorrowPdfFilename => _tomorrowWeekday.isNotEmpty ? '${_tomorrowWeekday.toLowerCase()}.pdf' : tomorrowFilename;
 
-  /// Downloads a PDF from the given URL with HTTP Basic Auth
-  Future<File?> downloadPdf(String url, String filename, {bool forceReload = false}) async {
-    try {
-      // Get cache directory
-      final cacheDir = await getTemporaryDirectory();
-      final file = File('${cacheDir.path}/$filename');
 
-      // Check if file exists and is not empty (unless force reload)
-      if (!forceReload && file.existsSync() && file.lengthSync() > 0) {
-        debugPrint('Using cached PDF file: $filename');
-        return file;
-      }
-
-      // Create HTTP request with Basic Auth
-      final credentials = base64Encode(utf8.encode('$_username:$_password'));
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Basic $credentials',
-          'User-Agent': 'LGKA-Flutter-App/1.0',
-        },
-      );
-
-      if (response.statusCode != 200) {
-        debugPrint('Failed to download PDF: ${response.statusCode}');
-        return null;
-      }
-
-      // Save PDF to file
-      await file.writeAsBytes(response.bodyBytes);
-      debugPrint('Successfully downloaded PDF: $filename');
-
-      // Extract metadata after successful download
-      final isToday = url == todayUrl;
-      await _extractMetadataFromPdf(file, isToday);
-
-      // If we now have weekday info, rename the file and save with weekday name
-      final newFilename = isToday ? todayPdfFilename : tomorrowPdfFilename;
-      if (newFilename != filename) {
-        final newFile = File('${cacheDir.path}/$newFilename');
-        // Copy to new filename and delete old one
-        await file.copy(newFile.path);
-        if (await file.exists()) {
-          await file.delete();
-        }
-        debugPrint('Renamed PDF from $filename to $newFilename');
-        return newFile;
-      }
-
-      // Update loaded state
-      _checkIfBothDaysLoaded();
-
-      return file;
-    } catch (e) {
-      debugPrint('Error downloading PDF: $e');
-      return null;
-    }
-  }
 
   /// Enhanced method to download PDF with weekday-based naming
   Future<File?> downloadPdfWithWeekdayName(String url, bool isToday, {bool forceReload = false}) async {
@@ -292,33 +249,56 @@ class PdfRepository extends ChangeNotifier {
   Future<void> preloadPdfs({bool forceReload = false}) async {
     _isLoading = true;
     _showLoadingBar = true;
+    _todayLoading = true;
+    _tomorrowLoading = true;
     // Keep previous error visible during retry; clear only on success
     notifyListeners();
 
     debugPrint('🌐 [PdfRepository] Loading fresh PDFs from network');
 
     try {
-      // Download fresh PDFs from network
-      final results = await Future.wait([
-        downloadPdfWithWeekdayName(todayUrl, true, forceReload: forceReload),
-        downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: forceReload),
-      ]);
+      // Download PDFs individually to handle partial failures
+      final todayResult = await downloadPdfWithWeekdayName(todayUrl, true, forceReload: forceReload).catchError((e) {
+        debugPrint('❌ [PdfRepository] Today PDF failed: $e');
+        _todayError = 'Server nicht erreichbar';
+        return null;
+      });
 
-      // Check if at least one PDF was successfully downloaded
-      if (results[0] != null || results[1] != null) {
-        debugPrint('✅ [PdfRepository] Fresh PDFs downloaded successfully');
-        _error = null; // Clear error on success
+      final tomorrowResult = await downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: forceReload).catchError((e) {
+        debugPrint('❌ [PdfRepository] Tomorrow PDF failed: $e');
+        _tomorrowError = 'Server nicht erreichbar';
+        return null;
+      });
+
+      // Handle individual results
+      if (todayResult != null) {
+        _todayError = null; // Clear today error on success
+        debugPrint('✅ [PdfRepository] Today PDF downloaded successfully');
+      }
+
+      if (tomorrowResult != null) {
+        _tomorrowError = null; // Clear tomorrow error on success
+        debugPrint('✅ [PdfRepository] Tomorrow PDF downloaded successfully');
+      }
+
+      // Set global error only if both failed
+      if (todayResult == null && tomorrowResult == null) {
+        debugPrint('❌ [PdfRepository] Both PDFs failed to download');
+        _error = 'Server nicht erreichbar';
       } else {
-        debugPrint('❌ [PdfRepository] Failed to download PDFs');
-        // Set user-facing error but do not clear existing data
-        _error = 'Vertretungspläne konnten nicht geladen werden';
+        _error = null; // Clear global error if at least one succeeded
+        debugPrint('✅ [PdfRepository] At least one PDF downloaded successfully');
       }
     } catch (e) {
       debugPrint('❌ [PdfRepository] Error downloading PDFs: $e');
-      _error = 'Vertretungspläne konnten nicht geladen werden';
+      _error = 'Server nicht erreichbar';
+      _todayError = 'Server nicht erreichbar';
+      _tomorrowError = 'Server nicht erreichbar';
     } finally {
       _isLoading = false;
       _showLoadingBar = false;
+      _todayLoading = false;
+      _tomorrowLoading = false;
       notifyListeners();
     }
   }
@@ -326,6 +306,54 @@ class PdfRepository extends ChangeNotifier {
   /// Retry loading PDFs (for retry button)
   Future<void> retryLoadPdfs() async {
     await preloadPdfs(forceReload: true);
+  }
+
+  /// Retry loading only today's PDF
+  Future<void> retryTodayPdf() async {
+    _todayLoading = true;
+    _todayError = null;
+    notifyListeners();
+
+    try {
+      final result = await downloadPdfWithWeekdayName(todayUrl, true, forceReload: true);
+      if (result != null) {
+        _todayError = null;
+        debugPrint('✅ [PdfRepository] Today PDF retry successful');
+      } else {
+        _todayError = 'Server nicht erreichbar';
+        debugPrint('❌ [PdfRepository] Today PDF retry failed');
+      }
+    } catch (e) {
+      _todayError = 'Server nicht erreichbar';
+      debugPrint('❌ [PdfRepository] Today PDF retry error: $e');
+    } finally {
+      _todayLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Retry loading only tomorrow's PDF
+  Future<void> retryTomorrowPdf() async {
+    _tomorrowLoading = true;
+    _tomorrowError = null;
+    notifyListeners();
+
+    try {
+      final result = await downloadPdfWithWeekdayName(tomorrowUrl, false, forceReload: true);
+      if (result != null) {
+        _tomorrowError = null;
+        debugPrint('✅ [PdfRepository] Tomorrow PDF retry successful');
+      } else {
+        _tomorrowError = 'Server nicht erreichbar';
+        debugPrint('❌ [PdfRepository] Tomorrow PDF retry failed');
+      }
+    } catch (e) {
+      _tomorrowError = 'Server nicht erreichbar';
+      debugPrint('❌ [PdfRepository] Tomorrow PDF retry error: $e');
+    } finally {
+      _tomorrowLoading = false;
+      notifyListeners();
+    }
   }
 }
 
