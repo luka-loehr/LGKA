@@ -29,6 +29,8 @@ class PdfRepository extends ChangeNotifier {
   String _tomorrowDate = '';
   bool _weekdaysLoaded = false;
   bool _isLoading = false;
+  bool _showLoadingBar = false;
+  String? _error;
 
 
   // Getters for accessing the data
@@ -40,6 +42,8 @@ class PdfRepository extends ChangeNotifier {
   String get tomorrowDate => _tomorrowDate;
   bool get weekdaysLoaded => _weekdaysLoaded;
   bool get isLoading => _isLoading;
+  bool get showLoadingBar => _showLoadingBar;
+  String? get error => _error;
 
   
   // Dynamic filename getters based on weekdays
@@ -283,6 +287,8 @@ class PdfRepository extends ChangeNotifier {
   /// Preload both PDFs from network
   Future<void> preloadPdfs({bool forceReload = false}) async {
     _isLoading = true;
+    _showLoadingBar = true;
+    _error = null; // Clear previous errors
     notifyListeners();
 
     debugPrint('🌐 [PdfRepository] Loading fresh PDFs from network');
@@ -297,15 +303,24 @@ class PdfRepository extends ChangeNotifier {
       // Check if at least one PDF was successfully downloaded
       if (results[0] != null || results[1] != null) {
         debugPrint('✅ [PdfRepository] Fresh PDFs downloaded successfully');
+        _error = null; // Clear error on success
       } else {
         debugPrint('❌ [PdfRepository] Failed to download PDFs');
+        _error = 'Vertretungspläne konnten nicht geladen werden';
       }
     } catch (e) {
       debugPrint('❌ [PdfRepository] Error downloading PDFs: $e');
+      _error = 'Vertretungspläne konnten nicht geladen werden';
     } finally {
       _isLoading = false;
+      _showLoadingBar = false;
       notifyListeners();
     }
+  }
+
+  /// Retry loading PDFs (for retry button)
+  Future<void> retryLoadPdfs() async {
+    await preloadPdfs(forceReload: true);
   }
 }
 
