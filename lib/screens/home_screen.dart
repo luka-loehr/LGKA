@@ -88,11 +88,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     await pdfRepo.preloadPdfs(forceReload: forceReload);
   }
 
-  /// Retry method for global PDF errors (when both PDFs fail)
+  /// Retry method for global connection errors (when both PDFs fail and no weather data)
   Future<void> _retryAll() async {
-    // Refresh only PDF data - weather works independently
-    final pdfRepo = ref.read(pdfRepositoryProvider);
-    await pdfRepo.retryLoadPdfs();
+    // Use unified retry service to retry both weather and PDFs simultaneously
+    final retryService = ref.read(globalRetryServiceProvider);
+    await retryService.retryAll();
   }
 
   /// Retry only today's PDF
@@ -287,17 +287,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Vertretungspläne nicht verfügbar',
+                        'Serververbindung fehlgeschlagen',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: AppColors.primaryText,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Der Schulserver ist momentan nicht erreichbar',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.secondaryText,
                         ),
                         textAlign: TextAlign.center,
                       ),
