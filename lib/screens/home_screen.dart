@@ -176,7 +176,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     }
 
     // Control error animation based on error state (keep error visible during retry)
-    if (pdfRepo.error != null && !pdfRepo.weekdaysLoaded) {
+    if (pdfRepo.shouldShowError) {
       if (_errorAnimationController.status == AnimationStatus.dismissed) {
         _errorAnimationController.forward();
       }
@@ -266,7 +266,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
             const SizedBox(height: 8),
 
           // Error state - same format as weather page (show error even during retry)
-          if (pdfRepo.error != null && !pdfRepo.weekdaysLoaded)
+          if (pdfRepo.shouldShowError)
             Expanded(
               child: FadeTransition(
                 opacity: _errorAnimation,

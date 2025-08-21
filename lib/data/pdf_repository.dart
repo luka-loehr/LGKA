@@ -45,6 +45,10 @@ class PdfRepository extends ChangeNotifier {
   bool get showLoadingBar => _showLoadingBar;
   String? get error => _error;
 
+  // Derived state for UI logic
+  bool get hasAnyData => _todayWeekday.isNotEmpty || _tomorrowWeekday.isNotEmpty;
+  bool get shouldShowError => _error != null && !hasAnyData;
+
   
   // Dynamic filename getters based on weekdays
   String get todayPdfFilename => _todayWeekday.isNotEmpty ? '${_todayWeekday.toLowerCase()}.pdf' : todayFilename;
@@ -288,7 +292,7 @@ class PdfRepository extends ChangeNotifier {
   Future<void> preloadPdfs({bool forceReload = false}) async {
     _isLoading = true;
     _showLoadingBar = true;
-    _error = null; // Clear previous errors
+    // Keep previous error visible during retry; clear only on success
     notifyListeners();
 
     debugPrint('🌐 [PdfRepository] Loading fresh PDFs from network');
@@ -306,6 +310,7 @@ class PdfRepository extends ChangeNotifier {
         _error = null; // Clear error on success
       } else {
         debugPrint('❌ [PdfRepository] Failed to download PDFs');
+        // Set user-facing error but do not clear existing data
         _error = 'Vertretungspläne konnten nicht geladen werden';
       }
     } catch (e) {
