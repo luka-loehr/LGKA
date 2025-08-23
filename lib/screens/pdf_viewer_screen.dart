@@ -48,6 +48,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<SearchResult> _searchResults = [];
   int _currentSearchIndex = -1;
+  
+  // Search bar state
+  bool _isSearchBarVisible = false;
 
   @override
   void initState() {
@@ -281,49 +284,41 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     setState(() {
       _searchResults.clear();
       _currentSearchIndex = -1;
+      _isSearchBarVisible = false;
     });
   }
 
-  void _showSearchDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Im PDF suchen'),
-          content: TextField(
-            controller: _searchController,
-            decoration: const InputDecoration(
-              hintText: 'Suchbegriff eingeben (z.B. "9b", "Mathe", "Raum 101")',
-              prefixIcon: Icon(Icons.search),
-            ),
-            autofocus: true,
-            onSubmitted: (value) {
-              if (value.trim().isNotEmpty) {
-                _searchInPdf(value);
-                Navigator.of(context).pop();
-              }
-            },
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Abbrechen'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Suchen'),
-              onPressed: () {
-                if (_searchController.text.trim().isNotEmpty) {
-                  _searchInPdf(_searchController.text);
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-          ],
+  void _showSearchBar() {
+    setState(() {
+      _isSearchBarVisible = true;
+    });
+    // Focus the search field after a short delay
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        FocusScope.of(context).requestFocus(FocusNode());
+        _searchController.selection = TextSelection.fromPosition(
+          TextPosition(offset: _searchController.text.length),
         );
-      },
-    );
+      }
+    });
+  }
+
+  void _hideSearchBar() {
+    setState(() {
+      _isSearchBarVisible = false;
+      _searchResults.clear();
+      _currentSearchIndex = -1;
+    });
+    _searchController.clear();
+  }
+
+  void _onSearchSubmitted(String query) {
+    if (query.trim().isNotEmpty) {
+      _searchInPdf(query);
+      setState(() {
+        _isSearchBarVisible = false;
+      });
+    }
   }
 
   Future<void> _sharePdf() async {
@@ -405,13 +400,31 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Stundenplan',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryText,
+        title: _isSearchBarVisible
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'Suchbegriff eingeben...',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(
+                    color: AppColors.secondaryText.withValues(alpha: 0.7),
+                  ),
+                ),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryText,
+                ),
+                onSubmitted: _onSearchSubmitted,
+                onTapOutside: (event) => _hideSearchBar(),
+              )
+            : Text(
+                'Stundenplan',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryText,
+                    ),
               ),
-        ),
         backgroundColor: AppColors.appBackground,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.primaryText),
@@ -426,16 +439,16 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         ),
         actions: [
           // Search functionality
-          if (_searchResults.isEmpty) ...[
+          if (_searchResults.isEmpty && !_isSearchBarVisible) ...[
             IconButton(
-              onPressed: () => _showSearchDialog(),
+              onPressed: _showSearchBar,
               icon: const Icon(
                 Icons.search,
                 color: AppColors.secondaryText,
               ),
               tooltip: 'Im PDF suchen',
             ),
-          ] else ...[
+          ] else if (_searchResults.isNotEmpty) ...[
             // Search navigation
             IconButton(
               onPressed: _previousSearchResult,
