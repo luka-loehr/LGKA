@@ -8,12 +8,14 @@ import '../screens/home_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/legal_screen.dart';
 import '../screens/pdf_viewer_screen.dart';
+import '../screens/schedule_page.dart';
 
 class AppRouter {
   static const String welcome = '/welcome';
   static const String auth = '/auth';
   static const String home = '/';
   static const String pdfViewer = '/pdf-viewer';
+  static const String schedule = '/schedule';
   static const String settings = '/settings';
   static const String legal = '/legal';
 
@@ -42,6 +44,10 @@ class AppRouter {
               dayName: data['dayName'],
             );
           },
+        ),
+        GoRoute(
+          path: schedule,
+          builder: (context, state) => const SchedulePage(),
         ),
         GoRoute(
           path: settings,

@@ -62,6 +62,9 @@ dependencies:
   # CSV Processing
   csv: ^6.0.0
   
+  # HTML Parsing
+  html: ^0.15.4
+  
   # Internationalization
   intl: ^0.20.2
   
