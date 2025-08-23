@@ -242,7 +242,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     final pdfRepo = ref.watch(pdfRepositoryProvider);
     
     if (!pdfRepo.isInitialized || pdfRepo.isLoading) {
-      return const _LoadingView();
+      return _LoadingView();
     }
 
     if (pdfRepo.hasAnyError && !pdfRepo.hasAnyData) {
@@ -655,15 +655,15 @@ class _LoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
           ),
-          SizedBox(height: 16),
-          Text(
+          const SizedBox(height: 16),
+          const Text(
             'Lade Vertretungspläne...',
             style: TextStyle(color: AppColors.secondaryText),
           ),
