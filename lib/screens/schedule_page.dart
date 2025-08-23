@@ -42,15 +42,15 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
 
   Widget _buildBody(ScheduleState state) {
     if (state.isLoading) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               'Lade Stundenpläne...',
               style: TextStyle(
                 color: AppColors.secondaryText,
@@ -254,14 +254,14 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
         content: Row(
           children: [
             CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
             ),
-            SizedBox(width: 16),
-            Text('Lade Stundenplan...'),
+            const SizedBox(width: 16),
+            const Text('Lade Stundenplan...'),
           ],
         ),
       ),
