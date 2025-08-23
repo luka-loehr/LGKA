@@ -93,14 +93,14 @@ class LegalScreen extends ConsumerWidget {
           children: [
             Icon(
               icon,
-              color: AppColors.appBlueAccent,
+              color: Theme.of(context).colorScheme.primary,
               size: 20,
             ),
             const SizedBox(width: 12),
             Text(
               text,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.appBlueAccent,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.w500,
               ),
             ),
