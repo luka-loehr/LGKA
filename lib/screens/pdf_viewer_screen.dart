@@ -103,25 +103,37 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       return;
     }
 
+    print('🔍 [PDFViewer] Starting search for: "$query"');
     setState(() {
       _currentSearchIndex = -1;
     });
 
     try {
       final bytes = await widget.pdfFile.readAsBytes();
+      print('🔍 [PDFViewer] PDF file size: ${bytes.length} bytes');
+      
       final document = syncfusion.PdfDocument(inputBytes: bytes);
       final pageCount = document.pages.count;
+      print('🔍 [PDFViewer] PDF has $pageCount pages');
+      
       final results = <SearchResult>[];
 
       for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
         try {
+          print('🔍 [PDFViewer] Processing page ${pageIndex + 1}');
+          
           final textExtractor = syncfusion.PdfTextExtractor(document);
           final pageText = textExtractor.extractText(
             startPageIndex: pageIndex,
             endPageIndex: pageIndex,
           );
+          
+          print('🔍 [PDFViewer] Page ${pageIndex + 1} text length: ${pageText.length}');
+          print('🔍 [PDFViewer] Page ${pageIndex + 1} sample text: ${pageText.substring(0, pageText.length > 100 ? 100 : pageText.length)}');
 
           if (pageText.toLowerCase().contains(query.toLowerCase())) {
+            print('🔍 [PDFViewer] Found match on page ${pageIndex + 1}');
+            
             // Find all occurrences on this page
             final lowerText = pageText.toLowerCase();
             final lowerQuery = query.toLowerCase();
@@ -145,14 +157,18 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               
               startIndex = index + 1;
             }
+          } else {
+            print('🔍 [PDFViewer] No match found on page ${pageIndex + 1}');
           }
         } catch (e) {
+          print('🔍 [PDFViewer] Error processing page ${pageIndex + 1}: $e');
           // Skip pages with extraction errors
           continue;
         }
       }
 
       document.dispose();
+      print('🔍 [PDFViewer] Search completed. Found ${results.length} results');
 
       setState(() {
         _searchResults = results;
@@ -161,11 +177,28 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
       if (results.isNotEmpty) {
         HapticService.subtle();
+      } else {
+        // Show a message when no results are found
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Keine Ergebnisse für "$query" gefunden'),
+              duration: const Duration(seconds: 3),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
       }
     } catch (e) {
-      // setState(() {
-      //   _searchError = 'Fehler beim Suchen: $e';
-      // });
+      print('🔍 [PDFViewer] Search error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Suchen: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -198,6 +231,53 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       _searchResults.clear();
       _currentSearchIndex = -1;
     });
+  }
+
+  // Debug method to test text extraction
+  Future<void> _testTextExtraction() async {
+    try {
+      print('🧪 [PDFViewer] Testing text extraction...');
+      
+      final bytes = await widget.pdfFile.readAsBytes();
+      print('🧪 [PDFViewer] PDF file size: ${bytes.length} bytes');
+      
+      final document = syncfusion.PdfDocument(inputBytes: bytes);
+      final pageCount = document.pages.count;
+      print('🧪 [PDFViewer] PDF has $pageCount pages');
+      
+      if (pageCount > 0) {
+        final textExtractor = syncfusion.PdfTextExtractor(document);
+        final firstPageText = textExtractor.extractText(
+          startPageIndex: 0,
+          endPageIndex: 0,
+        );
+        
+        print('🧪 [PDFViewer] First page text length: ${firstPageText.length}');
+        print('🧪 [PDFViewer] First page text (first 200 chars): ${firstPageText.substring(0, firstPageText.length > 200 ? 200 : firstPageText.length)}');
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Text extraction test: ${firstPageText.length} chars on first page'),
+              duration: const Duration(seconds: 5),
+              backgroundColor: Colors.blue,
+            ),
+          );
+        }
+      }
+      
+      document.dispose();
+    } catch (e) {
+      print('🧪 [PDFViewer] Text extraction test error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Text extraction test failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _showSearchDialog() {
@@ -362,6 +442,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 color: AppColors.secondaryText,
               ),
               tooltip: 'Im PDF suchen',
+            ),
+            // Debug button to test text extraction
+            IconButton(
+              onPressed: _testTextExtraction,
+              icon: const Icon(
+                Icons.bug_report,
+                color: Colors.orange,
+              ),
+              tooltip: 'Text Extraction Test',
             ),
           ] else ...[
             // Search navigation
