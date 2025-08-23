@@ -183,8 +183,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                   CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
+                  SizedBox(height: 16),
+                  Text(
                     'Lade Wetterdaten...',
                     style: TextStyle(color: AppColors.secondaryText),
                   ),
