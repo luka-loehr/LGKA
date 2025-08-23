@@ -239,14 +239,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                       ),
                     )
                   : Padding(
-                      padding: EdgeInsets.only(
-                        left: 16.0,
-                        right: 16.0,
-                        top: 16.0,
-                        bottom: _isButtonNavigation(context)
-                          ? 50.0  // Button navigation (3 buttons) - more space needed
-                          : 24.0, // Gesture navigation (white bar) - less space needed
-                      ),
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
                           // Weather station explanation or waiting message
