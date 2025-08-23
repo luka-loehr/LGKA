@@ -188,60 +188,29 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
             ),
           ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.schedule,
-                color: Colors.white,
-                size: 24,
+            // Header - Grade Level (e.g., "5-10" or "J11/J12")
+            Text(
+              schedule.gradeLevel,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: AppColors.primaryText,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    schedule.gradeLevel,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.primaryText,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _cleanScheduleTitle(schedule.title),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.secondaryText,
-                    ),
-                  ),
-                ],
+            const SizedBox(height: 16),
+            // Footer - Just the Halbjahr
+            Text(
+              schedule.halbjahr,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.secondaryText,
               ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: AppColors.secondaryText,
-              size: 16,
             ),
           ],
         ),
       ),
     );
-  }
-
-  /// Clean schedule title by removing "Stundenpläne" prefix
-  String _cleanScheduleTitle(String title) {
-    if (title.startsWith('Stundenpläne')) {
-      return title.substring('Stundenpläne'.length).trim();
-    }
-    return title;
   }
 
   Widget _buildFooter(BuildContext context) {
