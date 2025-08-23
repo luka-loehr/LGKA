@@ -154,32 +154,15 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
             children: [
               if (state.firstSemesterSchedules.isNotEmpty) ...[
-                _buildSemesterSection('1. Halbjahr', state.firstSemesterSchedules),
-                const SizedBox(height: 24),
+                ...state.firstSemesterSchedules.map((schedule) => _buildScheduleCard(schedule)),
+                const SizedBox(height: 16),
               ],
               if (state.secondSemesterSchedules.isNotEmpty) ...[
-                _buildSemesterSection('2. Halbjahr', state.secondSemesterSchedules),
+                ...state.secondSemesterSchedules.map((schedule) => _buildScheduleCard(schedule)),
               ],
             ],
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildSemesterSection(String semester, List<ScheduleItem> schedules) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          semester,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: 12),
-        ...schedules.map((schedule) => _buildScheduleCard(schedule)),
       ],
     );
   }
