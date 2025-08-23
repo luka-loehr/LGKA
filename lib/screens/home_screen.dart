@@ -651,7 +651,7 @@ class _ScheduleOptionButtonState extends ConsumerState<_ScheduleOptionButton>
 
 /// Loading view while PDFs are being initialized
 class _LoadingView extends StatelessWidget {
-  const _LoadingView();
+  _LoadingView();
 
   @override
   Widget build(BuildContext context) {
@@ -883,7 +883,7 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
   Widget _buildRetryButton() {
     return IconButton(
       onPressed: widget.onRetry,
-      icon: const Icon(
+      icon: Icon(
         Icons.refresh,
         color: Theme.of(context).colorScheme.primary,
         size: 20,

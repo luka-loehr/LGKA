@@ -231,8 +231,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                     ),
                   )
               : weatherState.chartData.isEmpty
-                  ? const Center(
-                      child: Text(
+                  ? Center(
+                      child: const Text(
                         'Keine Wetterdaten verfügbar',
                         style: TextStyle(color: AppColors.secondaryText),
                       ),
