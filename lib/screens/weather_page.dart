@@ -285,7 +285,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                               ],
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           // Current weather data cards
                           if (weatherState.latestData != null) ...[
                             // Temperature and humidity row
@@ -421,7 +421,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                               ],
                             ),
                             const SizedBox(height: 12),
-                            // Wind and pressure row
+                            // Wind speed and pressure row
                             Row(
                               children: [
                                 Expanded(
@@ -462,7 +462,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            'Wind',
+                                            'Windgeschwindigkeit',
                                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                               color: _selectedChart == ChartType.windSpeed
                                                   ? Theme.of(context).colorScheme.primary
@@ -475,11 +475,11 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                           const SizedBox(height: 4),
                                           Text(
                                             '${weatherState.latestData!.windSpeed.toStringAsFixed(1)} km/h',
-                                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                               color: _selectedChart == ChartType.windSpeed
                                                   ? Theme.of(context).colorScheme.primary
                                                   : AppColors.primaryText,
-                                              fontWeight: FontWeight.w600,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                         ],
@@ -539,11 +539,11 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                           const SizedBox(height: 4),
                                           Text(
                                             '${weatherState.latestData!.pressure.toStringAsFixed(0)} hPa',
-                                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                               color: _selectedChart == ChartType.pressure
                                                   ? Theme.of(context).colorScheme.primary
                                                   : AppColors.primaryText,
-                                              fontWeight: FontWeight.w600,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                         ],
@@ -554,7 +554,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                               ],
                             ),
                           ],
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           // Chart or time-based message
                           Expanded(
                             child: Container(
@@ -698,7 +698,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                   ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           _buildFooter(context),
                         ],
                       ),
