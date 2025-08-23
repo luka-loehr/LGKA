@@ -47,7 +47,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              color: AppColors.appBlueAccent,
+              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
             ),
             SizedBox(height: 16),
             Text(
@@ -105,7 +105,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
               ref.read(scheduleProvider.notifier).loadSchedules();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.appBlueAccent,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
             ),
             child: const Text('Erneut versuchen'),
@@ -169,7 +169,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
         Text(
           semester,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.appBlueAccent,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.w600,
               ),
         ),
@@ -194,12 +194,12 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.appBlueAccent.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.schedule,
-                  color: AppColors.appBlueAccent,
+                  color: Theme.of(context).colorScheme.primary,
                   size: 24,
                 ),
               ),
@@ -258,7 +258,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
         content: Row(
           children: [
             CircularProgressIndicator(
-              color: AppColors.appBlueAccent,
+              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
             ),
             SizedBox(width: 16),
             Text('Lade Stundenplan...'),
