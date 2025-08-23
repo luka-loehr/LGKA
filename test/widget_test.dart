@@ -23,7 +23,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          preferencesManagerProvider.overrideWithValue(preferencesManager),
+          preferencesManagerProvider.overrideWith((ref) => preferencesManager),
         ],
         child: const LGKAApp(initialRoute: AppRouter.welcome),
       ),
