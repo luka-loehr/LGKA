@@ -105,28 +105,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
 
   void _refreshData() {
-    // Use unified retry service to retry both weather and PDFs simultaneously
-    final retryService = ref.read(globalRetryServiceProvider);
-    retryService.retryAll();
-  }
-
-  void _updateDataInBackground() {
-    ref.read(weatherDataProvider.notifier).updateDataInBackground();
-  }
-
-  String _formatUpdateTime(DateTime time) {
-    final now = DateTime.now();
-    final difference = now.difference(time);
-    
-    if (difference.inMinutes < 1) {
-      return 'Gerade eben';
-    } else if (difference.inMinutes < 60) {
-      return 'vor ${difference.inMinutes} Minute${difference.inMinutes == 1 ? '' : 'n'}';
-    } else if (difference.inHours < 24) {
-      return 'vor ${difference.inHours} Stunde${difference.inHours == 1 ? '' : 'n'}';
-    } else {
-      return DateFormat('dd.MM. HH:mm').format(time);
-    }
+    // Retry weather data refresh
+    ref.read(weatherDataProvider.notifier).refreshWeatherData();
   }
 
   Widget _buildChartPlaceholder() {
@@ -134,10 +114,10 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       width: double.infinity,
       height: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.appSurface.withOpacity(0.3),
+        color: AppColors.appSurface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.secondaryText.withOpacity(0.1),
+          color: AppColors.secondaryText.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -169,10 +149,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     super.build(context);
 
     final weatherState = ref.watch(weatherDataProvider);
-    final connectivityState = ref.watch(connectivityProvider);
 
-    // Control error animation based on intelligent error state
-    final shouldShowWeatherError = connectivityState.shouldShowWeatherConnectionError;
+    // Control error animation based on weather error state
+    final shouldShowWeatherError = weatherState.error != null && weatherState.chartData.isEmpty;
     if (shouldShowWeatherError) {
       if (_errorAnimationController.status == AnimationStatus.dismissed) {
         _errorAnimationController.forward();
@@ -221,7 +200,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                         Icon(
                           Icons.cloud_off,
                           size: 64,
-                          color: AppColors.secondaryText.withOpacity(0.5),
+                          color: AppColors.secondaryText.withValues(alpha: 0.5),
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -273,13 +252,13 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: _isChartAvailable() 
-                                ? AppColors.appBlueAccent.withOpacity(0.1)
-                                : Colors.orange.withOpacity(0.1),
+                                ? AppColors.appBlueAccent.withValues(alpha: 0.1)
+                                : Colors.orange.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: _isChartAvailable() 
-                                  ? AppColors.appBlueAccent.withOpacity(0.3)
-                                  : Colors.orange.withOpacity(0.3),
+                                  ? AppColors.appBlueAccent.withValues(alpha: 0.3)
+                                  : Colors.orange.withValues(alpha: 0.3),
                                 width: 1,
                               ),
                             ),
@@ -332,8 +311,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                         boxShadow: [
                                           BoxShadow(
                                             color: _selectedChart == ChartType.temperature
-                                                ? AppColors.appBlueAccent.withOpacity(0.3)
-                                                : AppColors.appBlueAccent.withOpacity(0.1),
+                                                ? AppColors.appBlueAccent.withValues(alpha: 0.3)
+                                                : AppColors.appBlueAccent.withValues(alpha: 0.1),
                                             blurRadius: 8,
                                             offset: const Offset(0, 4),
                                           ),
@@ -375,7 +354,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       border: Border.all(color: Colors.transparent, width: 2),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.appBlueAccent.withOpacity(0.1),
+                                          color: AppColors.appBlueAccent.withValues(alpha: 0.1),
                                           blurRadius: 8,
                                           offset: const Offset(0, 4),
                                         ),
@@ -419,7 +398,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       border: Border.all(color: Colors.transparent, width: 2),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.appBlueAccent.withOpacity(0.1),
+                                          color: AppColors.appBlueAccent.withValues(alpha: 0.1),
                                           blurRadius: 8,
                                           offset: const Offset(0, 4),
                                         ),
@@ -458,7 +437,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       border: Border.all(color: Colors.transparent, width: 2),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.appBlueAccent.withOpacity(0.1),
+                                          color: AppColors.appBlueAccent.withValues(alpha: 0.1),
                                           blurRadius: 8,
                                           offset: const Offset(0, 4),
                                         ),
@@ -499,7 +478,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.appBlueAccent.withOpacity(0.1),
+                                    color: AppColors.appBlueAccent.withValues(alpha: 0.1),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -527,18 +506,18 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                               primaryXAxis: DateTimeAxis(
                                                 dateFormat: DateFormat.Hm(),
                                                 intervalType: DateTimeIntervalType.hours,
-                                                interval: 2,
+                                                interval: _calculateOptimalInterval(weatherState.chartData, context),
                                                 majorGridLines: MajorGridLines(
-                                                  color: AppColors.secondaryText.withOpacity(0.2),
+                                                  color: AppColors.secondaryText.withValues(alpha: 0.2),
                                                   width: 0.5,
                                                 ),
                                                 minorGridLines: const MinorGridLines(width: 0),
                                                 axisLine: AxisLine(
-                                                  color: AppColors.secondaryText.withOpacity(0.3),
+                                                  color: AppColors.secondaryText.withValues(alpha: 0.3),
                                                   width: 1,
                                                 ),
                                                 majorTickLines: MajorTickLines(
-                                                  color: AppColors.secondaryText.withOpacity(0.3),
+                                                  color: AppColors.secondaryText.withValues(alpha: 0.3),
                                                   width: 1,
                                                 ),
                                                 labelStyle: TextStyle(
@@ -562,16 +541,16 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                                   ),
                                                 ),
                                                 majorGridLines: MajorGridLines(
-                                                  color: AppColors.secondaryText.withOpacity(0.2),
+                                                  color: AppColors.secondaryText.withValues(alpha: 0.2),
                                                   width: 0.5,
                                                 ),
                                                 minorGridLines: const MinorGridLines(width: 0),
                                                 axisLine: AxisLine(
-                                                  color: AppColors.secondaryText.withOpacity(0.3),
+                                                  color: AppColors.secondaryText.withValues(alpha: 0.3),
                                                   width: 1,
                                                 ),
                                                 majorTickLines: MajorTickLines(
-                                                  color: AppColors.secondaryText.withOpacity(0.3),
+                                                  color: AppColors.secondaryText.withValues(alpha: 0.3),
                                                   width: 1,
                                                 ),
                                                 labelStyle: TextStyle(
@@ -616,7 +595,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       Icon(
                                         Icons.hourglass_empty,
                                         size: 48,
-                                        color: AppColors.secondaryText.withOpacity(0.5),
+                                        color: AppColors.secondaryText.withValues(alpha: 0.5),
                                       ),
                                       const SizedBox(height: 16),
                                       Text(
@@ -683,6 +662,47 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     final now = DateTime.now();
     // Charts are available after 0:30 (00:30)
     return now.hour > 0 || (now.hour == 0 && now.minute >= 30);
+  }
+  
+  /// Calculate optimal x-axis interval to prevent overlapping time labels
+  double _calculateOptimalInterval(List<WeatherData> chartData, BuildContext context) {
+    if (chartData.isEmpty) return 2.0;
+    
+    // Get the time range of the data
+    final firstTime = chartData.first.time;
+    final lastTime = chartData.last.time;
+    final totalHours = lastTime.difference(firstTime).inHours;
+    
+    // Get the actual chart width from MediaQuery
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final availableWidth = screenWidth - 64.0; // Account for padding (32px on each side)
+    
+    // Calculate how many labels we can comfortably fit
+    // We want to show enough labels to be useful but not so many that they overlap
+    final labelWidth = 70.0; // Approximate width of a time label (HH:MM) with some spacing
+    final maxLabels = (availableWidth / labelWidth).floor();
+    
+    // Ensure we have at least 2 labels and at most 8 labels
+    final targetLabels = maxLabels.clamp(2, 8);
+    
+    // Calculate the minimum interval needed
+    double minInterval = totalHours / targetLabels;
+    
+    // Round up to the nearest "nice" interval
+    if (minInterval <= 1.0) {
+      return 1.0; // Show every hour
+    } else if (minInterval <= 2.0) {
+      return 2.0; // Show every 2 hours
+    } else if (minInterval <= 3.0) {
+      return 3.0; // Show every 3 hours
+    } else if (minInterval <= 4.0) {
+      return 4.0; // Show every 4 hours
+    } else if (minInterval <= 6.0) {
+      return 6.0; // Show every 6 hours
+    } else {
+      return 12.0; // Show every 12 hours for very long ranges
+    }
   }
   
   String _getChartUnavailableMessage() {

@@ -71,7 +71,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
   Future<void> _preloadPdfs() async {
     try {
       final pdfRepo = ref.read(pdfRepositoryProvider);
-      await pdfRepo.preloadPdfs();
+      await pdfRepo.initialize();
     } catch (e) {
       debugPrint('Error preloading PDFs: $e');
     }
