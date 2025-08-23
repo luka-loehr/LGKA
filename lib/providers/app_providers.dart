@@ -6,7 +6,7 @@ import '../data/pdf_repository.dart';
 import '../services/weather_service.dart';
 
 // Preferences Manager Provider
-final preferencesManagerProvider = Provider<PreferencesManager>((ref) {
+final preferencesManagerProvider = ChangeNotifierProvider<PreferencesManager>((ref) {
   throw UnimplementedError('PreferencesManager must be overridden');
 });
 
