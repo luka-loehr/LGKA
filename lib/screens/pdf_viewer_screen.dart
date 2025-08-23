@@ -405,24 +405,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.dayName ?? 'Vertretungsplan',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryText,
-                  ),
-            ),
-            if (_searchResults.isNotEmpty)
-              Text(
-                '${_currentSearchIndex + 1} von ${_searchResults.length} Ergebnissen',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.secondaryText,
-                ),
+        title: Text(
+          widget.dayName ?? 'Vertretungsplan',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryText,
               ),
-          ],
         ),
         backgroundColor: AppColors.appBackground,
         elevation: 0,
@@ -487,94 +475,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       ),
       body: Column(
         children: [
-          // Search results display
-          if (_searchResults.isNotEmpty) ...[
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: AppColors.appSurface.withValues(alpha: 0.8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.search,
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Suche nach "${_searchResults[_currentSearchIndex].query}"',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.primaryText,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '${_currentSearchIndex + 1}/${_searchResults.length}',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              color: Theme.of(context).colorScheme.primary,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Seite ${_searchResults[_currentSearchIndex].pageNumber}',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _searchResults[_currentSearchIndex].context,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.secondaryText,
-                          ),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
           // PDF viewer
           Expanded(
             child: pdfx.PdfView(
