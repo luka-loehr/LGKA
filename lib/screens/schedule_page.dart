@@ -42,19 +42,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
         backgroundColor: AppColors.appBackground,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.primaryText),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              await HapticService.subtle();
-              ref.read(scheduleProvider.notifier).refreshSchedules();
-            },
-            icon: const Icon(
-              Icons.refresh,
-              color: AppColors.secondaryText,
-            ),
-            tooltip: 'Aktualisieren',
-          ),
-        ],
+
       ),
       body: _buildBody(scheduleState),
     );
@@ -171,25 +159,17 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
   }
 
   Widget _buildScheduleList(ScheduleState state) {
-    return RefreshIndicator(
-      onRefresh: () => ref.read(scheduleProvider.notifier).refreshSchedules(),
-      color: AppColors.appBlueAccent,
-      child: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          if (state.firstSemesterSchedules.isNotEmpty) ...[
-            _buildSemesterSection('1. Halbjahr', state.firstSemesterSchedules),
-            const SizedBox(height: 24),
-          ],
-          if (state.secondSemesterSchedules.isNotEmpty) ...[
-            _buildSemesterSection('2. Halbjahr', state.secondSemesterSchedules),
-          ],
-          if (state.lastUpdated != null) ...[
-            const SizedBox(height: 24),
-            _buildLastUpdatedInfo(state.lastUpdated!),
-          ],
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        if (state.firstSemesterSchedules.isNotEmpty) ...[
+          _buildSemesterSection('1. Halbjahr', state.firstSemesterSchedules),
+          const SizedBox(height: 24),
         ],
-      ),
+        if (state.secondSemesterSchedules.isNotEmpty) ...[
+          _buildSemesterSection('2. Halbjahr', state.secondSemesterSchedules),
+        ],
+      ],
     );
   }
 
@@ -270,32 +250,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     );
   }
 
-  Widget _buildLastUpdatedInfo(DateTime lastUpdated) {
-    return Center(
-      child: Text(
-        'Zuletzt aktualisiert: ${_formatDateTime(lastUpdated)}',
-        style: const TextStyle(
-          color: AppColors.secondaryText,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
 
-  String _formatDateTime(DateTime dateTime) {
-    final now = DateTime.now();
-    final difference = now.difference(dateTime);
-
-    if (difference.inMinutes < 1) {
-      return 'Gerade eben';
-    } else if (difference.inMinutes < 60) {
-      return 'Vor ${difference.inMinutes} Minuten';
-    } else if (difference.inHours < 24) {
-      return 'Vor ${difference.inHours} Stunden';
-    } else {
-      return '${dateTime.day}.${dateTime.month}.${dateTime.year}';
-    }
-  }
 
   void _openSchedule(ScheduleItem schedule) {
     HapticService.subtle();
