@@ -108,12 +108,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildSegmentedButton(int index, String title, IconData icon) {
     final isSelected = _currentPage == index;
+    final shouldShowText = _shouldShowTextForTab(index);
     
     return GestureDetector(
       onTap: () => _switchToPage(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: shouldShowText ? 16 : 12,
+          vertical: 8,
+        ),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.appBlueAccent : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
@@ -126,18 +130,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               size: 18,
               color: isSelected ? Colors.white : AppColors.secondaryText,
             ),
-            const SizedBox(width: 6),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: isSelected ? Colors.white : AppColors.secondaryText,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            if (shouldShowText) ...[
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: isSelected ? Colors.white : AppColors.secondaryText,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+  /// Determine if text should be shown for a specific tab based on current page
+  bool _shouldShowTextForTab(int tabIndex) {
+    // Always show text for the current page
+    if (tabIndex == _currentPage) return true;
+    
+    // Show text for adjacent tabs (left and right neighbors)
+    if (tabIndex == _currentPage - 1 || tabIndex == _currentPage + 1) return true;
+    
+    // Don't show text for distant tabs
+    return false;
   }
 
   void _switchToPage(int index) {
