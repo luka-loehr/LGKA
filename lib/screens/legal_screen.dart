@@ -1,19 +1,16 @@
+// Copyright Luka Löhr 2025
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lgka_flutter/providers/app_providers.dart';
-import 'package:lgka_flutter/theme/app_theme.dart';
-import 'package:lgka_flutter/providers/haptic_service.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../theme/app_theme.dart';
+import '../providers/haptic_service.dart';
 
 class LegalScreen extends ConsumerWidget {
   const LegalScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pdfRepo = ref.watch(pdfRepositoryProvider);
-    final todayPdfTimestamp = pdfRepo.todayLastUpdated;
-
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       appBar: AppBar(
