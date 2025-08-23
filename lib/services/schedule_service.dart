@@ -130,6 +130,37 @@ class ScheduleService {
       
       await file.writeAsBytes(response.bodyBytes);
       print('PDF saved successfully: ${file.path}');
+      
+      // Validate that the PDF is actually valid and non-empty
+      if (response.bodyBytes.length < 1000) {
+        // PDF is suspiciously small (likely empty or corrupted)
+        print('PDF appears to be empty or corrupted: ${schedule.title} (${response.bodyBytes.length} bytes)');
+        await file.delete(); // Clean up the invalid file
+        return null;
+      }
+      
+      // Check if server returned HTML instead of PDF (common error case)
+      final responseText = String.fromCharCodes(response.bodyBytes.take(100));
+      if (responseText.contains('<html') || responseText.contains('<!DOCTYPE') || responseText.contains('error')) {
+        print('Server returned HTML instead of PDF: ${schedule.title}');
+        await file.delete(); // Clean up the invalid file
+        return null;
+      }
+      
+      // Try to validate PDF structure (basic check)
+      try {
+        final pdfBytes = await file.readAsBytes();
+        if (pdfBytes.length > 0 && !_isValidPdfContent(pdfBytes)) {
+          print('PDF content appears invalid: ${schedule.title}');
+          await file.delete(); // Clean up the invalid file
+          return null;
+        }
+      } catch (e) {
+        print('Error validating PDF: ${schedule.title} - $e');
+        await file.delete(); // Clean up the invalid file
+        return null;
+      }
+      
       return file;
     } catch (e) {
       print('Error downloading schedule ${schedule.title}: $e');
@@ -141,6 +172,25 @@ class ScheduleService {
   void clearCache() {
     _cachedSchedules = null;
     _lastFetchTime = null;
+  }
+  
+  /// Check if PDF content appears to be valid
+  bool _isValidPdfContent(List<int> bytes) {
+    if (bytes.length < 8) return false;
+    
+    // Check for PDF header signature (%PDF-)
+    final header = String.fromCharCodes(bytes.take(8));
+    if (!header.startsWith('%PDF-')) {
+      return false;
+    }
+    
+    // Check for PDF trailer (basic validation)
+    final trailer = String.fromCharCodes(bytes.takeLast(100));
+    if (!trailer.contains('trailer') && !trailer.contains('startxref')) {
+      return false;
+    }
+    
+    return true;
   }
 }
 
