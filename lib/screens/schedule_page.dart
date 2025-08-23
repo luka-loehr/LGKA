@@ -154,12 +154,30 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
             children: [
+              // First group: 5-10 semesters
               if (state.firstHalbjahrSchedules.isNotEmpty) ...[
-                ...state.firstHalbjahrSchedules.map((schedule) => _buildScheduleCard(schedule)),
-                const SizedBox(height: 16),
+                ...state.firstHalbjahrSchedules
+                    .where((schedule) => schedule.gradeLevel == 'Klassen 5-10')
+                    .map((schedule) => _buildScheduleCard(schedule)),
+                const SizedBox(height: 16), // Same spacing as substitution screen
               ],
               if (state.secondHalbjahrSchedules.isNotEmpty) ...[
-                ...state.secondHalbjahrSchedules.map((schedule) => _buildScheduleCard(schedule)),
+                ...state.secondHalbjahrSchedules
+                    .where((schedule) => schedule.gradeLevel == 'Klassen 5-10')
+                    .map((schedule) => _buildScheduleCard(schedule)),
+                const SizedBox(height: 24), // Bigger spacing between groups
+              ],
+              // Second group: J11/J12 semesters
+              if (state.firstHalbjahrSchedules.isNotEmpty) ...[
+                ...state.firstHalbjahrSchedules
+                    .where((schedule) => schedule.gradeLevel == 'J11/J12')
+                    .map((schedule) => _buildScheduleCard(schedule)),
+                const SizedBox(height: 16), // Same spacing as substitution screen
+              ],
+              if (state.secondHalbjahrSchedules.isNotEmpty) ...[
+                ...state.secondHalbjahrSchedules
+                    .where((schedule) => schedule.gradeLevel == 'J11/J12')
+                    .map((schedule) => _buildScheduleCard(schedule)),
               ],
             ],
           ),
@@ -175,7 +193,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
       onTap: () => _openSchedule(schedule),
       child: Container(
         width: double.infinity,
-        margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         decoration: BoxDecoration(
           color: AppColors.appSurface,
@@ -188,24 +205,46 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            // Header - Grade Level (e.g., "5-10" or "J11/J12")
-            Text(
-              schedule.gradeLevel,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: AppColors.primaryText,
-                fontWeight: FontWeight.w600,
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.schedule,
+                color: Colors.white,
+                size: 24,
               ),
             ),
-            const SizedBox(height: 16),
-            // Footer - Just the Halbjahr
-            Text(
-              schedule.halbjahr,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.secondaryText,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Row(
+                children: [
+                  Text(
+                    schedule.gradeLevel,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppColors.primaryText,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    schedule.halbjahr,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppColors.secondaryText,
+                    ),
+                  ),
+                ],
               ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: AppColors.secondaryText,
+              size: 16,
             ),
           ],
         ),
