@@ -279,15 +279,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     }
   }
 
-  void _clearSearch() {
-    _searchController.clear();
-    setState(() {
-      _searchResults.clear();
-      _currentSearchIndex = -1;
-      _isSearchBarVisible = false;
-    });
-  }
-
   void _showSearchBar() {
     setState(() {
       _isSearchBarVisible = true;
