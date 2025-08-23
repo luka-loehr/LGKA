@@ -58,7 +58,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget _buildAccentColorSetting(BuildContext context, PreferencesManager preferencesManager) {
     final currentTheme = Theme.of(context);
     final presetColors = [
-      {'name': 'Blau', 'value': 'blue', 'color': Theme.of(context).colorScheme.primary},
+      {'name': 'Blau', 'value': 'blue', 'color': AppColors.appBlueAccent},
       {'name': 'Grün', 'value': 'green', 'color': Colors.green},
       {'name': 'Lila', 'value': 'purple', 'color': Colors.purple},
       {'name': 'Orange', 'value': 'orange', 'color': Colors.orange},
