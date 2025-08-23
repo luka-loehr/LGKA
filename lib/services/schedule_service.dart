@@ -70,13 +70,13 @@ class ScheduleService {
   Future<List<ScheduleItem>> _scrapeSchedules() async {
     final credentials = base64Encode(utf8.encode('$_username:$_password'));
     
-    final response = await http.get(
-      Uri.parse(_schedulePageUrl),
-      headers: {
-        'Authorization': 'Basic $credentials',
-        'User-Agent': 'LGKA-Flutter-App/1.0',
-      },
-    ).timeout(_timeout);
+          final response = await http.get(
+        Uri.parse(_schedulePageUrl),
+        headers: {
+          'Authorization': 'Basic $credentials',
+          'User-Agent': 'LGKA-App-Luka-Loehr',
+        },
+      ).timeout(_timeout);
 
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch schedule page: HTTP ${response.statusCode}');
@@ -97,7 +97,7 @@ class ScheduleService {
         Uri.parse(schedule.fullUrl),
         headers: {
           'Authorization': 'Basic $credentials',
-          'User-Agent': 'LGKA-Flutter-App/1.0',
+          'User-Agent': 'LGKA-App-Luka-Loehr',
         },
       ).timeout(_timeout);
 
