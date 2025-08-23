@@ -72,7 +72,7 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: 'Fehler beim Laden der Stundenpläne: $e',
+        error: 'Serververbindung fehlgeschlagen',
       );
     }
   }
@@ -90,7 +90,7 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
     } catch (e) {
       // Update error state
       state = state.copyWith(
-        error: 'Fehler beim Herunterladen: $e',
+        error: 'Serververbindung fehlgeschlagen',
       );
       return null;
     }
