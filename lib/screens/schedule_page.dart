@@ -31,12 +31,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
-      appBar: AppBar(
-        backgroundColor: AppColors.appBackground,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.primaryText),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: _buildBody(scheduleState),
       ),
-      body: _buildBody(scheduleState),
     );
   }
 
@@ -148,16 +146,23 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
   }
 
   Widget _buildScheduleList(ScheduleState state) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+    return Column(
       children: [
-        if (state.firstSemesterSchedules.isNotEmpty) ...[
-          _buildSemesterSection('1. Halbjahr', state.firstSemesterSchedules),
-          const SizedBox(height: 24),
-        ],
-        if (state.secondSemesterSchedules.isNotEmpty) ...[
-          _buildSemesterSection('2. Halbjahr', state.secondSemesterSchedules),
-        ],
+        const SizedBox(height: 24),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+            children: [
+              if (state.firstSemesterSchedules.isNotEmpty) ...[
+                _buildSemesterSection('1. Halbjahr', state.firstSemesterSchedules),
+                const SizedBox(height: 24),
+              ],
+              if (state.secondSemesterSchedules.isNotEmpty) ...[
+                _buildSemesterSection('2. Halbjahr', state.secondSemesterSchedules),
+              ],
+            ],
+          ),
+        ),
       ],
     );
   }
