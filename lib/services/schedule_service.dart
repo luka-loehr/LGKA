@@ -91,7 +91,7 @@ class ScheduleService {
   }
 
   /// Download a specific schedule PDF
-  Future<File> downloadSchedule(ScheduleItem schedule) async {
+  Future<File?> downloadSchedule(ScheduleItem schedule) async {
     try {
       final credentials = base64Encode(utf8.encode('$_username:$_password'));
       
@@ -108,6 +108,12 @@ class ScheduleService {
 
       print('Response status: ${response.statusCode}');
       print('Response headers: ${response.headers}');
+
+      // Handle 404 errors gracefully - PDF might not be available yet
+      if (response.statusCode == 404) {
+        print('PDF not available yet: ${schedule.title} (404)');
+        return null; // Return null instead of throwing exception
+      }
 
       if (response.statusCode != 200) {
         throw Exception('Failed to download PDF: HTTP ${response.statusCode}');
