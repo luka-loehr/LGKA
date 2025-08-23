@@ -57,7 +57,7 @@ dependencies:
   photo_view: ^0.15.0
   
   # Charts
-  syncfusion_flutter_charts: ^29.2.9
+  syncfusion_flutter_charts: ^30.2.6+1
   
   # CSV Processing
   csv: ^6.0.0
