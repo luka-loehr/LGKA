@@ -82,6 +82,11 @@ class ScheduleService {
       throw Exception('Failed to fetch schedule page: HTTP ${response.statusCode}');
     }
 
+    // Check if response body is empty or too short to be valid HTML
+    if (response.body.isEmpty || response.body.length < 100) {
+      throw Exception('Server returned empty or invalid response');
+    }
+
     return await compute(_parseScheduleHtml, response.body);
   }
 
