@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
 import '../providers/haptic_service.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 
 // Helper function for robust navigation bar detection across all Android devices
@@ -704,6 +705,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                   ),
                             ),
                           ),
+                          const SizedBox(height: 20),
+                          _buildFooter(context),
                         ],
                       ),
                     );
@@ -902,5 +905,59 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       return 'Diagramme sind ab 0:30 Uhr verfügbar.\nNoch $minutesLeft Minute${minutesLeft == 1 ? '' : 'n'} warten.';
     }
     return 'Diagramme sind ab 0:30 Uhr verfügbar.';
+  }
+
+  Widget _buildFooter(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: _getFooterPadding(context),
+      ),
+      child: FutureBuilder<PackageInfo>(
+        future: PackageInfo.fromPlatform(),
+        builder: (context, snapshot) {
+          final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '© 2025 ',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.secondaryText.withValues(alpha: 0.5),
+                ),
+              ),
+              Text(
+                'Luka Löhr',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                ' • v$version',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.secondaryText.withValues(alpha: 0.5),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  double _getFooterPadding(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final gestureInsets = mediaQuery.systemGestureInsets.bottom;
+    final viewPadding = mediaQuery.viewPadding.bottom;
+    
+    // Determine navigation mode based on gesture insets
+    if (gestureInsets >= 45) {
+      return 34.0; // Button navigation
+    } else if (gestureInsets <= 25) {
+      return 8.0; // Gesture navigation
+    } else {
+      // Ambiguous range - use viewPadding as secondary indicator
+      return viewPadding > 50 ? 34.0 : 8.0;
+    }
   }
 } 
