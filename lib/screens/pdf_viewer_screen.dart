@@ -227,17 +227,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       // Provide haptic feedback
       HapticService.subtle();
       
-      // Show a brief message indicating the navigation
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Seite ${result.pageNumber} - "${result.query}" gefunden'),
-            duration: const Duration(seconds: 2),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-          ),
-        );
-      }
-      
       print('🔍 [PDFViewer] Navigated to page ${result.pageNumber}');
     } catch (e) {
       print('🔍 [PDFViewer] Error navigating to page ${result.pageNumber}: $e');
