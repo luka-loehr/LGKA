@@ -3,10 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'theme/app_theme.dart';
+import 'package:lgka_flutter/navigation/app_router.dart';
+import 'package:lgka_flutter/providers/app_providers.dart';
+import 'package:lgka_flutter/widgets/edge_to_edge_wrapper.dart';
 import 'data/preferences_manager.dart';
-import 'providers/app_providers.dart';
-import 'navigation/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
