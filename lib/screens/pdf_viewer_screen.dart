@@ -2,32 +2,78 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
 import 'package:lgka_flutter/providers/haptic_service.dart';
-import 'package:pdfx/pdfx.dart';
+import 'package:pdfx/pdfx.dart' as pdfx;
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart' as syncfusion;
+
+// Search result data class
+class SearchResult {
+  final int pageNumber;
+  final String context;
+  final String query;
+  final int matchIndex;
+
+  SearchResult({
+    required this.pageNumber,
+    required this.context,
+    required this.query,
+    required this.matchIndex,
+  });
+}
 
 class PDFViewerScreen extends StatefulWidget {
   final File pdfFile;
   final String? dayName; // Optional day name for filename
+  final List<int>? targetPages; // Optional target pages for direct navigation
 
-  const PDFViewerScreen({super.key, required this.pdfFile, this.dayName});
+  const PDFViewerScreen({
+    super.key, 
+    required this.pdfFile, 
+    this.dayName,
+    this.targetPages,
+  });
 
   @override
   State<PDFViewerScreen> createState() => _PDFViewerScreenState();
 }
 
 class _PDFViewerScreenState extends State<PDFViewerScreen> {
-  late final PdfController _pdfController;
+  late final pdfx.PdfController _pdfController;
   bool _hasTriggeredLoadedHaptic = false;
   final GlobalKey _shareButtonKey = GlobalKey(); // Key for share button position
+  
+  // Search functionality
+  final TextEditingController _searchController = TextEditingController();
+  List<SearchResult> _searchResults = [];
+  int _currentSearchIndex = -1;
 
   @override
   void initState() {
     super.initState();
-    _pdfController = PdfController(
-      document: PdfDocument.openFile(widget.pdfFile.path),
+    _pdfController = pdfx.PdfController(
+      document: pdfx.PdfDocument.openFile(widget.pdfFile.path),
     );
+    
+    // Navigate to target page if provided
+    if (widget.targetPages != null && widget.targetPages!.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final targetPage = widget.targetPages!.first;
+        _pdfController.jumpToPage(targetPage - 1); // Convert to 0-based index
+        
+        // Show snackbar with found pages
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gefundene Seiten: ${widget.targetPages!.join(", ")}'),
+              duration: const Duration(seconds: 3),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
+          );
+        }
+      });
+    }
     
     // Trigger haptic feedback after a short delay to indicate PDF is loaded
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -43,7 +89,157 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   @override
   void dispose() {
     _pdfController.dispose();
+    _searchController.dispose();
     super.dispose();
+  }
+
+  // Search functionality
+  Future<void> _searchInPdf(String query) async {
+    if (query.trim().isEmpty) {
+      setState(() {
+        _searchResults.clear();
+        _currentSearchIndex = -1;
+      });
+      return;
+    }
+
+    setState(() {
+      _currentSearchIndex = -1;
+    });
+
+    try {
+      final bytes = await widget.pdfFile.readAsBytes();
+      final document = syncfusion.PdfDocument(inputBytes: bytes);
+      final pageCount = document.pages.count;
+      final results = <SearchResult>[];
+
+      for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+        try {
+          final textExtractor = syncfusion.PdfTextExtractor(document);
+          final pageText = textExtractor.extractText(
+            startPageIndex: pageIndex,
+            endPageIndex: pageIndex,
+          );
+
+          if (pageText.toLowerCase().contains(query.toLowerCase())) {
+            // Find all occurrences on this page
+            final lowerText = pageText.toLowerCase();
+            final lowerQuery = query.toLowerCase();
+            int startIndex = 0;
+            
+            while (true) {
+              final index = lowerText.indexOf(lowerQuery, startIndex);
+              if (index == -1) break;
+              
+              // Get context around the match
+              final contextStart = (index - 20).clamp(0, pageText.length);
+              final contextEnd = (index + query.length + 20).clamp(0, pageText.length);
+              final context = pageText.substring(contextStart, contextEnd);
+              
+              results.add(SearchResult(
+                pageNumber: pageIndex + 1,
+                context: context,
+                query: query,
+                matchIndex: index - contextStart,
+              ));
+              
+              startIndex = index + 1;
+            }
+          }
+        } catch (e) {
+          // Skip pages with extraction errors
+          continue;
+        }
+      }
+
+      document.dispose();
+
+      setState(() {
+        _searchResults = results;
+        _currentSearchIndex = results.isNotEmpty ? 0 : -1;
+      });
+
+      if (results.isNotEmpty) {
+        HapticService.subtle();
+      }
+    } catch (e) {
+      // setState(() {
+      //   _searchError = 'Fehler beim Suchen: $e';
+      // });
+    }
+  }
+
+  void _navigateToSearchResult(SearchResult result) {
+    _pdfController.jumpToPage(result.pageNumber - 1); // Convert to 0-based index
+    HapticService.subtle();
+  }
+
+  void _nextSearchResult() {
+    if (_searchResults.isNotEmpty && _currentSearchIndex < _searchResults.length - 1) {
+      setState(() {
+        _currentSearchIndex++;
+      });
+      _navigateToSearchResult(_searchResults[_currentSearchIndex]);
+    }
+  }
+
+  void _previousSearchResult() {
+    if (_searchResults.isNotEmpty && _currentSearchIndex > 0) {
+      setState(() {
+        _currentSearchIndex--;
+      });
+      _navigateToSearchResult(_searchResults[_currentSearchIndex]);
+    }
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    setState(() {
+      _searchResults.clear();
+      _currentSearchIndex = -1;
+    });
+  }
+
+  void _showSearchDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Im PDF suchen'),
+          content: TextField(
+            controller: _searchController,
+            decoration: const InputDecoration(
+              hintText: 'Suchbegriff eingeben (z.B. "9b", "Mathe", "Raum 101")',
+              prefixIcon: Icon(Icons.search),
+            ),
+            autofocus: true,
+            onSubmitted: (value) {
+              if (value.trim().isNotEmpty) {
+                _searchInPdf(value);
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Abbrechen'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Suchen'),
+              onPressed: () {
+                if (_searchController.text.trim().isNotEmpty) {
+                  _searchInPdf(_searchController.text);
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _sharePdf() async {
@@ -97,7 +293,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         }
       }
 
-      final result = await Share.shareXFiles(
+      await Share.shareXFiles(
         [XFile(tempFile.path)],
         subject: subject,
         sharePositionOrigin: sharePositionOrigin,
@@ -125,12 +321,24 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.dayName ?? 'Vertretungsplan',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryText,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.dayName ?? 'Vertretungsplan',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryText,
+                  ),
+            ),
+            if (_searchResults.isNotEmpty)
+              Text(
+                '${_currentSearchIndex + 1} von ${_searchResults.length} Ergebnissen',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.secondaryText,
+                ),
               ),
+          ],
         ),
         backgroundColor: AppColors.appBackground,
         elevation: 0,
@@ -145,6 +353,43 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           },
         ),
         actions: [
+          // Search functionality
+          if (_searchResults.isEmpty) ...[
+            IconButton(
+              onPressed: () => _showSearchDialog(),
+              icon: const Icon(
+                Icons.search,
+                color: AppColors.secondaryText,
+              ),
+              tooltip: 'Im PDF suchen',
+            ),
+          ] else ...[
+            // Search navigation
+            IconButton(
+              onPressed: _previousSearchResult,
+              icon: const Icon(
+                Icons.arrow_upward,
+                color: AppColors.secondaryText,
+              ),
+              tooltip: 'Vorheriges Ergebnis',
+            ),
+            IconButton(
+              onPressed: _nextSearchResult,
+              icon: const Icon(
+                Icons.arrow_downward,
+                color: AppColors.secondaryText,
+              ),
+              tooltip: 'Nächstes Ergebnis',
+            ),
+            IconButton(
+              onPressed: _clearSearch,
+              icon: const Icon(
+                Icons.close,
+                color: AppColors.secondaryText,
+              ),
+              tooltip: 'Suche schließen',
+            ),
+          ],
           IconButton(
             key: _shareButtonKey, // Add key for position calculation
             onPressed: _sharePdf,
@@ -156,30 +401,83 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           ),
         ],
       ),
-      body: PdfView(
-        controller: _pdfController,
-        builders: PdfViewBuilders<DefaultBuilderOptions>(
-          options: const DefaultBuilderOptions(
-            loaderSwitchDuration: Duration.zero, // Remove animation duration
-            transitionBuilder: _noTransition, // Use instant transition
+      body: Column(
+        children: [
+          // Search results display
+          if (_searchResults.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              color: AppColors.appSurface.withValues(alpha: 0.8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.search,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Suche nach "${_searchResults[_currentSearchIndex].query}"',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primaryText,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Seite ${_searchResults[_currentSearchIndex].pageNumber}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.secondaryText,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _searchResults[_currentSearchIndex].context,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.secondaryText,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+          // PDF viewer
+          Expanded(
+            child: pdfx.PdfView(
+              controller: _pdfController,
+              builders: pdfx.PdfViewBuilders<pdfx.DefaultBuilderOptions>(
+                options: const pdfx.DefaultBuilderOptions(
+                  loaderSwitchDuration: Duration.zero, // Remove animation duration
+                  transitionBuilder: _noTransition, // Use instant transition
+                ),
+                documentLoaderBuilder: (_) => const SizedBox.shrink(), // Remove document loading spinner
+                pageLoaderBuilder: (_) => const SizedBox.shrink(), // Remove page loading spinner
+                errorBuilder: (_, error) => Center(child: Text(error.toString())),
+                pageBuilder: _pageBuilder,
+              ),
+            ),
           ),
-          documentLoaderBuilder: (_) => const SizedBox.shrink(), // Remove document loading spinner
-          pageLoaderBuilder: (_) => const SizedBox.shrink(), // Remove page loading spinner
-          errorBuilder: (_, error) => Center(child: Text(error.toString())),
-          pageBuilder: _pageBuilder,
-        ),
+        ],
       ),
     );
   }
 
   PhotoViewGalleryPageOptions _pageBuilder(
     BuildContext context,
-    Future<PdfPageImage> pageImage,
+    Future<pdfx.PdfPageImage> pageImage,
     int index,
-    PdfDocument document,
+    pdfx.PdfDocument document,
   ) {
     return PhotoViewGalleryPageOptions(
-      imageProvider: PdfPageImageProvider(
+      imageProvider: pdfx.PdfPageImageProvider(
         pageImage,
         index,
         document.id,
