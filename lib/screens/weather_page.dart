@@ -910,7 +910,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   Widget _buildFooter(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: _getFooterPadding(context),
+        bottom: _isButtonNavigation(context) ? 34.0 : 8.0,
       ),
       child: FutureBuilder<PackageInfo>(
         future: PackageInfo.fromPlatform(),
@@ -943,21 +943,5 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
         },
       ),
     );
-  }
-
-  double _getFooterPadding(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final gestureInsets = mediaQuery.systemGestureInsets.bottom;
-    final viewPadding = mediaQuery.viewPadding.bottom;
-    
-    // Determine navigation mode based on gesture insets
-    if (gestureInsets >= 45) {
-      return 34.0; // Button navigation
-    } else if (gestureInsets <= 25) {
-      return 8.0; // Gesture navigation
-    } else {
-      // Ambiguous range - use viewPadding as secondary indicator
-      return viewPadding > 50 ? 34.0 : 8.0;
-    }
   }
 } 
