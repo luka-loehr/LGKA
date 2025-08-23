@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
 import 'package:lgka_flutter/providers/haptic_service.dart';
+import 'package:lgka_flutter/data/preferences_manager.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
