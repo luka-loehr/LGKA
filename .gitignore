@@ -36,8 +36,7 @@ migrate_working_dir/
 /build/
 pubspec.lock
 
-# Web related
-lib/generated_plugin_registrant.dart
+
 
 # Symbolication related
 app.*.symbols
@@ -83,32 +82,7 @@ app.*.map.json
 **/ios/**/*.xcworkspace/
 **/ios/**/*.xcodeproj/project.xcworkspace/
 
-# macOS/XCode related
-**/macos/**/*.mode1v3
-**/macos/**/*.mode2v3
-**/macos/**/*.moved-aside
-**/macos/**/*.pbxuser
-**/macos/**/*.perspectivev3
-**/macos/**/*sync/
-**/macos/**/.sconsign.dblite
-**/macos/**/.tags*
-**/macos/**/.vagrant/
-**/macos/**/DerivedData/
-**/macos/**/Icon?
-**/macos/**/Pods/
-**/macos/**/.symlinks/
-**/macos/**/profile
-**/macos/**/xcuserdata
-**/macos/.generated/
-**/macos/Flutter/App.framework
-**/macos/Flutter/Flutter.framework
-**/macos/Flutter/Generated.xcconfig
-**/macos/Flutter/app.flx
-**/macos/Flutter/app.zip
-**/macos/Flutter/flutter_assets/
-**/macos/Flutter/flutter_export_environment.sh
-**/macos/ServiceDefinitions.json
-**/macos/Runner/GeneratedPluginRegistrant.*
+
 
 # Sensitive files - Keys and credentials
 /keystore/
@@ -136,8 +110,6 @@ LGKA-v*.ipa
 
 # Build scripts outputs
 build_ios_release.sh
-build_macos_release.sh
-run_macos.sh
 
 # Personal documentation (helpful but not for repository)
 APP_STORE_SUBMISSION_CHECKLIST.md

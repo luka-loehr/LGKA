@@ -32,17 +32,9 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       appBar: AppBar(
-        title: Text(
-          'Stundenpläne',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryText,
-              ),
-        ),
         backgroundColor: AppColors.appBackground,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.primaryText),
-
       ),
       body: _buildBody(scheduleState),
     );
