@@ -87,8 +87,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
           const Text(
             'Fehler beim Laden',
             style: TextStyle(
-              color: AppColors.primaryText,
-            ),
+                  color: AppColors.primaryText,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -101,16 +101,17 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () {
-              ref.read(scheduleProvider.notifier).loadSchedules();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.appBlueAccent,
-              foregroundColor: Colors.white,
+              onPressed: () {
+                ref.read(scheduleProvider.notifier).loadSchedules();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.appBlueAccent,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Erneut versuchen'),
             ),
-            child: const Text('Erneut versuchen'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

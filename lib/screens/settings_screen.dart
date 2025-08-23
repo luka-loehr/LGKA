@@ -39,41 +39,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             color: AppColors.appSurface,
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Datum anzeigen',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.appOnSurface,
-                            fontWeight: FontWeight.w500,
-                          ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Datum nach Wochentag anzeigen',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.secondaryText,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-              Switch(
-                value: preferencesManager.showDatesWithWeekdays,
-                onChanged: (value) async {
-                  await preferencesManager.setShowDatesWithWeekdays(value);
-                  HapticService.subtle();
-                  setState(() {});
-                },
-                activeColor: AppColors.appBlueAccent,
-              ),
-            ],
+          child: Center(
+            child: Text(
+              'Weitere Einstellungen werden hier angezeigt',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.secondaryText,
+                  ),
+            ),
           ),
         ),
       ),

@@ -764,7 +764,6 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
   @override
   Widget build(BuildContext context) {
     final preferencesManager = ref.watch(preferencesManagerProvider);
-    final showDates = preferencesManager.showDatesWithWeekdays;
     
     final isDisabled = !widget.pdfState.canDisplay;
     final hasError = widget.pdfState.error != null;
@@ -793,7 +792,7 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
                   _buildIcon(isDisabled),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: _buildContent(showDates, isDisabled, hasError, isLoading),
+                    child: _buildContent(isDisabled, hasError, isLoading),
                   ),
                   if (hasError) _buildRetryButton(),
                 ],
@@ -844,7 +843,7 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
     );
   }
 
-  Widget _buildContent(bool showDates, bool isDisabled, bool hasError, bool isLoading) {
+  Widget _buildContent(bool isDisabled, bool hasError, bool isLoading) {
     final weekday = widget.pdfState.weekday ?? '';
     final date = widget.pdfState.date ?? '';
     
@@ -870,14 +869,10 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
         ),
         if (date.isNotEmpty && !isDisabled) ...[
           const SizedBox(width: 8),
-          AnimatedOpacity(
-            opacity: showDates ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 200),
-            child: Text(
-              date,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.secondaryText,
-              ),
+          Text(
+            date,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppColors.secondaryText,
             ),
           ),
         ],
@@ -965,10 +960,6 @@ class _SettingsSheet extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildDateSetting(context, preferencesManager),
-                    const SizedBox(height: 16),
-                    _buildDivider(),
-                    const SizedBox(height: 16),
                     _buildLegalLinks(context),
                   ],
                 ),
@@ -980,49 +971,7 @@ class _SettingsSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildDateSetting(BuildContext context, PreferencesManager preferencesManager) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Icon(
-          Icons.calendar_today_outlined,
-          color: AppColors.appBlueAccent,
-          size: 20,
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Datum anzeigen',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.appBlueAccent,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Datum nach Wochentag anzeigen',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.secondaryText,
-                ),
-              ),
-            ],
-          ),
-        ),
-        
-        Switch(
-          value: preferencesManager.showDatesWithWeekdays,
-          onChanged: (value) async {
-            await preferencesManager.setShowDatesWithWeekdays(value);
-            HapticService.subtle();
-          },
-          activeColor: AppColors.appBlueAccent,
-        ),
-      ],
-    );
-  }
+
 
   Widget _buildDivider() {
     return Container(
