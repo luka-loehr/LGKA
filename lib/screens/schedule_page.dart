@@ -2,11 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import '../theme/app_theme.dart';
+import 'package:go_router/go_router.dart';
+import '../providers/schedule_provider.dart';
 import '../providers/haptic_service.dart';
+import '../theme/app_theme.dart';
+import '../services/schedule_service.dart';
 
-/// Schedule page with different grade level options
 class SchedulePage extends ConsumerStatefulWidget {
   const SchedulePage({super.key});
 
@@ -14,273 +15,332 @@ class SchedulePage extends ConsumerStatefulWidget {
   ConsumerState<SchedulePage> createState() => _SchedulePageState();
 }
 
-class _SchedulePageState extends ConsumerState<SchedulePage>
-    with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
-  bool _hasShownButtons = false;
-
+class _SchedulePageState extends ConsumerState<SchedulePage> {
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOutCubic,
-    ));
-  }
-
-  @override
-  void dispose() {
-    _fadeController.dispose();
-    super.dispose();
-  }
-
-  void _startButtonAnimation() {
-    if (!_hasShownButtons) {
-      _hasShownButtons = true;
-      _fadeController.forward();
-    }
+    // Load schedules when page initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(scheduleProvider.notifier).loadSchedules();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Start animation when buttons should be visible
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startButtonAnimation();
-    });
+    final scheduleState = ref.watch(scheduleProvider);
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          const SizedBox(height: 24),
-          
-          // Schedule options with proper fade-in animation
-          FadeTransition(
-            opacity: _fadeAnimation,
-            child: _buildScheduleOptions(),
+    return Scaffold(
+      backgroundColor: AppColors.appBackground,
+      appBar: AppBar(
+        title: Text(
+          'Stundenpläne',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryText,
+              ),
+        ),
+        backgroundColor: AppColors.appBackground,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: AppColors.primaryText),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await HapticService.subtle();
+              ref.read(scheduleProvider.notifier).refreshSchedules();
+            },
+            icon: const Icon(
+              Icons.refresh,
+              color: AppColors.secondaryText,
+            ),
+            tooltip: 'Aktualisieren',
           ),
-          
-          const Spacer(),
-          
-          // Footer
-          _buildFooter(context),
+        ],
+      ),
+      body: _buildBody(scheduleState),
+    );
+  }
+
+  Widget _buildBody(ScheduleState state) {
+    if (state.isLoading) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              color: AppColors.appBlueAccent,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Lade Stundenpläne...',
+              style: TextStyle(
+                color: AppColors.secondaryText,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (state.hasError) {
+      return _buildErrorState(state.error!);
+    }
+
+    if (!state.hasSchedules) {
+      return _buildEmptyState();
+    }
+
+    return _buildScheduleList(state);
+  }
+
+  Widget _buildErrorState(String error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 64,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Fehler beim Laden',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: AppColors.primaryText,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              style: const TextStyle(
+                color: AppColors.secondaryText,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(scheduleProvider.notifier).loadSchedules();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.appBlueAccent,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Erneut versuchen'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.schedule,
+            color: AppColors.secondaryText,
+            size: 64,
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Keine Stundenpläne verfügbar',
+            style: TextStyle(
+              color: AppColors.primaryText,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Versuche es später erneut',
+            style: TextStyle(
+              color: AppColors.secondaryText,
+              fontSize: 14,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildScheduleOptions() {
+  Widget _buildScheduleList(ScheduleState state) {
+    return RefreshIndicator(
+      onRefresh: () => ref.read(scheduleProvider.notifier).refreshSchedules(),
+      color: AppColors.appBlueAccent,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          if (state.firstSemesterSchedules.isNotEmpty) ...[
+            _buildSemesterSection('1. Halbjahr', state.firstSemesterSchedules),
+            const SizedBox(height: 24),
+          ],
+          if (state.secondSemesterSchedules.isNotEmpty) ...[
+            _buildSemesterSection('2. Halbjahr', state.secondSemesterSchedules),
+          ],
+          if (state.lastUpdated != null) ...[
+            const SizedBox(height: 24),
+            _buildLastUpdatedInfo(state.lastUpdated!),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSemesterSection(String semester, List<ScheduleItem> schedules) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _ScheduleOptionButton(
-          label: 'Klassenstufe 5-7',
-          onTap: () => _openSchedule('klassenstufe_5_7'),
+        Text(
+          semester,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppColors.appBlueAccent,
+                fontWeight: FontWeight.w600,
+              ),
         ),
-        const SizedBox(height: 16),
-        _ScheduleOptionButton(
-          label: 'Klassenstufe 8-10',
-          onTap: () => _openSchedule('klassenstufe_8_10'),
-        ),
-        const SizedBox(height: 16),
-        _ScheduleOptionButton(
-          label: 'Oberstufe',
-          onTap: () => _openSchedule('oberstufe'),
-        ),
+        const SizedBox(height: 12),
+        ...schedules.map((schedule) => _buildScheduleCard(schedule)),
       ],
     );
   }
 
-  void _openSchedule(String scheduleType) {
-    // TODO: Implement schedule opening logic
-    // This could open a PDF viewer or navigate to a schedule screen
-    HapticService.subtle();
-  }
-
-  Widget _buildFooter(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: _getFooterPadding(context),
-      ),
-      child: FutureBuilder<PackageInfo>(
-        future: PackageInfo.fromPlatform(),
-        builder: (context, snapshot) {
-          final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildScheduleCard(ScheduleItem schedule) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      color: AppColors.appSurface,
+      elevation: 2,
+      child: InkWell(
+        onTap: () => _openSchedule(schedule),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
             children: [
-              Text(
-                '© 2025 ',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.secondaryText.withValues(alpha: 0.5),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.appBlueAccent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.schedule,
+                  color: AppColors.appBlueAccent,
+                  size: 24,
                 ),
               ),
-              Text(
-                'Luka Löhr',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.appBlueAccent.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                ' • v$version',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.secondaryText.withValues(alpha: 0.5),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  double _getFooterPadding(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final gestureInsets = mediaQuery.systemGestureInsets.bottom;
-    final viewPadding = mediaQuery.viewPadding.bottom;
-    
-    // Determine navigation mode based on gesture insets
-    if (gestureInsets >= 45) {
-      return 34.0; // Button navigation
-    } else if (gestureInsets <= 25) {
-      return 8.0; // Gesture navigation
-    } else {
-      // Ambiguous range - use viewPadding as secondary indicator
-      return viewPadding > 50 ? 34.0 : 8.0;
-    }
-  }
-}
-
-/// Schedule option button
-class _ScheduleOptionButton extends ConsumerStatefulWidget {
-  final String label;
-  final VoidCallback onTap;
-
-  const _ScheduleOptionButton({
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  ConsumerState<_ScheduleOptionButton> createState() => _ScheduleOptionButtonState();
-}
-
-class _ScheduleOptionButtonState extends ConsumerState<_ScheduleOptionButton>
-    with TickerProviderStateMixin {
-  late AnimationController _scaleController;
-  late Animation<double> _scaleAnimation;
-  bool _isPressed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _scaleController = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _scaleController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => _onTapDown(),
-      onTapUp: (_) => _onTapUp(),
-      onTapCancel: () => _onTapCancel(),
-      onTap: _handleTap,
-      child: AnimatedBuilder(
-        animation: _scaleAnimation,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _isPressed ? _scaleAnimation.value : 1.0,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              decoration: BoxDecoration(
-                color: _isPressed 
-                    ? AppColors.appSurface.withValues(alpha: 0.8)
-                    : AppColors.appSurface,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: _isPressed ? [] : [
-                  BoxShadow(
-                    color: AppColors.appBlueAccent.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.calendarIconBackground,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.schedule,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      widget.label,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppColors.appOnSurface,
-                        fontWeight: FontWeight.w500,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      schedule.gradeLevel,
+                      style: const TextStyle(
+                        color: AppColors.primaryText,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: AppColors.secondaryText.withValues(alpha: 0.6),
-                    size: 16,
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      schedule.title,
+                      style: const TextStyle(
+                        color: AppColors.secondaryText,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: AppColors.secondaryText,
+                size: 16,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  void _onTapDown() {
-    setState(() => _isPressed = true);
-    _scaleController.forward();
+  Widget _buildLastUpdatedInfo(DateTime lastUpdated) {
+    return Center(
+      child: Text(
+        'Zuletzt aktualisiert: ${_formatDateTime(lastUpdated)}',
+        style: const TextStyle(
+          color: AppColors.secondaryText,
+          fontSize: 12,
+        ),
+      ),
+    );
   }
 
-  void _onTapUp() {
-    setState(() => _isPressed = false);
-    _scaleController.reverse();
+  String _formatDateTime(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inMinutes < 1) {
+      return 'Gerade eben';
+    } else if (difference.inMinutes < 60) {
+      return 'Vor ${difference.inMinutes} Minuten';
+    } else if (difference.inHours < 24) {
+      return 'Vor ${difference.inHours} Stunden';
+    } else {
+      return '${dateTime.day}.${dateTime.month}.${dateTime.year}';
+    }
   }
 
-  void _onTapCancel() {
-    setState(() => _isPressed = false);
-    _scaleController.reverse();
-  }
-
-  void _handleTap() {
+  void _openSchedule(ScheduleItem schedule) {
     HapticService.subtle();
-    widget.onTap();
+    
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(
+              color: AppColors.appBlueAccent,
+            ),
+            SizedBox(width: 16),
+            Text('Lade Stundenplan...'),
+          ],
+        ),
+      ),
+    );
+
+    // Download schedule in background
+    ref.read(scheduleProvider.notifier).downloadSchedule(schedule).then((file) {
+      if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        
+        if (file != null) {
+          // Navigate to PDF viewer
+          context.push('/pdf-viewer', extra: {
+            'file': file,
+            'dayName': '${schedule.gradeLevel} - ${schedule.semester}',
+          });
+        }
+      }
+    }).catchError((e) {
+      if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Laden: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
   }
 } 
