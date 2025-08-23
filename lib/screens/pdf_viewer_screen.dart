@@ -125,17 +125,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       
       final results = <SearchResult>[];
 
-      // Show progress to user
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Durchsuche ${pageCount} Seiten nach "$query"...'),
-            duration: const Duration(seconds: 2),
-            backgroundColor: Colors.blue,
-          ),
-        );
-      }
-
       for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
         try {
           final textExtractor = syncfusion.PdfTextExtractor(document);
@@ -199,8 +188,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${results.length} Ergebnisse für "$query" gefunden - springe zu Seite ${results.first.pageNumber}'),
-              duration: const Duration(seconds: 3),
+              content: Text('${results.length} Ergebnisse gefunden'),
+              duration: const Duration(seconds: 2),
               backgroundColor: Colors.green,
             ),
           );
@@ -210,8 +199,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Keine Ergebnisse für "$query" in allen ${pageCount} Seiten gefunden'),
-              duration: const Duration(seconds: 4),
+              content: Text('Keine Ergebnisse gefunden'),
+              duration: const Duration(seconds: 2),
               backgroundColor: Colors.orange,
             ),
           );
