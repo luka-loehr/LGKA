@@ -327,7 +327,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '© 2025 ',
+                '© ${DateTime.now().year} ',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.secondaryText.withValues(alpha: 0.5),
                 ),
@@ -480,7 +480,7 @@ class _StundenplanPageState extends ConsumerState<_StundenplanPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '© 2025 ',
+                '© ${DateTime.now().year} ',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.secondaryText.withValues(alpha: 0.5),
                 ),

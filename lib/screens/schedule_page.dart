@@ -154,12 +154,12 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
             children: [
-              if (state.firstSemesterSchedules.isNotEmpty) ...[
-                ...state.firstSemesterSchedules.map((schedule) => _buildScheduleCard(schedule)),
+              if (state.firstHalbjahrSchedules.isNotEmpty) ...[
+                ...state.firstHalbjahrSchedules.map((schedule) => _buildScheduleCard(schedule)),
                 const SizedBox(height: 16),
               ],
-              if (state.secondSemesterSchedules.isNotEmpty) ...[
-                ...state.secondSemesterSchedules.map((schedule) => _buildScheduleCard(schedule)),
+              if (state.secondHalbjahrSchedules.isNotEmpty) ...[
+                ...state.secondHalbjahrSchedules.map((schedule) => _buildScheduleCard(schedule)),
               ],
             ],
           ),
@@ -257,7 +257,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '© 2025 ',
+                '© ${DateTime.now().year} ',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.secondaryText.withValues(alpha: 0.5),
                 ),
@@ -327,7 +327,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
           // Navigate to PDF viewer
           context.push('/pdf-viewer', extra: {
             'file': file,
-            'dayName': '${schedule.gradeLevel} - ${schedule.semester}',
+            'dayName': '${schedule.gradeLevel} - ${schedule.halbjahr}',
           });
         }
       }

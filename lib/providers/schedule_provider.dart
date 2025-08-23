@@ -38,16 +38,16 @@ class ScheduleState {
   /// Check if there's an error
   bool get hasError => error != null;
   
-  /// Get schedules by semester
-  List<ScheduleItem> getSchedulesBySemester(String semester) {
-    return schedules.where((s) => s.semester == semester).toList();
+  /// Get schedules by halbjahr
+  List<ScheduleItem> getSchedulesByHalbjahr(String halbjahr) {
+    return schedules.where((s) => s.halbjahr == halbjahr).toList();
   }
   
-  /// Get first semester schedules
-  List<ScheduleItem> get firstSemesterSchedules => getSchedulesBySemester('1. Halbjahr');
+  /// Get first halbjahr schedules
+  List<ScheduleItem> get firstHalbjahrSchedules => getSchedulesByHalbjahr('1. Halbjahr');
   
-  /// Get second semester schedules
-  List<ScheduleItem> get secondSemesterSchedules => getSchedulesBySemester('2. Halbjahr');
+  /// Get second halbjahr schedules
+  List<ScheduleItem> get secondHalbjahrSchedules => getSchedulesByHalbjahr('2. Halbjahr');
 }
 
 /// Notifier for managing schedule state
