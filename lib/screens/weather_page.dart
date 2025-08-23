@@ -913,7 +913,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '© 2025 ',
+                '© ${DateTime.now().year} ',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.secondaryText.withValues(alpha: 0.5),
                 ),
