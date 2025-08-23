@@ -188,7 +188,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${results.length} Ergebnisse gefunden'),
+              content: Text(results.length == 1 
+                ? '1 Ergebnis gefunden' 
+                : '${results.length} Ergebnisse gefunden'),
               duration: const Duration(seconds: 2),
               backgroundColor: Colors.green,
             ),
