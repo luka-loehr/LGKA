@@ -573,12 +573,16 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
             fontWeight: FontWeight.w500,
           ),
         ),
-        if (showDates && date.isNotEmpty && !isDisabled) ...[
+        if (date.isNotEmpty && !isDisabled) ...[
           const SizedBox(width: 8),
-          Text(
-            date,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.secondaryText,
+          AnimatedOpacity(
+            opacity: showDates ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 200),
+            child: Text(
+              date,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.secondaryText,
+              ),
             ),
           ),
         ],
