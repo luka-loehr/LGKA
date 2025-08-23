@@ -152,23 +152,23 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       children: [
-        if (state.firstSemesterSchedules.isNotEmpty) ...[
-          _buildSemesterSection('1. Halbjahr', state.firstSemesterSchedules),
+        if (state.firstHalbjahrSchedules.isNotEmpty) ...[
+          _buildHalbjahrSection('1. Halbjahr', state.firstHalbjahrSchedules),
           const SizedBox(height: 24),
         ],
-        if (state.secondSemesterSchedules.isNotEmpty) ...[
-          _buildSemesterSection('2. Halbjahr', state.secondSemesterSchedules),
+        if (state.secondHalbjahrSchedules.isNotEmpty) ...[
+          _buildHalbjahrSection('2. Halbjahr', state.secondHalbjahrSchedules),
         ],
       ],
     );
   }
 
-  Widget _buildSemesterSection(String semester, List<ScheduleItem> schedules) {
+  Widget _buildHalbjahrSection(String halbjahr, List<ScheduleItem> schedules) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          semester,
+          halbjahr,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: AppColors.appBlueAccent,
                 fontWeight: FontWeight.w600,
@@ -277,7 +277,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
           // Navigate to PDF viewer
           context.push('/pdf-viewer', extra: {
             'file': file,
-            'dayName': '${schedule.gradeLevel} - ${schedule.semester}',
+            'dayName': '${schedule.gradeLevel} - ${schedule.halbjahr}',
           });
         }
       }

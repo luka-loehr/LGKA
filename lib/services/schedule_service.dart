@@ -11,21 +11,21 @@ import 'package:path_provider/path_provider.dart';
 class ScheduleItem {
   final String title;
   final String url;
-  final String semester;
+  final String halbjahr;
   final String gradeLevel;
   final String fullUrl;
 
-  const ScheduleItem({
+  const   ScheduleItem({
     required this.title,
     required this.url,
-    required this.semester,
+    required this.halbjahr,
     required this.gradeLevel,
     required this.fullUrl,
   });
 
   @override
   String toString() {
-    return 'ScheduleItem(title: $title, semester: $semester, gradeLevel: $gradeLevel)';
+    return 'ScheduleItem(title: $title, halbjahr: $halbjahr, gradeLevel: $gradeLevel)';
   }
 }
 
@@ -111,8 +111,8 @@ class ScheduleService {
       // Save to temporary directory with descriptive filename
       final cacheDir = await getTemporaryDirectory();
       final sanitizedGradeLevel = schedule.gradeLevel.replaceAll('/', '_');
-      final sanitizedSemester = schedule.semester.replaceAll('.', '_');
-      final filename = '${sanitizedGradeLevel}_${sanitizedSemester}.pdf';
+      final sanitizedHalbjahr = schedule.halbjahr.replaceAll('.', '_');
+      final filename = '${sanitizedGradeLevel}_${sanitizedHalbjahr}.pdf';
       final file = File('${cacheDir.path}/$filename');
       
       print('Saving PDF with filename: $filename');
@@ -165,16 +165,16 @@ List<ScheduleItem> _parseScheduleHtml(String htmlContent) {
         print('  Original href: $href');
         print('  Converted URL: $fullUrl');
 
-        // Extract semester and grade level from title
-        final semester = _extractSemester(title);
+        // Extract halbjahr and grade level from title
+        final halbjahr = _extractHalbjahr(title);
         final gradeLevel = _extractGradeLevel(title);
 
-        print('  Semester: $semester, Grade Level: $gradeLevel');
+        print('  Halbjahr: $halbjahr, Grade Level: $gradeLevel');
 
         schedules.add(ScheduleItem(
           title: title,
           url: href,
-          semester: semester,
+          halbjahr: halbjahr,
           gradeLevel: gradeLevel,
           fullUrl: fullUrl,
         ));
@@ -191,8 +191,8 @@ List<ScheduleItem> _parseScheduleHtml(String htmlContent) {
   }
 }
 
-/// Extract semester information from title
-String _extractSemester(String title) {
+/// Extract halbjahr information from title
+String _extractHalbjahr(String title) {
   if (title.contains('1.HJ')) return '1. Halbjahr';
   if (title.contains('2.HJ')) return '2. Halbjahr';
   return 'Unbekannt';
