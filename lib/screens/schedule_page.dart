@@ -335,6 +335,15 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
             'file': file,
             'dayName': '${schedule.gradeLevel} - ${schedule.halbjahr}',
           });
+        } else {
+          // PDF is not available yet
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${schedule.halbjahr} ist noch nicht verfügbar'),
+              backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 3),
+            ),
+          );
         }
       }
     }).catchError((e) {
