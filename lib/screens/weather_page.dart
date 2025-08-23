@@ -176,15 +176,15 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     }
     
     return weatherState.isLoading && weatherState.chartData.isEmpty
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Lade Wetterdaten...',
                     style: TextStyle(color: AppColors.secondaryText),
                   ),
