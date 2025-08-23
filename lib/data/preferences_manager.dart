@@ -7,8 +7,9 @@ class PreferencesManager extends ChangeNotifier {
   static const String _keyFirstLaunch = 'is_first_launch';
   static const String _keyAuthenticated = 'is_authenticated';
   static const String _keyDebugMode = 'is_debug_mode';
-
   static const String _keyShowNavigationDebug = 'show_navigation_debug';
+  static const String _keyAccentColor = 'accent_color';
+  static const String _keyVibrationEnabled = 'vibration_enabled';
 
   late final SharedPreferences _prefs;
 
@@ -48,6 +49,22 @@ class PreferencesManager extends ChangeNotifier {
 
   Future<void> setShowNavigationDebug(bool value) async {
     await _prefs.setBool(_keyShowNavigationDebug, value);
+    notifyListeners();
+  }
+
+  // Accent color preference
+  String get accentColor => _prefs.getString(_keyAccentColor) ?? 'blue';
+
+  Future<void> setAccentColor(String color) async {
+    await _prefs.setString(_keyAccentColor, color);
+    notifyListeners();
+  }
+
+  // Vibration preference
+  bool get vibrationEnabled => _prefs.getBool(_keyVibrationEnabled) ?? true;
+
+  Future<void> setVibrationEnabled(bool value) async {
+    await _prefs.setBool(_keyVibrationEnabled, value);
     notifyListeners();
   }
 
