@@ -130,7 +130,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
             width: 24,
             height: 24,
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.appBlueAccent),
+              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
               strokeWidth: 2,
             ),
           ),
@@ -181,7 +181,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.appBlueAccent),
+                    valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
                   ),
                   SizedBox(height: 16),
                   Text(
@@ -218,7 +218,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                           icon: const Icon(Icons.refresh),
                           label: const Text('Erneut versuchen'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.appBlueAccent,
+                            backgroundColor: Theme.of(context).colorScheme.primary,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             shape: RoundedRectangleBorder(
@@ -259,7 +259,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: _isChartAvailable() 
-                                  ? AppColors.appBlueAccent.withValues(alpha: 0.3)
+                                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
                                   : Colors.orange.withValues(alpha: 0.3),
                                 width: 1.5,
                               ),
@@ -273,7 +273,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                     : 'Daten werden gesammelt',
                                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                     color: _isChartAvailable() 
-                                      ? AppColors.appBlueAccent
+                                      ? Theme.of(context).colorScheme.primary
                                       : Colors.orange,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -320,12 +320,12 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
                                         color: _selectedChart == ChartType.temperature
-                                            ? AppColors.appBlueAccent.withValues(alpha: 0.1)
+                                            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
                                             : AppColors.appSurface,
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
                                           color: _selectedChart == ChartType.temperature
-                                              ? AppColors.appBlueAccent
+                                              ? Theme.of(context).colorScheme.primary
                                               : AppColors.secondaryText.withValues(alpha: 0.2),
                                           width: _selectedChart == ChartType.temperature ? 2 : 1,
                                         ),
@@ -338,7 +338,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                             'Temperatur',
                                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                               color: _selectedChart == ChartType.temperature
-                                                  ? AppColors.appBlueAccent
+                                                  ? Theme.of(context).colorScheme.primary
                                                   : AppColors.secondaryText,
                                               fontWeight: _selectedChart == ChartType.temperature
                                                   ? FontWeight.w600
@@ -350,7 +350,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                             '${weatherState.latestData!.temperature.toStringAsFixed(1)}°C',
                                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                               color: _selectedChart == ChartType.temperature
-                                                  ? AppColors.appBlueAccent
+                                                  ? Theme.of(context).colorScheme.primary
                                                   : AppColors.primaryText,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -384,12 +384,12 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
                                         color: _selectedChart == ChartType.humidity
-                                            ? AppColors.appBlueAccent.withValues(alpha: 0.1)
+                                            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
                                             : AppColors.appSurface,
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
                                           color: _selectedChart == ChartType.humidity
-                                              ? AppColors.appBlueAccent
+                                              ? Theme.of(context).colorScheme.primary
                                               : AppColors.secondaryText.withValues(alpha: 0.2),
                                           width: _selectedChart == ChartType.humidity ? 2 : 1,
                                         ),
@@ -402,7 +402,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                             'Luftfeuchtigkeit',
                                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                               color: _selectedChart == ChartType.humidity
-                                                  ? AppColors.appBlueAccent
+                                                  ? Theme.of(context).colorScheme.primary
                                                   : AppColors.secondaryText,
                                               fontWeight: _selectedChart == ChartType.humidity
                                                   ? FontWeight.w600
@@ -414,7 +414,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                             '${weatherState.latestData!.humidity.toStringAsFixed(0)}%',
                                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                               color: _selectedChart == ChartType.humidity
-                                                  ? AppColors.appBlueAccent
+                                                  ? Theme.of(context).colorScheme.primary
                                                   : AppColors.primaryText,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -453,12 +453,12 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
                                         color: _selectedChart == ChartType.windSpeed
-                                            ? AppColors.appBlueAccent.withValues(alpha: 0.1)
+                                            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
                                             : AppColors.appSurface,
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
                                           color: _selectedChart == ChartType.windSpeed
-                                              ? AppColors.appBlueAccent
+                                              ? Theme.of(context).colorScheme.primary
                                               : AppColors.secondaryText.withValues(alpha: 0.2),
                                           width: _selectedChart == ChartType.windSpeed ? 2 : 1,
                                         ),
@@ -471,7 +471,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                             'Wind',
                                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                               color: _selectedChart == ChartType.windSpeed
-                                                  ? AppColors.appBlueAccent
+                                                  ? Theme.of(context).colorScheme.primary
                                                   : AppColors.secondaryText,
                                               fontWeight: _selectedChart == ChartType.windSpeed
                                                   ? FontWeight.w600
@@ -483,7 +483,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                             '${weatherState.latestData!.windSpeed.toStringAsFixed(1)} km/h',
                                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                               color: _selectedChart == ChartType.windSpeed
-                                                  ? AppColors.appBlueAccent
+                                                  ? Theme.of(context).colorScheme.primary
                                                   : AppColors.primaryText,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -517,12 +517,12 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
                                         color: _selectedChart == ChartType.pressure
-                                            ? AppColors.appBlueAccent.withValues(alpha: 0.1)
+                                            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
                                             : AppColors.appSurface,
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
                                           color: _selectedChart == ChartType.pressure
-                                              ? AppColors.appBlueAccent
+                                              ? Theme.of(context).colorScheme.primary
                                               : AppColors.secondaryText.withValues(alpha: 0.2),
                                           width: _selectedChart == ChartType.pressure ? 2 : 1,
                                         ),
@@ -535,7 +535,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                             'Luftdruck',
                                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                               color: _selectedChart == ChartType.pressure
-                                                  ? AppColors.appBlueAccent
+                                                  ? Theme.of(context).colorScheme.primary
                                                   : AppColors.secondaryText,
                                               fontWeight: _selectedChart == ChartType.pressure
                                                   ? FontWeight.w600
@@ -547,7 +547,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                             '${weatherState.latestData!.pressure.toStringAsFixed(0)} hPa',
                                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                               color: _selectedChart == ChartType.pressure
-                                                  ? AppColors.appBlueAccent
+                                                  ? Theme.of(context).colorScheme.primary
                                                   : AppColors.primaryText,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -570,7 +570,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.appBlueAccent.withValues(alpha: 0.1),
+                                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -661,7 +661,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                                   color: AppColors.primaryText,
                                                   fontSize: 12,
                                                 ),
-                                                borderColor: AppColors.appBlueAccent,
+                                                borderColor: Theme.of(context).colorScheme.primary,
                                                 borderWidth: 1,
                                                 format: _getTooltipFormat(),
                                               ),
@@ -670,7 +670,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                                   dataSource: weatherState.chartData,
                                                   xValueMapper: (WeatherData data, _) => data.time,
                                                   yValueMapper: (WeatherData data, _) => _getYValue(data),
-                                                  color: AppColors.appBlueAccent,
+                                                  color: Theme.of(context).colorScheme.primary,
                                                   width: 3,
                                                   splineType: SplineType.cardinal,
                                                   cardinalSplineTension: 0.7,
