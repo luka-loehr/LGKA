@@ -17,19 +17,41 @@ class AppColors {
   // Text colors
   static const Color primaryText = Colors.white;
   static const Color secondaryText = Color(0xB3FFFFFF); // White with 70% opacity (ARGB format)
+
+  // Accent color mapping
+  static Color getAccentColor(String colorName) {
+    switch (colorName) {
+      case 'blue':
+        return appBlueAccent;
+      case 'green':
+        return Colors.green;
+      case 'purple':
+        return Colors.purple;
+      case 'orange':
+        return Colors.orange;
+      case 'pink':
+        return Colors.pink;
+      default:
+        return appBlueAccent;
+    }
+  }
 }
 
 class AppTheme {
-  static ThemeData get darkTheme {
+  static ThemeData get darkTheme => getDarkThemeWithAccent('blue');
+
+  static ThemeData getDarkThemeWithAccent(String accentColorName) {
+    final accentColor = AppColors.getAccentColor(accentColorName);
+    
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
       
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         surface: AppColors.appBackground,
         surfaceContainer: AppColors.appSurface,
         onSurface: AppColors.appOnBackground,
-        primary: AppColors.appBlueAccent,
+        primary: accentColor,
         onPrimary: Colors.white,
         secondary: AppColors.iconTint,
         onSecondary: Colors.white,
@@ -37,7 +59,7 @@ class AppTheme {
 
       scaffoldBackgroundColor: AppColors.appBackground,
       
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.appBackground,
         foregroundColor: AppColors.primaryText,
         elevation: 0,
@@ -93,7 +115,7 @@ class AppTheme {
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.appBlueAccent,
+          backgroundColor: accentColor,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -122,7 +144,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.appBlueAccent),
+          borderSide: BorderSide(color: accentColor),
         ),
         hintStyle: const TextStyle(color: AppColors.secondaryText),
         labelStyle: const TextStyle(color: AppColors.secondaryText),
@@ -131,6 +153,21 @@ class AppTheme {
       dividerTheme: const DividerThemeData(
         color: Color(0x1AFFFFFF), // White with 10% opacity
         thickness: 1,
+      ),
+
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return accentColor;
+          }
+          return AppColors.iconTint;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return accentColor.withValues(alpha: 0.5);
+          }
+          return AppColors.iconTint.withValues(alpha: 0.3);
+        }),
       ),
     );
   }
