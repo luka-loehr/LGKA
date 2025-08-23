@@ -7,7 +7,7 @@ class PreferencesManager extends ChangeNotifier {
   static const String _keyFirstLaunch = 'is_first_launch';
   static const String _keyAuthenticated = 'is_authenticated';
   static const String _keyDebugMode = 'is_debug_mode';
-  static const String _keyShowDates = 'show_dates_with_weekdays';
+
   static const String _keyShowNavigationDebug = 'show_navigation_debug';
 
   late final SharedPreferences _prefs;
@@ -41,13 +41,7 @@ class PreferencesManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Show dates with weekdays (enabled by default)
-  bool get showDatesWithWeekdays => _prefs.getBool(_keyShowDates) ?? true;
 
-  Future<void> setShowDatesWithWeekdays(bool value) async {
-    await _prefs.setBool(_keyShowDates, value);
-    notifyListeners();
-  }
   
   // Show navigation debug window (disabled by default)
   bool get showNavigationDebug => _prefs.getBool(_keyShowNavigationDebug) ?? false;
