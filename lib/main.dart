@@ -61,10 +61,11 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
   }
 
   Future<void> _preloadData() async {
-    // Run both preloading operations in parallel for faster startup
+    // Run all preloading operations in parallel for faster startup
     await Future.wait([
       _preloadPdfs(),
       _preloadWeatherData(),
+      _preloadSchedules(),
     ]);
   }
 
@@ -83,6 +84,15 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
       await weatherDataNotifier.preloadWeatherData();
     } catch (e) {
       debugPrint('Error preloading weather data: $e');
+    }
+  }
+
+  Future<void> _preloadSchedules() async {
+    try {
+      final scheduleNotifier = ref.read(scheduleProvider.notifier);
+      await scheduleNotifier.loadSchedules();
+    } catch (e) {
+      debugPrint('Error preloading schedules: $e');
     }
   }
 

@@ -61,8 +61,13 @@ class WeatherService {
     print('🌤️ [WeatherService] URL: $csvUrl');
     
     try {
-      print('🌤️ [WeatherService] Making HTTP request...');
-      final response = await http.get(Uri.parse(csvUrl)).timeout(const Duration(seconds: 5));
+          print('🌤️ [WeatherService] Making HTTP request...');
+    final response = await http.get(
+      Uri.parse(csvUrl),
+      headers: {
+        'User-Agent': 'LGKA-App-Luka-Loehr',
+      },
+    ).timeout(const Duration(seconds: 5));
       
       print('🌤️ [WeatherService] Response status code: ${response.statusCode}');
       print('🌤️ [WeatherService] Response headers: ${response.headers}');
@@ -187,7 +192,12 @@ class WeatherService {
     
     try {
       print('🌤️ [WeatherService] Making HTTP request for latest data...');
-      final response = await http.get(Uri.parse(csvUrl)).timeout(const Duration(seconds: 5));
+      final response = await http.get(
+        Uri.parse(csvUrl),
+        headers: {
+          'User-Agent': 'LGKA-App-Luka-Loehr',
+        },
+      ).timeout(const Duration(seconds: 5));
       
       if (response.statusCode != 200) {
         print('❌ [WeatherService] HTTP error: ${response.statusCode}');
