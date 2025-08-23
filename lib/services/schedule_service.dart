@@ -185,7 +185,7 @@ class ScheduleService {
     }
     
     // Check for PDF trailer (basic validation)
-    final trailer = String.fromCharCodes(bytes.takeLast(100));
+    final trailer = String.fromCharCodes(bytes.skip(bytes.length - 100).take(100));
     if (!trailer.contains('trailer') && !trailer.contains('startxref')) {
       return false;
     }
