@@ -99,8 +99,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildSegmentedButton(0, 'Vertretungsplan', Icons.calendar_today),
-          _buildSegmentedButton(1, 'Stundenplan', Icons.schedule),
-          _buildSegmentedButton(2, 'Wetter', Icons.wb_sunny_outlined),
+          _buildSegmentedButton(1, 'Wetter', Icons.wb_sunny_outlined),
+          _buildSegmentedButton(2, 'Stundenplan', Icons.schedule),
         ],
       ),
     );
@@ -174,8 +174,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       },
       children: [
         const _SubstitutionPlanPage(),
-        const SchedulePage(),
         const WeatherPage(),
+        const SchedulePage(),
       ],
     );
   }
