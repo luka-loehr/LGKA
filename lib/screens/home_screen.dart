@@ -187,7 +187,41 @@ class _SubstitutionPlanPage extends ConsumerStatefulWidget {
   ConsumerState<_SubstitutionPlanPage> createState() => _SubstitutionPlanPageState();
 }
 
-class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage> {
+class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
+    with TickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
+  bool _hasShownButtons = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOutCubic,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
+  }
+
+  void _startButtonAnimation() {
+    if (!_hasShownButtons) {
+      _hasShownButtons = true;
+      _fadeController.forward();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final pdfRepo = ref.watch(pdfRepositoryProvider);
@@ -202,14 +236,22 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage> {
       );
     }
 
+    // Start animation when buttons should be visible
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startButtonAnimation();
+    });
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
           const SizedBox(height: 24),
           
-          // Plan options
-          _buildPlanOptions(pdfRepo),
+          // Plan options with proper fade-in animation
+          FadeTransition(
+            opacity: _fadeAnimation,
+            child: _buildPlanOptions(pdfRepo),
+          ),
           
           const Spacer(),
           
