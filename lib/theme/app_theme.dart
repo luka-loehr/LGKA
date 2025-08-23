@@ -26,7 +26,7 @@ class AppColors {
       case 'lavender':
         return Color(0xFF9B6BDF); // More saturated lavender - elegant and vibrant
       case 'mint':
-        return Color(0xFF4FB89A); // Slightly darker mint green - trendy and vibrant
+        return Color(0xFF45A88A); // A bit more darker mint green - trendy and vibrant
       case 'peach':
         return Color(0xFFD4945A); // More saturated peach - warm and vibrant
       case 'rose':
