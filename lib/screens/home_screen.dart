@@ -831,8 +831,8 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
       height: 40,
       decoration: BoxDecoration(
         color: isDisabled 
-            ? AppColors.calendarIconBackground.withValues(alpha: 0.5)
-            : AppColors.calendarIconBackground,
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
+            : Theme.of(context).colorScheme.primary,
         shape: BoxShape.circle,
       ),
       child: Icon(
