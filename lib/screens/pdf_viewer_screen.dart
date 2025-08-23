@@ -169,11 +169,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               final context = pageText.substring(contextStart, contextEnd);
               
               results.add(SearchResult(
-                pageNumber: pageIndex + 1,
+                pageNumber: pageIndex + 2, // +2 instead of +1 to fix the offset
                 context: context,
                 query: query,
                 matchIndex: index - contextStart,
               ));
+              
+              print('🔍 [PDFViewer] Added result: pageIndex=$pageIndex, reportedPage=${pageIndex + 2}, actualPage=${pageIndex + 1}');
               
               startIndex = index + 1;
             }
