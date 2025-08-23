@@ -119,7 +119,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           vertical: 8,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.appBlueAccent : Colors.transparent,
+          color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -335,7 +335,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
               Text(
                 'Luka Löhr',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.appBlueAccent.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -488,7 +488,7 @@ class _StundenplanPageState extends ConsumerState<_StundenplanPage>
               Text(
                 'Luka Löhr',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.appBlueAccent.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -583,7 +583,7 @@ class _ScheduleOptionButtonState extends ConsumerState<_ScheduleOptionButton>
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: _isPressed ? [] : [
                   BoxShadow(
-                    color: AppColors.appBlueAccent.withValues(alpha: 0.1),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -660,7 +660,7 @@ class _LoadingView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.appBlueAccent),
+            valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
           ),
           SizedBox(height: 16),
           Text(
@@ -705,7 +705,7 @@ class _ErrorView extends StatelessWidget {
             icon: const Icon(Icons.refresh),
             label: const Text('Erneut versuchen'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.appBlueAccent,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -818,7 +818,7 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
     if (_isPressed || isDisabled) return [];
     return [
       BoxShadow(
-        color: AppColors.appBlueAccent.withValues(alpha: 0.1),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         blurRadius: 8,
         offset: const Offset(0, 4),
       ),
@@ -885,7 +885,7 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
       onPressed: widget.onRetry,
       icon: const Icon(
         Icons.refresh,
-        color: AppColors.appBlueAccent,
+        color: Theme.of(context).colorScheme.primary,
         size: 20,
       ),
       padding: EdgeInsets.zero,
@@ -982,7 +982,7 @@ class _SettingsSheet extends ConsumerWidget {
   Widget _buildAccentColorSetting(BuildContext context, PreferencesManager preferencesManager) {
     final currentTheme = Theme.of(context);
     final presetColors = [
-      {'name': 'Blau', 'value': 'blue', 'color': AppColors.appBlueAccent},
+      {'name': 'Blau', 'value': 'blue', 'color': Theme.of(context).colorScheme.primary},
       {'name': 'Grün', 'value': 'green', 'color': Colors.green},
       {'name': 'Lila', 'value': 'purple', 'color': Colors.purple},
       {'name': 'Orange', 'value': 'orange', 'color': Colors.orange},
