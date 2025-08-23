@@ -199,10 +199,10 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.cloud_off,
                           size: 64,
-                          color: AppColors.secondaryText.withValues(alpha: 0.5),
+                          color: AppColors.secondaryText,
                         ),
                         const SizedBox(height: 16),
                         Text(
