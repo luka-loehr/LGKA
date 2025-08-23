@@ -226,24 +226,72 @@ Map<String, String> _extractPdfData(List<int> bytes) {
     if (planMatch != null) {
       final partialDate = planMatch.group(1)!;
       weekday = planMatch.group(2)!;
+
+      // Extract year from the date context, not from anywhere in the text
+      // Look for year in the same line or nearby context as the date
+      final dateContextPattern = RegExp(r'(\d{1,2}\.\d{1,2}\.)\s*\/\s*(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag).*?(\d{4})', caseSensitive: false, dotAll: true);
+      final dateContextMatch = dateContextPattern.firstMatch(text);
       
-      // Extract year from timestamp
-      final yearPattern = RegExp(r'(\d{4})');
-      final yearMatch = yearPattern.firstMatch(text);
-      if (yearMatch != null) {
-        date = '$partialDate${yearMatch.group(0)}';
+      if (dateContextMatch != null) {
+        date = '$partialDate${dateContextMatch.group(3)}';
       } else {
-        date = partialDate;
+        // If no year found in context, use current year
+        final currentYear = DateTime.now().year;
+        date = '$partialDate$currentYear';
       }
+
+      // Normalize date format: ensure month has leading zero
+      date = date.replaceAllMapped(
+        RegExp(r'(\d{1,2})\.(\d{1,2})\.(\d{4})'),
+        (match) {
+          final day = match.group(1)!.padLeft(2, '0');
+          final month = match.group(2)!.padLeft(2, '0');
+          final year = match.group(3);
+          return '$day.$month.$year';
+        },
+      );
+
+      // Debug: Print the extracted date
+      debugPrint('DEBUG: Extracted date: "$date" from partial: "$partialDate"');
+      debugPrint('DEBUG: Full text for context: "${text.substring(0, text.length > 200 ? 200 : text.length)}"');
     } else {
-      // Fallback patterns
-      final weekdayPattern = RegExp(r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)', caseSensitive: false);
-      final weekdayMatch = weekdayPattern.firstMatch(text);
-      weekday = weekdayMatch?.group(1) ?? '';
-      
-      final datePattern = RegExp(r'(\d{1,2}\.\d{1,2}\.\d{4})');
-      final dateMatch = datePattern.firstMatch(text);
-      date = dateMatch?.group(1) ?? '';
+      // Fallback patterns - look for complete date format first
+      final completeDatePattern = RegExp(r'(\d{1,2}\.\d{1,2}\.\d{4})');
+      final completeDateMatch = completeDatePattern.firstMatch(text);
+      if (completeDateMatch != null) {
+        date = completeDateMatch.group(1)!;
+      } else {
+        // If no complete date, try to find weekday and partial date separately
+        final weekdayPattern = RegExp(r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)', caseSensitive: false);
+        final weekdayMatch = weekdayPattern.firstMatch(text);
+        weekday = weekdayMatch?.group(1) ?? '';
+        
+        // Look for partial date near the weekday
+        final partialDatePattern = RegExp(r'(\d{1,2}\.\d{1,2}\.)');
+        final partialDateMatch = partialDatePattern.firstMatch(text);
+        if (partialDateMatch != null) {
+          // Use current year for partial dates
+          final currentYear = DateTime.now().year;
+          date = '${partialDateMatch.group(1)}$currentYear';
+        }
+      }
+
+      // Also normalize fallback date format
+      if (date.isNotEmpty) {
+        date = date.replaceAllMapped(
+          RegExp(r'(\d{1,2})\.(\d{1,2})\.(\d{4})'),
+          (match) {
+            final day = match.group(1)!.padLeft(2, '0');
+            final month = match.group(2)!.padLeft(2, '0');
+            final year = match.group(3);
+            return '$day.$month.$year';
+          },
+        );
+      }
+
+      // Debug: Print the fallback extracted date
+      debugPrint('DEBUG: Fallback extracted date: "$date"');
+      debugPrint('DEBUG: Fallback weekday: "$weekday"');
     }
 
     // Extract last updated timestamp
