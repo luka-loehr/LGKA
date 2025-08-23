@@ -1,8 +1,9 @@
 // Copyright Luka Löhr 2025
 
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PreferencesManager {
+class PreferencesManager extends ChangeNotifier {
   static const String _keyFirstLaunch = 'is_first_launch';
   static const String _keyAuthenticated = 'is_authenticated';
   static const String _keyDebugMode = 'is_debug_mode';
@@ -21,6 +22,7 @@ class PreferencesManager {
 
   Future<void> setFirstLaunch(bool value) async {
     await _prefs.setBool(_keyFirstLaunch, value);
+    notifyListeners();
   }
 
   // Authentication status
@@ -28,6 +30,7 @@ class PreferencesManager {
 
   Future<void> setAuthenticated(bool value) async {
     await _prefs.setBool(_keyAuthenticated, value);
+    notifyListeners();
   }
 
   // Debug mode status
@@ -35,6 +38,7 @@ class PreferencesManager {
 
   Future<void> setDebugMode(bool value) async {
     await _prefs.setBool(_keyDebugMode, value);
+    notifyListeners();
   }
 
   // Show dates with weekdays (enabled by default)
@@ -42,6 +46,7 @@ class PreferencesManager {
 
   Future<void> setShowDatesWithWeekdays(bool value) async {
     await _prefs.setBool(_keyShowDates, value);
+    notifyListeners();
   }
   
   // Show navigation debug window (disabled by default)
@@ -49,10 +54,12 @@ class PreferencesManager {
 
   Future<void> setShowNavigationDebug(bool value) async {
     await _prefs.setBool(_keyShowNavigationDebug, value);
+    notifyListeners();
   }
 
   // Clear all preferences
   Future<void> clearAllPreferences() async {
     await _prefs.clear();
+    notifyListeners();
   }
 } 
