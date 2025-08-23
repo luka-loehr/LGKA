@@ -46,6 +46,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   
   // Search functionality
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
   List<SearchResult> _searchResults = [];
   int _currentSearchIndex = -1;
   
@@ -93,6 +94,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   void dispose() {
     _pdfController.dispose();
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -287,14 +289,18 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     // Focus the search field after the widget is built to open keyboard
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        // Create a focus node and request focus
-        final focusNode = FocusNode();
-        FocusScope.of(context).requestFocus(focusNode);
-        
-        // Set cursor position to end of text
-        _searchController.selection = TextSelection.fromPosition(
-          TextPosition(offset: _searchController.text.length),
-        );
+        // Use a small delay to ensure the TextField is fully rendered
+        Future.delayed(const Duration(milliseconds: 50), () {
+          if (mounted) {
+            // Request focus using the dedicated focus node
+            _searchFocusNode.requestFocus();
+            
+            // Set cursor position to end of text
+            _searchController.selection = TextSelection.fromPosition(
+              TextPosition(offset: _searchController.text.length),
+            );
+          }
+        });
       }
     });
   }
@@ -486,6 +492,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                   Expanded(
                     child: TextField(
                       controller: _searchController,
+                      focusNode: _searchFocusNode,
                       autofocus: true,
                       decoration: InputDecoration(
                         hintText: 'Suchbegriff eingeben...',
