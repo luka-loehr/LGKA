@@ -283,10 +283,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     setState(() {
       _isSearchBarVisible = true;
     });
-    // Focus the search field after a short delay
-    Future.delayed(const Duration(milliseconds: 100), () {
+    
+    // Focus the search field after the widget is built to open keyboard
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        FocusScope.of(context).requestFocus(FocusNode());
+        // Create a focus node and request focus
+        final focusNode = FocusNode();
+        FocusScope.of(context).requestFocus(focusNode);
+        
+        // Set cursor position to end of text
         _searchController.selection = TextSelection.fromPosition(
           TextPosition(offset: _searchController.text.length),
         );
@@ -391,31 +396,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: _isSearchBarVisible
-            ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                decoration: InputDecoration(
-                  hintText: 'Suchbegriff eingeben...',
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(
-                    color: AppColors.secondaryText.withValues(alpha: 0.7),
-                  ),
-                ),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryText,
-                ),
-                onSubmitted: _onSearchSubmitted,
-                onTapOutside: (event) => _hideSearchBar(),
-              )
-            : Text(
-                'Stundenplan',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryText,
-                    ),
+        title: Text(
+          'Stundenplan',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryText,
               ),
+        ),
         backgroundColor: AppColors.appBackground,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.primaryText),
@@ -489,6 +476,54 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       ),
       body: Column(
         children: [
+          // Expandable search bar below app bar
+          if (_isSearchBarVisible) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              color: AppColors.appSurface.withValues(alpha: 0.95),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: 'Suchbegriff eingeben...',
+                        prefixIcon: const Icon(Icons.search, color: AppColors.secondaryText),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 2,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: AppColors.appBackground,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppColors.primaryText,
+                      ),
+                      onSubmitted: _onSearchSubmitted,
+                      onTapOutside: (event) => _hideSearchBar(),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  IconButton(
+                    onPressed: _hideSearchBar,
+                    icon: const Icon(Icons.close, color: AppColors.secondaryText),
+                    tooltip: 'Suche abbrechen',
+                  ),
+                ],
+              ),
+            ),
+          ],
           // PDF viewer
           Expanded(
             child: pdfx.PdfView(
