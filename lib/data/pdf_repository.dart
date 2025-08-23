@@ -134,7 +134,7 @@ class PdfRepository extends ChangeNotifier {
       Uri.parse(url),
       headers: {
         'Authorization': 'Basic $credentials',
-        'User-Agent': 'LGKA-Flutter-App/1.0',
+        'User-Agent': 'LGKA-App-Luka-Loehr',
       },
     ).timeout(_timeout);
 

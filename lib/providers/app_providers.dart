@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/preferences_manager.dart';
 import '../data/pdf_repository.dart';
 import '../services/weather_service.dart';
+import '../providers/schedule_provider.dart';
+import '../services/schedule_service.dart';
 
 // Preferences Manager Provider
 final preferencesManagerProvider = ChangeNotifierProvider<PreferencesManager>((ref) {
@@ -158,3 +160,12 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
     }
   }
 }
+
+// Schedule Provider
+final scheduleProvider = StateNotifierProvider<ScheduleNotifier, ScheduleState>((ref) {
+  return ScheduleNotifier(ref.read(scheduleServiceProvider));
+});
+
+final scheduleServiceProvider = Provider<ScheduleService>((ref) {
+  return ScheduleService();
+});
