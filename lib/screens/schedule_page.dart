@@ -74,40 +74,38 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
 
   Widget _buildErrorState(String error) {
     return Padding(
-      padding: const EdgeInsets.only(top: 24.0),
+      padding: const EdgeInsets.all(32.0),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.error_outline,
-            color: Colors.red,
+          Icon(
+            Icons.schedule_outlined,
             size: 64,
+            color: AppColors.secondaryText.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Fehler beim Laden',
-            style: TextStyle(
-              color: AppColors.primaryText,
-            ),
-          ),
-          const SizedBox(height: 8),
           Text(
-            error,
-            style: const TextStyle(
-              color: AppColors.secondaryText,
-              fontSize: 14,
+            'Serververbindung fehlgeschlagen',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: AppColors.primaryText,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
+          ElevatedButton.icon(
             onPressed: () {
               ref.read(scheduleProvider.notifier).loadSchedules();
             },
+            icon: const Icon(Icons.refresh),
+            label: const Text('Erneut versuchen'),
             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text('Erneut versuchen'),
           ),
         ],
       ),
