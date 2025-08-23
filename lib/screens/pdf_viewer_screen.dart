@@ -51,14 +51,31 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     await HapticService.subtle();
     
     try {
-          // Create a nice filename for sharing
-    String fileName;
-    if (widget.dayName != null && widget.dayName!.isNotEmpty) {
-      final dayFormatted = widget.dayName!.toLowerCase();
-      fileName = '${dayFormatted}_vertretungsplan.pdf';
-    } else {
-      fileName = 'vertretungsplan.pdf';
-    }
+      // Create a nice filename for sharing
+      String fileName;
+      String subject;
+      
+      if (widget.dayName != null && widget.dayName!.isNotEmpty) {
+        // Check if this is a schedule (contains "Klassen" or "J11/J12")
+        if (widget.dayName!.contains('Klassen') || widget.dayName!.contains('J11/J12')) {
+          // This is a schedule PDF
+          final cleanName = widget.dayName!
+              .replaceAll('Klassen ', '')
+              .replaceAll('J11/J12', 'J11-12')
+              .replaceAll(' - ', '_')
+              .replaceAll(' ', '');
+          fileName = 'LGKA_Stundenplan_$cleanName.pdf';
+          subject = 'LGKA+ Stundenplan';
+        } else {
+          // This is a substitution plan
+          final dayFormatted = widget.dayName!.toLowerCase();
+          fileName = 'LGKA_Vertretungsplan_$dayFormatted.pdf';
+          subject = 'LGKA+ Vertretungsplan';
+        }
+      } else {
+        fileName = 'LGKA_Dokument.pdf';
+        subject = 'LGKA+ Dokument';
+      }
 
       // Create a temporary file with the nice name for sharing
       final tempDir = Directory.systemTemp;
@@ -82,7 +99,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
       final result = await Share.shareXFiles(
         [XFile(tempFile.path)],
-        subject: 'LGKA+ Vertretungsplan',
+        subject: subject,
         sharePositionOrigin: sharePositionOrigin,
       );
 
