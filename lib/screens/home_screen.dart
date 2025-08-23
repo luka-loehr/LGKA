@@ -979,10 +979,10 @@ class _SettingsSheet extends ConsumerWidget {
     final currentTheme = Theme.of(context);
     final presetColors = [
       {'name': 'Blau', 'value': 'blue', 'color': AppColors.appBlueAccent},
-      {'name': 'Grün', 'value': 'green', 'color': Colors.green},
-      {'name': 'Lila', 'value': 'purple', 'color': Colors.purple},
-      {'name': 'Orange', 'value': 'orange', 'color': Colors.orange},
-      {'name': 'Rosa', 'value': 'pink', 'color': Colors.pink},
+      {'name': 'Mint', 'value': 'mint', 'color': Color(0xFF7FB8A8)},
+      {'name': 'Lavendel', 'value': 'lavender', 'color': Color(0xFFB8A9D9)},
+      {'name': 'Rose', 'value': 'rose', 'color': Color(0xFFD4A5A5)},
+      {'name': 'Pfirsich', 'value': 'peach', 'color': Color(0xFFE6B17A)},
     ];
 
     return Column(

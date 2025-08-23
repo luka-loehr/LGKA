@@ -18,19 +18,19 @@ class AppColors {
   static const Color primaryText = Colors.white;
   static const Color secondaryText = Color(0xB3FFFFFF); // White with 70% opacity (ARGB format)
 
-  // Accent color mapping
+  // Accent color mapping - Aesthetic pastel Gen Z colors
   static Color getAccentColor(String colorName) {
     switch (colorName) {
       case 'blue':
         return appBlueAccent;
-      case 'green':
-        return Colors.green;
-      case 'purple':
-        return Colors.purple;
-      case 'orange':
-        return Colors.orange;
-      case 'pink':
-        return Colors.pink;
+      case 'lavender':
+        return Color(0xFF9B6BDF); // More saturated lavender - elegant and vibrant
+      case 'mint':
+        return Color(0xFF5AC8A8); // More saturated mint green - trendy and vibrant
+      case 'peach':
+        return Color(0xFFD4945A); // More saturated peach - warm and vibrant
+      case 'rose':
+        return Color(0xFFC47A7A); // More saturated rose - gentle and vibrant
       default:
         return appBlueAccent;
     }
