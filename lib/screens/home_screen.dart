@@ -148,14 +148,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   /// Determine if text should be shown for a specific tab based on current page
   bool _shouldShowTextForTab(int tabIndex) {
-    // Always show text for the current page
-    if (tabIndex == _currentPage) return true;
-    
-    // Show text for adjacent tabs (left and right neighbors)
-    if (tabIndex == _currentPage - 1 || tabIndex == _currentPage + 1) return true;
-    
-    // Don't show text for distant tabs
-    return false;
+    // Only show text for the current page
+    return tabIndex == _currentPage;
   }
 
   void _switchToPage(int index) {
