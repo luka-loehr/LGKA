@@ -197,11 +197,18 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
       if (results.isNotEmpty) {
         HapticService.subtle();
+        
+        // Automatically navigate to the first result
+        if (results.isNotEmpty) {
+          print('🔍 [PDFViewer] Auto-navigating to first result: page ${results.first.pageNumber}');
+          _navigateToSearchResult(results.first);
+        }
+        
         // Show success message
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${results.length} Ergebnisse für "$query" gefunden'),
+              content: Text('${results.length} Ergebnisse für "$query" gefunden - springe zu Seite ${results.first.pageNumber}'),
               duration: const Duration(seconds: 3),
               backgroundColor: Colors.green,
             ),
@@ -233,8 +240,38 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   }
 
   void _navigateToSearchResult(SearchResult result) {
-    _pdfController.jumpToPage(result.pageNumber - 1); // Convert to 0-based index
-    HapticService.subtle();
+    print('🔍 [PDFViewer] Navigating to page ${result.pageNumber}');
+    
+    try {
+      // Navigate to the page (convert to 0-based index)
+      _pdfController.jumpToPage(result.pageNumber - 1);
+      
+      // Provide haptic feedback
+      HapticService.subtle();
+      
+      // Show a brief message indicating the navigation
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Seite ${result.pageNumber} - "${result.query}" gefunden'),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
+      }
+      
+      print('🔍 [PDFViewer] Successfully navigated to page ${result.pageNumber}');
+    } catch (e) {
+      print('🔍 [PDFViewer] Error navigating to page ${result.pageNumber}: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Navigieren zu Seite ${result.pageNumber}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _nextSearchResult() {
@@ -547,22 +584,64 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                           ),
                         ),
                       ),
-                      Text(
-                        'Seite ${_searchResults[_currentSearchIndex].pageNumber}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.secondaryText,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${_currentSearchIndex + 1}/${_searchResults.length}',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    _searchResults[_currentSearchIndex].context,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.secondaryText,
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Seite ${_searchResults[_currentSearchIndex].pageNumber}',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _searchResults[_currentSearchIndex].context,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.secondaryText,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
