@@ -103,24 +103,40 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       return;
     }
 
-    print('🔍 [PDFViewer] Starting search for: "$query"');
-    setState(() {
-      _currentSearchIndex = -1;
-    });
-
     try {
+      print('🔍 [PDFViewer] Starting search for: "$query"');
+      print('🔍 [PDFViewer] PDF file path: ${widget.pdfFile.path}');
+      print('🔍 [PDFViewer] PDF file exists: ${await widget.pdfFile.exists()}');
+      
+      // Show loading state
+      setState(() {
+        _currentSearchIndex = -1;
+      });
+
       final bytes = await widget.pdfFile.readAsBytes();
       print('🔍 [PDFViewer] PDF file size: ${bytes.length} bytes');
+      print('🔍 [PDFViewer] PDF file first 100 bytes: ${bytes.take(100).map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ')}');
       
       final document = syncfusion.PdfDocument(inputBytes: bytes);
       final pageCount = document.pages.count;
-      print('🔍 [PDFViewer] PDF has $pageCount pages');
+      print('🔍 [PDFViewer] PDF has $pageCount pages - will search ALL pages');
       
       final results = <SearchResult>[];
 
+      // Show progress to user
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Durchsuche ${pageCount} Seiten nach "$query"...'),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.blue,
+          ),
+        );
+      }
+
       for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
         try {
-          print('🔍 [PDFViewer] Processing page ${pageIndex + 1}');
+          print('🔍 [PDFViewer] Processing page ${pageIndex + 1} of $pageCount');
           
           final textExtractor = syncfusion.PdfTextExtractor(document);
           final pageText = textExtractor.extractText(
@@ -129,7 +145,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           );
           
           print('🔍 [PDFViewer] Page ${pageIndex + 1} text length: ${pageText.length}');
-          print('🔍 [PDFViewer] Page ${pageIndex + 1} sample text: ${pageText.substring(0, pageText.length > 100 ? 100 : pageText.length)}');
+          if (pageText.length > 0) {
+            print('🔍 [PDFViewer] Page ${pageIndex + 1} sample text: ${pageText.substring(0, pageText.length > 100 ? 100 : pageText.length)}');
+          } else {
+            print('🔍 [PDFViewer] Page ${pageIndex + 1} has NO text (might be image-only)');
+          }
 
           if (pageText.toLowerCase().contains(query.toLowerCase())) {
             print('🔍 [PDFViewer] Found match on page ${pageIndex + 1}');
@@ -168,7 +188,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       }
 
       document.dispose();
-      print('🔍 [PDFViewer] Search completed. Found ${results.length} results');
+      print('🔍 [PDFViewer] Search completed. Found ${results.length} results across ALL pages');
 
       setState(() {
         _searchResults = results;
@@ -177,13 +197,23 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
       if (results.isNotEmpty) {
         HapticService.subtle();
+        // Show success message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${results.length} Ergebnisse für "$query" gefunden'),
+              duration: const Duration(seconds: 3),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       } else {
         // Show a message when no results are found
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Keine Ergebnisse für "$query" gefunden'),
-              duration: const Duration(seconds: 3),
+              content: Text('Keine Ergebnisse für "$query" in allen ${pageCount} Seiten gefunden'),
+              duration: const Duration(seconds: 4),
               backgroundColor: Colors.orange,
             ),
           );
