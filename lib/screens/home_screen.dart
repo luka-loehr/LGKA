@@ -964,10 +964,6 @@ class _SettingsSheet extends ConsumerWidget {
                     const SizedBox(height: 20),
                     _buildDivider(),
                     const SizedBox(height: 20),
-                    _buildVibrationSetting(context, preferencesManager),
-                    const SizedBox(height: 20),
-                    _buildDivider(),
-                    const SizedBox(height: 20),
                     _buildLegalLinks(context),
                   ],
                 ),
@@ -1047,45 +1043,6 @@ class _SettingsSheet extends ConsumerWidget {
               ),
             );
           }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildVibrationSetting(BuildContext context, PreferencesManager preferencesManager) {
-    final currentTheme = Theme.of(context);
-    
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Vibration',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.primaryText,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Haptisches Feedback aktivieren',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.secondaryText,
-                    ),
-              ),
-            ],
-          ),
-        ),
-        Switch(
-          value: preferencesManager.vibrationEnabled,
-          onChanged: (value) async {
-            await preferencesManager.setVibrationEnabled(value);
-            HapticService.subtle();
-          },
-          activeColor: currentTheme.colorScheme.primary,
         ),
       ],
     );
