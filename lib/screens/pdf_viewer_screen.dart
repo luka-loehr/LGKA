@@ -448,6 +448,16 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               ),
               tooltip: 'Im PDF suchen',
             ),
+          ] else if (_isSearchBarVisible) ...[
+            // Clear search when search bar is visible
+            IconButton(
+              onPressed: _hideSearchBar,
+              icon: const Icon(
+                Icons.close,
+                color: AppColors.secondaryText,
+              ),
+              tooltip: 'Suche abbrechen',
+            ),
           ] else if (_searchResults.isNotEmpty) ...[
             // Search navigation
             IconButton(
@@ -467,12 +477,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               tooltip: 'Nächstes Ergebnis',
             ),
             IconButton(
-              onPressed: _clearSearch,
+              onPressed: _showSearchBar,
               icon: const Icon(
-                Icons.close,
+                Icons.search,
                 color: AppColors.secondaryText,
               ),
-              tooltip: 'Suche schließen',
+              tooltip: 'Neue Suche',
             ),
           ],
           IconButton(
