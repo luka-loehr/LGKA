@@ -42,8 +42,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   static const Duration _buttonAnimationDuration = Duration(milliseconds: 300);
   
   // Colors
-  static const Color _activeBlueColor = AppColors.appBlueAccent; // Use centralized brand color
-  static const Color _inactiveBlueColor = Color(0xFF1D3A80); // Darker blue instead of gray-blue
   static const Color _errorRedColor = Colors.red;
   static const Color _successGreenColor = Colors.green;
   
@@ -53,6 +51,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   late Animation<Color?> _buttonColorAnimation;
   late AnimationController _successColorController;
   late Animation<Color?> _successColorAnimation;
+
+  // Dynamic accent color that adapts to theme
+  Color get _activeColor => Theme.of(context).colorScheme.primary;
+  
+  // Inactive color with transparency
+  Color get _inactiveColor => _activeColor.withValues(alpha: 0.5);
 
   @override
   void initState() {
@@ -65,7 +69,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
 
     _buttonColorAnimation = ColorTween(
-      begin: _activeBlueColor, // Blue
+      begin: _activeColor, // Dynamic accent color
       end: _errorRedColor,
     ).animate(CurvedAnimation(
       parent: _buttonColorController,
@@ -79,7 +83,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
 
     _successColorAnimation = ColorTween(
-      begin: _activeBlueColor, // Blue
+      begin: _activeColor, // Dynamic accent color
       end: _successGreenColor, // Green
     ).animate(CurvedAnimation(
       parent: _successColorController,
@@ -240,10 +244,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     }
     
     if (_canLogin) {
-      return _activeBlueColor; // Active blue when fields have content
+      return _activeColor; // Active blue when fields have content
     }
     
-    return _inactiveBlueColor; // Grayed-out blue when fields are empty
+    return _inactiveColor; // Grayed-out blue when fields are empty
   }
 
   @override
