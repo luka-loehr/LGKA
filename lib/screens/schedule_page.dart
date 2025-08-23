@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../providers/schedule_provider.dart';
 import '../providers/haptic_service.dart';
 import '../theme/app_theme.dart';
@@ -163,6 +164,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
             ],
           ),
         ),
+        const SizedBox(height: 20),
+        _buildFooter(context),
       ],
     );
   }
@@ -239,6 +242,60 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
       return title.substring('Stundenpläne'.length).trim();
     }
     return title;
+  }
+
+  Widget _buildFooter(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: _getFooterPadding(context),
+      ),
+      child: FutureBuilder<PackageInfo>(
+        future: PackageInfo.fromPlatform(),
+        builder: (context, snapshot) {
+          final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '© 2025 ',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.secondaryText.withValues(alpha: 0.5),
+                ),
+              ),
+              Text(
+                'Luka Löhr',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                ' • v$version',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.secondaryText.withValues(alpha: 0.5),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  double _getFooterPadding(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final gestureInsets = mediaQuery.systemGestureInsets.bottom;
+    final viewPadding = mediaQuery.viewPadding.bottom;
+    
+    // Determine navigation mode based on gesture insets
+    if (gestureInsets >= 45) {
+      return 34.0; // Button navigation
+    } else if (gestureInsets <= 25) {
+      return 8.0; // Gesture navigation
+    } else {
+      // Ambiguous range - use viewPadding as secondary indicator
+      return viewPadding > 50 ? 34.0 : 8.0;
+    }
   }
 
   void _openSchedule(ScheduleItem schedule) {
