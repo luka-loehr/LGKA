@@ -64,6 +64,16 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
 
     try {
       final schedules = await _scheduleService.getSchedules();
+      
+      // Check if we got any schedules
+      if (schedules.isEmpty) {
+        state = state.copyWith(
+          isLoading: false,
+          error: 'Serververbindung fehlgeschlagen',
+        );
+        return;
+      }
+      
       state = state.copyWith(
         schedules: schedules,
         isLoading: false,
