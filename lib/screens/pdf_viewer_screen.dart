@@ -103,23 +103,20 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       return;
     }
 
-    try {
-      print('🔍 [PDFViewer] Starting search for: "$query"');
-      print('🔍 [PDFViewer] PDF file path: ${widget.pdfFile.path}');
-      print('🔍 [PDFViewer] PDF file exists: ${await widget.pdfFile.exists()}');
-      
-      // Show loading state
-      setState(() {
-        _currentSearchIndex = -1;
-      });
+    print('🔍 [PDFViewer] Starting search for: "$query"');
+    
+    // Show loading state
+    setState(() {
+      _currentSearchIndex = -1;
+    });
 
+    try {
       final bytes = await widget.pdfFile.readAsBytes();
       print('🔍 [PDFViewer] PDF file size: ${bytes.length} bytes');
-      print('🔍 [PDFViewer] PDF file first 100 bytes: ${bytes.take(100).map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ')}');
       
       final document = syncfusion.PdfDocument(inputBytes: bytes);
       final pageCount = document.pages.count;
-      print('🔍 [PDFViewer] PDF has $pageCount pages - will search ALL pages');
+      print('🔍 [PDFViewer] Searching ${pageCount} pages for "$query"');
       
       final results = <SearchResult>[];
 
@@ -136,23 +133,14 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
       for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
         try {
-          print('🔍 [PDFViewer] Processing page ${pageIndex + 1} of $pageCount');
-          
           final textExtractor = syncfusion.PdfTextExtractor(document);
           final pageText = textExtractor.extractText(
             startPageIndex: pageIndex,
             endPageIndex: pageIndex,
           );
-          
-          print('🔍 [PDFViewer] Page ${pageIndex + 1} text length: ${pageText.length}');
-          if (pageText.length > 0) {
-            print('🔍 [PDFViewer] Page ${pageIndex + 1} sample text: ${pageText.substring(0, pageText.length > 100 ? 100 : pageText.length)}');
-          } else {
-            print('🔍 [PDFViewer] Page ${pageIndex + 1} has NO text (might be image-only)');
-          }
 
           if (pageText.toLowerCase().contains(query.toLowerCase())) {
-            print('🔍 [PDFViewer] Found match on page ${pageIndex + 1}');
+            print('🔍 [PDFViewer] Found match on page ${pageIndex + 2}');
             
             // Find all occurrences on this page
             final lowerText = pageText.toLowerCase();
@@ -175,12 +163,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 matchIndex: index - contextStart,
               ));
               
-              print('🔍 [PDFViewer] Added result: pageIndex=$pageIndex, reportedPage=${pageIndex + 2}, actualPage=${pageIndex + 1}');
-              
               startIndex = index + 1;
             }
-          } else {
-            print('🔍 [PDFViewer] No match found on page ${pageIndex + 1}');
           }
         } catch (e) {
           print('🔍 [PDFViewer] Error processing page ${pageIndex + 1}: $e');
@@ -190,7 +174,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       }
 
       document.dispose();
-      print('🔍 [PDFViewer] Search completed. Found ${results.length} results across ALL pages');
+      print('🔍 [PDFViewer] Search completed: ${results.length} results found');
 
       setState(() {
         _searchResults = results;
@@ -242,8 +226,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   }
 
   void _navigateToSearchResult(SearchResult result) {
-    print('🔍 [PDFViewer] Navigating to page ${result.pageNumber}');
-    
     try {
       // Navigate to the page (convert to 0-based index)
       _pdfController.jumpToPage(result.pageNumber - 1);
@@ -262,7 +244,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         );
       }
       
-      print('🔍 [PDFViewer] Successfully navigated to page ${result.pageNumber}');
+      print('🔍 [PDFViewer] Navigated to page ${result.pageNumber}');
     } catch (e) {
       print('🔍 [PDFViewer] Error navigating to page ${result.pageNumber}: $e');
       if (mounted) {
@@ -300,53 +282,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       _searchResults.clear();
       _currentSearchIndex = -1;
     });
-  }
-
-  // Debug method to test text extraction
-  Future<void> _testTextExtraction() async {
-    try {
-      print('🧪 [PDFViewer] Testing text extraction...');
-      
-      final bytes = await widget.pdfFile.readAsBytes();
-      print('🧪 [PDFViewer] PDF file size: ${bytes.length} bytes');
-      
-      final document = syncfusion.PdfDocument(inputBytes: bytes);
-      final pageCount = document.pages.count;
-      print('🧪 [PDFViewer] PDF has $pageCount pages');
-      
-      if (pageCount > 0) {
-        final textExtractor = syncfusion.PdfTextExtractor(document);
-        final firstPageText = textExtractor.extractText(
-          startPageIndex: 0,
-          endPageIndex: 0,
-        );
-        
-        print('🧪 [PDFViewer] First page text length: ${firstPageText.length}');
-        print('🧪 [PDFViewer] First page text (first 200 chars): ${firstPageText.substring(0, firstPageText.length > 200 ? 200 : firstPageText.length)}');
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Text extraction test: ${firstPageText.length} chars on first page'),
-              duration: const Duration(seconds: 5),
-              backgroundColor: Colors.blue,
-            ),
-          );
-        }
-      }
-      
-      document.dispose();
-    } catch (e) {
-      print('🧪 [PDFViewer] Text extraction test error: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Text extraction test failed: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
   }
 
   void _showSearchDialog() {
@@ -511,15 +446,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 color: AppColors.secondaryText,
               ),
               tooltip: 'Im PDF suchen',
-            ),
-            // Debug button to test text extraction
-            IconButton(
-              onPressed: _testTextExtraction,
-              icon: const Icon(
-                Icons.bug_report,
-                color: Colors.orange,
-              ),
-              tooltip: 'Text Extraction Test',
             ),
           ] else ...[
             // Search navigation
