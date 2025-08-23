@@ -5,18 +5,17 @@ import 'package:go_router/go_router.dart';
 import '../screens/welcome_screen.dart';
 import '../screens/auth_screen.dart';
 import '../screens/home_screen.dart';
-import '../screens/settings_screen.dart';
-import '../screens/legal_screen.dart';
 import '../screens/pdf_viewer_screen.dart';
 import '../screens/schedule_page.dart';
+import '../screens/legal_screen.dart';
 
 class AppRouter {
+  // Route names
   static const String welcome = '/welcome';
   static const String auth = '/auth';
   static const String home = '/';
   static const String pdfViewer = '/pdf-viewer';
   static const String schedule = '/schedule';
-  static const String settings = '/settings';
   static const String legal = '/legal';
 
   static GoRouter createRouter({required String initialLocation}) {
@@ -48,10 +47,6 @@ class AppRouter {
         GoRoute(
           path: schedule,
           builder: (context, state) => const SchedulePage(),
-        ),
-        GoRoute(
-          path: settings,
-          builder: (context, state) => const SettingsScreen(),
         ),
         GoRoute(
           path: legal,
