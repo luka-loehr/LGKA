@@ -72,7 +72,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
+              backgroundColor: AppColors.appBackground,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -123,7 +123,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                         child: ElevatedButton(
                           onPressed: _isNavigating ? null : _navigateToAuth,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.appBlueAccent,
+                            backgroundColor: Theme.of(context).colorScheme.primary,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
