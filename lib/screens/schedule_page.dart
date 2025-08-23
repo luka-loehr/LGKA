@@ -148,14 +148,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
   Widget _buildScheduleList(ScheduleState state) {
     return Column(
       children: [
-        // Header above the button area
-        Text(
-          'Stundenplan',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            color: AppColors.primaryText,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
         const SizedBox(height: 24),
         Expanded(
           child: ListView(
