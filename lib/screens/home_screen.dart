@@ -155,11 +155,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _switchToPage(int index) {
     if (_currentPage != index) {
       HapticService.subtle();
-      _pageController.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      _pageController.jumpToPage(index);
       setState(() => _currentPage = index);
     }
   }
