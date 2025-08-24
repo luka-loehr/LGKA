@@ -249,7 +249,7 @@ List<ScheduleItem> _parseScheduleHtml(String htmlContent) {
     // Find the module containing schedule links
     final module = document.querySelector('#mod-custom213');
     if (module == null) {
-      throw Exception('Schedule module not found');
+      throw Exception('Serververbindung fehlgeschlagen');
     }
 
     // Find all links in the module
@@ -289,12 +289,13 @@ List<ScheduleItem> _parseScheduleHtml(String htmlContent) {
     }
 
     if (schedules.isEmpty) {
-      throw Exception('No schedule links found');
+      throw Exception('Serververbindung fehlgeschlagen');
     }
 
     return schedules;
   } catch (e) {
-    throw Exception('Failed to parse schedule HTML: $e');
+    // Convert any parsing error to generic server connection error
+    throw Exception('Serververbindung fehlgeschlagen');
   }
 }
 
