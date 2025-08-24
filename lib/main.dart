@@ -3,9 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:lgka_flutter/navigation/app_router.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'data/preferences_manager.dart';
+import 'package:lgka_flutter/l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -104,6 +106,16 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
       theme: theme,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
+      locale: const Locale('de', 'DE'),
+      supportedLocales: const [
+        Locale('de', 'DE'),
+      ],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       builder: (context, child) {
         // Wrap the entire app with proper edge-to-edge inset handling
         return EdgeToEdgeWrapper(child: child ?? const SizedBox.shrink());
