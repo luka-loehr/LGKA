@@ -380,10 +380,26 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Determine the appropriate header based on the dayName
+    String headerTitle;
+    if (widget.dayName != null && widget.dayName!.isNotEmpty) {
+      // Check if this is a schedule (contains "Klassen" or "J11/J12")
+      if (widget.dayName!.contains('Klassen') || widget.dayName!.contains('J11/J12')) {
+        // This is a schedule PDF
+        headerTitle = 'Stundenplan';
+      } else {
+        // This is a substitution plan - use the day name
+        headerTitle = widget.dayName!;
+      }
+    } else {
+      // Fallback to default
+      headerTitle = 'Dokument';
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Stundenplan',
+          headerTitle,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.primaryText,
