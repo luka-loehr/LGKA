@@ -8,7 +8,6 @@ import '../providers/schedule_provider.dart';
 import '../providers/haptic_service.dart';
 import '../theme/app_theme.dart';
 import '../services/schedule_service.dart';
-import '../services/retry_service.dart';
 
 class SchedulePage extends ConsumerStatefulWidget {
   const SchedulePage({super.key});
@@ -22,6 +21,13 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   bool _hasShownButtons = false;
+  
+  // Track available schedules
+  List<ScheduleItem> _availableFirstHalbjahr = [];
+  List<ScheduleItem> _availableSecondHalbjahr = [];
+  bool _isCheckingAvailability = false;
+  DateTime? _lastAvailabilityCheck;
+  static const Duration _availabilityCheckInterval = Duration(minutes: 15);
 
   @override
   void initState() {
@@ -39,8 +45,12 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     ));
     
     // Load schedules when page initializes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(scheduleProvider.notifier).loadSchedules();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(scheduleProvider.notifier).loadSchedules();
+      // Check availability only if it hasn't been checked recently
+      if (_shouldCheckAvailability()) {
+        await _checkScheduleAvailability();
+      }
     });
   }
 
@@ -54,6 +64,77 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     if (!_hasShownButtons) {
       _hasShownButtons = true;
       _fadeController.forward();
+    }
+  }
+  
+  /// Check if availability should be checked (based on timing and cached data)
+  bool _shouldCheckAvailability() {
+    // If we have cached results and they're recent, don't check again
+    if (_lastAvailabilityCheck != null && 
+        _availableFirstHalbjahr.isNotEmpty || _availableSecondHalbjahr.isNotEmpty) {
+      final timeSinceLastCheck = DateTime.now().difference(_lastAvailabilityCheck!);
+      if (timeSinceLastCheck < _availabilityCheckInterval) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  /// Check which schedules have available PDFs
+  Future<void> _checkScheduleAvailability() async {
+    if (_isCheckingAvailability) return;
+    
+    setState(() {
+      _isCheckingAvailability = true;
+    });
+    
+    try {
+      final scheduleNotifier = ref.read(scheduleProvider.notifier);
+      
+      // Get all schedules to check
+      final allSchedules = [
+        ...ref.read(scheduleProvider).firstHalbjahrSchedules,
+        ...ref.read(scheduleProvider).secondHalbjahrSchedules,
+      ];
+      
+      // Check availability concurrently instead of sequentially
+      final availabilityFutures = allSchedules.map((schedule) async {
+        final isAvailable = await scheduleNotifier.isScheduleAvailable(schedule);
+        // Update progress after each check completes
+        setState(() {
+        });
+        return {'schedule': schedule, 'isAvailable': isAvailable};
+      });
+      
+      // Wait for all availability checks to complete
+      final results = await Future.wait(availabilityFutures);
+      
+      // Separate results by halbjahr
+      _availableFirstHalbjahr = [];
+      _availableSecondHalbjahr = [];
+      
+      for (final result in results) {
+        if (result['isAvailable'] as bool) {
+          final schedule = result['schedule'] as ScheduleItem;
+          if (schedule.halbjahr == '1. Halbjahr') {
+            _availableFirstHalbjahr.add(schedule);
+          } else if (schedule.halbjahr == '2. Halbjahr') {
+            _availableSecondHalbjahr.add(schedule);
+          }
+        }
+      }
+      
+      // EXCLUSIVE LOGIC: If second half-year is available, clear first half-year
+      if (_availableSecondHalbjahr.isNotEmpty) {
+        _availableFirstHalbjahr.clear(); // Only show second half-year
+      }
+      
+      setState(() {});
+    } finally {
+      setState(() {
+        _isCheckingAvailability = false;
+        _lastAvailabilityCheck = DateTime.now();
+      });
     }
   }
 
@@ -104,6 +185,28 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       );
     }
 
+    // Show availability checking state if schedules are loaded but availability is still being checked
+    if (_isCheckingAvailability) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Prüfe Verfügbarkeit...',
+              style: TextStyle(
+                color: AppColors.secondaryText,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     // Start animation when buttons should be visible
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startButtonAnimation();
@@ -136,8 +239,9 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () {
-              ref.read(retryServiceProvider).retryAllDataSources();
+            onPressed: () async {
+              await ref.read(scheduleProvider.notifier).refreshSchedules();
+              await _checkScheduleAvailability();
             },
             icon: const Icon(Icons.refresh),
             label: const Text('Erneut versuchen'),
@@ -195,28 +299,14 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           child: ListView(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
             children: [
-              // First group: 5-10 semesters
-              if (state.firstHalbjahrSchedules.isNotEmpty) ...[
-                ...state.firstHalbjahrSchedules
+              // Build all available schedules with consistent spacing
+              if (_availableFirstHalbjahr.isNotEmpty || _availableSecondHalbjahr.isNotEmpty) ...[
+                // Get all available schedules (either first or second half-year)
+                ...(_availableFirstHalbjahr.isNotEmpty ? _availableFirstHalbjahr : _availableSecondHalbjahr)
                     .where((schedule) => schedule.gradeLevel == 'Klassen 5-10')
                     .map((schedule) => _buildScheduleCard(schedule)),
-                const SizedBox(height: 16), // Same spacing as substitution screen
-              ],
-              if (state.secondHalbjahrSchedules.isNotEmpty) ...[
-                ...state.secondHalbjahrSchedules
-                    .where((schedule) => schedule.gradeLevel == 'Klassen 5-10')
-                    .map((schedule) => _buildScheduleCard(schedule)),
-                const SizedBox(height: 24), // Bigger spacing between groups
-              ],
-              // Second group: J11/J12 semesters
-              if (state.firstHalbjahrSchedules.isNotEmpty) ...[
-                ...state.firstHalbjahrSchedules
-                    .where((schedule) => schedule.gradeLevel == 'J11/J12')
-                    .map((schedule) => _buildScheduleCard(schedule)),
-                const SizedBox(height: 16), // Same spacing as substitution screen
-              ],
-              if (state.secondHalbjahrSchedules.isNotEmpty) ...[
-                ...state.secondHalbjahrSchedules
+                const SizedBox(height: 16), // Consistent spacing between grade levels
+                ...(_availableFirstHalbjahr.isNotEmpty ? _availableFirstHalbjahr : _availableSecondHalbjahr)
                     .where((schedule) => schedule.gradeLevel == 'J11/J12')
                     .map((schedule) => _buildScheduleCard(schedule)),
               ],

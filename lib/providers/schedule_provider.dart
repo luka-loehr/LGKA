@@ -121,6 +121,27 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
   void clearError() {
     state = state.copyWith(error: null);
   }
+  /// Check if a schedule PDF is available and valid (>1000 bytes)
+  Future<bool> isScheduleAvailable(ScheduleItem schedule) async {
+    try {
+      return await _scheduleService.isScheduleAvailable(schedule);
+    } catch (e) {
+      return false; // If check fails, assume not available
+    }
+  }
+  
+  /// Get available schedules (those with valid PDFs)
+  Future<List<ScheduleItem>> getAvailableSchedules() async {
+    final availableSchedules = <ScheduleItem>[];
+    
+    for (final schedule in state.schedules) {
+      if (await isScheduleAvailable(schedule)) {
+        availableSchedules.add(schedule);
+      }
+    }
+    
+    return availableSchedules;
+  }
 }
 
 /// Provider for schedule service
