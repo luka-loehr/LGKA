@@ -92,11 +92,15 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     }
 
     if (state.hasError) {
-      return _buildErrorState(state.error!);
+      return Center(
+        child: _buildErrorState(state.error!),
+      );
     }
 
     if (!state.hasSchedules) {
-      return _buildEmptyState();
+      return Center(
+        child: _buildEmptyState(),
+      );
     }
 
     // Start animation when buttons should be visible
