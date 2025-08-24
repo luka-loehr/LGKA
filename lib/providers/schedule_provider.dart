@@ -77,6 +77,7 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
       state = state.copyWith(
         schedules: schedules,
         isLoading: false,
+        error: null,
         lastUpdated: DateTime.now(),
       );
     } catch (e) {
