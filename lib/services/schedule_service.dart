@@ -36,10 +36,16 @@ class ScheduleService {
   static const String _username = 'vertretungsplan';
   static const String _password = 'ephraim';
   static const Duration _timeout = Duration(seconds: 15);
+  static const Duration _availabilityCheckTimeout = Duration(seconds: 5); // Faster timeout for availability checks
 
   List<ScheduleItem>? _cachedSchedules;
   DateTime? _lastFetchTime;
   static const Duration _cacheValidity = Duration(minutes: 30);
+  
+  // Cache for availability checks
+  Map<String, bool> _availabilityCache = {};
+  DateTime? _lastAvailabilityCheck;
+  static const Duration _availabilityCacheValidity = Duration(minutes: 15);
 
   /// Get all available schedules, using cache if valid
   Future<List<ScheduleItem>> getSchedules() async {
@@ -90,14 +96,52 @@ class ScheduleService {
     return await compute(_parseScheduleHtml, response.body);
   }
 
+  /// Check if a schedule PDF is available (HEAD request for faster checking)
+  Future<bool> isScheduleAvailable(ScheduleItem schedule) async {
+    // Check cache first
+    final cacheKey = '${schedule.fullUrl}_${schedule.halbjahr}_${schedule.gradeLevel}';
+    
+    // Check if cache is still valid
+    if (_availabilityCache.containsKey(cacheKey) && _lastAvailabilityCheck != null) {
+      final timeSinceLastCheck = DateTime.now().difference(_lastAvailabilityCheck!);
+      if (timeSinceLastCheck < _availabilityCacheValidity) {
+        return _availabilityCache[cacheKey]!;
+      }
+    }
+    
+    try {
+      final credentials = base64Encode(utf8.encode('$_username:$_password'));
+
+      final response = await http.head(
+        Uri.parse(schedule.fullUrl),
+        headers: {
+          'Authorization': 'Basic $credentials',
+          'User-Agent': 'LGKA-App-Luka-Loehr',
+        },
+      ).timeout(_availabilityCheckTimeout);
+
+      // Cache the result
+      final isAvailable = response.statusCode == 200;
+      _availabilityCache[cacheKey] = isAvailable;
+      _lastAvailabilityCheck = DateTime.now();
+      
+      return isAvailable;
+    } catch (e) {
+      // If there's any error (timeout, network issue, etc.), assume not available
+      _availabilityCache[cacheKey] = false;
+      _lastAvailabilityCheck = DateTime.now();
+      return false;
+    }
+  }
+
   /// Download a specific schedule PDF
   Future<File?> downloadSchedule(ScheduleItem schedule) async {
     try {
       final credentials = base64Encode(utf8.encode('$_username:$_password'));
-      
+
       print('Downloading schedule: ${schedule.title}');
       print('URL: ${schedule.fullUrl}');
-      
+
       final response = await http.get(
         Uri.parse(schedule.fullUrl),
         headers: {
@@ -123,7 +167,7 @@ class ScheduleService {
       final cacheDir = await getTemporaryDirectory();
       final sanitizedGradeLevel = schedule.gradeLevel.replaceAll('/', '_');
       final sanitizedHalbjahr = schedule.halbjahr.replaceAll('.', '_');
-      final filename = '${sanitizedGradeLevel}_${sanitizedHalbjahr}.pdf';
+      final filename = '${sanitizedGradeLevel}_$sanitizedHalbjahr.pdf';
       final file = File('${cacheDir.path}/$filename');
       
       print('Saving PDF with filename: $filename');
@@ -150,7 +194,7 @@ class ScheduleService {
       // Try to validate PDF structure (basic check)
       try {
         final pdfBytes = await file.readAsBytes();
-        if (pdfBytes.length > 0 && !_isValidPdfContent(pdfBytes)) {
+        if (pdfBytes.isNotEmpty && !_isValidPdfContent(pdfBytes)) {
           print('PDF content appears invalid: ${schedule.title}');
           await file.delete(); // Clean up the invalid file
           return null;
