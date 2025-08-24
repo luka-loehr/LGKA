@@ -162,7 +162,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
             ),
             const SizedBox(height: 16),
             const Text(
-              'Lade Stundenpläne...',
+              'Prüfe Verfügbarkeit...',
               style: TextStyle(
                 color: AppColors.secondaryText,
                 fontSize: 16,
@@ -196,7 +196,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
             ),
             const SizedBox(height: 16),
             const Text(
-              'Prüfe Verfügbarkeit...',
+              'Lade Stundenpläne...',
               style: TextStyle(
                 color: AppColors.secondaryText,
                 fontSize: 16,
