@@ -136,7 +136,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () {
-              ref.read(scheduleProvider.notifier).loadSchedules();
+              ref.read(scheduleProvider.notifier).refreshSchedules();
             },
             icon: const Icon(Icons.refresh),
             label: const Text('Erneut versuchen'),
