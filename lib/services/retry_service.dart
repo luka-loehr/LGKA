@@ -3,7 +3,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
 import '../data/pdf_repository.dart';
-import '../providers/schedule_provider.dart';
 
 /// Centralized service for retrying all data sources
 class RetryService {
