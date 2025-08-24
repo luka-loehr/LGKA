@@ -22,12 +22,13 @@ class ScheduleState {
     List<ScheduleItem>? schedules,
     bool? isLoading,
     String? error,
+    bool clearError = false,
     DateTime? lastUpdated,
   }) {
     return ScheduleState(
       schedules: schedules ?? this.schedules,
       isLoading: isLoading ?? this.isLoading,
-      error: error ?? this.error,
+      error: clearError ? null : (error ?? this.error),
       lastUpdated: lastUpdated ?? this.lastUpdated,
     );
   }
@@ -60,7 +61,7 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
   Future<void> loadSchedules() async {
     if (state.isLoading) return;
 
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true, clearError: true);
 
     try {
       final schedules = await _scheduleService.getSchedules();
@@ -77,7 +78,7 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
       state = state.copyWith(
         schedules: schedules,
         isLoading: false,
-        error: null,
+        clearError: true,
         lastUpdated: DateTime.now(),
       );
     } catch (e) {
