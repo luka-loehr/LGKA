@@ -223,9 +223,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                   opacity: _errorAnimation,
                   child: Padding(
                     padding: const EdgeInsets.all(32.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
+                                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                         const Icon(
                           Icons.cloud_off,
                           size: 64,
