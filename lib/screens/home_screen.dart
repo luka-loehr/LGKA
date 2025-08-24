@@ -11,6 +11,7 @@ import '../data/pdf_repository.dart';
 import '../data/preferences_manager.dart';
 import '../providers/haptic_service.dart';
 import '../navigation/app_router.dart';
+import '../services/retry_service.dart';
 import 'weather_page.dart';
 import 'schedule_page.dart';
 
@@ -243,7 +244,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
 
     if (pdfRepo.hasAnyError && !pdfRepo.hasAnyData) {
       return _ErrorView(
-        onRetry: () => pdfRepo.retryAll(),
+        onRetry: () => ref.read(retryServiceProvider).retryAllDataSources(),
       );
     }
 
@@ -280,14 +281,14 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
           pdfState: pdfRepo.todayState,
           label: 'Heute',
           onTap: () => _openPdf(pdfRepo, true),
-          onRetry: () => pdfRepo.retryPdf(true),
+          onRetry: () => ref.read(retryServiceProvider).retryAllDataSources(),
         ),
         const SizedBox(height: 16),
         _PlanOptionButton(
           pdfState: pdfRepo.tomorrowState,
           label: 'Morgen',
           onTap: () => _openPdf(pdfRepo, false),
-          onRetry: () => pdfRepo.retryPdf(false),
+          onRetry: () => ref.read(retryServiceProvider).retryAllDataSources(),
         ),
       ],
     );
