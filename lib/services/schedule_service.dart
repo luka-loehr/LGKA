@@ -216,6 +216,8 @@ class ScheduleService {
   void clearCache() {
     _cachedSchedules = null;
     _lastFetchTime = null;
+    _availabilityCache.clear();
+    _lastAvailabilityCheck = null;
   }
   
   /// Check if PDF content appears to be valid
