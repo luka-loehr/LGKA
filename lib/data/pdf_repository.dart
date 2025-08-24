@@ -121,7 +121,7 @@ class PdfRepository extends ChangeNotifier {
       // Update state with error
       _updatePdfState(isToday, state.copyWith(
         isLoading: false,
-        error: 'Verbindung fehlgeschlagen',
+        error: 'Serververbindung fehlgeschlagen',
       ));
     }
   }
