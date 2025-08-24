@@ -4,6 +4,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import '../services/weather_service.dart';
 import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
+import '../services/retry_service.dart';
 import '../providers/haptic_service.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -134,8 +135,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
 
   void _refreshData() {
-    // Retry weather data refresh
-    ref.read(weatherDataProvider.notifier).refreshWeatherData();
+    // Retry all data sources for better user experience
+    ref.read(retryServiceProvider).retryAllDataSources();
   }
 
   Widget _buildChartPlaceholder() {
