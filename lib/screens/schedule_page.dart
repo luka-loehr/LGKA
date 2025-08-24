@@ -8,6 +8,7 @@ import '../providers/schedule_provider.dart';
 import '../providers/haptic_service.dart';
 import '../theme/app_theme.dart';
 import '../services/schedule_service.dart';
+import '../services/retry_service.dart';
 
 class SchedulePage extends ConsumerStatefulWidget {
   const SchedulePage({super.key});
@@ -136,7 +137,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () {
-              ref.read(scheduleProvider.notifier).refreshSchedules();
+              ref.read(retryServiceProvider).retryAllDataSources();
             },
             icon: const Icon(Icons.refresh),
             label: const Text('Erneut versuchen'),
