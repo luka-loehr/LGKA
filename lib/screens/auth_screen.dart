@@ -52,24 +52,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   late AnimationController _successColorController;
   late Animation<Color?> _successColorAnimation;
 
-  // Dynamic accent color that adapts to theme
-  Color get _activeColor => Theme.of(context).colorScheme.primary;
+  // Standard app blue color
+  static const Color _activeColor = Color(0xFF3770D4);
   
   // Inactive color with transparency
-  Color get _inactiveColor => _activeColor.withValues(alpha: 0.5);
+  static const Color _inactiveColor = Color(0x803770D4); // 50% opacity
 
   @override
   void initState() {
     super.initState();
     
-    // Setup button color animation controllers (colors will be set in didChangeDependencies)
+    // Setup button color animation with standard app blue
     _buttonColorController = AnimationController(
       duration: _buttonAnimationDuration,
       vsync: this,
     );
 
     _buttonColorAnimation = ColorTween(
-      begin: Colors.grey, // Placeholder color, will be updated in didChangeDependencies
+      begin: _activeColor, // Standard app blue
       end: _errorRedColor,
     ).animate(CurvedAnimation(
       parent: _buttonColorController,
@@ -83,7 +83,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
 
     _successColorAnimation = ColorTween(
-      begin: Colors.grey, // Placeholder color, will be updated in didChangeDependencies
+      begin: _activeColor, // Standard app blue
       end: _successGreenColor, // Green
     ).animate(CurvedAnimation(
       parent: _successColorController,
@@ -125,24 +125,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    
-    // Update animation colors now that theme is available
-    _buttonColorAnimation = ColorTween(
-      begin: _activeColor,
-      end: _errorRedColor,
-    ).animate(CurvedAnimation(
-      parent: _buttonColorController,
-      curve: Curves.easeInOut,
-    ));
-
-    _successColorAnimation = ColorTween(
-      begin: _activeColor,
-      end: _successGreenColor,
-    ).animate(CurvedAnimation(
-      parent: _successColorController,
-      curve: Curves.easeInOut,
-    ));
-    
     // Ensure keyboard animation updates when keyboard visibility changes
     _updateOffsetState();
   }
