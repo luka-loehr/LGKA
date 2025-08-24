@@ -11,35 +11,57 @@ class RetryService {
   RetryService(this._ref);
 
   /// Retry all data sources simultaneously
-  Future<void> retryAllDataSources() async {
-    // Trigger all retries in parallel without waiting for results
-    // This ensures the user doesn't have to wait for each one to complete
+  /// This method just triggers the retries and doesn't wait for results
+  void retryAllDataSources() {
+    try {
+      // Retry weather data - fire and forget
+      _ref.read(weatherDataProvider.notifier).refreshWeatherData();
+    } catch (e) {
+      // Silently ignore any errors - don't crash the retry service
+    }
     
-    // Retry weather data
-    _ref.read(weatherDataProvider.notifier).refreshWeatherData();
+    try {
+      // Retry PDF substitution plans - fire and forget
+      final pdfRepo = _ref.read(pdfRepositoryProvider);
+      pdfRepo.retryAll();
+    } catch (e) {
+      // Silently ignore any errors - don't crash the retry service
+    }
     
-    // Retry PDF substitution plans
-    final pdfRepo = _ref.read(pdfRepositoryProvider);
-    pdfRepo.retryAll();
-    
-    // Retry schedule data
-    _ref.read(scheduleProvider.notifier).refreshSchedules();
+    try {
+      // Retry schedule data - fire and forget
+      _ref.read(scheduleProvider.notifier).refreshSchedules();
+    } catch (e) {
+      // Silently ignore any errors - don't crash the retry service
+    }
   }
 
   /// Retry only weather data
-  Future<void> retryWeatherData() async {
-    _ref.read(weatherDataProvider.notifier).refreshWeatherData();
+  void retryWeatherData() {
+    try {
+      _ref.read(weatherDataProvider.notifier).refreshWeatherData();
+    } catch (e) {
+      // Silently ignore any errors - don't crash the retry service
+    }
   }
 
   /// Retry only PDF substitution plans
-  Future<void> retryPdfData() async {
-    final pdfRepo = _ref.read(pdfRepositoryProvider);
-    pdfRepo.retryAll();
+  void retryPdfData() {
+    try {
+      final pdfRepo = _ref.read(pdfRepositoryProvider);
+      pdfRepo.retryAll();
+    } catch (e) {
+      // Silently ignore any errors - don't crash the retry service
+    }
   }
 
   /// Retry only schedule data
-  Future<void> retryScheduleData() async {
-    _ref.read(scheduleProvider.notifier).refreshSchedules();
+  void retryScheduleData() {
+    try {
+      _ref.read(scheduleProvider.notifier).refreshSchedules();
+    } catch (e) {
+      // Silently ignore any errors - don't crash the retry service
+    }
   }
 }
 
