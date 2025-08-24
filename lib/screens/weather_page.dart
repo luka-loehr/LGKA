@@ -180,9 +180,12 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
 
     final weatherState = ref.watch(weatherDataProvider);
 
-    // Control error animation based on weather error state
+    // Control error animation based on weather error state or stale data
     final shouldShowWeatherError = weatherState.error != null && weatherState.chartData.isEmpty;
-    if (shouldShowWeatherError) {
+    final shouldShowStaleDataError = _isDataStale() && weatherState.chartData.isNotEmpty;
+    final shouldShowAnyError = shouldShowWeatherError || shouldShowStaleDataError;
+    
+    if (shouldShowAnyError) {
       if (_errorAnimationController.status == AnimationStatus.dismissed) {
         _errorAnimationController.forward();
       }
@@ -219,14 +222,14 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                 ],
               ),
             )
-          : shouldShowWeatherError
+          : shouldShowAnyError
               ? FadeTransition(
                   opacity: _errorAnimation,
                   child: Padding(
                     padding: const EdgeInsets.all(32.0),
-                                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                         const Icon(
                           Icons.cloud_off,
                           size: 64,
@@ -234,7 +237,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Serververbindung fehlgeschlagen',
+                          shouldShowStaleDataError 
+                            ? 'Reparaturarbeiten werden durchgeführt'
+                            : 'Serververbindung fehlgeschlagen',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: AppColors.primaryText,
                           ),
@@ -890,6 +895,34 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     final now = DateTime.now();
     // Charts are available after 0:30 (00:30)
     return now.hour > 0 || (now.hour == 0 && now.minute >= 30);
+  }
+  
+  /// Check if weather data values have been the same for more than 60 minutes
+  bool _isDataStale() {
+    final weatherState = ref.read(weatherDataProvider);
+    if (weatherState.chartData.length < 2) return false;
+    
+    // Get the last 60 minutes of data (assuming 1-minute intervals)
+    final now = DateTime.now();
+    final sixtyMinutesAgo = now.subtract(const Duration(minutes: 60));
+    
+    // Filter data from last 60 minutes
+    final recentData = weatherState.chartData
+        .where((data) => data.time.isAfter(sixtyMinutesAgo))
+        .toList();
+    
+    if (recentData.length < 2) return false;
+    
+    // Check if all values are exactly the same
+    final firstData = recentData.first;
+    final allSame = recentData.every((data) =>
+        data.temperature == firstData.temperature &&
+        data.humidity == firstData.humidity &&
+        data.windSpeed == firstData.windSpeed &&
+        data.pressure == firstData.pressure &&
+        data.radiation == firstData.radiation);
+    
+    return allSame;
   }
   
   /// Calculate optimal x-axis interval to prevent overlapping time labels
