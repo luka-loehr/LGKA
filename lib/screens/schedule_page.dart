@@ -16,14 +16,44 @@ class SchedulePage extends ConsumerStatefulWidget {
   ConsumerState<SchedulePage> createState() => _SchedulePageState();
 }
 
-class _SchedulePageState extends ConsumerState<SchedulePage> {
+class _SchedulePageState extends ConsumerState<SchedulePage>
+    with TickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
+  bool _hasShownButtons = false;
+
   @override
   void initState() {
     super.initState();
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOutCubic,
+    ));
+    
     // Load schedules when page initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(scheduleProvider.notifier).loadSchedules();
     });
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
+  }
+
+  void _startButtonAnimation() {
+    if (!_hasShownButtons) {
+      _hasShownButtons = true;
+      _fadeController.forward();
+    }
   }
 
   @override
@@ -69,7 +99,15 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
       return _buildEmptyState();
     }
 
-    return _buildScheduleList(state);
+    // Start animation when buttons should be visible
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startButtonAnimation();
+    });
+
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: _buildScheduleList(state),
+    );
   }
 
   Widget _buildErrorState(String error) {
