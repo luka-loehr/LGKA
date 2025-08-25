@@ -1,6 +1,6 @@
 ![LGKA+ Banner](app_store_assets/banners/lgka_banner_1024x500.png)
 
-# LGKA+ – Digital Substitution and Timetables
+# LGKA+ – The app for Lessing-Gymnasium Karlsruhe
 
 [![Flutter](https://img.shields.io/badge/Flutter-Latest-02569B?style=flat&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green?style=flat)](https://github.com/luka-loehr/LGKA/releases)
