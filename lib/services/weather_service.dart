@@ -65,7 +65,7 @@ class WeatherService {
     final response = await http.get(
       Uri.parse(csvUrl),
       headers: {
-        'User-Agent': 'LGKA-App-Luka-Loehr',
+        'User-Agent': 'LGKA+ App Luka Löhr',
       },
     ).timeout(const Duration(seconds: 5));
       
@@ -195,7 +195,7 @@ class WeatherService {
       final response = await http.get(
         Uri.parse(csvUrl),
         headers: {
-          'User-Agent': 'LGKA-App-Luka-Loehr',
+          'User-Agent': 'LGKA+ App Luka Löhr',
         },
       ).timeout(const Duration(seconds: 5));
       
