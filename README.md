@@ -1,20 +1,20 @@
 ![LGKA+ Banner](app_store_assets/banners/lgka_banner_1024x500.png)
 
-# LGKA+ – Digital Substitution Schedule
+# LGKA+ – Digital Substitution and Timetables
 
 [![Flutter](https://img.shields.io/badge/Flutter-Latest-02569B?style=flat&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green?style=flat)](https://github.com/luka-loehr/LGKA/releases)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-orange?style=flat)](LICENSE)
 
-Mobile app for the digital substitution schedule of Lessing-Gymnasium Karlsruhe.
+Mobile app for substitution and timetables plus weather data of Lessing-Gymnasium Karlsruhe.
 
 ## Features
 
-- **Substitution Schedule**: Automatic download for today and tomorrow
-- **PDF Viewer**: Integrated display with zoom, sharing and external app integration
-- **Weather Data**: Live data from the school weather station with charts
-- **Dark-Only Design**: Eye-friendly Material Design 3 theme
-- **Network-Dependent**: Always fetches fresh data from the network
+- **Substitution and timetables**: Automatic fetch (today/tomorrow) and timetables
+- **PDF viewer**: Integrated display with zoom and sharing
+- **Weather data**: Live data with charts
+- **Dark-only design**: Material Design 3
+- **Network-based**: Always fetches fresh data from the school server
 
 ## Quick Start
 
@@ -27,7 +27,7 @@ Mobile app for the digital substitution schedule of Lessing-Gymnasium Karlsruhe.
 ### Installation & Setup
 
 #### End Users
-**[Latest Release](https://github.com/luka-loehr/LGKA/releases/latest)** – ARM64 APK for Android 5.0+
+**[Latest Release](https://github.com/luka-loehr/LGKA/releases/latest)** – Android APKs (split-per-ABI) und AAB für den Play Store
 
 #### Developers
 ```bash
@@ -61,14 +61,17 @@ flutter test test/widget_test.dart
 
 ### Building
 ```bash
-# Build optimized APK (~10MB per architecture)
+# Build split-per-ABI APKs (arm64-v8a ~21 MB, armeabi-v7a ~19 MB)
 flutter build apk --release --split-per-abi
 
-# Build for specific architecture
+# Build for specific architecture (arm64 only)
 flutter build apk --release --target-platform=android-arm64
 
-# Build for Play Store
+# Build universal AAB (all ABIs) for Play Store (~47 MB upload; Play liefert Gerätesplits)
 flutter build appbundle --release
+
+# Optional: arm64-only AAB (~18 MB)
+flutter build appbundle --release --target-platform=android-arm64
 ```
 
 ### Configuration Management
@@ -108,27 +111,26 @@ The app follows clean architecture principles with clear separation of concerns:
 
 ### Key Implementation Details
 
-#### Network-Dependent Architecture
-- **Fresh data**: Always fetches the latest data from network sources
-- **Preloading**: Parallel PDF and weather data loading on app start
-- **Loading states**: Shows loading spinners until network requests complete
+#### Network-based architecture
+- **Fresh data**: Directly fetched from the school server
+- **Preloading**: Parallel loading of PDFs and weather on app start
+- **Loading states**: Clear states until requests complete
 
-#### PDF Management System
-- **Processing**: Syncfusion Flutter PDF for metadata extraction and text parsing in isolates
-- **Viewing**: pdfx with PhotoView for zoom/pan capabilities and custom transitions
-- **Storage**: Weekday-based naming with legacy fallback, stored in temporary directory
-- **Authentication**: HTTP Basic Auth for school server access
+#### PDF Management
+- **Processing**: Syncfusion Flutter PDF for metadata/text in isolates
+- **Viewing**: pdfx with PhotoView (zoom/pan)
+- **Storage**: Temporary directory, weekday-based filenames
+- **Access**: HTTP Basic Auth (school server)
 
-#### Weather Data Pipeline
-- **Source**: School weather station CSV data (`;` delimited, UTF-8 encoded)
-- **Caching**: 10-minute cache validity with in-memory + persistent storage
-- **Processing**: Data downsampling for chart performance (adaptive sampling rates)
-- **Visualization**: Syncfusion SplineSeries charts with Material 3 theming and tooltips
+#### Weather data pipeline
+- **Source**: School weather station (CSV, UTF-8, `;`)
+- **Caching**: 10 minutes in-memory
+- **Processing**: Downsampling for performance
+- **Visualization**: Syncfusion SplineSeries
 
-#### Authentication & Security
-- Simple credential-based authentication (hardcoded for school use)
-- Session management with automatic logout
-- Secure preference storage for user settings
+#### Auth & Security
+- No user accounts; credentials only for server access
+- Settings stored locally
 
 ### State Management & Providers
 
@@ -169,9 +171,9 @@ Routes are defined in `lib/navigation/app_router.dart`:
 - **csv** ^6.0.0 - CSV parsing for weather data
 - **intl** ^0.19.0 - Date/time formatting and internationalization
 
-### Network & Connectivity
-- **http** ^1.2.2 - HTTP requests with Basic Auth
-- **connectivity_plus** ^6.1.0 - Network state monitoring
+### Network
+- **http** ^1.2.2 – HTTP (Basic Auth, User-Agent: `LGKA-App-Luka-Loehr`)
+- **html** ^0.15.4 – HTML parsing (timetables)
 
 ### Development & Tooling
 - **flutter_launcher_icons** ^0.14.1 - Automated icon generation
@@ -197,7 +199,7 @@ App settings are centralized in `app_config/app_config.yaml`:
 - App identity (name, package, description)
 - Version management (version_name, version_code)
 - Platform-specific settings:
-  - **Android**: min_sdk: 21, target_sdk: 34, compile_sdk: 34
+  - **Android**: min_sdk: 21, target_sdk: 36, compile_sdk: 36
   - **iOS**: deployment_target: 12.0
 - Icon configuration with automatic generation
 
@@ -205,19 +207,19 @@ Apply changes with: `dart run scripts/apply_app_config.dart`
 
 ### Build Configuration
 - **Dart SDK**: 3.8.0+
-- **Android**: Min SDK 21, Target SDK 34 (configurable via app_config.yaml)
-- **iOS**: Deployment target 12.0
-- **Optimizations**: R8 full mode enabled, resource optimization, tree-shaking
-- **APK Size**: Split APKs reduce download to ~10MB per architecture
-- **Performance**: Parallel builds, configuration caching, D8 desugaring enabled
+- **Android**: Min SDK 21, Target SDK 36 (via `pubspec.yaml: flutter.targetSdkVersion`)
+  - **iOS**: Deployment target 12.0
+- **Optimizations**: R8/ProGuard, resource shrinking, tree-shaking
+- **APK size (arm64-v8a)**: ~21 MB (split APK); universal AAB ~47 MB; arm64-only AAB ~18 MB (Play delivers device splits)
+- **Performance**: Parallel builds, configuration cache, D8
 
 ## Development Guidelines
 
 ### Theme & UX
-- **Dark-only Material Design 3** theme with `useMaterial3: true`
-- **Custom color scheme** based on pure black background (#000000) and blue accents (#3770D4)
-- **Haptic feedback** abstracted through `HapticService` for cross-platform tactile responses
-- **Edge-to-edge display** with proper inset handling for Android 15+ compatibility
+- **Dark-only Material Design 3** with `useMaterial3: true`
+- **Appblue** color scheme
+- **Haptic feedback** via `HapticService`
+- **Edge-to-edge display** with insets for Android 15+
 
 ### File Operations
 - **Built-in PDF viewer**: Uses pdfx for consistent PDF viewing experience
