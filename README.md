@@ -8,6 +8,11 @@
 
 Mobile app for substitution and timetables plus weather data of Lessing-Gymnasium Karlsruhe.
 
+## Get the app
+
+- iOS: https://apps.apple.com/app/lgka/id6747010920
+- Android: https://play.google.com/store/apps/details?id=com.lgka
+
 ## Features
 
 - **Substitution and timetables**: Automatic fetch (today/tomorrow) and timetables
@@ -15,6 +20,37 @@ Mobile app for substitution and timetables plus weather data of Lessing-Gymnasiu
 - **Weather data**: Live data with charts
 - **Dark-only design**: Material Design 3
 - **Network-based**: Always fetches fresh data from the school server
+- **Dynamic accent colors**: Adjustable accent color applied consistently across the app
+
+## Schedule (Timetables) – How it works
+
+The Schedule screen fetches official timetable PDFs from the school website using secure web scraping with robust caching and validation.
+
+- Data source: Page `unterricht/stundenplan` (HTTP Basic Auth) with strict User-Agent `LGKA-App-Luka-Loehr`.
+- Scraping: Links are parsed from module `#mod-custom213`, relative URLs are converted to absolute. Each link becomes a `ScheduleItem` with `title`, `fullUrl`, `halbjahr` (1./2. Halbjahr), and `gradeLevel` (Klassen 5-10, J11/J12).
+- Caching:
+  - Schedule list cache: 30 minutes validity (serves last data on errors).
+  - Availability cache: 15 minutes validity using lightweight HTTP HEAD checks.
+- Availability checks:
+  - All items are checked concurrently for presence (HTTP 200).
+  - If any 2. Halbjahr plans are available, 1. Halbjahr is hidden to avoid confusion.
+- Download & validation:
+  - On tap, the PDF downloads with authentication to a temporary file named `<GradeLevel>_<Halbjahr>.pdf`.
+  - HTTP 404 is treated as “not available yet” (no error toast).
+  - Files smaller than 1 KB or HTML responses are discarded.
+  - Basic PDF checks ensure `%PDF-` header and trailer markers.
+- UI/UX states:
+  - Initial load shows a progress indicator, then a smooth fade-in of available items.
+  - Clear empty/error states with a single retry that refreshes all data sources.
+  - Footer adapts to gesture/button navigation and shows app version.
+- Errors:
+  - All parsing/network failures are surfaced as a generic server connection error, with fallback to cached schedules if scraping fails.
+
+Related code:
+
+- `lib/services/schedule_service.dart` – scraping, caching, availability checks, downloads
+- `lib/providers/schedule_provider.dart` – state, retries, error handling
+- `lib/screens/schedule_page.dart` – UI, animations, availability filtering
 
 ## Quick Start
 
