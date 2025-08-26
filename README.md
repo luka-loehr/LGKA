@@ -6,7 +6,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green?style=flat)](https://github.com/luka-loehr/LGKA/releases)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-orange?style=flat)](LICENSE)
 
-Mobile app for substitution and timetables plus weather data of Lessing-Gymnasium Karlsruhe.
+Mobile app for substitution/timetables plus weather data of Lessing-Gymnasium Karlsruhe.
 
 ## Get the app
 
@@ -15,42 +15,26 @@ Mobile app for substitution and timetables plus weather data of Lessing-Gymnasiu
 
 ## Features
 
-- **Substitution and timetables**: Automatic fetch (today/tomorrow) and timetables
-- **PDF viewer**: Integrated display with zoom and sharing
-- **Weather data**: Live data with charts
-- **Dark-only design**: Material Design 3
-- **Network-based**: Always fetches fresh data from the school server
-- **Dynamic accent colors**: Adjustable accent color applied consistently across the app
+- Substitution plans (today/tomorrow) and official timetables (PDF)
+- Integrated PDF viewer with zoom and sharing
+- Weather data with smooth charts and stale-data detection
+- Dark-only Material Design 3
+- Dynamic accent colors across the entire app
 
-## Schedule (Timetables) – How it works
+## Schedule (Timetables)
 
-The Schedule screen fetches official timetable PDFs from the school website using secure web scraping with robust caching and validation.
+How the Schedule screen works (high level):
 
-- Data source: Page `unterricht/stundenplan` (HTTP Basic Auth) with strict User-Agent `LGKA-App-Luka-Loehr`.
-- Scraping: Links are parsed from module `#mod-custom213`, relative URLs are converted to absolute. Each link becomes a `ScheduleItem` with `title`, `fullUrl`, `halbjahr` (1./2. Halbjahr), and `gradeLevel` (Klassen 5-10, J11/J12).
+- Source and access: Securely fetches the page `unterricht/stundenplan` with HTTP Basic Auth and the unified User‑Agent `LGKA-App-Luka-Loehr`.
+- Parsing: Extracts links from module `#mod-custom213`, normalizes URLs, and builds entries with half‑year and grade level.
 - Caching:
-  - Schedule list cache: 30 minutes validity (serves last data on errors).
-  - Availability cache: 15 minutes validity using lightweight HTTP HEAD checks.
-- Availability checks:
-  - All items are checked concurrently for presence (HTTP 200).
-  - If any 2. Halbjahr plans are available, 1. Halbjahr is hidden to avoid confusion.
-- Download & validation:
-  - On tap, the PDF downloads with authentication to a temporary file named `<GradeLevel>_<Halbjahr>.pdf`.
-  - HTTP 404 is treated as “not available yet” (no error toast).
-  - Files smaller than 1 KB or HTML responses are discarded.
-  - Basic PDF checks ensure `%PDF-` header and trailer markers.
-- UI/UX states:
-  - Initial load shows a progress indicator, then a smooth fade-in of available items.
-  - Clear empty/error states with a single retry that refreshes all data sources.
-  - Footer adapts to gesture/button navigation and shows app version.
-- Errors:
-  - All parsing/network failures are surfaced as a generic server connection error, with fallback to cached schedules if scraping fails.
+  - List cache: 30 minutes (serves last known data on errors)
+  - Availability cache: 15 minutes (lightweight HEAD requests)
+- Availability: Checks all items concurrently; if any 2nd half‑year plans are present, 1st half‑year is hidden.
+- Download & validation: Authenticated PDF download to a temp file; 404 means “not available yet”; tiny/HTML/invalid PDFs are discarded using header/trailer checks.
+- UX: Clear loading/empty/error states, single retry refresh, smooth fade‑ins, footer with version and adaptive bottom padding.
 
-Related code:
-
-- `lib/services/schedule_service.dart` – scraping, caching, availability checks, downloads
-- `lib/providers/schedule_provider.dart` – state, retries, error handling
-- `lib/screens/schedule_page.dart` – UI, animations, availability filtering
+Related code: `lib/services/schedule_service.dart`, `lib/providers/schedule_provider.dart`, `lib/screens/schedule_page.dart`
 
 ## Quick Start
 
@@ -81,9 +65,9 @@ flutter run
 flutter run -d [device-id]
 ```
 
-## Development Commands
+## Development
 
-### Testing & Analysis
+### Test & Analyze
 ```bash
 # Analyze code for issues
 flutter analyze
@@ -95,7 +79,7 @@ flutter test
 flutter test test/widget_test.dart
 ```
 
-### Building
+### Build
 ```bash
 # Build split-per-ABI APKs (arm64-v8a ~21 MB, armeabi-v7a ~19 MB)
 flutter build apk --release --split-per-abi
@@ -110,7 +94,7 @@ flutter build appbundle --release
 flutter build appbundle --release --target-platform=android-arm64
 ```
 
-### Configuration Management
+### Config
 ```bash
 # Update app configuration (icons, version, etc.)
 ./scripts/update_app_config.sh
@@ -134,87 +118,20 @@ flutter pub outdated
 flutter pub upgrade
 ```
 
-## Architecture
+## Architecture (short)
 
-### Core Architecture Pattern
-The app follows clean architecture principles with clear separation of concerns:
+- Layers: `data/` (repos), `services/` (business logic), `providers/` (Riverpod state), `screens/` (UI), `navigation/` (GoRouter)
+- PDFs: Syncfusion parsing, pdfx viewer, temp storage
+- Weather: CSV source, 10‑min cache, charts
+- Auth & Security: HTTP Basic Auth only; settings stored locally
 
-- **Data Layer** (`lib/data/`): Repositories and preference management
-- **State Management** (`lib/providers/`): Riverpod providers for reactive state
-- **Services** (`lib/services/`): Business logic for weather data and file handling
-- **Presentation** (`lib/screens/`): UI screens with Material Design 3 dark theme
-- **Navigation** (`lib/navigation/`): GoRouter-based declarative routing
+## Stack
 
-### Key Implementation Details
-
-#### Network-based architecture
-- **Fresh data**: Directly fetched from the school server
-- **Preloading**: Parallel loading of PDFs and weather on app start
-- **Loading states**: Clear states until requests complete
-
-#### PDF Management
-- **Processing**: Syncfusion Flutter PDF for metadata/text in isolates
-- **Viewing**: pdfx with PhotoView (zoom/pan)
-- **Storage**: Temporary directory, weekday-based filenames
-- **Access**: HTTP Basic Auth (school server)
-
-#### Weather data pipeline
-- **Source**: School weather station (CSV, UTF-8, `;`)
-- **Caching**: 10 minutes in-memory
-- **Processing**: Downsampling for performance
-- **Visualization**: Syncfusion SplineSeries
-
-#### Auth & Security
-- No user accounts; credentials only for server access
-- Settings stored locally
-
-### State Management & Providers
-
-**Riverpod-based architecture** with dependency injection and reactive state:
-
-- **`preferencesManagerProvider`**: User settings and authentication state
-- **`pdfRepositoryProvider`**: ChangeNotifier for PDF download state with loading indicators
-- **`weatherDataProvider`**: StateNotifier managing weather data and loading states
-
-### Navigation Flow
-
-Routes are defined in `lib/navigation/app_router.dart`:
-
-- `/welcome`: First-time user onboarding
-- `/auth`: Password authentication screen
-- `/`: Home screen with tabs for PDFs and weather
-- `/pdf-viewer`: PDF viewing with sharing capabilities
-- `/settings`: App preferences
-- `/legal`: Legal information and privacy policy
-
-## Tech Stack
-
-### Core Framework
-- **Flutter** (latest stable) / **Dart 3.8.0+**
-- **flutter_riverpod** - State management
-- **go_router** - Navigation
-- **shared_preferences** - Local storage
-- **path_provider** - File system access
-
-### PDF & Documents
-- **syncfusion_flutter_pdf** ^29.2.9 - PDF processing and text extraction
-- **pdfx** ^2.9.1 - PDF viewing with zoom/pan capabilities
-- **photo_view** ^0.15.0 - Image viewing for PDF pages
-- **share_plus** ^11.0.0 - System share functionality
-
-### Charts & Data Visualization
-- **syncfusion_flutter_charts** ^29.2.9 - Weather data charts (SplineSeries)
-- **csv** ^6.0.0 - CSV parsing for weather data
-- **intl** ^0.19.0 - Date/time formatting and internationalization
-
-### Network
-- **http** ^1.2.2 – HTTP (Basic Auth, User-Agent: `LGKA-App-Luka-Loehr`)
-- **html** ^0.15.4 – HTML parsing (timetables)
-
-### Development & Tooling
-- **flutter_launcher_icons** ^0.14.1 - Automated icon generation
-- **yaml** ^3.1.2 - Configuration file parsing
-- **package_info_plus** ^8.3.0 - App version information
+- Flutter (stable), Dart 3.8+
+- State: flutter_riverpod; Navigation: go_router
+- Docs/PDF: syncfusion_flutter_pdf, pdfx, photo_view, share_plus
+- Charts/Data: syncfusion_flutter_charts, csv, intl
+- Network: http (Basic Auth; User-Agent `LGKA-App-Luka-Loehr`), html parser
 
 ## Project Structure
 
@@ -249,7 +166,7 @@ Apply changes with: `dart run scripts/apply_app_config.dart`
 - **APK size (arm64-v8a)**: ~21 MB (split APK); universal AAB ~47 MB; arm64-only AAB ~18 MB (Play delivers device splits)
 - **Performance**: Parallel builds, configuration cache, D8
 
-## Development Guidelines
+## Guidelines (short)
 
 ### Theme & UX
 - **Dark-only Material Design 3** with `useMaterial3: true`
