@@ -12,8 +12,12 @@ Mobile app for substitution/timetables plus weather data of Lessing-Gymnasium Ka
 
 Download the app here:
 
-[![Get it on Google Play](https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg)](https://play.google.com/store/apps/details?id=com.lgka)
-[![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/app/lgka/id6747010920)
+<a href="https://play.google.com/store/apps/details?id=com.lgka">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" height="60"/>
+  </a>
+<a href="https://apps.apple.com/app/lgka/id6747010920">
+  <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="60"/>
+</a>
 
 ## Features
 
