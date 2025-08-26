@@ -35,14 +35,6 @@ Mobile app for substitution/timetables plus weather data of Lessing-Gymnasium Ka
 - Only available PDFs are shown; unavailable ones are hidden
 - One tap opens the PDF viewer with sharing
 
-## Privacy & Legal
-
-- No data collection or tracking
-- All data remains local on the device
-- Secure connection to the school server
-
-[📋 Privacy Policy](privacy.html) | [ℹ️ Legal Notice](impressum.html)
-
 ## License
 
 [Creative Commons BY-NC-ND 4.0](LICENSE) – Private student project
