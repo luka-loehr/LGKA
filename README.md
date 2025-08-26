@@ -20,13 +20,6 @@ Mobile app for substitution/timetables plus weather data of Lessing-Gymnasium Ka
 - Dark‑only Material Design 3
 - Dynamic accent colors
 
-## Schedule (Timetables)
-
-- Official timetable PDFs fetched from the school website
-- Clear grouping by grade level and half‑year (1./2. Halbjahr)
-- Only available PDFs are shown; unavailable ones are hidden
-- One tap opens the PDF viewer with sharing
-
 ## License
 
 [Creative Commons BY-NC-ND 4.0](LICENSE) – Private student project
