@@ -14,8 +14,7 @@ Download the app here:
 
 <a href="https://apps.apple.com/app/lgka/id6747010920">
   <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"/>
-</a>
-<a href="https://play.google.com/store/apps/details?id=com.lgka">
+</a><a href="https://play.google.com/store/apps/details?id=com.lgka">
   <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" height="40"/>
 </a>
 
