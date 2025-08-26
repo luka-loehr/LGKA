@@ -10,14 +10,13 @@ Mobile app for substitution/timetables plus weather data of Lessing-Gymnasium Ka
 
 ## Get the app
 
-<p>
+<p style="display:flex; align-items:center; gap:10px;">
   <a href="https://apps.apple.com/app/lgka/id6747010920" target="_blank" rel="noopener">
-    <img alt="Download on the App Store" height="54" src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1724284800" />
+    <img alt="Download on the App Store" style="height:54px; display:inline-block; vertical-align:middle;" src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1724284800" />
   </a>
-  <a href="https://play.google.com/store/apps/details?id=com.lgka" target="_blank" rel="noopener" style="margin-left:10px;">
-    <img alt="Get it on Google Play" height="54" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" />
+  <a href="https://play.google.com/store/apps/details?id=com.lgka" target="_blank" rel="noopener">
+    <img alt="Get it on Google Play" style="height:54px; display:inline-block; vertical-align:middle;" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" />
   </a>
-  
 </p>
 
 ## Features
