@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../theme/app_theme.dart';
+import '../providers/haptic_service.dart';
 
 class InAppWebViewScreen extends StatefulWidget {
   final String url;
@@ -20,6 +21,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
   final GlobalKey webViewKey = GlobalKey();
   InAppWebViewController? _controller;
   double _progress = 0;
+  bool _hasTriggeredLoadedHaptic = false;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +78,18 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
           },
           onProgressChanged: (controller, progress) {
             setState(() => _progress = progress / 100);
+            
+            // Trigger haptic feedback when page is fully loaded
+            if (progress == 100 && !_hasTriggeredLoadedHaptic) {
+              _hasTriggeredLoadedHaptic = true;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  if (mounted) {
+                    HapticService.pdfLoading();
+                  }
+                });
+              });
+            }
           },
           onReceivedHttpAuthRequest: (controller, challenge) async {
             // Provide basic auth when challenged
