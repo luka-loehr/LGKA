@@ -28,6 +28,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   bool _showErrorFlash = false;
   bool _showSuccessFlash = false;
   bool _shouldShowOffset = false;
+  String _currentAccentColor = 'blue';
   
   // Adaptive offset calculation based on screen height
   double _getAdaptiveOffset(BuildContext context) {
@@ -61,6 +62,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   @override
   void initState() {
     super.initState();
+    
+    // Get initial accent color
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final prefsManager = ref.read(preferencesManagerProvider);
+      _currentAccentColor = prefsManager.accentColor;
+    });
     
     // Setup button color animation with accent color
     _buttonColorController = AnimationController(
@@ -97,14 +104,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     // Listen for text changes to update button state
     _usernameController.addListener(_handleTextChange);
     _passwordController.addListener(_handleTextChange);
-    
-    // Listen for accent color changes
-    ref.listen(preferencesManagerProvider, (previous, next) {
-      if (previous?.accentColor != next.accentColor) {
-        _updateAnimations();
-        setState(() {}); // Trigger rebuild to update colors
-      }
-    });
   }
 
   // Update animations when accent color changes
@@ -282,6 +281,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     // Check if keyboard is visible to update offset state
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateOffsetState();
+    });
+    
+    // Listen for accent color changes
+    ref.listen(preferencesManagerProvider, (previous, next) {
+      if (previous?.accentColor != next.accentColor) {
+        _currentAccentColor = next.accentColor;
+        _updateAnimations();
+        setState(() {}); // Trigger rebuild to update colors
+      }
     });
     
     // Get screen metrics for responsive design
