@@ -201,7 +201,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _onMedkitPressed() {
     HapticService.subtle();
-    // TODO: Hook up illness report flow
+    context.push(AppRouter.webview, extra: {
+      'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
+      'title': 'Krankmeldung',
+      // Basic auth is handled by WebView challenge; headers here for completeness if needed
+      'headers': {
+        'User-Agent': 'LGKA-App-Luka-Loehr',
+      }
+    });
   }
 }
 
