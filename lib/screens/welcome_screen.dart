@@ -63,9 +63,9 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     // Small delay for the animation to feel natural
     await Future.delayed(const Duration(milliseconds: 50));
     
-    // Navigate to auth screen
+    // Navigate to info screen
     if (mounted) {
-      context.go(AppRouter.auth);
+      context.go(AppRouter.info);
     }
   }
 
