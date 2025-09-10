@@ -980,10 +980,6 @@ class _SettingsSheet extends ConsumerWidget {
                     const SizedBox(height: 20),
                     _buildDivider(),
                     const SizedBox(height: 20),
-                    _buildDebugOptions(context, preferencesManager),
-                    const SizedBox(height: 20),
-                    _buildDivider(),
-                    const SizedBox(height: 20),
                     _buildLegalLinks(context),
                   ],
                 ),
@@ -1068,46 +1064,6 @@ class _SettingsSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildDebugOptions(BuildContext context, PreferencesManager preferencesManager) {
-    return Column(
-      children: [
-        Text(
-          'Debug-Optionen',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.primaryText,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Zurücksetzen der App-Einstellungen',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.secondaryText,
-              ),
-        ),
-        const SizedBox(height: 16),
-        ElevatedButton.icon(
-          onPressed: () async {
-            await preferencesManager.clearAllPreferences();
-            HapticService.subtle();
-            // Close settings sheet and navigate to welcome screen
-            Navigator.of(context).pop(); // Close settings sheet
-            context.go(AppRouter.welcome); // Go directly to welcome screen
-          },
-          icon: const Icon(Icons.refresh),
-          label: const Text('App zurücksetzen'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red.withValues(alpha: 0.8),
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildDivider() {
     return Container(
