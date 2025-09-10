@@ -40,7 +40,11 @@ class AppRouter {
         ),
         GoRoute(
           path: auth,
-          builder: (context, state) => const AuthScreen(),
+          pageBuilder: (context, state) => CustomTransitionPage(
+            child: const AuthScreen(),
+            transitionsBuilder: _infoTransition,
+            transitionDuration: const Duration(milliseconds: 400),
+          ),
         ),
         GoRoute(
           path: home,
