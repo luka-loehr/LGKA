@@ -29,17 +29,22 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
     {
       'icon': Icons.calendar_today,
       'title': 'Vertretungsplan',
-      'description': 'Aktueller Vertretungsplan des Lessing-Gymnasiums',
+      'description': 'Aktueller Vertretungsplan für heute/morgen',
     },
     {
       'icon': Icons.schedule,
       'title': 'Stundenplan',
-      'description': 'Persönlicher Stundenplan verwalten',
+      'description': 'Stundenplan fürs 1./2. Halbjahr',
     },
     {
       'icon': Icons.cloud,
       'title': 'Wetterdaten',
-      'description': 'Echtzeit-Wetterdaten der Schule',
+      'description': 'Zugriff auf die eigene Wetterstation der Schule',
+    },
+    {
+      'icon': Icons.sick,
+      'title': 'Krankmeldung',
+      'description': 'Krankmeldung direkt über die App einreichen',
     },
   ];
 
@@ -212,32 +217,49 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                         child: SizedBox(
                           width: double.infinity,
                           height: 50,
-                          child: ElevatedButton(
-                            onPressed: _isNavigating ? null : _navigateToAuth,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.getAccentColor(_selectedColor),
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: _isNavigating ? 0 : 2,
-                            ),
-                            child: _isNavigating
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                  ),
-                                )
-                              : Text(
-                                  'Los geht\'s!',
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeInOut,
+                            decoration: BoxDecoration(
+                              color: AppColors.getAccentColor(_selectedColor),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: _isNavigating ? null : [
+                                BoxShadow(
+                                  color: AppColors.getAccentColor(_selectedColor).withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  spreadRadius: 2,
+                                  offset: const Offset(0, 2),
                                 ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: _isNavigating ? null : _navigateToAuth,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: _isNavigating
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ),
+                                  )
+                                : Text(
+                                    'Los geht\'s!',
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                            ),
                           ),
                         ),
                       ),
@@ -253,40 +275,41 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
   }
 
   Widget _buildFeatureCard(Map<String, dynamic> feature) {
-    // Calculate responsive card height based on screen size
+    // Calculate responsive card height based on screen size - medium cards
     final screenHeight = MediaQuery.of(context).size.height;
-    final cardHeight = screenHeight * 0.12; // 12% of screen height
-    final minHeight = 80.0;
-    final maxHeight = 120.0;
+    final cardHeight = screenHeight * 0.10; // 10% of screen height (medium size)
+    final minHeight = 70.0; // Medium size
+    final maxHeight = 100.0; // Medium size
     final finalHeight = cardHeight.clamp(minHeight, maxHeight);
     
     return Card(
       color: AppColors.appSurface,
       elevation: 0,
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 7), // Medium spacing
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14), // Medium border radius
       ),
       child: SizedBox(
         height: finalHeight,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14), // Medium padding
           child: Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 44, // Medium size
+                height: 44, // Medium size
                 decoration: BoxDecoration(
                   color: AppColors.getAccentColor(_selectedColor).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(11), // Medium border radius
                 ),
                 child: Icon(
                   feature['icon'] as IconData,
                   color: AppColors.getAccentColor(_selectedColor),
-                  size: 24,
+                  size: 22, // Medium icon size
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14), // Medium spacing
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,14 +317,14 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                   children: [
                     Text(
                       feature['title'] as String,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith( // Back to titleMedium
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 3), // Medium spacing
                     Text(
                       feature['description'] as String,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith( // Back to bodyMedium
                         color: AppColors.secondaryText,
                       ),
                     ),
@@ -329,6 +352,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
       onTap: () => _selectColor(colorData['name'] as String),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
         width: boxSize,
         height: boxSize,
         decoration: BoxDecoration(
@@ -349,20 +373,25 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
             : null,
         ),
         child: Center(
-          child: isSelected
-            ? Icon(
-                Icons.check,
-                color: Colors.white,
-                size: boxSize * 0.32, // Scale with box size
-              )
-            : Container(
-                width: boxSize * 0.24, // Scale with box size
-                height: boxSize * 0.24, // Scale with box size
-                decoration: const BoxDecoration(
-                  color: Colors.white24,
-                  shape: BoxShape.circle,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: isSelected
+              ? Icon(
+                  Icons.check,
+                  key: const ValueKey('check'),
+                  color: Colors.white,
+                  size: boxSize * 0.32, // Scale with box size
+                )
+              : Container(
+                  key: const ValueKey('dot'),
+                  width: boxSize * 0.24, // Scale with box size
+                  height: boxSize * 0.24, // Scale with box size
+                  decoration: const BoxDecoration(
+                    color: Colors.white24,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
+          ),
         ),
       ),
     );
