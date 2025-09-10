@@ -75,15 +75,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return AppBar(
       backgroundColor: AppColors.appBackground,
       elevation: 0,
-      leading: _currentPage == 0
-          ? IconButton(
-              onPressed: _onMedkitPressed,
-              icon: const Icon(
-                Icons.medical_services_outlined,
-                color: Colors.red,
-              ),
-            )
-          : null,
+      leading: IconButton(
+        onPressed: _onMedkitPressed,
+        icon: const Icon(
+          Icons.medical_services_outlined,
+          color: Colors.red,
+        ),
+      ),
       title: _buildSegmentedControl(),
       centerTitle: true,
       actions: [
