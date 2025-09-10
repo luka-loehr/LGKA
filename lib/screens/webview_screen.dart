@@ -32,7 +32,10 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close, color: AppColors.secondaryText),
-          onPressed: () => Navigator.of(context).maybePop(),
+          onPressed: () {
+            HapticService.subtle();
+            Navigator.of(context).maybePop();
+          },
         ),
         title: Text(
           widget.title ?? 'Browser',
