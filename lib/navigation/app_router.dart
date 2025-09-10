@@ -8,6 +8,7 @@ import '../screens/home_screen.dart';
 import '../screens/pdf_viewer_screen.dart';
 import '../screens/schedule_page.dart';
 import '../screens/legal_screen.dart';
+import '../screens/webview_screen.dart';
 
 class AppRouter {
   // Route names
@@ -17,6 +18,7 @@ class AppRouter {
   static const String pdfViewer = '/pdf-viewer';
   static const String schedule = '/schedule';
   static const String legal = '/legal';
+  static const String webview = '/webview';
 
   static GoRouter createRouter({required String initialLocation}) {
     return GoRouter(
@@ -51,6 +53,17 @@ class AppRouter {
         GoRoute(
           path: legal,
           builder: (context, state) => const LegalScreen(),
+        ),
+        GoRoute(
+          path: webview,
+          builder: (context, state) {
+            final data = state.extra as Map<String, dynamic>;
+            return InAppWebViewScreen(
+              url: data['url'] as String,
+              title: data['title'] as String?,
+              headers: data['headers'] as Map<String, String>?,
+            );
+          },
         ),
       ],
     );

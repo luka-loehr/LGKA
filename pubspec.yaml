@@ -73,6 +73,7 @@ dependencies:
   # App Info
   package_info_plus: ^8.3.0
   url_launcher: ^6.2.5
+  flutter_inappwebview: ^6.0.0
 
 dev_dependencies:
   flutter_test:
