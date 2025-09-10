@@ -1089,43 +1089,17 @@ class _SettingsSheet extends ConsumerWidget {
           'Impressum', 
           'https://luka-loehr.github.io/LGKA/impressum.html'
         ),
-        const SizedBox(height: 20),
-        _buildCreatorLink(context),
+        const SizedBox(height: 12),
+        _buildLegalLink(
+          context,
+          Icons.person_outline, 
+          'Erstellt von Luka Löhr', 
+          'https://lukaloehr.de'
+        ),
       ],
     );
   }
 
-  Widget _buildCreatorLink(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        HapticService.subtle();
-        _launchURL('https://lukaloehr.de');
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Erstellt von ',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.secondaryText.withValues(alpha: 0.7),
-              ),
-            ),
-            Text(
-              'Luka Löhr',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.w600,
-                decoration: TextDecoration.none,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildLegalLink(BuildContext context, IconData icon, String text, String url) {
     return InkWell(
