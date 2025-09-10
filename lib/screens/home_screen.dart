@@ -1089,13 +1089,6 @@ class _SettingsSheet extends ConsumerWidget {
           'Impressum', 
           'https://luka-loehr.github.io/LGKA/impressum.html'
         ),
-        const SizedBox(height: 12),
-        _buildLegalLink(
-          context,
-          Icons.person_outline, 
-          'Erstellt von Luka Löhr', 
-          'https://lukaloehr.de'
-        ),
       ],
     );
   }
