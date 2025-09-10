@@ -173,41 +173,44 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
 
                       // Features List
                       Expanded(
-                        child: ListView(
-                          children: [
-                            ..._features.map((feature) => _buildFeatureCard(feature)),
-                            const SizedBox(height: 20),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ..._features.map((feature) => _buildFeatureCard(feature)),
+                              const SizedBox(height: 20),
 
-                            // Accent Color Section
-                            Text(
-                              'Deine Akzentfarbe',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
+                              // Accent Color Section
+                              Text(
+                                'Deine Akzentfarbe',
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
 
-                            const SizedBox(height: 8),
+                              const SizedBox(height: 8),
 
-                            Text(
-                              'Wähle deine Lieblingsfarbe aus. Diese wird überall in der App verwendet.',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.secondaryText,
+                              Text(
+                                'Wähle deine Lieblingsfarbe aus. Diese wird überall in der App verwendet.',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.secondaryText,
+                                ),
                               ),
-                            ),
 
-                            const SizedBox(height: 12),
+                              const SizedBox(height: 12),
 
-                            // Color Selection
-                            Wrap(
-                              spacing: 12,
-                              runSpacing: 12,
-                              children: _accentColors.map((colorData) =>
-                                _buildColorOption(colorData)
-                              ).toList(),
-                            ),
+                              // Color Selection
+                              Wrap(
+                                spacing: 12,
+                                runSpacing: 12,
+                                children: _accentColors.map((colorData) =>
+                                  _buildColorOption(colorData)
+                                ).toList(),
+                              ),
 
-                            const SizedBox(height: 32),
-                          ],
+                              const SizedBox(height: 32),
+                            ],
+                          ),
                         ),
                       ),
 
@@ -342,11 +345,12 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
     final isSelected = _selectedColor == colorData['name'];
     final color = colorData['color'] as Color;
 
-    // Calculate responsive box size to fit 5 colors in one line
+    // Calculate responsive box size to fit 5 colors in one line with max size constraint
     final screenWidth = MediaQuery.of(context).size.width;
     final availableWidth = screenWidth - 32; // Subtract padding (16px on each side)
     final spacingWidth = 4 * 12; // 4 gaps between 5 boxes × 12px spacing
-    final boxSize = (availableWidth - spacingWidth) / 5;
+    final calculatedSize = (availableWidth - spacingWidth) / 5;
+    final boxSize = calculatedSize.clamp(40.0, 80.0); // Min 40px, max 80px
 
     return GestureDetector(
       onTap: () => _selectColor(colorData['name'] as String),
