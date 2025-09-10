@@ -174,17 +174,19 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                       // Features List
                       Expanded(
                         child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ..._features.map((feature) => _buildFeatureCard(feature)),
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 24),
 
                               // Accent Color Section
                               Text(
                                 'Deine Akzentfarbe',
                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryText,
                                 ),
                               ),
 
@@ -194,10 +196,11 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                                 'Wähle deine Lieblingsfarbe aus. Diese wird überall in der App verwendet.',
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: AppColors.secondaryText,
+                                  height: 1.4,
                                 ),
                               ),
 
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 16),
 
                               // Color Selection
                               Wrap(
@@ -208,7 +211,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                                 ).toList(),
                               ),
 
-                              const SizedBox(height: 32),
+                              const SizedBox(height: 40),
                             ],
                           ),
                         ),
@@ -278,73 +281,57 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
   }
 
   Widget _buildFeatureCard(Map<String, dynamic> feature) {
-    // Calculate responsive card height based on screen size - medium cards
-    final screenHeight = MediaQuery.of(context).size.height;
-    final cardHeight = screenHeight * 0.10; // 10% of screen height (medium size)
-    final minHeight = 70.0; // Medium size
-    final maxHeight = 100.0; // Medium size
-    final finalHeight = cardHeight.clamp(minHeight, maxHeight);
-    
     return Card(
       color: AppColors.appSurface,
       elevation: 0,
-      margin: const EdgeInsets.only(bottom: 7), // Medium spacing
+      margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14), // Medium border radius
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: SizedBox(
-        height: finalHeight,
-        child: Padding(
-          padding: const EdgeInsets.all(14), // Medium padding
-          child: Row(
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 44, // Medium size
-                height: 44, // Medium size
-                decoration: BoxDecoration(
-                  color: AppColors.getAccentColor(_selectedColor).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(11), // Medium border radius
-                ),
-                child: Icon(
-                  feature['icon'] as IconData,
-                  color: AppColors.getAccentColor(_selectedColor),
-                  size: 22, // Medium icon size
-                ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.getAccentColor(_selectedColor).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(width: 14), // Medium spacing
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        feature['title'] as String,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Flexible(
-                      child: Text(
-                        feature['description'] as String,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.secondaryText,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                      ),
-                    ),
-                  ],
-                ),
+              child: Icon(
+                feature['icon'] as IconData,
+                color: AppColors.getAccentColor(_selectedColor),
+                size: 24,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    feature['title'] as String,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryText,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    feature['description'] as String,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppColors.secondaryText,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
