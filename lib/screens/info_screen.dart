@@ -317,18 +317,27 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      feature['title'] as String,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith( // Back to titleMedium
-                        fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Text(
+                        feature['title'] as String,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
-                    const SizedBox(height: 3), // Medium spacing
-                    Text(
-                      feature['description'] as String,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith( // Back to bodyMedium
-                        color: AppColors.secondaryText,
+                    const SizedBox(height: 3),
+                    Flexible(
+                      child: Text(
+                        feature['description'] as String,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.secondaryText,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
                       ),
                     ),
                   ],
