@@ -42,24 +42,12 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
           style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.primaryText),
         ),
         centerTitle: true,
-        actions: [
-          if (_progress < 1.0)
-            Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  value: _progress,
-                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
-                ),
-              ),
-            ),
-        ],
+        actions: [],
       ),
       body: SafeArea(
-        child: InAppWebView(
+        child: Stack(
+          children: [
+            InAppWebView(
           key: webViewKey,
           initialUrlRequest: URLRequest(
             url: WebUri(widget.url),
@@ -105,6 +93,30 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
               permanentPersistence: true,
             );
           },
+            ),
+            if (_progress < 1.0)
+              Container(
+                color: AppColors.appBackground,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+                        strokeWidth: 3,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Lade Krankmeldung...',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.secondaryText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
