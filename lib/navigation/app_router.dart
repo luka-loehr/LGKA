@@ -56,12 +56,27 @@ class AppRouter {
         ),
         GoRoute(
           path: webview,
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final data = state.extra as Map<String, dynamic>;
-            return InAppWebViewScreen(
-              url: data['url'] as String,
-              title: data['title'] as String?,
-              headers: data['headers'] as Map<String, String>?,
+            return CustomTransitionPage(
+              child: InAppWebViewScreen(
+                url: data['url'] as String,
+                title: data['title'] as String?,
+                headers: data['headers'] as Map<String, String>?,
+              ),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeInOut,
+                  )),
+                  child: child,
+                );
+              },
+              transitionDuration: const Duration(milliseconds: 300),
             );
           },
         ),
