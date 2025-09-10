@@ -159,7 +159,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                       // Header
                       Text(
                         'Was kannst du mit der App machen?',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -253,6 +253,13 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
   }
 
   Widget _buildFeatureCard(Map<String, dynamic> feature) {
+    // Calculate responsive card height based on screen size
+    final screenHeight = MediaQuery.of(context).size.height;
+    final cardHeight = screenHeight * 0.12; // 12% of screen height
+    final minHeight = 80.0;
+    final maxHeight = 120.0;
+    final finalHeight = cardHeight.clamp(minHeight, maxHeight);
+    
     return Card(
       color: AppColors.appSurface,
       elevation: 0,
@@ -260,45 +267,49 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.getAccentColor(_selectedColor).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+      child: SizedBox(
+        height: finalHeight,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.getAccentColor(_selectedColor).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  feature['icon'] as IconData,
+                  color: AppColors.getAccentColor(_selectedColor),
+                  size: 24,
+                ),
               ),
-              child: Icon(
-                feature['icon'] as IconData,
-                color: AppColors.getAccentColor(_selectedColor),
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    feature['title'] as String,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      feature['title'] as String,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    feature['description'] as String,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.secondaryText,
+                    const SizedBox(height: 4),
+                    Text(
+                      feature['description'] as String,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.secondaryText,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
