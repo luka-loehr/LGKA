@@ -32,7 +32,11 @@ class AppRouter {
         ),
         GoRoute(
           path: info,
-          builder: (context, state) => const InfoScreen(),
+          pageBuilder: (context, state) => CustomTransitionPage(
+            child: const InfoScreen(),
+            transitionsBuilder: _infoTransition,
+            transitionDuration: const Duration(milliseconds: 400),
+          ),
         ),
         GoRoute(
           path: auth,
@@ -179,6 +183,48 @@ class AppRouter {
         .animate(CurvedAnimation(
           parent: animation,
           curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+        ));
+
+    return SlideTransition(
+      position: slideAnimation,
+      child: ScaleTransition(
+        scale: scaleAnimation,
+        child: FadeTransition(
+          opacity: fadeAnimation,
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  // Info screen transitions (smooth slide in with fade, matching auth style)
+  static Widget _infoTransition(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    // Smooth slide in from right with sophisticated curve
+    var slideAnimation = Tween<Offset>(
+      begin: const Offset(0.3, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: animation,
+      curve: const Interval(0.0, 0.8, curve: Curves.easeOutCubic),
+    ));
+
+    // Subtle scale animation for polish
+    var scaleAnimation = Tween<double>(begin: 0.98, end: 1.0)
+        .animate(CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOut,
+        ));
+
+    // Smooth fade in
+    var fadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(
+          parent: animation,
+          curve: const Interval(0.0, 0.7, curve: Curves.easeOut),
         ));
 
     return SlideTransition(
