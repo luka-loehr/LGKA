@@ -980,6 +980,10 @@ class _SettingsSheet extends ConsumerWidget {
                     const SizedBox(height: 20),
                     _buildDivider(),
                     const SizedBox(height: 20),
+                    _buildDebugOptions(context, preferencesManager),
+                    const SizedBox(height: 20),
+                    _buildDivider(),
+                    const SizedBox(height: 20),
                     _buildLegalLinks(context),
                   ],
                 ),
@@ -1059,6 +1063,47 @@ class _SettingsSheet extends ConsumerWidget {
               ),
             );
           }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDebugOptions(BuildContext context, PreferencesManager preferencesManager) {
+    return Column(
+      children: [
+        Text(
+          'Debug-Optionen',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppColors.primaryText,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Zurücksetzen der App-Einstellungen',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.secondaryText,
+              ),
+        ),
+        const SizedBox(height: 16),
+        ElevatedButton.icon(
+          onPressed: () async {
+            await preferencesManager.clearAllPreferences();
+            HapticService.subtle();
+            // Restart the app to go through the welcome flow
+            Navigator.of(context).pop(); // Close settings sheet
+            // The app will restart and show welcome screen
+          },
+          icon: const Icon(Icons.refresh),
+          label: const Text('App zurücksetzen'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red.withValues(alpha: 0.8),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
         ),
       ],
     );

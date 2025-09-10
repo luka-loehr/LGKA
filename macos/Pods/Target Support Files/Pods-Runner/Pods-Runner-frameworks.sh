@@ -176,6 +176,8 @@ code_sign_if_enabled() {
 }
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/OrderedSet/OrderedSet.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/flutter_inappwebview_macos/flutter_inappwebview_macos.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/package_info_plus/package_info_plus.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/path_provider_foundation/path_provider_foundation.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/pdfx/pdfx.framework"
@@ -184,6 +186,8 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/url_launcher_macos/url_launcher_macos.framework"
 fi
 if [[ "$CONFIGURATION" == "Profile" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/OrderedSet/OrderedSet.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/flutter_inappwebview_macos/flutter_inappwebview_macos.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/package_info_plus/package_info_plus.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/path_provider_foundation/path_provider_foundation.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/pdfx/pdfx.framework"
@@ -192,6 +196,8 @@ if [[ "$CONFIGURATION" == "Profile" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/url_launcher_macos/url_launcher_macos.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/OrderedSet/OrderedSet.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/flutter_inappwebview_macos/flutter_inappwebview_macos.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/package_info_plus/package_info_plus.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/path_provider_foundation/path_provider_foundation.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/pdfx/pdfx.framework"
