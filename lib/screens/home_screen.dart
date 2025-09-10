@@ -75,6 +75,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return AppBar(
       backgroundColor: AppColors.appBackground,
       elevation: 0,
+      leading: _currentPage == 0
+          ? IconButton(
+              onPressed: _onMedkitPressed,
+              icon: const Icon(
+                Icons.medical_services_outlined,
+                color: Colors.red,
+              ),
+            )
+          : null,
       title: _buildSegmentedControl(),
       centerTitle: true,
       actions: [
@@ -188,6 +197,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       builder: (context) => _SettingsSheet(),
     );
+  }
+
+  void _onMedkitPressed() {
+    HapticService.subtle();
+    // TODO: Hook up illness report flow
   }
 }
 
