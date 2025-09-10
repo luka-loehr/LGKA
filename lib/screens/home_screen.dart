@@ -1090,9 +1090,9 @@ class _SettingsSheet extends ConsumerWidget {
           onPressed: () async {
             await preferencesManager.clearAllPreferences();
             HapticService.subtle();
-            // Restart the app to go through the welcome flow
+            // Close settings sheet and navigate to welcome screen
             Navigator.of(context).pop(); // Close settings sheet
-            // The app will restart and show welcome screen
+            context.go(AppRouter.welcome); // Go directly to welcome screen
           },
           icon: const Icon(Icons.refresh),
           label: const Text('App zurücksetzen'),
