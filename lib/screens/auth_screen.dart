@@ -52,24 +52,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   late AnimationController _successColorController;
   late Animation<Color?> _successColorAnimation;
 
-  // Standard app blue color
-  static const Color _activeColor = Color(0xFF3770D4);
+  // Get accent color from preferences
+  Color get _activeColor => AppColors.getAccentColor(ref.read(preferencesManagerProvider).accentColor);
   
   // Inactive color with transparency
-  static const Color _inactiveColor = Color(0x803770D4); // 50% opacity
+  Color get _inactiveColor => _activeColor.withValues(alpha: 0.5); // 50% opacity
 
   @override
   void initState() {
     super.initState();
     
-    // Setup button color animation with standard app blue
+    // Setup button color animation with accent color
     _buttonColorController = AnimationController(
       duration: _buttonAnimationDuration,
       vsync: this,
     );
 
     _buttonColorAnimation = ColorTween(
-      begin: _activeColor, // Standard app blue
+      begin: _activeColor, // Current accent color
       end: _errorRedColor,
     ).animate(CurvedAnimation(
       parent: _buttonColorController,
@@ -83,7 +83,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
 
     _successColorAnimation = ColorTween(
-      begin: _activeColor, // Standard app blue
+      begin: _activeColor, // Current accent color
       end: _successGreenColor, // Green
     ).animate(CurvedAnimation(
       parent: _successColorController,
@@ -97,6 +97,33 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     // Listen for text changes to update button state
     _usernameController.addListener(_handleTextChange);
     _passwordController.addListener(_handleTextChange);
+    
+    // Listen for accent color changes
+    ref.listen(preferencesManagerProvider, (previous, next) {
+      if (previous?.accentColor != next.accentColor) {
+        _updateAnimations();
+        setState(() {}); // Trigger rebuild to update colors
+      }
+    });
+  }
+
+  // Update animations when accent color changes
+  void _updateAnimations() {
+    _buttonColorAnimation = ColorTween(
+      begin: _activeColor,
+      end: _errorRedColor,
+    ).animate(CurvedAnimation(
+      parent: _buttonColorController,
+      curve: Curves.easeInOut,
+    ));
+
+    _successColorAnimation = ColorTween(
+      begin: _activeColor,
+      end: _successGreenColor,
+    ).animate(CurvedAnimation(
+      parent: _successColorController,
+      curve: Curves.easeInOut,
+    ));
   }
   
   void _handleFocusChange() {
