@@ -19,9 +19,10 @@ void main() async {
   final preferencesManager = PreferencesManager();
   await preferencesManager.init();
   
-  // Determine initial route
+  // Determine initial route with onboarding + auth gating
   String initialRoute;
-  if (preferencesManager.isFirstLaunch) {
+  if (preferencesManager.isFirstLaunch || !preferencesManager.onboardingCompleted) {
+    // Force Welcome → Info flow on fresh install or if onboarding not completed
     initialRoute = AppRouter.welcome;
   } else if (preferencesManager.isAuthenticated) {
     initialRoute = AppRouter.home;

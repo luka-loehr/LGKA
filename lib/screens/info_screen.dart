@@ -135,6 +135,10 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
     // Small delay for the animation to feel natural
     await Future.delayed(const Duration(milliseconds: 50));
 
+    // Mark onboarding as completed (welcome + info)
+    final prefsManager = ref.read(preferencesManagerProvider);
+    await prefsManager.setOnboardingCompleted(true);
+
     // Release button animation
     _buttonController.reverse();
 

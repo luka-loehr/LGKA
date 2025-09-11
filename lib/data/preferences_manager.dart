@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PreferencesManager extends ChangeNotifier {
   static const String _keyFirstLaunch = 'is_first_launch';
   static const String _keyAuthenticated = 'is_authenticated';
+  static const String _keyOnboardingCompleted = 'onboarding_completed';
   static const String _keyDebugMode = 'is_debug_mode';
   static const String _keyShowNavigationDebug = 'show_navigation_debug';
   static const String _keyAccentColor = 'accent_color';
@@ -31,6 +32,14 @@ class PreferencesManager extends ChangeNotifier {
 
   Future<void> setAuthenticated(bool value) async {
     await _prefs.setBool(_keyAuthenticated, value);
+    notifyListeners();
+  }
+
+  // Onboarding completed (welcome + info)
+  bool get onboardingCompleted => _prefs.getBool(_keyOnboardingCompleted) ?? false;
+
+  Future<void> setOnboardingCompleted(bool value) async {
+    await _prefs.setBool(_keyOnboardingCompleted, value);
     notifyListeners();
   }
 
