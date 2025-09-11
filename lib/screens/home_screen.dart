@@ -79,7 +79,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onPressed: _onMedkitPressed,
         icon: const Icon(
           Icons.medical_services_outlined,
-          color: Colors.white,
+          color: AppColors.secondaryText,
         ),
       ),
       title: _buildSegmentedControl(),
