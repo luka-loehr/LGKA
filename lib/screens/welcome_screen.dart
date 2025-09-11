@@ -103,7 +103,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                 const SizedBox(height: 16),
                 
                 Text(
-                  'Bei der neuen Vertretungsplan App des Lessing-Gymnasiums Karlsruhe.',
+                  'Bei der neuen App fürs Lessing-Gymnasium Karlsruhe.',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: AppColors.secondaryText,
                   ),
