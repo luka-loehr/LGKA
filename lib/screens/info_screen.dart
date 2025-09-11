@@ -60,9 +60,9 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
   void initState() {
     super.initState();
 
-    // Load current accent color
+    // Load current accent color; default to blue on first launch
     final prefsManager = ref.read(preferencesManagerProvider);
-    _selectedColor = prefsManager.accentColor;
+    _selectedColor = prefsManager.accentColor.isNotEmpty ? prefsManager.accentColor : 'blue';
 
     // Button animation
     _buttonController = AnimationController(
@@ -135,9 +135,10 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
     // Small delay for the animation to feel natural
     await Future.delayed(const Duration(milliseconds: 50));
 
-    // Mark onboarding as completed (welcome + info)
+    // Mark onboarding as completed (welcome + info) and mark first launch false
     final prefsManager = ref.read(preferencesManagerProvider);
     await prefsManager.setOnboardingCompleted(true);
+    await prefsManager.setFirstLaunch(false);
 
     // Release button animation
     _buttonController.reverse();

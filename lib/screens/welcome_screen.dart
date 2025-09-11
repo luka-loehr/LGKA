@@ -52,10 +52,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     // Premium haptic feedback
     await HapticService.light();
     
-    // Update preferences
-    final prefsManager = ref.read(preferencesManagerProvider);
-    await prefsManager.setFirstLaunch(false);
-    ref.read(isFirstLaunchProvider.notifier).state = false;
+    // Do not mark first launch here; onboarding completes on InfoScreen
     
     // Release button animation
     _buttonController.reverse();
