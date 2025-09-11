@@ -17,6 +17,11 @@ class PreferencesManager extends ChangeNotifier {
   // Initialize the preferences manager
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
+
+    // Ensure defaults on first run
+    if (!_prefs.containsKey(_keyAccentColor)) {
+      await _prefs.setString(_keyAccentColor, 'blue');
+    }
   }
 
   // First launch status
