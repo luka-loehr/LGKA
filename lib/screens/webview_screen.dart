@@ -22,6 +22,36 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
   InAppWebViewController? _controller;
   double _progress = 0;
   bool _hasTriggeredLoadedHaptic = false;
+  bool _hasError = false;
+  String? _errorText;
+
+  Future<void> _retryLoad() async {
+    setState(() {
+      _hasError = false;
+      _errorText = null;
+      _progress = 0;
+      _hasTriggeredLoadedHaptic = false;
+    });
+    await HapticService.light();
+    if (_controller != null) {
+      try {
+        await _controller!.reload();
+      } catch (_) {
+        // Fallback: load initial URL again
+        try {
+          await _controller!.loadUrl(
+            urlRequest: URLRequest(
+              url: WebUri(widget.url),
+              headers: {
+                'User-Agent': 'LGKA-App-Luka-Loehr',
+                ...?widget.headers,
+              },
+            ),
+          );
+        } catch (_) {}
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +112,18 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
               });
             }
           },
+          onReceivedError: (controller, request, error) {
+            setState(() {
+              _hasError = true;
+              _errorText = error.description;
+            });
+          },
+          onReceivedHttpError: (controller, request, error) {
+            setState(() {
+              _hasError = true;
+              _errorText = 'HTTP ${error.statusCode}';
+            });
+          },
           onReceivedHttpAuthRequest: (controller, challenge) async {
             // Provide basic auth when challenged
             final String username = 'vertretungsplan';
@@ -94,7 +136,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
             );
           },
             ),
-            if (_progress < 1.0)
+            if (_progress < 1.0 && !_hasError)
               Container(
                 color: AppColors.appBackground,
                 child: Center(
@@ -110,6 +152,55 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                         'Lade Krankmeldung...',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppColors.secondaryText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            if (_hasError)
+              Container(
+                color: AppColors.appBackground,
+                padding: const EdgeInsets.all(32.0),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.wifi_off,
+                        size: 64,
+                        color: AppColors.secondaryText.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Verbindung zum Server fehlgeschlagen',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: AppColors.primaryText,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      if (_errorText != null && _errorText!.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          _errorText!,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.secondaryText,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: _retryLoad,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Erneut versuchen'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       ),
                     ],
