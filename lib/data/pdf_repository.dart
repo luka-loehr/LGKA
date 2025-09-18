@@ -52,7 +52,11 @@ class PdfState {
   bool get isWeekend => weekday == 'weekend';
   
   /// Returns true if this PDF can be displayed
-  bool get canDisplay => hasData && !isWeekend && file != null;
+  bool get canDisplay {
+    final hasWeekday = (weekday != null && weekday!.isNotEmpty && weekday != 'weekend');
+    final hasDateString = (date != null && date!.isNotEmpty);
+    return hasData && hasWeekday && hasDateString && file != null;
+  }
 }
 
 /// Repository for managing PDF substitution plans
@@ -201,7 +205,24 @@ Map<String, String> _extractPdfData(List<int> bytes) {
   try {
     final document = PdfDocument(inputBytes: bytes);
     final textExtractor = PdfTextExtractor(document);
-    final text = textExtractor.extractText(startPageIndex: 0, endPageIndex: 0);
+    String text = textExtractor.extractText(startPageIndex: 0, endPageIndex: 0);
+    // Normalize text to improve regex robustness
+    text = text
+        .replaceAll(RegExp(r'[\u200B-\u200D\uFEFF]'), '') // zero-width chars
+        .replaceAll('\u00A0', ' ') // NBSP to space
+        .replaceAll('\u202F', ' ') // narrow NBSP
+        .replaceAll('\u2060', '') // word joiner
+        .replaceAll('\u2044', '/') // fraction slash to normal slash
+        .replaceAll('\u2215', '/') // division slash to normal slash
+        // Normalize dash/hyphen variants to '-'
+        .replaceAll('\u2010', '-') // hyphen
+        .replaceAll('\u2011', '-') // non-breaking hyphen
+        .replaceAll('\u2012', '-') // figure dash
+        .replaceAll('\u2013', '-') // en dash
+        .replaceAll('\u2212', '-') // minus
+        .replaceAll(RegExp(r'\s+/\s+'), ' / ') // normalize around slash
+        .replaceAll(RegExp(r'\s+'), ' ') // collapse whitespace
+        .trim();
     document.dispose();
 
     // Check if PDF is empty (weekend/holiday)
@@ -213,86 +234,145 @@ Map<String, String> _extractPdfData(List<int> bytes) {
       };
     }
 
-    // Extract date and weekday from "23.6. / Montag" format
-    final planPattern = RegExp(
+    // Prefer extracting from the header line: "Lessing-Klassen  19.9. / Freitag"
+    String weekday = '';
+    String date = '';
+    String? detectedYearFromFooter;
+
+    // Try to read academic footer date like "19.9.2025 (38)"
+    final footerMatch = RegExp(r'\b(\d{1,2})\.(\d{1,2})\.((?:19|20)\d{2})\b\s*\(\d+\)')
+        .firstMatch(text);
+    if (footerMatch != null) {
+      detectedYearFromFooter = footerMatch.group(3);
+      debugPrint('DEBUG: Footer year detected: $detectedYearFromFooter');
+    }
+
+    // Header pattern strictly scoped to the title line (robust against other dates on page)
+    final headerPattern = RegExp(
+      r'Lessing\S*Klassen\s+(\d{1,2}\.\d{1,2}\.)\s*\/\s*(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)\b',
+      caseSensitive: false,
+    );
+    final headerMatch = headerPattern.firstMatch(text);
+    if (headerMatch != null) {
+      final partialDate = headerMatch.group(1)!;
+      weekday = headerMatch.group(2)!;
+      final year = detectedYearFromFooter ?? DateTime.now().year.toString();
+      date = '$partialDate$year';
+      // Also log the header line around the match for verification
+      final lineStart = text.lastIndexOf('\n', headerMatch.start);
+      final lineEnd = text.indexOf('\n', headerMatch.end);
+      final headerLine = text.substring(
+          lineStart == -1 ? 0 : lineStart + 1,
+          lineEnd == -1 ? text.length : lineEnd);
+      debugPrint('DEBUG: Header matched. line="$headerLine" weekday=$weekday partial=$partialDate footerYear=$detectedYearFromFooter -> date=$date');
+    } else {
+      // Fallback specifically on the header line if pattern failed due to stray characters
+      final headerLineMatch = RegExp(r'Lessing\S*Klassen[^\n]+', caseSensitive: false)
+          .firstMatch(text);
+      if (headerLineMatch != null) {
+        final headerLine = headerLineMatch.group(0)!;
+        final partialDate = RegExp(r'(\d{1,2}\.\d{1,2}\.)').firstMatch(headerLine)?.group(1);
+        final weekdayLoose = RegExp(
+          r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)',
+          caseSensitive: false,
+        ).firstMatch(headerLine)?.group(1);
+        if (partialDate != null && weekdayLoose != null) {
+          weekday = weekdayLoose;
+          final year = detectedYearFromFooter ?? DateTime.now().year.toString();
+          date = '$partialDate$year';
+          debugPrint('DEBUG: Header line parsed. line="$headerLine" weekday=$weekday partial=$partialDate footerYear=$detectedYearFromFooter -> date=$date');
+        } else {
+          debugPrint('DEBUG: Header line found but could not parse. line="$headerLine"');
+        }
+      }
+    }
+
+    // Pattern A: "Freitag, 19.09.2025" or "Freitag 19.09.2025"
+    final patternA = RegExp(
+      r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)[,\s]+(\d{1,2}\.\d{1,2}\.(?:\d{2}|\d{4}))',
+      caseSensitive: false,
+    );
+    final matchA = patternA.firstMatch(text);
+
+    // Pattern B: "19.9. / Freitag" possibly without year right there
+    final patternB = RegExp(
       r'(\d{1,2}\.\d{1,2}\.)\s*\/\s*(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)',
       caseSensitive: false,
     );
-    
-    final planMatch = planPattern.firstMatch(text);
-    String weekday = '';
-    String date = '';
-    
-    if (planMatch != null) {
-      final partialDate = planMatch.group(1)!;
-      weekday = planMatch.group(2)!;
+    final matchB = patternB.firstMatch(text);
 
-      // Extract year from the date context, not from anywhere in the text
-      // Look for year in the same line or nearby context as the date
-      final dateContextPattern = RegExp(r'(\d{1,2}\.\d{1,2}\.)\s*\/\s*(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag).*?(\d{4})', caseSensitive: false, dotAll: true);
-      final dateContextMatch = dateContextPattern.firstMatch(text);
-      
-      if (dateContextMatch != null) {
-        date = '$partialDate${dateContextMatch.group(3)}';
-      } else {
-        // If no year found in context, use current year
-        final currentYear = DateTime.now().year;
-        date = '$partialDate$currentYear';
-      }
-
-      // Normalize date format: ensure month has leading zero
+    if (date.isEmpty && matchA != null) {
+      weekday = matchA.group(1)!;
+      date = matchA.group(2)!;
+      // Normalize 2-digit year to 4-digit by assuming 2000+
       date = date.replaceAllMapped(
-        RegExp(r'(\d{1,2})\.(\d{1,2})\.(\d{4})'),
-        (match) {
-          final day = match.group(1)!.padLeft(2, '0');
-          final month = match.group(2)!.padLeft(2, '0');
-          final year = match.group(3);
-          return '$day.$month.$year';
-        },
+        RegExp(r'^(\d{1,2})\.(\d{1,2})\.(\d{2})$'),
+        (m) => '${m.group(1)!.padLeft(2, '0')}.${m.group(2)!.padLeft(2, '0')}.20${m.group(3)}',
       );
+      debugPrint('DEBUG: PatternA matched. weekday=$weekday rawDate=${matchA.group(2)} -> date=$date');
+    } else if (date.isEmpty && matchB != null) {
+      final partialDate = matchB.group(1)!; // with trailing dot
+      weekday = matchB.group(2)!;
 
-      // Debug: Print the extracted date
-      debugPrint('DEBUG: Extracted date: "$date" from partial: "$partialDate"');
-      debugPrint('DEBUG: Full text for context: "${text.substring(0, text.length > 200 ? 200 : text.length)}"');
-    } else {
-      // Fallback patterns - look for complete date format first
-      final completeDatePattern = RegExp(r'(\d{1,2}\.\d{1,2}\.\d{4})');
-      final completeDateMatch = completeDatePattern.firstMatch(text);
-      if (completeDateMatch != null) {
-        date = completeDateMatch.group(1)!;
-      } else {
-        // If no complete date, try to find weekday and partial date separately
-        final weekdayPattern = RegExp(r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)', caseSensitive: false);
-        final weekdayMatch = weekdayPattern.firstMatch(text);
-        weekday = weekdayMatch?.group(1) ?? '';
-        
-        // Look for partial date near the weekday
-        final partialDatePattern = RegExp(r'(\d{1,2}\.\d{1,2}\.)');
-        final partialDateMatch = partialDatePattern.firstMatch(text);
-        if (partialDateMatch != null) {
-          // Use current year for partial dates
-          final currentYear = DateTime.now().year;
-          date = '${partialDateMatch.group(1)}$currentYear';
+      // Find a 4-digit year near this match to avoid picking up unrelated numbers
+      final start = (matchB.start - 200).clamp(0, text.length);
+      final end = (matchB.end + 200).clamp(0, text.length);
+      final localContext = text.substring(start as int, end as int);
+      // Prefer real years only (19xx or 20xx). This avoids picking up '7613' from ZIP '76135'.
+      final yearInContext = RegExp(r'\b(19|20)\d{2}\b').firstMatch(localContext)?.group(0);
+
+      // As a more reliable fallback, use the document timestamp year if present
+      final tsYear = RegExp(r'\b\d{1,2}\.\d{1,2}\.(\d{4})\s+\d{1,2}:\d{2}\b')
+          .firstMatch(text)
+          ?.group(1);
+
+      final year = (detectedYearFromFooter ?? yearInContext ?? tsYear) ?? DateTime.now().year.toString();
+      date = '$partialDate$year';
+      debugPrint('DEBUG: PatternB matched. weekday=$weekday partial=$partialDate ctxYear=$yearInContext tsYear=$tsYear -> date=$date');
+    } else if (date.isEmpty) {
+      // Fallback: try to find both independently, preferring weekday first
+      final weekdayOnly = RegExp(r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)', caseSensitive: false)
+          .firstMatch(text);
+      if (weekdayOnly != null) {
+        weekday = weekdayOnly.group(1)!;
+        // Try to find a complete date near the weekday mention
+        final start = (weekdayOnly.start - 200).clamp(0, text.length);
+        final end = (weekdayOnly.end + 200).clamp(0, text.length);
+        final localContext = text.substring(start as int, end as int);
+        final dateNearby = RegExp(r'(\d{1,2})\.(\d{1,2})\.((?:19|20)\d{2})').firstMatch(localContext);
+        if (dateNearby != null) {
+          date = '${dateNearby.group(1)!.padLeft(2, '0')}.${dateNearby.group(2)!.padLeft(2, '0')}.${dateNearby.group(3)}';
         }
       }
-
-      // Also normalize fallback date format
-      if (date.isNotEmpty) {
-        date = date.replaceAllMapped(
-          RegExp(r'(\d{1,2})\.(\d{1,2})\.(\d{4})'),
-          (match) {
-            final day = match.group(1)!.padLeft(2, '0');
-            final month = match.group(2)!.padLeft(2, '0');
-            final year = match.group(3);
-            return '$day.$month.$year';
-          },
-        );
+      // As a last resort, look for any full date on the page
+      if (date.isEmpty) {
+        final anyDate = RegExp(r'(\d{1,2})\.(\d{1,2})\.(19|20)\d{2}')
+            .firstMatch(text);
+        if (anyDate != null) {
+          date = '${anyDate.group(1)!.padLeft(2, '0')}.${anyDate.group(2)!.padLeft(2, '0')}.${anyDate.group(0)!.split('.').last}';
+        }
       }
-
-      // Debug: Print the fallback extracted date
-      debugPrint('DEBUG: Fallback extracted date: "$date"');
-      debugPrint('DEBUG: Fallback weekday: "$weekday"');
+      debugPrint('DEBUG: Fallback matched. weekday=$weekday date=$date');
     }
+
+    // Normalize weekday capitalization (first letter uppercase, rest lowercase)
+    if (weekday.isNotEmpty) {
+      final lower = weekday.toLowerCase();
+      weekday = lower[0].toUpperCase() + lower.substring(1);
+    }
+
+    // Normalize date format if present
+    if (date.isNotEmpty) {
+      date = date.replaceAllMapped(
+        RegExp(r'^(\d{1,2})\.(\d{1,2})\.(\d{4})$'),
+        (m) => '${m.group(1)!.padLeft(2, '0')}.${m.group(2)!.padLeft(2, '0')}.${m.group(3)}',
+      );
+    }
+
+    // Extra diagnostics: show nearby header context and bottom date if present
+    final headerContext = RegExp(r'Lessing-?Klassen\s+[^\n]{0,80}', caseSensitive: false).firstMatch(text)?.group(0) ?? '';
+    final footerDate = RegExp(r'\b(\d{1,2}\.\d{1,2}\.((?:19|20)\d{2}))\b\s*\(\d+\)').firstMatch(text)?.group(1) ?? '';
+    debugPrint('DEBUG: Parsed weekday="$weekday" date="$date" headerCtx="$headerContext" footerDate="$footerDate"');
 
     // Extract last updated timestamp
     final timestampPattern = RegExp(r'(\d{1,2}\.\d{1,2}\.\d{4}\s+\d{1,2}:\d{2})');
@@ -312,3 +392,8 @@ Map<String, String> _extractPdfData(List<int> bytes) {
     };
   }
 } 
+
+/// Debug helper to reuse the same parsing in tooling/tests
+Map<String, String> debugExtractPdfDataFromBytes(List<int> bytes) {
+  return _extractPdfData(bytes);
+}
