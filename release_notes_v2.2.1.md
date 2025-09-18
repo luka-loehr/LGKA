@@ -4,27 +4,27 @@ iOS: https://apps.apple.com/app/lgka/id6747010920
 Android: https://play.google.com/store/apps/details?id=com.lgka
 
 ## ✨ What's New
-- 🐞 Fix: Auf der Vertretungsseite konnte bei Parserfehlern fälschlich „noch keine info“ angezeigt werden. Jetzt wird zuverlässig der korrekte Tag und das Datum gezeigt.
+- 🐞 Fix: On the substitution page, a parser failure could show “noch keine info” instead of the correct day and date. It now reliably displays the proper label.
 
 ## 🛠 Improvements
-- Version-Bump und aktualisierte Android-Artefakte (APK & AAB)
-- Kleine Stabilitäts- und Performance-Verbesserungen
+- Version bump and refreshed Android artifacts (APK & AAB)
+- Minor stability and performance improvements
 
 ## 🤖 Android Support
-- 🧱 ARM64-optimierte Builds (APK/AAB)
-- 🧩 Material Design 3, Edge-to-Edge, Android 15 kompatibel
-- 📱 Gute Kompatibilität über verschiedene Displaygrößen
+- 🧱 ARM64-optimized builds (APK/AAB)
+- 🧩 Material Design 3, edge-to-edge, Android 15 compatible
+- 📱 Good compatibility across different screen sizes
 
 ## 🔍 Technical Details
 - Version: 2.2.1 (Build 71)
-- Plattformen: iOS 13.0+, Android 7.0+
-- Architektur: ARM64
+- Platforms: iOS 13.0+, Android 7.0+
+- Architecture: ARM64
 
 ---
 
 ## 📋 Legal
 Developer: Luka Löhr  
-Impressum: https://luka-loehr.github.io/LGKA/impressum.html  
-Datenschutz: https://luka-loehr.github.io/LGKA/privacy.html
+Imprint: https://luka-loehr.github.io/LGKA/impressum.html  
+Privacy: https://luka-loehr.github.io/LGKA/privacy.html
 
-Dies ist eine inoffizielle Helfer-App für Schüler*innen des Lessing-Gymnasium Karlsruhe und steht nicht in direkter Verbindung mit der Schulleitung.
+This is an unofficial helper app for students of Lessing-Gymnasium Karlsruhe and is not directly affiliated with the school administration.
