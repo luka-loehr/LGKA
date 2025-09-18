@@ -355,18 +355,44 @@ Map<String, String> _extractPdfData(List<int> bytes) {
       debugPrint('DEBUG: Fallback matched. weekday=$weekday date=$date');
     }
 
-    // Normalize weekday capitalization (first letter uppercase, rest lowercase)
-    if (weekday.isNotEmpty) {
-      final lower = weekday.toLowerCase();
-      weekday = lower[0].toUpperCase() + lower.substring(1);
-    }
-
     // Normalize date format if present
     if (date.isNotEmpty) {
       date = date.replaceAllMapped(
         RegExp(r'^(\d{1,2})\.(\d{1,2})\.(\d{4})$'),
         (m) => '${m.group(1)!.padLeft(2, '0')}.${m.group(2)!.padLeft(2, '0')}.${m.group(3)}',
       );
+    }
+
+    // Fallback: if weekday missing but date present, derive weekday from date
+    if ((weekday.isEmpty || weekday == 'weekend') && date.isNotEmpty) {
+      final m = RegExp(r'^(\d{2})\.(\d{2})\.(\d{4})$').firstMatch(date);
+      if (m != null) {
+        final day = int.parse(m.group(1)!);
+        final month = int.parse(m.group(2)!);
+        final year = int.parse(m.group(3)!);
+        try {
+          final dt = DateTime(year, month, day);
+          const deWeekdays = {
+            DateTime.monday: 'Montag',
+            DateTime.tuesday: 'Dienstag',
+            DateTime.wednesday: 'Mittwoch',
+            DateTime.thursday: 'Donnerstag',
+            DateTime.friday: 'Freitag',
+            DateTime.saturday: 'Samstag',
+            DateTime.sunday: 'Sonntag',
+          };
+          weekday = deWeekdays[dt.weekday] ?? '';
+          debugPrint('DEBUG: Weekday derived from date fallback -> $weekday');
+        } catch (_) {
+          // ignore invalid dates
+        }
+      }
+    }
+
+    // Normalize weekday capitalization (first letter uppercase, rest lowercase)
+    if (weekday.isNotEmpty && weekday != 'weekend') {
+      final lower = weekday.toLowerCase();
+      weekday = lower[0].toUpperCase() + lower.substring(1);
     }
 
     // Extra diagnostics: show nearby header context and bottom date if present
