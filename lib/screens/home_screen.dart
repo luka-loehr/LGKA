@@ -78,7 +78,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       leading: IconButton(
         onPressed: _onMedkitPressed,
         icon: const Icon(
-          Icons.domain,
+          Icons.business,
           color: AppColors.secondaryText,
         ),
       ),
