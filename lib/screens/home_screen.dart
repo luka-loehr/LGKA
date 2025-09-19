@@ -76,9 +76,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: AppColors.appBackground,
       elevation: 0,
       leading: IconButton(
-        onPressed: _onMedkitPressed,
+        onPressed: _onSchoolPressed,
         icon: const Icon(
-          Icons.location_city,
+          Icons.school,
           color: AppColors.secondaryText,
         ),
       ),
@@ -197,16 +197,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  void _onMedkitPressed() {
+  void _onSchoolPressed() {
     HapticService.subtle();
-    context.push(AppRouter.webview, extra: {
-      'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
-      'title': 'Krankmeldung',
-      // Basic auth is handled by WebView challenge; headers here for completeness if needed
-      'headers': {
-        'User-Agent': 'LGKA-App-Luka-Loehr',
-      }
-    });
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E1E),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => const _SchoolOptionsSheet(),
+    );
   }
 }
 
@@ -1142,7 +1143,189 @@ class _SettingsSheet extends ConsumerWidget {
   double _getBottomPadding(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final gestureInsets = mediaQuery.systemGestureInsets.bottom;
-    
+
+    if (gestureInsets >= 45) {
+      return 54.0; // Button navigation
+    } else if (gestureInsets <= 25) {
+      return 8.0; // Gesture navigation
+    } else {
+      return mediaQuery.viewPadding.bottom > 50 ? 54.0 : 8.0;
+    }
+  }
+}
+
+/// School options bottom sheet
+class _SchoolOptionsSheet extends ConsumerWidget {
+  const _SchoolOptionsSheet();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Wrap(
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            16,
+            16,
+            16,
+            _getBottomPadding(context),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Schuloptionen',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: AppColors.appOnSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.appSurface,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: [
+                    _buildSchoolOption(
+                      context,
+                      Icons.sick_outlined,
+                      'Krankmeldung',
+                      'Krankheit oder Abwesenheit melden',
+                      () => _openKrankmeldung(context),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSchoolOption(
+                      context,
+                      Icons.people_outlined,
+                      'Kollegium',
+                      'Lehrer und Mitarbeiter kontaktieren',
+                      () => _openKollegium(context),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSchoolOption(
+                      context,
+                      Icons.rule_outlined,
+                      'Schulordnung',
+                      'Regeln und Verhaltensrichtlinien',
+                      () => _openSchulordnung(context),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSchoolOption(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: () {
+        HapticService.subtle();
+        onTap();
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppColors.appOnSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.secondaryText,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: AppColors.secondaryText.withValues(alpha: 0.6),
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openKrankmeldung(BuildContext context) {
+    Navigator.of(context).pop(); // Close the bottom sheet
+    // Navigate to the webview with the illness report
+    context.push(AppRouter.webview, extra: {
+      'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
+      'title': 'Krankmeldung',
+      'headers': {
+        'User-Agent': 'LGKA-App-Luka-Loehr',
+      }
+    });
+  }
+
+  void _openKollegium(BuildContext context) {
+    Navigator.of(context).pop(); // Close the bottom sheet
+    // TODO: Implement Kollegium functionality
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Kollegium - Funktion wird bald verfügbar sein'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _openSchulordnung(BuildContext context) {
+    Navigator.of(context).pop(); // Close the bottom sheet
+    // TODO: Implement Schulordnung functionality
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Schulordnung - Funktion wird bald verfügbar sein'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  double _getBottomPadding(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final gestureInsets = mediaQuery.systemGestureInsets.bottom;
+
     if (gestureInsets >= 45) {
       return 54.0; // Button navigation
     } else if (gestureInsets <= 25) {
