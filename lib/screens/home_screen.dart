@@ -1215,16 +1215,16 @@ class _SchoolOptionsSheet extends ConsumerWidget {
         const SizedBox(height: 12),
         _buildSchoolLink(
           context,
-          Icons.people_outlined, 
-          'Kollegium', 
-          () => _openKollegium(context),
+          Icons.rule_outlined, 
+          'Schulordnung', 
+          () => _openSchulordnung(context),
         ),
         const SizedBox(height: 12),
         _buildSchoolLink(
           context,
-          Icons.rule_outlined, 
-          'Schulordnung', 
-          () => _openSchulordnung(context),
+          Icons.people_outlined, 
+          'Kollegium', 
+          () => _openKollegium(context),
         ),
       ],
     );
