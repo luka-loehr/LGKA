@@ -1164,9 +1164,9 @@ class _SchoolOptionsSheet extends ConsumerWidget {
       children: [
         Padding(
           padding: EdgeInsets.fromLTRB(
-            16,
-            16,
-            16,
+            16, 
+            16, 
+            16, 
             _getBottomPadding(context),
           ),
           child: Column(
@@ -1180,9 +1180,9 @@ class _SchoolOptionsSheet extends ConsumerWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
+              
               const SizedBox(height: 16),
-
+              
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
@@ -1192,29 +1192,7 @@ class _SchoolOptionsSheet extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildSchoolOption(
-                      context,
-                      Icons.sick_outlined,
-                      'Krankmeldung',
-                      'Krankheit oder Abwesenheit melden',
-                      () => _openKrankmeldung(context),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildSchoolOption(
-                      context,
-                      Icons.people_outlined,
-                      'Kollegium',
-                      'Lehrer und Mitarbeiter kontaktieren',
-                      () => _openKollegium(context),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildSchoolOption(
-                      context,
-                      Icons.rule_outlined,
-                      'Schulordnung',
-                      'Regeln und Verhaltensrichtlinien',
-                      () => _openSchulordnung(context),
-                    ),
+                    _buildSchoolLinks(context),
                   ],
                 ),
               ),
@@ -1225,60 +1203,61 @@ class _SchoolOptionsSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildSchoolOption(
-    BuildContext context,
-    IconData icon,
-    String title,
-    String subtitle,
-    VoidCallback onTap,
-  ) {
+  Widget _buildSchoolLinks(BuildContext context) {
+    return Column(
+      children: [
+        _buildSchoolLink(
+          context,
+          Icons.sick_outlined, 
+          'Krankmeldung', 
+          () => _openKrankmeldung(context),
+        ),
+        const SizedBox(height: 12),
+        _buildSchoolLink(
+          context,
+          Icons.people_outlined, 
+          'Kollegium', 
+          () => _openKollegium(context),
+        ),
+        const SizedBox(height: 12),
+        _buildSchoolLink(
+          context,
+          Icons.rule_outlined, 
+          'Schulordnung', 
+          () => _openSchulordnung(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSchoolLink(BuildContext context, IconData icon, String text, VoidCallback onTap) {
     return InkWell(
       onTap: () {
         HapticService.subtle();
         onTap();
       },
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(8),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         child: Row(
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                icon,
-                color: Theme.of(context).colorScheme.primary,
-                size: 24,
-              ),
+            Icon(
+              icon,
+              color: AppColors.secondaryText,
+              size: 18,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.appOnSurface,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.secondaryText,
-                    ),
-                  ),
-                ],
+              child: Text(
+                text,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.secondaryText,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             Icon(
-              Icons.arrow_forward_ios,
+              Icons.open_in_new,
               color: AppColors.secondaryText.withValues(alpha: 0.6),
               size: 16,
             ),
