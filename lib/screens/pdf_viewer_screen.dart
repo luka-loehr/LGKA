@@ -81,7 +81,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       });
     }
     
-    // After first frame: try auto-jump to last searched page if present
+    // After first frame: try auto-jump to last searched page if present (per schedule type)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
         // Access preferences via ProviderScope context
@@ -89,19 +89,28 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         final container = ProviderScope.containerOf(context, listen: false);
         final prefs = container.read(preferencesManagerProvider);
 
-        final lastQuery = prefs.lastPdfSearchQuery;
-        final lastPage = prefs.lastPdfSearchPage; // 1-based
+        // Determine schedule type based on dayName labeling used in UI
+        final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen');
+        final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
+        final isSchedule = isSchedule5to10 || isScheduleJ11J12;
 
-        if ((widget.targetPages == null || widget.targetPages!.isEmpty) && lastPage != null && lastPage > 0) {
+        int? lastPage;
+        if (isSchedule5to10) {
+          lastPage = prefs.lastSchedulePage5to10;
+        } else if (isScheduleJ11J12) {
+          lastPage = prefs.lastSchedulePageJ11J12;
+        }
+
+        if (isSchedule && (widget.targetPages == null || widget.targetPages!.isEmpty) && lastPage != null && lastPage > 0) {
           // Delay slightly to ensure PdfView is attached and ready
           Future.delayed(const Duration(milliseconds: 120), () {
             try {
-              debugPrint('📄 [PDFViewer] Auto-jump to saved page $lastPage');
+              debugPrint('📄 [PDFViewer] Auto-jump to saved schedule page $lastPage');
               _pdfController.jumpToPage(lastPage - 1);
             } catch (_) {}
           });
         } else {
-          debugPrint('📄 [PDFViewer] No saved page found, staying on page 1');
+          debugPrint('📄 [PDFViewer] No saved schedule page found, staying on page 1');
         }
       } catch (_) {}
 
@@ -253,8 +262,16 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       try {
         final container = ProviderScope.containerOf(context, listen: false);
         final prefs = container.read(preferencesManagerProvider);
-        prefs.setLastPdfSearchQuery(result.query);
-        prefs.setLastPdfSearchPage(result.pageNumber);
+        // Store per schedule type only; ignore substitution plans
+        final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen');
+        final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
+        if (isSchedule5to10) {
+          prefs.setLastScheduleQuery5to10(result.query);
+          prefs.setLastSchedulePage5to10(result.pageNumber);
+        } else if (isScheduleJ11J12) {
+          prefs.setLastScheduleQueryJ11J12(result.query);
+          prefs.setLastSchedulePageJ11J12(result.pageNumber);
+        }
       } catch (_) {}
       
       // Provide haptic feedback
@@ -335,7 +352,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       try {
         final container = ProviderScope.containerOf(context, listen: false);
         final prefs = container.read(preferencesManagerProvider);
-        prefs.setLastPdfSearchQuery(query.trim());
+        final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen');
+        final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
+        if (isSchedule5to10) {
+          prefs.setLastScheduleQuery5to10(query.trim());
+        } else if (isScheduleJ11J12) {
+          prefs.setLastScheduleQueryJ11J12(query.trim());
+        }
       } catch (_) {}
     }
   }
