@@ -81,7 +81,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       });
     }
     
-    // After first frame: try auto-jump to last searched page if present (per schedule type)
+    // After first frame: for 5–10 schedules, auto-search user's class; otherwise do nothing
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
         // Access preferences via ProviderScope context
@@ -91,27 +91,18 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
         // Determine schedule type based on dayName labeling used in UI
         final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen');
-        final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
-        final isSchedule = isSchedule5to10 || isScheduleJ11J12;
 
-        int? lastPage;
-        if (isSchedule5to10) {
-          lastPage = prefs.lastSchedulePage5to10;
-        } else if (isScheduleJ11J12) {
-          lastPage = prefs.lastSchedulePageJ11J12;
-        }
-
-        if (isSchedule && (widget.targetPages == null || widget.targetPages!.isEmpty) && lastPage != null && lastPage > 0) {
-          // Delay slightly to ensure PdfView is attached and ready
-          final int pageToJump = lastPage!; // safe, checked above
-          Future.delayed(const Duration(milliseconds: 120), () {
-            try {
-              debugPrint('📄 [PDFViewer] Auto-jump to saved schedule page $pageToJump');
-              _pdfController.jumpToPage(pageToJump - 1);
-            } catch (_) {}
-          });
-        } else {
-          debugPrint('📄 [PDFViewer] No saved schedule page found, staying on page 1');
+        // Only for 5–10: if user has set a class, auto-run a search for it
+        if (isSchedule5to10 && (widget.targetPages == null || widget.targetPages!.isEmpty)) {
+          final classQuery = prefs.scheduleClass5to10;
+          if (classQuery != null && classQuery.trim().isNotEmpty) {
+            Future.delayed(const Duration(milliseconds: 120), () {
+              debugPrint('📄 [PDFViewer] Auto-search for class "$classQuery" (5–10)');
+              _searchInPdf(classQuery.trim());
+            });
+          } else {
+            debugPrint('📄 [PDFViewer] No class set for 5–10; staying on page 1');
+          }
         }
       } catch (_) {}
 
@@ -263,15 +254,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       try {
         final container = ProviderScope.containerOf(context, listen: false);
         final prefs = container.read(preferencesManagerProvider);
-        // Store per schedule type only; ignore substitution plans
+        // Store only for 5–10 schedules; ignore substitution plans and J11/J12
         final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen');
-        final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
         if (isSchedule5to10) {
           prefs.setLastScheduleQuery5to10(result.query);
           prefs.setLastSchedulePage5to10(result.pageNumber);
-        } else if (isScheduleJ11J12) {
-          prefs.setLastScheduleQueryJ11J12(result.query);
-          prefs.setLastSchedulePageJ11J12(result.pageNumber);
         }
       } catch (_) {}
       
@@ -349,16 +336,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       setState(() {
         _isSearchBarVisible = false;
       });
-      // Optimistically store query; page will be stored on navigation
+      // Optimistically store query (5–10 only); page will be stored on navigation
       try {
         final container = ProviderScope.containerOf(context, listen: false);
         final prefs = container.read(preferencesManagerProvider);
         final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen');
-        final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
         if (isSchedule5to10) {
           prefs.setLastScheduleQuery5to10(query.trim());
-        } else if (isScheduleJ11J12) {
-          prefs.setLastScheduleQueryJ11J12(query.trim());
         }
       } catch (_) {}
     }

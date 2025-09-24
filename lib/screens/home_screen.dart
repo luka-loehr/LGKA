@@ -981,6 +981,8 @@ class _SettingsSheet extends ConsumerWidget {
                     const SizedBox(height: 20),
                     _buildDivider(),
                     const SizedBox(height: 20),
+                    _buildClassSetting5to10(context, preferencesManager),
+                    const SizedBox(height: 20),
                     _buildLegalLinks(context),
                   ],
                 ),
@@ -1060,6 +1062,57 @@ class _SettingsSheet extends ConsumerWidget {
               ),
             );
           }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildClassSetting5to10(BuildContext context, PreferencesManager preferencesManager) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Deine Klasse (5–10)',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppColors.primaryText,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Beispiel: 5a, 7c, 10b. Wird genutzt, um im 5–10 Stundenplan automatisch zur Seite zu springen.',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.secondaryText,
+              ),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: TextEditingController(text: preferencesManager.scheduleClass5to10 ?? ''),
+          textInputAction: TextInputAction.done,
+          decoration: InputDecoration(
+            hintText: 'z. B. 7c',
+            prefixIcon: const Icon(Icons.class_, color: AppColors.secondaryText),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
+            ),
+            filled: true,
+            fillColor: AppColors.appBackground,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
+          onSubmitted: (value) {
+            preferencesManager.setScheduleClass5to10(value.trim());
+            HapticService.subtle();
+          },
         ),
       ],
     );

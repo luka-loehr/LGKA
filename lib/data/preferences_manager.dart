@@ -18,6 +18,7 @@ class PreferencesManager extends ChangeNotifier {
   static const String _keyLastPageJ11J12 = 'last_schedule_j11_12_page';
   static const String _keyLastQuery5to10 = 'last_schedule_5_10_query';
   static const String _keyLastQueryJ11J12 = 'last_schedule_j11_12_query';
+  static const String _keyScheduleClass5to10 = 'schedule_5_10_class';
 
   late final SharedPreferences _prefs;
 
@@ -167,6 +168,18 @@ class PreferencesManager extends ChangeNotifier {
       await _prefs.remove(_keyLastQueryJ11J12);
     } else {
       await _prefs.setString(_keyLastQueryJ11J12, value);
+    }
+    notifyListeners();
+  }
+
+  // Preferred class for schedules 5–10
+  String? get scheduleClass5to10 => _prefs.getString(_keyScheduleClass5to10);
+
+  Future<void> setScheduleClass5to10(String? value) async {
+    if (value == null || value.trim().isEmpty) {
+      await _prefs.remove(_keyScheduleClass5to10);
+    } else {
+      await _prefs.setString(_keyScheduleClass5to10, value.trim());
     }
     notifyListeners();
   }
