@@ -93,7 +93,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         final lastPage = prefs.lastPdfSearchPage; // 1-based
 
         if ((widget.targetPages == null || widget.targetPages!.isEmpty) && lastPage != null && lastPage > 0) {
-          _pdfController.jumpToPage(lastPage - 1);
+          // Delay slightly to ensure PdfView is attached and ready
+          Future.delayed(const Duration(milliseconds: 120), () {
+            try {
+              debugPrint('📄 [PDFViewer] Auto-jump to saved page $lastPage');
+              _pdfController.jumpToPage(lastPage - 1);
+            } catch (_) {}
+          });
+        } else {
+          debugPrint('📄 [PDFViewer] No saved page found, staying on page 1');
         }
       } catch (_) {}
 
