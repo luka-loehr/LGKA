@@ -103,10 +103,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
         if (isSchedule && (widget.targetPages == null || widget.targetPages!.isEmpty) && lastPage != null && lastPage > 0) {
           // Delay slightly to ensure PdfView is attached and ready
+          final int pageToJump = lastPage!; // safe, checked above
           Future.delayed(const Duration(milliseconds: 120), () {
             try {
-              debugPrint('📄 [PDFViewer] Auto-jump to saved schedule page $lastPage');
-              _pdfController.jumpToPage(lastPage - 1);
+              debugPrint('📄 [PDFViewer] Auto-jump to saved schedule page $pageToJump');
+              _pdfController.jumpToPage(pageToJump - 1);
             } catch (_) {}
           });
         } else {
