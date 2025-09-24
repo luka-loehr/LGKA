@@ -13,6 +13,11 @@ class PreferencesManager extends ChangeNotifier {
   static const String _keyVibrationEnabled = 'vibration_enabled';
   static const String _keyLastPdfSearch = 'last_pdf_search_query';
   static const String _keyLastPdfPage = 'last_pdf_search_page';
+  // Per-schedule keys (exclude substitution plans)
+  static const String _keyLastPage5to10 = 'last_schedule_5_10_page';
+  static const String _keyLastPageJ11J12 = 'last_schedule_j11_12_page';
+  static const String _keyLastQuery5to10 = 'last_schedule_5_10_query';
+  static const String _keyLastQueryJ11J12 = 'last_schedule_j11_12_query';
 
   late final SharedPreferences _prefs;
 
@@ -108,6 +113,60 @@ class PreferencesManager extends ChangeNotifier {
       await _prefs.remove(_keyLastPdfPage);
     } else {
       await _prefs.setInt(_keyLastPdfPage, page);
+    }
+    notifyListeners();
+  }
+
+  // Per-schedule: last page (1-based)
+  int? get lastSchedulePage5to10 {
+    final page = _prefs.getInt(_keyLastPage5to10);
+    if (page == null || page < 1) return null;
+    return page;
+  }
+
+  Future<void> setLastSchedulePage5to10(int? page) async {
+    if (page == null || page < 1) {
+      await _prefs.remove(_keyLastPage5to10);
+    } else {
+      await _prefs.setInt(_keyLastPage5to10, page);
+    }
+    notifyListeners();
+  }
+
+  int? get lastSchedulePageJ11J12 {
+    final page = _prefs.getInt(_keyLastPageJ11J12);
+    if (page == null || page < 1) return null;
+    return page;
+  }
+
+  Future<void> setLastSchedulePageJ11J12(int? page) async {
+    if (page == null || page < 1) {
+      await _prefs.remove(_keyLastPageJ11J12);
+    } else {
+      await _prefs.setInt(_keyLastPageJ11J12, page);
+    }
+    notifyListeners();
+  }
+
+  // Per-schedule: last query (optional convenience)
+  String? get lastScheduleQuery5to10 => _prefs.getString(_keyLastQuery5to10);
+
+  Future<void> setLastScheduleQuery5to10(String? value) async {
+    if (value == null || value.trim().isEmpty) {
+      await _prefs.remove(_keyLastQuery5to10);
+    } else {
+      await _prefs.setString(_keyLastQuery5to10, value);
+    }
+    notifyListeners();
+  }
+
+  String? get lastScheduleQueryJ11J12 => _prefs.getString(_keyLastQueryJ11J12);
+
+  Future<void> setLastScheduleQueryJ11J12(String? value) async {
+    if (value == null || value.trim().isEmpty) {
+      await _prefs.remove(_keyLastQueryJ11J12);
+    } else {
+      await _prefs.setString(_keyLastQueryJ11J12, value);
     }
     notifyListeners();
   }
