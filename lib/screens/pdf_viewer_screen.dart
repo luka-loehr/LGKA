@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
 import 'package:lgka_flutter/providers/haptic_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:pdfx/pdfx.dart' as pdfx;
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -79,8 +81,22 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       });
     }
     
-    // Trigger haptic feedback after a short delay to indicate PDF is loaded
+    // After first frame: try auto-jump to last searched page if present
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        // Access preferences via ProviderScope context
+        // Using ProviderScope.containerOf to read without converting widget to Consumer
+        final container = ProviderScope.containerOf(context, listen: false);
+        final prefs = container.read(preferencesManagerProvider);
+
+        final lastQuery = prefs.lastPdfSearchQuery;
+        final lastPage = prefs.lastPdfSearchPage; // 1-based
+
+        if ((widget.targetPages == null || widget.targetPages!.isEmpty) && lastPage != null && lastPage > 0) {
+          _pdfController.jumpToPage(lastPage - 1);
+        }
+      } catch (_) {}
+
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted && !_hasTriggeredLoadedHaptic) {
           _hasTriggeredLoadedHaptic = true;
@@ -225,6 +241,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     try {
       // Navigate to the page (convert to 0-based index)
       _pdfController.jumpToPage(result.pageNumber - 1);
+      // Persist last successful search result
+      try {
+        final container = ProviderScope.containerOf(context, listen: false);
+        final prefs = container.read(preferencesManagerProvider);
+        prefs.setLastPdfSearchQuery(result.query);
+        prefs.setLastPdfSearchPage(result.pageNumber);
+      } catch (_) {}
       
       // Provide haptic feedback
       HapticService.subtle();
@@ -300,6 +323,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       setState(() {
         _isSearchBarVisible = false;
       });
+      // Optimistically store query; page will be stored on navigation
+      try {
+        final container = ProviderScope.containerOf(context, listen: false);
+        final prefs = container.read(preferencesManagerProvider);
+        prefs.setLastPdfSearchQuery(query.trim());
+      } catch (_) {}
     }
   }
 
