@@ -11,6 +11,8 @@ class PreferencesManager extends ChangeNotifier {
   static const String _keyShowNavigationDebug = 'show_navigation_debug';
   static const String _keyAccentColor = 'accent_color';
   static const String _keyVibrationEnabled = 'vibration_enabled';
+  static const String _keyLastPdfSearch = 'last_pdf_search_query';
+  static const String _keyLastPdfPage = 'last_pdf_search_page';
 
   late final SharedPreferences _prefs;
 
@@ -79,6 +81,34 @@ class PreferencesManager extends ChangeNotifier {
 
   Future<void> setVibrationEnabled(bool value) async {
     await _prefs.setBool(_keyVibrationEnabled, value);
+    notifyListeners();
+  }
+
+  // Last PDF search query (for schedule convenience)
+  String? get lastPdfSearchQuery => _prefs.getString(_keyLastPdfSearch);
+
+  Future<void> setLastPdfSearchQuery(String? value) async {
+    if (value == null || value.trim().isEmpty) {
+      await _prefs.remove(_keyLastPdfSearch);
+    } else {
+      await _prefs.setString(_keyLastPdfSearch, value);
+    }
+    notifyListeners();
+  }
+
+  // Last matched PDF page (1-based for readability)
+  int? get lastPdfSearchPage {
+    final page = _prefs.getInt(_keyLastPdfPage);
+    if (page == null || page < 1) return null;
+    return page;
+  }
+
+  Future<void> setLastPdfSearchPage(int? page) async {
+    if (page == null || page < 1) {
+      await _prefs.remove(_keyLastPdfPage);
+    } else {
+      await _prefs.setInt(_keyLastPdfPage, page);
+    }
     notifyListeners();
   }
 
