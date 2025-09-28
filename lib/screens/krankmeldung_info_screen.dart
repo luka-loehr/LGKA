@@ -55,7 +55,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                       _buildInfoCard(
                         context,
                         Icons.warning_amber_rounded,
-                        'Krankmeldung',
+                        '',
                         'Die Krankmeldung wird vom Lessing-Gymnasium entwickelt und hat nichts mit der LGKA+ App zu tun.',
                       ),
                       
@@ -173,15 +173,17 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryText,
-                      fontSize: 16,
+                  if (title.isNotEmpty) ...[
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryText,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
+                    const SizedBox(height: 6),
+                  ],
                   Text(
                     description,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
