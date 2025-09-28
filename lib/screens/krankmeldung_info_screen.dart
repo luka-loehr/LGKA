@@ -43,26 +43,26 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Warning icon and title
-              Row(
-                children: [
-                  Icon(
-                    Icons.warning_amber_rounded,
-                    color: Colors.orange,
-                    size: 28,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Wichtiger Hinweis',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: Colors.orange,
-                        fontWeight: FontWeight.bold,
-                      ),
+            // Warning icon and title
+            Row(
+              children: [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 28,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Wichtiger Hinweis',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
               
               const SizedBox(height: 20),
               
@@ -74,38 +74,36 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Main disclaimer text
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.appSurface,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.orange.withValues(alpha: 0.3),
-                            width: 1,
-                          ),
+                      Card(
+                        color: AppColors.appSurface,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Die Krankmeldung wird vom Lessing-Gymnasium entwickelt und hat nichts mit der LGKA+ App zu tun.',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: AppColors.appOnSurface,
-                                fontWeight: FontWeight.bold,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Die Krankmeldung wird vom Lessing-Gymnasium entwickelt und hat nichts mit der LGKA+ App zu tun.',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryText,
+                                ),
                               ),
-                            ),
-                            
-                            const SizedBox(height: 12),
-                            
-                            Text(
-                              'Bei Problemen wende dich direkt an das Lessing-Gymnasium.',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.secondaryText,
-                                height: 1.5,
+                              
+                              const SizedBox(height: 8),
+                              
+                              Text(
+                                'Bei Problemen wende dich direkt an das Lessing-Gymnasium.',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.secondaryText,
+                                  height: 1.3,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       
@@ -114,69 +112,63 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                       // Privacy policy section
                       Text(
                         'Datenschutz',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.appOnSurface,
-                          fontWeight: FontWeight.bold,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryText,
                         ),
                       ),
                       
                       const SizedBox(height: 8),
                       
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.appSurface,
-                          borderRadius: BorderRadius.circular(12),
+                      Text(
+                        'Lies vor der Nutzung die Datenschutzerklärung:',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.secondaryText,
+                          height: 1.4,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Lies vor der Nutzung die Datenschutzerklärung:',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.secondaryText,
-                                height: 1.5,
-                              ),
-                            ),
-                            
-                            const SizedBox(height: 12),
-                            
-                            InkWell(
-                              onTap: () {
-                                HapticService.subtle();
-                                _openPrivacyPolicy();
-                              },
-                              borderRadius: BorderRadius.circular(8),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.privacy_tip_outlined,
-                                      color: Theme.of(context).colorScheme.primary,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Text(
-                                        'Datenschutzerklärung des Lessing-Gymnasiums',
-                                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                          color: Theme.of(context).colorScheme.primary,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                    Icon(
-                                      Icons.open_in_new,
-                                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
-                                      size: 16,
-                                    ),
-                                  ],
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      Card(
+                        color: AppColors.appSurface,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            HapticService.subtle();
+                            _openPrivacyPolicy();
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.privacy_tip_outlined,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 24,
                                 ),
-                              ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Text(
+                                    'Datenschutzerklärung des Lessing-Gymnasiums',
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryText,
+                                    ),
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.open_in_new,
+                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+                                  size: 18,
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ],
