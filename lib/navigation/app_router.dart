@@ -10,6 +10,7 @@ import '../screens/pdf_viewer_screen.dart';
 import '../screens/schedule_page.dart';
 import '../screens/legal_screen.dart';
 import '../screens/webview_screen.dart';
+import '../screens/krankmeldung_info_screen.dart';
 
 class AppRouter {
   // Route names
@@ -21,6 +22,7 @@ class AppRouter {
   static const String schedule = '/schedule';
   static const String legal = '/legal';
   static const String webview = '/webview';
+  static const String krankmeldungInfo = '/krankmeldung-info';
 
   static GoRouter createRouter({required String initialLocation}) {
     return GoRouter(
@@ -59,6 +61,10 @@ class AppRouter {
         GoRoute(
           path: legal,
           builder: (context, state) => const LegalScreen(),
+        ),
+        GoRoute(
+          path: krankmeldungInfo,
+          builder: (context, state) => const KrankmeldungInfoScreen(),
         ),
         GoRoute(
           path: webview,
