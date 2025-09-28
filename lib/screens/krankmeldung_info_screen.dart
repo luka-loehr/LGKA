@@ -163,7 +163,8 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
       'title': 'Krankmeldung',
       'headers': {
         'User-Agent': 'LGKA-App-Luka-Loehr',
-      }
+      },
+      'fromKrankmeldungInfo': true, // Flag to indicate we came from info screen
     });
   }
 

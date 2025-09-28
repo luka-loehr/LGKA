@@ -75,6 +75,7 @@ class AppRouter {
                 url: data['url'] as String,
                 title: data['title'] as String?,
                 headers: data['headers'] as Map<String, String>?,
+                fromKrankmeldungInfo: data['fromKrankmeldungInfo'] as bool? ?? false,
               ),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return SlideTransition(
