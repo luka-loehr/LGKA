@@ -76,9 +76,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: AppColors.appBackground,
       elevation: 0,
       leading: IconButton(
-        onPressed: _onSchoolPressed,
+        onPressed: _onKrankmeldungPressed,
         icon: const Icon(
-          Icons.school,
+          Icons.medical_services_outlined,
           color: AppColors.secondaryText,
         ),
       ),
@@ -197,17 +197,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  void _onSchoolPressed() {
+  void _onKrankmeldungPressed() {
     HapticService.subtle();
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1E1E1E),
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => const _SchoolOptionsSheet(),
-    );
+    // Navigate directly to the webview with the illness report
+    context.push(AppRouter.webview, extra: {
+      'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
+      'title': 'Krankmeldung',
+      'headers': {
+        'User-Agent': 'LGKA-App-Luka-Loehr',
+      }
+    });
   }
 }
 
@@ -1138,167 +1137,6 @@ class _SettingsSheet extends ConsumerWidget {
     } catch (e) {
       debugPrint('Could not launch URL: $e');
     }
-  }
-
-  double _getBottomPadding(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final gestureInsets = mediaQuery.systemGestureInsets.bottom;
-
-    if (gestureInsets >= 45) {
-      return 54.0; // Button navigation
-    } else if (gestureInsets <= 25) {
-      return 8.0; // Gesture navigation
-    } else {
-      return mediaQuery.viewPadding.bottom > 50 ? 54.0 : 8.0;
-    }
-  }
-}
-
-/// School options bottom sheet
-class _SchoolOptionsSheet extends ConsumerWidget {
-  const _SchoolOptionsSheet();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Wrap(
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(
-            16, 
-            16, 
-            16, 
-            _getBottomPadding(context),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Schuloptionen',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: AppColors.appOnSurface,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.appSurface,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    _buildSchoolLinks(context),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSchoolLinks(BuildContext context) {
-    return Column(
-      children: [
-        _buildSchoolLink(
-          context,
-          Icons.sick_outlined, 
-          'Krankmeldung', 
-          () => _openKrankmeldung(context),
-        ),
-        const SizedBox(height: 12),
-        _buildSchoolLink(
-          context,
-          Icons.rule_outlined, 
-          'Schulordnung', 
-          () => _openSchulordnung(context),
-        ),
-        const SizedBox(height: 12),
-        _buildSchoolLink(
-          context,
-          Icons.people_outlined, 
-          'Kollegium', 
-          () => _openKollegium(context),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSchoolLink(BuildContext context, IconData icon, String text, VoidCallback onTap) {
-    return InkWell(
-      onTap: () {
-        HapticService.subtle();
-        onTap();
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: AppColors.secondaryText,
-              size: 18,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                text,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.secondaryText,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Icon(
-              Icons.open_in_new,
-              color: AppColors.secondaryText.withValues(alpha: 0.6),
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _openKrankmeldung(BuildContext context) {
-    Navigator.of(context).pop(); // Close the bottom sheet
-    // Navigate to the webview with the illness report
-    context.push(AppRouter.webview, extra: {
-      'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
-      'title': 'Krankmeldung',
-      'headers': {
-        'User-Agent': 'LGKA-App-Luka-Loehr',
-      }
-    });
-  }
-
-  void _openKollegium(BuildContext context) {
-    Navigator.of(context).pop(); // Close the bottom sheet
-    // TODO: Implement Kollegium functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Kollegium - Funktion wird bald verfügbar sein'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _openSchulordnung(BuildContext context) {
-    Navigator.of(context).pop(); // Close the bottom sheet
-    // TODO: Implement Schulordnung functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Schulordnung - Funktion wird bald verfügbar sein'),
-        duration: Duration(seconds: 2),
-      ),
-    );
   }
 
   double _getBottomPadding(BuildContext context) {
