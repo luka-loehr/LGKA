@@ -65,8 +65,8 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                       _buildInfoCard(
                         context,
                         Icons.support_agent,
-                        'Bei Problemen',
-                        'Wende dich direkt an das Lessing-Gymnasium Karlsruhe.',
+                        '',
+                        'Bei technischen Problemen wende dich direkt an das Lessing-Gymnasium Karlsruhe.',
                       ),
                       
                       const SizedBox(height: 40),
