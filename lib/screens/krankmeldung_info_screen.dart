@@ -38,7 +38,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -63,15 +63,15 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
               ],
             ),
             
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             
             // Main disclaimer text
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: AppColors.appSurface,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: Colors.orange.withValues(alpha: 0.3),
                   width: 1,
@@ -81,27 +81,17 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Die Krankmeldung hat nichts mit der LGKA+ App zu tun.',
+                    'Die Krankmeldung wird vom Lessing-Gymnasium entwickelt und hat nichts mit der LGKA+ App zu tun.',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: AppColors.appOnSurface,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   
                   Text(
-                    'Die Krankmeldung wird vom Lessing-Gymnasium Karlsruhe selbst entwickelt und betrieben. Sie steht in keinem rechtlichen Zusammenhang mit der LGKA+ App oder dem App-Entwickler Luka Löhr.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.secondaryText,
-                      height: 1.5,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  Text(
-                    'Bei Fehlern, Bugs oder Problemen mit der Krankmeldung wende dich bitte direkt an das Lessing-Gymnasium Karlsruhe.',
+                    'Bei Problemen wende dich direkt an das Lessing-Gymnasium.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.secondaryText,
                       height: 1.5,
@@ -111,7 +101,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
               ),
             ),
             
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             
             // Privacy policy section
             Text(
@@ -122,7 +112,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
               ),
             ),
             
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             
             Container(
               width: double.infinity,
@@ -135,7 +125,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bevor du die Krankmeldung nutzt, lies bitte die Datenschutzerklärung des Lessing-Gymnasiums Karlsruhe:',
+                    'Lies vor der Nutzung die Datenschutzerklärung:',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.secondaryText,
                       height: 1.5,
@@ -162,11 +152,10 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Datenschutzerklärung des Lessing-Gymnasiums Karlsruhe',
+                              'Datenschutzerklärung des Lessing-Gymnasiums',
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.w500,
-                                decoration: TextDecoration.underline,
                               ),
                             ),
                           ),
