@@ -55,7 +55,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                       _buildInfoCard(
                         context,
                         Icons.warning_amber_rounded,
-                        'Wichtiger Hinweis',
+                        'Krankmeldung',
                         'Die Krankmeldung wird vom Lessing-Gymnasium entwickelt und hat nichts mit der LGKA+ App zu tun.',
                       ),
                       
