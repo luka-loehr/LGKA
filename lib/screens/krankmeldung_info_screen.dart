@@ -29,7 +29,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
           ),
         ),
         title: Text(
-          'Krankmeldung',
+          'Wichtiger Hinweis',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             color: AppColors.appOnSurface,
             fontWeight: FontWeight.bold,
