@@ -54,6 +54,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   
   // Search bar state
   bool _isSearchBarVisible = false;
+  
+  // PDF loading state
+  bool _isPdfReady = false;
+  bool _hasJumpedToSavedPage = false;
 
   @override
   void initState() {
@@ -81,46 +85,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       });
     }
     
-    // After first frame: try auto-jump to last searched page if present (per schedule type)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      try {
-        // Access preferences via ProviderScope context
-        // Using ProviderScope.containerOf to read without converting widget to Consumer
-        final container = ProviderScope.containerOf(context, listen: false);
-        final prefs = container.read(preferencesManagerProvider);
-
-        // Determine schedule type based on dayName labeling used in UI
-        final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen');
-        final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
-        final isSchedule = isSchedule5to10 || isScheduleJ11J12;
-
-        int? lastPage;
-        if (isSchedule5to10) {
-          lastPage = prefs.lastSchedulePage5to10;
-        }
-        // J11/J12 schedules no longer use page persistence
-
-        if (isSchedule5to10 && (widget.targetPages == null || widget.targetPages!.isEmpty) && lastPage != null && lastPage > 0) {
-          // Delay slightly to ensure PdfView is attached and ready
-          final int pageToJump = lastPage!; // safe, checked above
-          Future.delayed(const Duration(milliseconds: 120), () {
-            try {
-              debugPrint('📄 [PDFViewer] Auto-jump to saved schedule page $pageToJump');
-              _pdfController.jumpToPage(pageToJump - 1);
-            } catch (_) {}
-          });
-        } else {
-          debugPrint('📄 [PDFViewer] No saved schedule page found, staying on page 1');
-        }
-      } catch (_) {}
-
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted && !_hasTriggeredLoadedHaptic) {
-          _hasTriggeredLoadedHaptic = true;
-          HapticService.pdfLoading();
-        }
-      });
-    });
+    // Initialize PDF ready detection
+    _initializePdfReadyDetection();
   }
   
   @override
@@ -129,6 +95,90 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
+  }
+
+  /// Initialize PDF ready detection and attempt to jump to saved page
+  void _initializePdfReadyDetection() {
+    // Try to jump to saved page after a short delay to allow PDF to initialize
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _attemptJumpToSavedPage();
+    });
+  }
+
+  /// Attempt to jump to saved page when PDF is ready
+  void _attemptJumpToSavedPage() {
+    if (_hasJumpedToSavedPage) return; // Already jumped
+    
+    try {
+      // Access preferences via ProviderScope context
+      final container = ProviderScope.containerOf(context, listen: false);
+      final prefs = container.read(preferencesManagerProvider);
+
+      // Determine schedule type based on dayName labeling used in UI
+      final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen');
+
+      int? lastPage;
+      if (isSchedule5to10) {
+        lastPage = prefs.lastSchedulePage5to10;
+      }
+
+      if (isSchedule5to10 && 
+          (widget.targetPages == null || widget.targetPages!.isEmpty) && 
+          lastPage != null && lastPage > 0) {
+        
+        // Try to jump immediately first
+        _tryJumpToPage(lastPage);
+        
+        // If that fails, set up a retry mechanism
+        if (!_hasJumpedToSavedPage) {
+          _setupRetryMechanism(lastPage);
+        }
+      } else {
+        debugPrint('📄 [PDFViewer] No saved schedule page found, staying on page 1');
+      }
+    } catch (e) {
+      debugPrint('📄 [PDFViewer] Error in saved page detection: $e');
+    }
+  }
+
+  /// Try to jump to a specific page
+  void _tryJumpToPage(int pageNumber) {
+    try {
+      debugPrint('📄 [PDFViewer] Attempting to jump to saved schedule page $pageNumber');
+      _pdfController.jumpToPage(pageNumber - 1); // Convert to 0-based index
+      _hasJumpedToSavedPage = true;
+      debugPrint('📄 [PDFViewer] Successfully jumped to page $pageNumber');
+    } catch (e) {
+      debugPrint('📄 [PDFViewer] Failed to jump to page $pageNumber: $e');
+    }
+  }
+
+  /// Set up retry mechanism for page jumping
+  void _setupRetryMechanism(int pageNumber) {
+    int retryCount = 0;
+    const maxRetries = 10;
+    const retryDelay = Duration(milliseconds: 200);
+
+    void retry() {
+      if (_hasJumpedToSavedPage || retryCount >= maxRetries) return;
+      
+      retryCount++;
+      debugPrint('📄 [PDFViewer] Retry attempt $retryCount to jump to page $pageNumber');
+      
+      Future.delayed(retryDelay, () {
+        if (mounted && !_hasJumpedToSavedPage) {
+          _tryJumpToPage(pageNumber);
+          
+          if (!_hasJumpedToSavedPage && retryCount < maxRetries) {
+            retry(); // Continue retrying
+          } else if (retryCount >= maxRetries) {
+            debugPrint('📄 [PDFViewer] Max retries reached, staying on page 1');
+          }
+        }
+      });
+    }
+    
+    retry();
   }
 
   // Search functionality
@@ -611,6 +661,27 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     int index,
     pdfx.PdfDocument document,
   ) {
+    // Mark PDF as ready when first page is being built
+    if (!_isPdfReady) {
+      _isPdfReady = true;
+      debugPrint('📄 [PDFViewer] PDF is ready, attempting to jump to saved page');
+      
+      // Try to jump to saved page now that PDF is ready
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!_hasJumpedToSavedPage) {
+          _attemptJumpToSavedPage();
+        }
+      });
+
+      // Trigger haptic feedback when PDF is loaded
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted && !_hasTriggeredLoadedHaptic) {
+          _hasTriggeredLoadedHaptic = true;
+          HapticService.pdfLoading();
+        }
+      });
+    }
+
     return PhotoViewGalleryPageOptions(
       imageProvider: pdfx.PdfPageImageProvider(
         pageImage,
