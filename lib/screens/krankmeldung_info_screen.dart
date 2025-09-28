@@ -59,7 +59,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                         'Die Krankmeldung wird vom Lessing-Gymnasium entwickelt und hat nichts mit der LGKA+ App zu tun.',
                       ),
                       
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
                       
                       // Problem contact card
                       _buildInfoCard(
@@ -68,32 +68,6 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                         'Bei Problemen',
                         'Wende dich direkt an das Lessing-Gymnasium Karlsruhe.',
                       ),
-                      
-                      const SizedBox(height: 24),
-                      
-                      // Privacy policy section
-                      Text(
-                        'Datenschutz',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryText,
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 8),
-                      
-                      Text(
-                        'Lies vor der Nutzung die Datenschutzerklärung:',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.secondaryText,
-                          height: 1.4,
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      // Privacy policy card
-                      _buildPrivacyCard(context),
                       
                       const SizedBox(height: 40),
                     ],
@@ -145,16 +119,6 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
     );
   }
 
-  void _openPrivacyPolicy() async {
-    try {
-      final url = Uri.parse('https://lessing-gymnasium-karlsruhe.de/cm3/index.php/impressum/datenschutzerklaerung');
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      }
-    } catch (e) {
-      debugPrint('Could not launch privacy policy URL: $e');
-    }
-  }
 
   void _openKrankmeldung(BuildContext context) {
     // Navigate to the webview with the illness report
@@ -172,30 +136,38 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
     return Card(
       color: AppColors.appSurface,
       elevation: 0,
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              width: 48,
-              height: 48,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    spreadRadius: 0,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Icon(
                 icon,
                 color: Theme.of(context).colorScheme.primary,
-                size: 24,
+                size: 26,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 18),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,14 +178,16 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: AppColors.primaryText,
+                      fontSize: 16,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
                     description,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.secondaryText,
-                      height: 1.3,
+                      height: 1.4,
+                      fontSize: 14,
                     ),
                   ),
                 ],
@@ -225,72 +199,4 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPrivacyCard(BuildContext context) {
-    return Card(
-      color: AppColors.appSurface,
-      elevation: 0,
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: InkWell(
-        onTap: () {
-          HapticService.subtle();
-          _openPrivacyPolicy();
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.privacy_tip_outlined,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Datenschutzerklärung',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryText,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Lessing-Gymnasium Karlsruhe',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.secondaryText,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.open_in_new,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
-                size: 18,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
