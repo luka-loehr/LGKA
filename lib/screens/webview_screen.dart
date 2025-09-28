@@ -10,8 +10,9 @@ class InAppWebViewScreen extends StatefulWidget {
   final String url;
   final String? title;
   final Map<String, String>? headers;
+  final bool fromKrankmeldungInfo;
 
-  const InAppWebViewScreen({super.key, required this.url, this.title, this.headers});
+  const InAppWebViewScreen({super.key, required this.url, this.title, this.headers, this.fromKrankmeldungInfo = false});
 
   @override
   State<InAppWebViewScreen> createState() => _InAppWebViewScreenState();
@@ -64,7 +65,13 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
           icon: const Icon(Icons.close, color: AppColors.secondaryText),
           onPressed: () {
             HapticService.subtle();
-            Navigator.of(context).maybePop();
+            if (widget.fromKrankmeldungInfo) {
+              // If we came from Krankmeldung info screen, go back to home
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            } else {
+              // Normal back navigation
+              Navigator.of(context).maybePop();
+            }
           },
         ),
         title: Text(
