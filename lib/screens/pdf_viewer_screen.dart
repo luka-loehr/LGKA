@@ -97,11 +97,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         int? lastPage;
         if (isSchedule5to10) {
           lastPage = prefs.lastSchedulePage5to10;
-        } else if (isScheduleJ11J12) {
-          lastPage = prefs.lastSchedulePageJ11J12;
         }
+        // J11/J12 schedules no longer use page persistence
 
-        if (isSchedule && (widget.targetPages == null || widget.targetPages!.isEmpty) && lastPage != null && lastPage > 0) {
+        if (isSchedule5to10 && (widget.targetPages == null || widget.targetPages!.isEmpty) && lastPage != null && lastPage > 0) {
           // Delay slightly to ensure PdfView is attached and ready
           final int pageToJump = lastPage!; // safe, checked above
           Future.delayed(const Duration(milliseconds: 120), () {
@@ -265,14 +264,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         final prefs = container.read(preferencesManagerProvider);
         // Store per schedule type only; ignore substitution plans
         final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen');
-        final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
         if (isSchedule5to10) {
           prefs.setLastScheduleQuery5to10(result.query);
           prefs.setLastSchedulePage5to10(result.pageNumber);
-        } else if (isScheduleJ11J12) {
-          prefs.setLastScheduleQueryJ11J12(result.query);
-          prefs.setLastSchedulePageJ11J12(result.pageNumber);
         }
+        // J11/J12 schedules no longer use page persistence
       } catch (_) {}
       
       // Provide haptic feedback
