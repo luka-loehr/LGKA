@@ -156,7 +156,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                         children: [
                           Icon(
                             Icons.privacy_tip_outlined,
-                            color: AppColors.appBlueAccent,
+                            color: Theme.of(context).colorScheme.primary,
                             size: 20,
                           ),
                           const SizedBox(width: 12),
@@ -164,7 +164,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                             child: Text(
                               'Datenschutzerklärung des Lessing-Gymnasiums Karlsruhe',
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.appBlueAccent,
+                                color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.w500,
                                 decoration: TextDecoration.underline,
                               ),
@@ -172,7 +172,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                           ),
                           Icon(
                             Icons.open_in_new,
-                            color: AppColors.appBlueAccent.withValues(alpha: 0.7),
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
                             size: 16,
                           ),
                         ],
@@ -194,7 +194,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                   _openKrankmeldung(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.appBlueAccent,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
