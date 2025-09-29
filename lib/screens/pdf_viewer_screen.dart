@@ -115,15 +115,23 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       final prefs = container.read(preferencesManagerProvider);
 
       // Determine schedule type based on dayName labeling used in UI
-      final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen');
+      final dayLabel = (widget.dayName ?? '');
+      final isSchedule5to10 = dayLabel.contains('Klassen');
+      final isScheduleJ11J12 = dayLabel.contains('J11/J12');
+      final isSubstitution = !isSchedule5to10 && !isScheduleJ11J12; // everything else
+
+      // Only run jumper for Klassen 5–10
+      if (!isSchedule5to10) {
+        // keep logs quiet to avoid noise for other PDFs
+        return;
+      }
 
       int? lastPage;
       if (isSchedule5to10) {
         lastPage = prefs.lastSchedulePage5to10;
       }
 
-      if (isSchedule5to10 && 
-          (widget.targetPages == null || widget.targetPages!.isEmpty) && 
+      if ((widget.targetPages == null || widget.targetPages!.isEmpty) && 
           lastPage != null && lastPage > 0) {
         
         // Try to jump immediately first
@@ -133,8 +141,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         if (!_hasJumpedToSavedPage) {
           _setupRetryMechanism(lastPage);
         }
-      } else {
-        debugPrint('📄 [PDFViewer] No saved schedule page found, staying on page 1');
       }
     } catch (e) {
       debugPrint('📄 [PDFViewer] Error in saved page detection: $e');
@@ -664,7 +670,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     // Mark PDF as ready when first page is being built
     if (!_isPdfReady) {
       _isPdfReady = true;
-      debugPrint('📄 [PDFViewer] PDF is ready, attempting to jump to saved page');
+      // Only log jump attempt for Klassen 5–10 to avoid noise
+      if ((widget.dayName ?? '').contains('Klassen')) {
+        debugPrint('📄 [PDFViewer] PDF is ready, attempting to jump to saved page');
+      }
       
       // Try to jump to saved page now that PDF is ready
       WidgetsBinding.instance.addPostFrameCallback((_) {
