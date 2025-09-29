@@ -29,7 +29,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
           ),
         ),
         title: Text(
-          'Wichtiger Hinweis',
+          'Hinweis zur Krankmeldung',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             color: AppColors.appOnSurface,
             fontWeight: FontWeight.bold,
@@ -56,7 +56,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                         context,
                         Icons.warning_amber_rounded,
                         '',
-                        'Die Krankmeldung wird vom Lessing-Gymnasium entwickelt und hat nichts mit der LGKA+ App zu tun.',
+                        'Die Krankmeldung wird vom Lessing-Gymnasium bereitgestellt und ist unabhängig von der LGKA+ App.',
                       ),
                       
                       const SizedBox(height: 16),
@@ -66,7 +66,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                         context,
                         Icons.support_agent,
                         '',
-                        'Bei technischen Problemen wende dich direkt an das Lessing-Gymnasium Karlsruhe.',
+                        'Bei technischen Fragen oder Problemen wende dich bitte direkt an das Lessing-Gymnasium Karlsruhe.',
                       ),
                       
                       const SizedBox(height: 40),
