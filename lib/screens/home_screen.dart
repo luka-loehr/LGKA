@@ -992,7 +992,7 @@ class _SettingsSheet extends ConsumerWidget {
       {'name': 'Mint', 'value': 'mint', 'color': Color(0xFF45A88A)},
       {'name': 'Lavendel', 'value': 'lavender', 'color': Color(0xFF9B6BDF)},
       {'name': 'Rose', 'value': 'rose', 'color': Color(0xFFC47A7A)},
-      {'name': 'Pfirsich', 'value': 'peach', 'color': Color(0xFFD4945A)},
+      {'name': 'Pfirsich', 'value': 'peach', 'color': Color(0xFFBF7F46)},
     ];
 
     return Column(

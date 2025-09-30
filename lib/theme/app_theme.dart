@@ -28,7 +28,7 @@ class AppColors {
       case 'mint':
         return Color(0xFF45A88A); // A bit more darker mint green - trendy and vibrant
       case 'peach':
-        return Color(0xFFD4945A); // More saturated peach - warm and vibrant
+        return Color(0xFFBF7F46); // Slightly darker peach/orange for better contrast
       case 'rose':
         return Color(0xFFC47A7A); // More saturated rose - gentle and vibrant
       default:
