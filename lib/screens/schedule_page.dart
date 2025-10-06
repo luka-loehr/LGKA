@@ -30,6 +30,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   bool _isCheckingAvailability = false;
   DateTime? _lastAvailabilityCheck;
   static const Duration _availabilityCheckInterval = Duration(minutes: 15);
+  bool _wasSchedulesLoading = true;
 
   @override
   void initState() {
@@ -143,6 +144,14 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   @override
   Widget build(BuildContext context) {
     final scheduleState = ref.watch(scheduleProvider);
+    // Fire haptic AFTER schedules finish loading (not after availability check)
+    final justFinishedLoading = _wasSchedulesLoading && !scheduleState.isLoading;
+    if (justFinishedLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await HapticService.light();
+      });
+    }
+    _wasSchedulesLoading = scheduleState.isLoading;
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
