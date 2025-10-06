@@ -20,7 +20,7 @@
   "dataCollectionDescription": "The weather station is currently collecting new data for today. Charts are available from 0:30 AM.",
   "welcomeHeadline": "Welcome!",
   "welcomeSubtitle": "Welcome to the new app for Lessing-Gymnasium Karlsruhe.",
-  "continue": "Continue",
+  "continueLabel": "Continue",
   "today": "Today",
   "tomorrow": "Tomorrow",
   "loadingSubstitutions": "Loading substitution plans...",

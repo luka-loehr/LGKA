@@ -138,7 +138,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                                 ),
                               )
                             : Text(
-                                AppLocalizations.of(context)!.continue_,
+                                AppLocalizations.of(context)!.continueLabel,
                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
