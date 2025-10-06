@@ -239,6 +239,14 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
             ),
             textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 8),
+          Text(
+            AppLocalizations.of(context)!.serverConnectionHint,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.secondaryText,
+            ),
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () async {

@@ -188,6 +188,14 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                         ),
                         textAlign: TextAlign.center,
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        AppLocalizations.of(context)!.serverConnectionHint,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.secondaryText,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                       // Intentionally hide raw error details in all builds (debug/release)
                       const SizedBox(height: 24),
                       ElevatedButton.icon(

@@ -13,6 +13,7 @@
   "krankmeldungButton": "Zur Krankmeldung",
   "serverMaintenance": "Reparaturarbeiten werden durchgeführt",
   "serverConnectionFailed": "Serververbindung fehlgeschlagen",
+  "serverConnectionHint": "Möglicherweise besteht keine Internetverbindung oder es finden gerade Wartungsarbeiten am Lessing-Gymnasium statt.",
   "tryAgain": "Erneut versuchen",
   "liveWeatherData": "Live Wetterdaten",
   "dataBeingCollected": "Daten werden gesammelt",
