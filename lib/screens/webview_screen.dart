@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../theme/app_theme.dart';
@@ -187,7 +188,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      if (_errorText != null && _errorText!.isNotEmpty) ...[
+                      if (kDebugMode && _errorText != null && _errorText!.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         Text(
                           _errorText!,
