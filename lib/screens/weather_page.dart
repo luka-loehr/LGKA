@@ -49,6 +49,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   bool _isChartRendered = false;
   bool _isInitialRenderComplete = false;
   int _debugCounter = 0; // Debug counter for logging
+  bool _forceShowErrorUntilSuccess = false; // Keep error UI visible during retries until data arrives
 
   late AnimationController _errorAnimationController;
   late Animation<double> _errorAnimation;
@@ -137,11 +138,15 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
 
   void _refreshData() async {
     await HapticService.light();
-    // Retry weather only; keep button visible until data arrives
+    // Ensure error UI stays visible while retrying, until data successfully loads
+    if (mounted) {
+      setState(() {
+        _forceShowErrorUntilSuccess = true;
+      });
+    }
     try {
       await ref.read(weatherDataProvider.notifier).refreshWeatherData();
     } catch (_) {}
-    // Do not hide the error UI here; it will disappear automatically once data loads
   }
 
   Widget _buildChartPlaceholder() {
@@ -186,9 +191,11 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     final weatherState = ref.watch(weatherDataProvider);
 
     // Control error animation based on weather error state or stale data
-    final shouldShowWeatherError = weatherState.error != null && weatherState.chartData.isEmpty;
+    final hasNoChartData = weatherState.chartData.isEmpty;
+    final shouldShowWeatherError = weatherState.error != null && hasNoChartData;
     final shouldShowStaleDataError = _isDataStale() && weatherState.chartData.isNotEmpty;
-    final shouldShowAnyError = shouldShowWeatherError || shouldShowStaleDataError;
+    // Keep showing the error placeholder while retrying until data loads
+    final shouldShowAnyError = _forceShowErrorUntilSuccess || shouldShowWeatherError || shouldShowStaleDataError;
     
     if (shouldShowAnyError) {
       if (_errorAnimationController.status == AnimationStatus.dismissed) {
@@ -197,6 +204,15 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     } else {
       if (_errorAnimationController.status == AnimationStatus.completed) {
         _errorAnimationController.reverse();
+      }
+    }
+
+    // Reset forced error once we have data
+    if (_forceShowErrorUntilSuccess && weatherState.chartData.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _forceShowErrorUntilSuccess = false;
+        });
       }
     }
 
