@@ -259,4 +259,19 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get letsGo => 'Los geht\'s!';
+
+  @override
+  String get username => 'Benutzername';
+
+  @override
+  String get password => 'Passwort';
+
+  @override
+  String get login => 'Anmelden';
+
+  @override
+  String get authTitle => 'Anmeldung erforderlich';
+
+  @override
+  String get authSubtitle => 'Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst';
 }

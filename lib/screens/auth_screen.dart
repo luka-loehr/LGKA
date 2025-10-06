@@ -7,6 +7,7 @@ import '../providers/app_providers.dart';
 import '../navigation/app_router.dart';
 import '../providers/haptic_service.dart';
 import '../theme/app_theme.dart';
+import '../l10n/app_localizations.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   final VoidCallback? onLoginSuccess;
@@ -334,7 +335,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       
                       // Title
                       Text(
-                        'Anmeldung erforderlich',
+                        AppLocalizations.of(context)!.authTitle,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 28 / textScaleFactor, // Adjust for text scale factor
@@ -347,7 +348,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       
                       // Subtitle
                       Text(
-                        'Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst',
+                        AppLocalizations.of(context)!.authSubtitle,
                         style: TextStyle(
                           color: const Color(0xB3FFFFFF), // 70% white
                           fontSize: 14 / textScaleFactor, // Adjust for text scale factor
@@ -383,13 +384,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                     color: Colors.white,
                                     fontSize: 16,
                                   ),
-                                  decoration: const InputDecoration(
-                                    hintText: 'Benutzername',
-                                    hintStyle: TextStyle(
+                                  decoration: InputDecoration(
+                                    hintText: AppLocalizations.of(context)!.username,
+                                    hintStyle: const TextStyle(
                                       color: Color(0x80FFFFFF),
                                       fontSize: 16,
                                     ),
-                                    prefixIcon: Icon(
+                                    prefixIcon: const Icon(
                                       Icons.person_outline,
                                       color: Color(0xFF8E8E93),
                                       size: 22,
@@ -397,12 +398,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                     border: InputBorder.none,
                                     focusedBorder: InputBorder.none,
                                     enabledBorder: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
+                                    contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 16,
                                       vertical: 18,
                                     ),
                                     filled: true,
-                                    fillColor: Color(0xFF1E1E1E),
+                                    fillColor: const Color(0xFF1E1E1E),
                                   ),
                                   textInputAction: TextInputAction.next,
                                   onSubmitted: (_) => _passwordFocusNode.requestFocus(),
@@ -431,13 +432,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                     color: Colors.white,
                                     fontSize: 16,
                                   ),
-                                  decoration: const InputDecoration(
-                                    hintText: 'Passwort',
-                                    hintStyle: TextStyle(
+                                  decoration: InputDecoration(
+                                    hintText: AppLocalizations.of(context)!.password,
+                                    hintStyle: const TextStyle(
                                       color: Color(0x80FFFFFF),
                                       fontSize: 16,
                                     ),
-                                    prefixIcon: Icon(
+                                    prefixIcon: const Icon(
                                       Icons.lock_outline,
                                       color: Color(0xFF8E8E93),
                                       size: 22,
@@ -445,12 +446,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                     border: InputBorder.none,
                                     focusedBorder: InputBorder.none,
                                     enabledBorder: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
+                                    contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 16,
                                       vertical: 18,
                                     ),
                                     filled: true,
-                                    fillColor: Color(0xFF1E1E1E),
+                                    fillColor: const Color(0xFF1E1E1E),
                                   ),
                                   textInputAction: TextInputAction.done,
                                   onSubmitted: (_) {
@@ -512,7 +513,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                               ),
                                             )
                                           : Text(
-                                              'Anmelden',
+                                              AppLocalizations.of(context)!.login,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w600,
                                                 color: Colors.white,
