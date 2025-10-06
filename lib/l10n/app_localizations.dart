@@ -215,11 +215,11 @@ abstract class AppLocalizations {
   /// **'Welcome to the new app for Lessing-Gymnasium Karlsruhe.'**
   String get welcomeSubtitle;
 
-  /// No description provided for @continue.
+  /// No description provided for @continueLabel.
   ///
   /// In en, this message translates to:
   /// **'Continue'**
-  String get continue;
+  String get continueLabel;
 
   /// No description provided for @today.
   ///
