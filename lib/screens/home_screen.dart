@@ -314,7 +314,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     // Get the PDF file and actual weekday from the PDF state
     final pdfFile = pdfRepo.getPdfFile(isToday);
     final pdfState = isToday ? pdfRepo.todayState : pdfRepo.tomorrowState;
-    final weekday = pdfState.weekday ?? (isToday ? 'Heute' : 'Morgen');
+    final weekday = pdfState.weekday ?? (isToday ? AppLocalizations.of(context)!.today : AppLocalizations.of(context)!.tomorrow);
     
     if (pdfFile != null) {
       // Navigate to PDF viewer screen

@@ -8,6 +8,7 @@ import '../providers/schedule_provider.dart';
 import '../providers/haptic_service.dart';
 import '../theme/app_theme.dart';
 import '../services/schedule_service.dart';
+import '../l10n/app_localizations.dart';
 
 class SchedulePage extends ConsumerStatefulWidget {
   const SchedulePage({super.key});
@@ -161,9 +162,9 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
               valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Prüfe Verfügbarkeit...',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.checkingAvailability,
+              style: const TextStyle(
                 color: AppColors.secondaryText,
                 fontSize: 16,
               ),
@@ -195,9 +196,9 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
               valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Lade Stundenpläne...',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.loadingSchedules,
+              style: const TextStyle(
                 color: AppColors.secondaryText,
                 fontSize: 16,
               ),
@@ -231,7 +232,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           ),
           const SizedBox(height: 16),
           Text(
-            'Serververbindung fehlgeschlagen',
+            AppLocalizations.of(context)!.serverConnectionFailed,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: AppColors.primaryText,
             ),
@@ -244,7 +245,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
               await _checkScheduleAvailability();
             },
             icon: const Icon(Icons.refresh),
-            label: const Text('Erneut versuchen'),
+            label: Text(AppLocalizations.of(context)!.tryAgain),
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
@@ -270,18 +271,18 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
             size: 64,
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Keine Stundenpläne verfügbar',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.noSchedulesAvailable,
+            style: const TextStyle(
               color: AppColors.primaryText,
               fontSize: 18,
               fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Versuche es später erneut',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.tryAgainLater,
+            style: const TextStyle(
               color: AppColors.secondaryText,
               fontSize: 14,
             ),
@@ -356,7 +357,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
               child: Row(
                 children: [
                   Text(
-                    schedule.gradeLevel,
+                    _localizeGradeLevel(context, schedule.gradeLevel),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: AppColors.primaryText,
                       fontWeight: FontWeight.w500,
@@ -364,7 +365,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    schedule.halbjahr,
+                    _localizeHalbjahr(context, schedule.halbjahr),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.secondaryText,
                     ),
@@ -381,6 +382,23 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
         ),
       ),
     );
+  }
+
+  String _localizeGradeLevel(BuildContext context, String gradeLevel) {
+    if (gradeLevel == 'Klassen 5-10') {
+      return 'Grades 5-10';
+    }
+    return gradeLevel; // J11/J12 stays the same
+  }
+
+  String _localizeHalbjahr(BuildContext context, String halbjahr) {
+    if (halbjahr == '1. Halbjahr') {
+      return '1st semester';
+    }
+    if (halbjahr == '2. Halbjahr') {
+      return '2nd semester';
+    }
+    return halbjahr;
   }
 
   Widget _buildFooter(BuildContext context) {
@@ -451,7 +469,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
               valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
             ),
             const SizedBox(width: 16),
-            const Text('Lade Stundenplan...'),
+            Text(AppLocalizations.of(context)!.loadingSchedule),
           ],
         ),
       ),
@@ -466,7 +484,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           // Navigate to PDF viewer
           context.push('/pdf-viewer', extra: {
             'file': file,
-            'dayName': '${schedule.gradeLevel} - ${schedule.halbjahr}',
+            'dayName': '${_localizeGradeLevel(context, schedule.gradeLevel)} - ${_localizeHalbjahr(context, schedule.halbjahr)}',
           });
         } else {
           // PDF is not available yet
@@ -485,7 +503,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Fehler beim Laden: $e'),
+            content: Text('${AppLocalizations.of(context)!.errorLoadingGeneric}: $e'),
             backgroundColor: Colors.red,
           ),
         );

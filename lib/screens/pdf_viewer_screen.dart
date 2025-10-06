@@ -8,6 +8,7 @@ import 'package:pdfx/pdfx.dart' as pdfx;
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:share_plus/share_plus.dart';
+import '../l10n/app_localizations.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart' as syncfusion;
 
 // Search result data class
@@ -76,7 +77,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Gefundene Seiten: ${widget.targetPages!.join(", ")}'),
+              content: Text('Found pages: ${widget.targetPages!.join(", ")}'),
               duration: const Duration(seconds: 3),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
@@ -278,8 +279,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(results.length == 1 
-                ? '1 Ergebnis gefunden' 
-                : '${results.length} Ergebnisse gefunden'),
+                ? '1 result found' 
+                : '${results.length} results found'),
               duration: const Duration(seconds: 2),
               backgroundColor: Colors.green,
             ),
@@ -290,7 +291,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Keine Ergebnisse gefunden'),
+              content: Text('No results found'),
               duration: const Duration(seconds: 2),
               backgroundColor: Colors.orange,
             ),
@@ -300,9 +301,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     } catch (e) {
       print('🔍 [PDFViewer] Search error: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Fehler beim Suchen: $e'),
+              content: Text('${AppLocalizations.of(context)!.errorLoadingGeneric}: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -334,9 +335,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     } catch (e) {
       print('🔍 [PDFViewer] Error navigating to page ${result.pageNumber}: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Fehler beim Navigieren zu Seite ${result.pageNumber}'),
+                content: Text('Error navigating to page ${result.pageNumber}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -434,17 +435,17 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               .replaceAll('J11/J12', 'J11-12')
               .replaceAll(' - ', '_')
               .replaceAll(' ', '');
-          fileName = 'LGKA_Stundenplan_$cleanName.pdf';
-          subject = 'LGKA+ Stundenplan';
+          fileName = '${AppLocalizations.of(context)!.filenameSchedulePrefix}$cleanName.pdf';
+          subject = AppLocalizations.of(context)!.subjectSchedule;
         } else {
           // This is a substitution plan
           final dayFormatted = widget.dayName!.toLowerCase();
-          fileName = 'LGKA_Vertretungsplan_$dayFormatted.pdf';
-          subject = 'LGKA+ Vertretungsplan';
+          fileName = '${AppLocalizations.of(context)!.filenameSubstitutionPrefix}$dayFormatted.pdf';
+          subject = AppLocalizations.of(context)!.subjectSubstitution;
         }
       } else {
-        fileName = 'LGKA_Dokument.pdf';
-        subject = 'LGKA+ Dokument';
+        fileName = 'LGKA_Document.pdf';
+        subject = 'LGKA+ Document';
       }
 
       // Create a temporary file with the nice name for sharing
@@ -499,14 +500,14 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       // Check if this is a schedule (contains "Klassen" or "J11/J12")
       if (widget.dayName!.contains('Klassen') || widget.dayName!.contains('J11/J12')) {
         // This is a schedule PDF
-        headerTitle = 'Stundenplan';
+        headerTitle = AppLocalizations.of(context)!.scheduleTitle;
       } else {
         // This is a substitution plan - use the day name
         headerTitle = widget.dayName!;
       }
     } else {
       // Fallback to default
-      headerTitle = 'Dokument';
+      headerTitle = AppLocalizations.of(context)!.documentTitle;
     }
 
     return Scaffold(
@@ -539,7 +540,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 Icons.search,
                 color: AppColors.secondaryText,
               ),
-              tooltip: 'Im PDF suchen',
+              tooltip: AppLocalizations.of(context)!.searchInPdf,
             ),
           ] else if (_isSearchBarVisible) ...[
             // Clear search when search bar is visible
@@ -549,7 +550,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 Icons.close,
                 color: AppColors.secondaryText,
               ),
-              tooltip: 'Suche abbrechen',
+              tooltip: AppLocalizations.of(context)!.cancelSearch,
             ),
           ] else if (_searchResults.isNotEmpty) ...[
             // Search navigation
@@ -559,7 +560,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 Icons.arrow_upward,
                 color: AppColors.secondaryText,
               ),
-              tooltip: 'Vorheriges Ergebnis',
+              tooltip: AppLocalizations.of(context)!.previousResult,
             ),
             IconButton(
               onPressed: _nextSearchResult,
@@ -567,7 +568,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 Icons.arrow_downward,
                 color: AppColors.secondaryText,
               ),
-              tooltip: 'Nächstes Ergebnis',
+              tooltip: AppLocalizations.of(context)!.nextResult,
             ),
             IconButton(
               onPressed: _showSearchBar,
@@ -575,7 +576,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 Icons.search,
                 color: AppColors.secondaryText,
               ),
-              tooltip: 'Neue Suche',
+              tooltip: AppLocalizations.of(context)!.newSearch,
             ),
           ],
           IconButton(
@@ -585,7 +586,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               Icons.share_outlined,
               color: AppColors.secondaryText,
             ),
-            tooltip: 'PDF teilen',
+            tooltip: AppLocalizations.of(context)!.sharePdf,
           ),
         ],
       ),
