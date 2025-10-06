@@ -274,4 +274,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get authSubtitle => 'Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst';
+
+  @override
+  String get searchHint => 'Suchbegriff eingeben...';
 }
