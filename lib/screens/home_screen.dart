@@ -736,7 +736,10 @@ class _ErrorView extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: onRetry,
+            onPressed: () async {
+              await HapticService.light();
+              onRetry();
+            },
             icon: const Icon(Icons.refresh),
             label: Text(AppLocalizations.of(context)!.tryAgain),
             style: ElevatedButton.styleFrom(
