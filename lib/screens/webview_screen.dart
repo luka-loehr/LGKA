@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../theme/app_theme.dart';
 import '../providers/haptic_service.dart';
+import '../l10n/app_localizations.dart';
 
 class InAppWebViewScreen extends StatefulWidget {
   final String url;
@@ -75,7 +76,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
           },
         ),
         title: Text(
-          widget.title ?? 'Browser',
+          widget.title ?? AppLocalizations.of(context)!.browserTitle,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.primaryText),
         ),
         centerTitle: true,
@@ -156,7 +157,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Lade Krankmeldung...',
+                        AppLocalizations.of(context)!.loadingSickNote,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppColors.secondaryText,
                         ),
@@ -180,7 +181,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Verbindung zum Server fehlgeschlagen',
+                        AppLocalizations.of(context)!.serverConnectionFailed,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: AppColors.primaryText,
                         ),
@@ -200,7 +201,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                       ElevatedButton.icon(
                         onPressed: _retryLoad,
                         icon: const Icon(Icons.refresh),
-                        label: const Text('Erneut versuchen'),
+                        label: Text(AppLocalizations.of(context)!.tryAgain),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(context).colorScheme.primary,
                           foregroundColor: Colors.white,

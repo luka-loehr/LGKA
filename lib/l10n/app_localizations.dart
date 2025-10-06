@@ -299,6 +299,234 @@ abstract class AppLocalizations {
   /// **'Legal Notice'**
   String get legalLabel;
 
+  /// No description provided for @krankmeldungInfoHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Sick Note Information'**
+  String get krankmeldungInfoHeader;
+
+  /// No description provided for @loadingSickNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading sick note...'**
+  String get loadingSickNote;
+
+  /// No description provided for @loadingWeather.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading weather data...'**
+  String get loadingWeather;
+
+  /// No description provided for @noWeatherData.
+  ///
+  /// In en, this message translates to:
+  /// **'No weather data available'**
+  String get noWeatherData;
+
+  /// No description provided for @temperatureLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get temperatureLabel;
+
+  /// No description provided for @humidityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity'**
+  String get humidityLabel;
+
+  /// No description provided for @windSpeedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind speed'**
+  String get windSpeedLabel;
+
+  /// No description provided for @pressureLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Air pressure'**
+  String get pressureLabel;
+
+  /// No description provided for @temperatureTodayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature today'**
+  String get temperatureTodayTitle;
+
+  /// No description provided for @humidityTodayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity today'**
+  String get humidityTodayTitle;
+
+  /// No description provided for @windSpeedTodayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind speed today'**
+  String get windSpeedTodayTitle;
+
+  /// No description provided for @pressureTodayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Air pressure today'**
+  String get pressureTodayTitle;
+
+  /// No description provided for @yAxisTemperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature (°C)'**
+  String get yAxisTemperature;
+
+  /// No description provided for @yAxisHumidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity (%)'**
+  String get yAxisHumidity;
+
+  /// No description provided for @yAxisWindSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind speed (km/h)'**
+  String get yAxisWindSpeed;
+
+  /// No description provided for @yAxisPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Air pressure (hPa)'**
+  String get yAxisPressure;
+
+  /// No description provided for @timeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get timeLabel;
+
+  /// No description provided for @chartsAvailableAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Charts are available from 0:30 AM.'**
+  String get chartsAvailableAt;
+
+  /// No description provided for @checkingAvailability.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking availability...'**
+  String get checkingAvailability;
+
+  /// No description provided for @loadingSchedules.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading schedules...'**
+  String get loadingSchedules;
+
+  /// No description provided for @noSchedulesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No schedules available'**
+  String get noSchedulesAvailable;
+
+  /// No description provided for @tryAgainLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Please try again later'**
+  String get tryAgainLater;
+
+  /// No description provided for @loadingSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading schedule...'**
+  String get loadingSchedule;
+
+  /// No description provided for @notAvailableYet.
+  ///
+  /// In en, this message translates to:
+  /// **'is not available yet'**
+  String get notAvailableYet;
+
+  /// No description provided for @errorLoadingGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading'**
+  String get errorLoadingGeneric;
+
+  /// No description provided for @browserTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browser'**
+  String get browserTitle;
+
+  /// No description provided for @searchInPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Search in PDF'**
+  String get searchInPdf;
+
+  /// No description provided for @cancelSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel search'**
+  String get cancelSearch;
+
+  /// No description provided for @previousResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous result'**
+  String get previousResult;
+
+  /// No description provided for @nextResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Next result'**
+  String get nextResult;
+
+  /// No description provided for @newSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'New search'**
+  String get newSearch;
+
+  /// No description provided for @sharePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Share PDF'**
+  String get sharePdf;
+
+  /// No description provided for @scheduleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule'**
+  String get scheduleTitle;
+
+  /// No description provided for @documentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get documentTitle;
+
+  /// No description provided for @filenameSchedulePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'LGKA_Schedule_'**
+  String get filenameSchedulePrefix;
+
+  /// No description provided for @subjectSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'LGKA+ Schedule'**
+  String get subjectSchedule;
+
+  /// No description provided for @filenameSubstitutionPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'LGKA_Substitution_'**
+  String get filenameSubstitutionPrefix;
+
+  /// No description provided for @subjectSubstitution.
+  ///
+  /// In en, this message translates to:
+  /// **'LGKA+ Substitution'**
+  String get subjectSubstitution;
+
   /// No description provided for @infoHeader.
   ///
   /// In en, this message translates to:
