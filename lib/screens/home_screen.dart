@@ -10,7 +10,6 @@ import '../providers/app_providers.dart';
 import '../data/pdf_repository.dart';
 import '../data/preferences_manager.dart';
 import '../providers/haptic_service.dart';
-import '../providers/schedule_provider.dart';
 import '../navigation/app_router.dart';
 import '../services/retry_service.dart';
 import 'weather_page.dart';
