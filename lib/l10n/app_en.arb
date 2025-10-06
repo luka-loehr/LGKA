@@ -13,6 +13,7 @@
   "krankmeldungButton": "To Sick Note",
   "serverMaintenance": "Maintenance work in progress",
   "serverConnectionFailed": "Server connection failed",
+  "serverConnectionHint": "This may be due to no internet connection or ongoing maintenance at Lessing-Gymnasium.",
   "tryAgain": "Try again",
   "liveWeatherData": "Live Weather Data",
   "dataBeingCollected": "Data being collected",
