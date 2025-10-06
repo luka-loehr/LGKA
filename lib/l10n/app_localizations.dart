@@ -628,6 +628,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use the credentials you already know from the substitution plan'**
   String get authSubtitle;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter search term...'**
+  String get searchHint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

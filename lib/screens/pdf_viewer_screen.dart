@@ -605,7 +605,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                       focusNode: _searchFocusNode,
                       autofocus: true,
                       decoration: InputDecoration(
-                        hintText: 'Suchbegriff eingeben...',
+                        hintText: AppLocalizations.of(context)!.searchHint,
                         prefixIcon: const Icon(Icons.search, color: AppColors.secondaryText),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),

@@ -92,4 +92,6 @@
   "login": "Anmelden",
   "authTitle": "Anmeldung erforderlich",
   "authSubtitle": "Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst"
+  ,
+  "searchHint": "Suchbegriff eingeben..."
 } 
