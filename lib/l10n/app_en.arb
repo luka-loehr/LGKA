@@ -88,4 +88,8 @@
   "yourAccentColor": "Your accent color",
   "chooseFavoriteColor": "Choose your favorite color. It will be used throughout the app.",
   "letsGo": "Let's go!"
+  ,
+  "username": "Username",
+  "password": "Password",
+  "login": "Log in"
 } 
