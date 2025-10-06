@@ -6,5 +6,16 @@
   "weather": "Wetter",
   "schedule": "Stundenplan",
   "legal": "Impressum",
-  "privacy": "Datenschutz"
+  "privacy": "Datenschutz",
+  "krankmeldung": "Krankmeldung",
+  "krankmeldungDisclaimer": "Die Krankmeldung wird vom Lessing-Gymnasium bereitgestellt und ist unabhängig von der LGKA+ App.",
+  "krankmeldungContact": "Bei technischen Fragen oder Problemen wende dich bitte direkt an das Lessing-Gymnasium Karlsruhe.",
+  "krankmeldungButton": "Zur Krankmeldung",
+  "serverMaintenance": "Reparaturarbeiten werden durchgeführt",
+  "serverConnectionFailed": "Serververbindung fehlgeschlagen",
+  "tryAgain": "Erneut versuchen",
+  "liveWeatherData": "Live Wetterdaten",
+  "dataBeingCollected": "Daten werden gesammelt",
+  "liveWeatherDescription": "Direkt von der schuleigenen Wetterstation auf dem Dach. Echtzeit-Daten von deiner Schule!",
+  "dataCollectionDescription": "Die Wetterstation sammelt gerade neue Daten für heute. Diagramme sind ab 0:30 Uhr verfügbar."
 } 

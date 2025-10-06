@@ -107,10 +107,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
       theme: theme,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
-      locale: const Locale('de', 'DE'),
-      supportedLocales: const [
-        Locale('de', 'DE'),
-      ],
+      supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
