@@ -95,4 +95,6 @@
   ,
   "authTitle": "Authentication required",
   "authSubtitle": "Use the credentials you already know from the substitution plan"
+  ,
+  "searchHint": "Enter search term..."
 } 

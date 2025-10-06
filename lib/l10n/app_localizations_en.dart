@@ -274,4 +274,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authSubtitle => 'Use the credentials you already know from the substitution plan';
+
+  @override
+  String get searchHint => 'Enter search term...';
 }
