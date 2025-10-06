@@ -188,16 +188,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      if (kDebugMode && _errorText != null && _errorText!.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          _errorText!,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.secondaryText,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                      // Intentionally hide raw error details in all builds (debug/release)
                       const SizedBox(height: 24),
                       ElevatedButton.icon(
                         onPressed: _retryLoad,
