@@ -214,6 +214,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
           _forceShowErrorUntilSuccess = false;
         });
       }
+      // Light haptic to signal data loaded successfully
+      HapticService.light();
     }
 
     // Trigger chart rendering when data becomes available
