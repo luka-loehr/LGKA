@@ -241,7 +241,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () async {
-              await ref.read(scheduleProvider.notifier).refreshSchedules();
+              // Use centralized retry to refresh weather, substitution PDFs, and schedules
+              ref.read(retryServiceProvider).retryAllDataSources();
               await _checkScheduleAvailability();
             },
             icon: const Icon(Icons.refresh),
