@@ -871,7 +871,7 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
   }
 
   Widget _buildContent(bool isDisabled, bool hasError, bool isLoading) {
-    final weekday = widget.pdfState.weekday ?? '';
+    String weekday = widget.pdfState.weekday ?? '';
     final date = widget.pdfState.date ?? '';
     
     String displayText;
@@ -880,6 +880,22 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
     } else if (weekday.isEmpty || weekday == 'weekend') {
       displayText = AppLocalizations.of(context)!.noInfoYet;
     } else {
+      // Translate German weekday names to English for display if needed
+      final localeCode = Localizations.localeOf(context).languageCode;
+      if (localeCode == 'en') {
+        const Map<String, String> germanToEnglishWeekday = {
+          'Montag': 'Monday',
+          'Dienstag': 'Tuesday',
+          'Mittwoch': 'Wednesday',
+          'Donnerstag': 'Thursday',
+          'Freitag': 'Friday',
+          'Samstag': 'Saturday',
+          'Sonntag': 'Sunday',
+        };
+        if (germanToEnglishWeekday.containsKey(weekday)) {
+          weekday = germanToEnglishWeekday[weekday]!;
+        }
+      }
       displayText = weekday;
     }
 
