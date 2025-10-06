@@ -111,6 +111,120 @@ class AppLocalizationsEn extends AppLocalizations {
   String get legalLabel => 'Legal Notice';
 
   @override
+  String get krankmeldungInfoHeader => 'Sick Note Information';
+
+  @override
+  String get loadingSickNote => 'Loading sick note...';
+
+  @override
+  String get loadingWeather => 'Loading weather data...';
+
+  @override
+  String get noWeatherData => 'No weather data available';
+
+  @override
+  String get temperatureLabel => 'Temperature';
+
+  @override
+  String get humidityLabel => 'Humidity';
+
+  @override
+  String get windSpeedLabel => 'Wind speed';
+
+  @override
+  String get pressureLabel => 'Air pressure';
+
+  @override
+  String get temperatureTodayTitle => 'Temperature today';
+
+  @override
+  String get humidityTodayTitle => 'Humidity today';
+
+  @override
+  String get windSpeedTodayTitle => 'Wind speed today';
+
+  @override
+  String get pressureTodayTitle => 'Air pressure today';
+
+  @override
+  String get yAxisTemperature => 'Temperature (°C)';
+
+  @override
+  String get yAxisHumidity => 'Humidity (%)';
+
+  @override
+  String get yAxisWindSpeed => 'Wind speed (km/h)';
+
+  @override
+  String get yAxisPressure => 'Air pressure (hPa)';
+
+  @override
+  String get timeLabel => 'Time';
+
+  @override
+  String get chartsAvailableAt => 'Charts are available from 0:30 AM.';
+
+  @override
+  String get checkingAvailability => 'Checking availability...';
+
+  @override
+  String get loadingSchedules => 'Loading schedules...';
+
+  @override
+  String get noSchedulesAvailable => 'No schedules available';
+
+  @override
+  String get tryAgainLater => 'Please try again later';
+
+  @override
+  String get loadingSchedule => 'Loading schedule...';
+
+  @override
+  String get notAvailableYet => 'is not available yet';
+
+  @override
+  String get errorLoadingGeneric => 'Error loading';
+
+  @override
+  String get browserTitle => 'Browser';
+
+  @override
+  String get searchInPdf => 'Search in PDF';
+
+  @override
+  String get cancelSearch => 'Cancel search';
+
+  @override
+  String get previousResult => 'Previous result';
+
+  @override
+  String get nextResult => 'Next result';
+
+  @override
+  String get newSearch => 'New search';
+
+  @override
+  String get sharePdf => 'Share PDF';
+
+  @override
+  String get scheduleTitle => 'Schedule';
+
+  @override
+  String get documentTitle => 'Document';
+
+  @override
+  String get filenameSchedulePrefix => 'LGKA_Schedule_';
+
+  @override
+  String get subjectSchedule => 'LGKA+ Schedule';
+
+  @override
+  String get filenameSubstitutionPrefix => 'LGKA_Substitution_';
+
+  @override
+  String get subjectSubstitution => 'LGKA+ Substitution';
+
+  @override
   String get infoHeader => 'What can you do with the app?';
 
   @override

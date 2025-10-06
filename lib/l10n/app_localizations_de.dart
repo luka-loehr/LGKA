@@ -111,6 +111,120 @@ class AppLocalizationsDe extends AppLocalizations {
   String get legalLabel => 'Impressum';
 
   @override
+  String get krankmeldungInfoHeader => 'Hinweis zur Krankmeldung';
+
+  @override
+  String get loadingSickNote => 'Lade Krankmeldung...';
+
+  @override
+  String get loadingWeather => 'Lade Wetterdaten...';
+
+  @override
+  String get noWeatherData => 'Keine Wetterdaten verfügbar';
+
+  @override
+  String get temperatureLabel => 'Temperatur';
+
+  @override
+  String get humidityLabel => 'Luftfeuchtigkeit';
+
+  @override
+  String get windSpeedLabel => 'Windgeschwindigkeit';
+
+  @override
+  String get pressureLabel => 'Luftdruck';
+
+  @override
+  String get temperatureTodayTitle => 'Temperaturverlauf heute';
+
+  @override
+  String get humidityTodayTitle => 'Luftfeuchtigkeitsverlauf heute';
+
+  @override
+  String get windSpeedTodayTitle => 'Windgeschwindigkeitsverlauf heute';
+
+  @override
+  String get pressureTodayTitle => 'Luftdruckverlauf heute';
+
+  @override
+  String get yAxisTemperature => 'Temperatur (°C)';
+
+  @override
+  String get yAxisHumidity => 'Luftfeuchtigkeit (%)';
+
+  @override
+  String get yAxisWindSpeed => 'Windgeschwindigkeit (km/h)';
+
+  @override
+  String get yAxisPressure => 'Luftdruck (hPa)';
+
+  @override
+  String get timeLabel => 'Uhrzeit';
+
+  @override
+  String get chartsAvailableAt => 'Diagramme sind ab 0:30 Uhr verfügbar.';
+
+  @override
+  String get checkingAvailability => 'Prüfe Verfügbarkeit...';
+
+  @override
+  String get loadingSchedules => 'Lade Stundenpläne...';
+
+  @override
+  String get noSchedulesAvailable => 'Keine Stundenpläne verfügbar';
+
+  @override
+  String get tryAgainLater => 'Versuche es später erneut';
+
+  @override
+  String get loadingSchedule => 'Lade Stundenplan...';
+
+  @override
+  String get notAvailableYet => 'ist noch nicht verfügbar';
+
+  @override
+  String get errorLoadingGeneric => 'Fehler beim Laden';
+
+  @override
+  String get browserTitle => 'Browser';
+
+  @override
+  String get searchInPdf => 'Im PDF suchen';
+
+  @override
+  String get cancelSearch => 'Suche abbrechen';
+
+  @override
+  String get previousResult => 'Vorheriges Ergebnis';
+
+  @override
+  String get nextResult => 'Nächstes Ergebnis';
+
+  @override
+  String get newSearch => 'Neue Suche';
+
+  @override
+  String get sharePdf => 'PDF teilen';
+
+  @override
+  String get scheduleTitle => 'Stundenplan';
+
+  @override
+  String get documentTitle => 'Dokument';
+
+  @override
+  String get filenameSchedulePrefix => 'LGKA_Stundenplan_';
+
+  @override
+  String get subjectSchedule => 'LGKA+ Stundenplan';
+
+  @override
+  String get filenameSubstitutionPrefix => 'LGKA_Vertretungsplan_';
+
+  @override
+  String get subjectSubstitution => 'LGKA+ Vertretungsplan';
+
+  @override
   String get infoHeader => 'Was kannst du mit der App machen?';
 
   @override
