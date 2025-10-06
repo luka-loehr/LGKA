@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
 import '../services/retry_service.dart';
 import '../providers/haptic_service.dart';
+import '../l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -238,8 +239,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                         const SizedBox(height: 16),
                         Text(
                           shouldShowStaleDataError 
-                            ? 'Reparaturarbeiten werden durchgeführt'
-                            : 'Serververbindung fehlgeschlagen',
+                            ? AppLocalizations.of(context)!.serverMaintenance
+                            : AppLocalizations.of(context)!.serverConnectionFailed,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: AppColors.primaryText,
                           ),
@@ -249,7 +250,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                         ElevatedButton.icon(
                           onPressed: _refreshData,
                           icon: const Icon(Icons.refresh),
-                          label: const Text('Erneut versuchen'),
+                          label: Text(AppLocalizations.of(context)!.tryAgain),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Theme.of(context).colorScheme.primary,
                             foregroundColor: Colors.white,
@@ -304,8 +305,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                     children: [
                                       Text(
                                         _isChartAvailable()
-                                          ? 'Live Wetterdaten'
-                                          : 'Daten werden gesammelt',
+                                          ? AppLocalizations.of(context)!.liveWeatherData
+                                          : AppLocalizations.of(context)!.dataBeingCollected,
                                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                           color: _isChartAvailable() 
                                             ? Theme.of(context).colorScheme.primary
@@ -316,8 +317,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       const SizedBox(height: 6),
                                       Text(
                                         _isChartAvailable()
-                                          ? 'Direkt von der schuleigenen Wetterstation auf dem Dach. Echtzeit-Daten von deiner Schule!'
-                                          : 'Die Wetterstation sammelt gerade neue Daten für heute. Diagramme sind ab 0:30 Uhr verfügbar.',
+                                          ? AppLocalizations.of(context)!.liveWeatherDescription
+                                          : AppLocalizations.of(context)!.dataCollectionDescription,
                                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                           color: AppColors.secondaryText,
                                           height: 1.4,

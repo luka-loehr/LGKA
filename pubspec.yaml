@@ -102,7 +102,7 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   
-  # Localization - German only
+  # Localization - German and English
   generate: true
   uses-material-design: true
 
