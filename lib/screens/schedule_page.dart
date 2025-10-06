@@ -31,6 +31,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   DateTime? _lastAvailabilityCheck;
   static const Duration _availabilityCheckInterval = Duration(minutes: 15);
   bool _wasSchedulesLoading = true;
+  bool _didShowInitialSpinner = false; // true once initial loading spinner was shown
+  bool _didVibrateOnInitialLoad = false; // ensure single haptic on first successful load
 
   @override
   void initState() {
@@ -144,7 +146,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   @override
   Widget build(BuildContext context) {
     final scheduleState = ref.watch(scheduleProvider);
-    // Remove early haptic; we'll vibrate once when buttons appear
+    // Track if initial spinner ever appeared in this page lifetime
+    if (scheduleState.isLoading) {
+      _didShowInitialSpinner = true;
+    }
     _wasSchedulesLoading = scheduleState.isLoading;
 
     return Scaffold(
@@ -214,12 +219,14 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
 
     // Start animation when buttons should be visible
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final hadAny = _availableFirstHalbjahr.isNotEmpty || _availableSecondHalbjahr.isNotEmpty;
-      if (hadAny) {
-        if (!_hasShownButtons) {
-          _hasShownButtons = true;
-          _fadeController.forward();
-          HapticService.light(); // single, when list first appears
+      final hasAnyButtons = _availableFirstHalbjahr.isNotEmpty || _availableSecondHalbjahr.isNotEmpty;
+      if (hasAnyButtons && !_hasShownButtons) {
+        _hasShownButtons = true;
+        _fadeController.forward();
+        // Vibrate only once per app launch after the initial spinner has been shown
+        if (_didShowInitialSpinner && !_didVibrateOnInitialLoad) {
+          _didVibrateOnInitialLoad = true;
+          HapticService.light();
         }
       }
     });
