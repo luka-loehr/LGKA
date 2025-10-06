@@ -179,6 +179,7 @@ class PdfRepository extends ChangeNotifier {
   /// Retry loading both PDFs
   Future<void> retryAll() async {
     await _loadBothPdfs();
+    // Optional: consumers (e.g., HomeScreen) can provide haptic on success when states become displayable
   }
 
   /// Refresh all PDFs (force reload)
