@@ -144,13 +144,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   @override
   Widget build(BuildContext context) {
     final scheduleState = ref.watch(scheduleProvider);
-    // Fire haptic AFTER schedules finish loading (not after availability check)
-    final justFinishedLoading = _wasSchedulesLoading && !scheduleState.isLoading;
-    if (justFinishedLoading) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await HapticService.light();
-      });
-    }
+    // Remove early haptic; we'll vibrate once when buttons appear
     _wasSchedulesLoading = scheduleState.isLoading;
 
     return Scaffold(
@@ -220,7 +214,14 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
 
     // Start animation when buttons should be visible
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startButtonAnimation();
+      final hadAny = _availableFirstHalbjahr.isNotEmpty || _availableSecondHalbjahr.isNotEmpty;
+      if (hadAny) {
+        if (!_hasShownButtons) {
+          _hasShownButtons = true;
+          _fadeController.forward();
+          HapticService.light(); // single, when list first appears
+        }
+      }
     });
 
     return FadeTransition(
