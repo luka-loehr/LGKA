@@ -241,16 +241,16 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                           shouldShowStaleDataError 
                             ? AppLocalizations.of(context)!.serverMaintenance
                             : AppLocalizations.of(context)!.serverConnectionFailed,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: AppColors.primaryText,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                         const SizedBox(height: 8),
                         Text(
                           AppLocalizations.of(context)!.serverConnectionHint,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppColors.secondaryText,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppColors.primaryText,
                           ),
                           textAlign: TextAlign.center,
                         ),
