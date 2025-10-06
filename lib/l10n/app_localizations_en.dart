@@ -259,4 +259,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get letsGo => 'Let\'s go!';
+
+  @override
+  String get username => 'Username';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get login => 'Log in';
+
+  @override
+  String get authTitle => 'Authentication required';
+
+  @override
+  String get authSubtitle => 'Use the credentials you already know from the substitution plan';
 }
