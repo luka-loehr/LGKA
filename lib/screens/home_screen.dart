@@ -32,6 +32,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     _initializeData();
+
+    // Haptic feedback when substitution data finishes loading and is available
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.listen(pdfRepositoryProvider, (previous, next) {
+        final wasLoading = previous?.isLoading ?? true;
+        final isNowLoaded = !next.isLoading && next.hasAnyData;
+        if (wasLoading && isNowLoaded) {
+          HapticService.light();
+        }
+      });
+    });
   }
 
   @override
@@ -258,7 +269,10 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
 
     if (pdfRepo.hasAnyError && !pdfRepo.hasAnyData) {
       return _ErrorView(
-        onRetry: () => ref.read(retryServiceProvider).retryAllDataSources(),
+        onRetry: () {
+          HapticService.light();
+          ref.read(retryServiceProvider).retryAllDataSources();
+        },
       );
     }
 
@@ -295,14 +309,20 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
           pdfState: pdfRepo.todayState,
           label: AppLocalizations.of(context)!.today,
           onTap: () => _openPdf(pdfRepo, true),
-          onRetry: () => ref.read(retryServiceProvider).retryAllDataSources(),
+          onRetry: () {
+            HapticService.light();
+            ref.read(retryServiceProvider).retryAllDataSources();
+          },
         ),
         const SizedBox(height: 16),
         _PlanOptionButton(
           pdfState: pdfRepo.tomorrowState,
           label: AppLocalizations.of(context)!.tomorrow,
           onTap: () => _openPdf(pdfRepo, false),
-          onRetry: () => ref.read(retryServiceProvider).retryAllDataSources(),
+          onRetry: () {
+            HapticService.light();
+            ref.read(retryServiceProvider).retryAllDataSources();
+          },
         ),
       ],
     );
