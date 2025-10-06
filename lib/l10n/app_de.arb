@@ -86,5 +86,10 @@
   "filenameSchedulePrefix": "LGKA_Stundenplan_",
   "subjectSchedule": "LGKA+ Stundenplan",
   "filenameSubstitutionPrefix": "LGKA_Vertretungsplan_",
-  "subjectSubstitution": "LGKA+ Vertretungsplan"
+  "subjectSubstitution": "LGKA+ Vertretungsplan",
+  "username": "Benutzername",
+  "password": "Passwort",
+  "login": "Anmelden",
+  "authTitle": "Anmeldung erforderlich",
+  "authSubtitle": "Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst"
 } 

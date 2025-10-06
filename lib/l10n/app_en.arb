@@ -92,4 +92,7 @@
   "username": "Username",
   "password": "Password",
   "login": "Log in"
+  ,
+  "authTitle": "Authentication required",
+  "authSubtitle": "Use the credentials you already know from the substitution plan"
 } 
