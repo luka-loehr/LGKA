@@ -216,9 +216,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                     valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Lade Wetterdaten...',
-                    style: TextStyle(color: AppColors.secondaryText),
+                  Text(
+                    AppLocalizations.of(context)!.loadingWeather,
+                    style: const TextStyle(color: AppColors.secondaryText),
                   ),
                 ],
               ),
@@ -266,9 +266,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                 )
               : weatherState.chartData.isEmpty
                   ? Center(
-                      child: const Text(
-                        'Keine Wetterdaten verfügbar',
-                        style: TextStyle(color: AppColors.secondaryText),
+                      child: Text(
+                        AppLocalizations.of(context)!.noWeatherData,
+                        style: const TextStyle(color: AppColors.secondaryText),
                       ),
                     )
                   : Builder(
@@ -371,7 +371,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                               mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
                                                 Text(
-                                                  'Temperatur',
+                                                  AppLocalizations.of(context)!.temperatureLabel,
                                                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                                     color: _selectedChart == ChartType.temperature
                                                         ? Theme.of(context).colorScheme.primary
@@ -435,7 +435,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                               mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
                                                 Text(
-                                                  'Luftfeuchtigkeit',
+                                                  AppLocalizations.of(context)!.humidityLabel,
                                                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                                     color: _selectedChart == ChartType.humidity
                                                         ? Theme.of(context).colorScheme.primary
@@ -504,7 +504,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                               mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
                                                 Text(
-                                                  'Windgeschwindigkeit',
+                                                  AppLocalizations.of(context)!.windSpeedLabel,
                                                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                                     color: _selectedChart == ChartType.windSpeed
                                                         ? Theme.of(context).colorScheme.primary
@@ -568,7 +568,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                               mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
                                                 Text(
-                                                  'Luftdruck',
+                                                  AppLocalizations.of(context)!.pressureLabel,
                                                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                                     color: _selectedChart == ChartType.pressure
                                                         ? Theme.of(context).colorScheme.primary
@@ -653,7 +653,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                                         fontSize: 11,
                                                       ),
                                                       title: AxisTitle(
-                                                        text: 'Uhrzeit',
+                                                        text: AppLocalizations.of(context)!.timeLabel,
                                                         textStyle: TextStyle(
                                                           color: AppColors.secondaryText,
                                                           fontSize: 12,
@@ -827,15 +827,15 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   String _getChartTitle() {
     switch (_selectedChart) {
       case ChartType.temperature:
-        return 'Temperaturverlauf heute';
+        return AppLocalizations.of(context)!.temperatureTodayTitle;
       case ChartType.humidity:
-        return 'Luftfeuchtigkeitsverlauf heute';
+        return AppLocalizations.of(context)!.humidityTodayTitle;
       case ChartType.windSpeed:
-        return 'Windgeschwindigkeitsverlauf heute';
+        return AppLocalizations.of(context)!.windSpeedTodayTitle;
       case ChartType.pressure:
-        return 'Luftdruckverlauf heute';
+        return AppLocalizations.of(context)!.pressureTodayTitle;
     }
-    return 'Wetterverlauf heute'; // Default fallback
+    return AppLocalizations.of(context)!.liveWeatherData; // Fallback
   }
   
   String _getTooltipFormat() {
@@ -855,15 +855,15 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   String _getYAxisTitle() {
     switch (_selectedChart) {
       case ChartType.temperature:
-        return 'Temperatur (°C)';
+        return AppLocalizations.of(context)!.yAxisTemperature;
       case ChartType.humidity:
-        return 'Luftfeuchtigkeit (%)';
+        return AppLocalizations.of(context)!.yAxisHumidity;
       case ChartType.windSpeed:
-        return 'Windgeschwindigkeit (km/h)';
+        return AppLocalizations.of(context)!.yAxisWindSpeed;
       case ChartType.pressure:
-        return 'Luftdruck (hPa)';
+        return AppLocalizations.of(context)!.yAxisPressure;
     }
-    return 'Wert'; // Default fallback
+    return AppLocalizations.of(context)!.liveWeatherData; // Fallback
   }
   
   double _getYValue(WeatherData data) {
@@ -971,9 +971,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     final now = DateTime.now();
     if (now.hour == 0 && now.minute < 30) {
       final minutesLeft = 30 - now.minute;
-      return 'Diagramme sind ab 0:30 Uhr verfügbar.\nNoch $minutesLeft Minute${minutesLeft == 1 ? '' : 'n'} warten.';
+      return AppLocalizations.of(context)!.chartsAvailableAt;
     }
-    return 'Diagramme sind ab 0:30 Uhr verfügbar.';
+    return AppLocalizations.of(context)!.chartsAvailableAt;
   }
 
   Widget _buildFooter(BuildContext context) {
