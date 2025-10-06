@@ -48,6 +48,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get serverConnectionFailed => 'Serververbindung fehlgeschlagen';
 
   @override
+  String get serverConnectionHint => 'Möglicherweise besteht keine Internetverbindung oder es finden gerade Wartungsarbeiten am Lessing-Gymnasium statt.';
+
+  @override
   String get tryAgain => 'Erneut versuchen';
 
   @override

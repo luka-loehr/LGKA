@@ -173,6 +173,12 @@ abstract class AppLocalizations {
   /// **'Server connection failed'**
   String get serverConnectionFailed;
 
+  /// No description provided for @serverConnectionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This may be due to no internet connection or ongoing maintenance at Lessing-Gymnasium.'**
+  String get serverConnectionHint;
+
   /// No description provided for @tryAgain.
   ///
   /// In en, this message translates to:
