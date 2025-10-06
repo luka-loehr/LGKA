@@ -314,7 +314,23 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     // Get the PDF file and actual weekday from the PDF state
     final pdfFile = pdfRepo.getPdfFile(isToday);
     final pdfState = isToday ? pdfRepo.todayState : pdfRepo.tomorrowState;
-    final weekday = pdfState.weekday ?? (isToday ? AppLocalizations.of(context)!.today : AppLocalizations.of(context)!.tomorrow);
+    String weekday = pdfState.weekday ?? (isToday ? AppLocalizations.of(context)!.today : AppLocalizations.of(context)!.tomorrow);
+    // Translate German weekdays to English for display when locale is English
+    final localeCode = Localizations.localeOf(context).languageCode;
+    if (localeCode == 'en') {
+      const Map<String, String> germanToEnglishWeekday = {
+        'Montag': 'Monday',
+        'Dienstag': 'Tuesday',
+        'Mittwoch': 'Wednesday',
+        'Donnerstag': 'Thursday',
+        'Freitag': 'Friday',
+        'Samstag': 'Saturday',
+        'Sonntag': 'Sunday',
+      };
+      if (germanToEnglishWeekday.containsKey(weekday)) {
+        weekday = germanToEnglishWeekday[weekday]!;
+      }
+    }
     
     if (pdfFile != null) {
       // Navigate to PDF viewer screen
@@ -953,7 +969,7 @@ class _SettingsSheet extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Einstellungen',
+                AppLocalizations.of(context)!.settings,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: AppColors.appOnSurface,
                   fontWeight: FontWeight.bold,
@@ -1000,7 +1016,7 @@ class _SettingsSheet extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Akzentfarbe',
+          AppLocalizations.of(context)!.accentColor,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: AppColors.primaryText,
                 fontWeight: FontWeight.w600,
@@ -1008,7 +1024,7 @@ class _SettingsSheet extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Wähle deine bevorzugte Akzentfarbe',
+          AppLocalizations.of(context)!.chooseAccentColor,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppColors.secondaryText,
               ),
@@ -1073,14 +1089,14 @@ class _SettingsSheet extends ConsumerWidget {
         _buildLegalLink(
           context,
           Icons.privacy_tip_outlined, 
-          'Datenschutzerklärung', 
+          AppLocalizations.of(context)!.privacyLabel, 
           'https://luka-loehr.github.io/LGKA/privacy.html'
         ),
         const SizedBox(height: 12),
         _buildLegalLink(
           context,
           Icons.info_outline, 
-          'Impressum', 
+          AppLocalizations.of(context)!.legalLabel, 
           'https://luka-loehr.github.io/LGKA/impressum.html'
         ),
       ],
