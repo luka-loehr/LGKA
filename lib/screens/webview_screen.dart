@@ -199,7 +199,10 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                       // Intentionally hide raw error details in all builds (debug/release)
                       const SizedBox(height: 24),
                       ElevatedButton.icon(
-                        onPressed: _retryLoad,
+                        onPressed: () async {
+                          await HapticService.light();
+                          _retryLoad();
+                        },
                         icon: const Icon(Icons.refresh),
                         label: Text(AppLocalizations.of(context)!.tryAgain),
                         style: ElevatedButton.styleFrom(
