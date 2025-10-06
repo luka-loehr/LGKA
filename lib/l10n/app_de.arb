@@ -21,7 +21,7 @@
   ,
   "welcomeHeadline": "Willkommen!",
   "welcomeSubtitle": "Bei der neuen App fürs Lessing-Gymnasium Karlsruhe.",
-  "continue": "Weiter",
+  "continueLabel": "Weiter",
   "today": "Heute",
   "tomorrow": "Morgen",
   "loadingSubstitutions": "Lade Vertretungspläne...",

@@ -69,7 +69,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get welcomeSubtitle => 'Bei der neuen App fürs Lessing-Gymnasium Karlsruhe.';
 
   @override
-  String get continue => 'Weiter';
+  String get continueLabel => 'Weiter';
 
   @override
   String get today => 'Heute';

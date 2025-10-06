@@ -69,7 +69,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeSubtitle => 'Welcome to the new app for Lessing-Gymnasium Karlsruhe.';
 
   @override
-  String get continue => 'Continue';
+  String get continueLabel => 'Continue';
 
   @override
   String get today => 'Today';
