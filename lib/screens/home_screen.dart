@@ -14,6 +14,7 @@ import '../navigation/app_router.dart';
 import '../services/retry_service.dart';
 import 'weather_page.dart';
 import 'schedule_page.dart';
+import '../l10n/app_localizations.dart';
 
 /// Main home screen with substitution plan and weather tabs
 class HomeScreen extends ConsumerStatefulWidget {
@@ -106,9 +107,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildSegmentedButton(0, 'Vertretungsplan', Icons.calendar_today),
-          _buildSegmentedButton(1, 'Wetter', Icons.wb_sunny_outlined),
-          _buildSegmentedButton(2, 'Stundenplan', Icons.schedule),
+          _buildSegmentedButton(0, AppLocalizations.of(context)!.substitutionPlan, Icons.calendar_today),
+          _buildSegmentedButton(1, AppLocalizations.of(context)!.weather, Icons.wb_sunny_outlined),
+          _buildSegmentedButton(2, AppLocalizations.of(context)!.schedule, Icons.schedule),
         ],
       ),
     );
@@ -292,14 +293,14 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
       children: [
         _PlanOptionButton(
           pdfState: pdfRepo.todayState,
-          label: 'Heute',
+          label: AppLocalizations.of(context)!.today,
           onTap: () => _openPdf(pdfRepo, true),
           onRetry: () => ref.read(retryServiceProvider).retryAllDataSources(),
         ),
         const SizedBox(height: 16),
         _PlanOptionButton(
           pdfState: pdfRepo.tomorrowState,
-          label: 'Morgen',
+          label: AppLocalizations.of(context)!.tomorrow,
           onTap: () => _openPdf(pdfRepo, false),
           onRetry: () => ref.read(retryServiceProvider).retryAllDataSources(),
         ),
@@ -673,9 +674,9 @@ class _LoadingView extends StatelessWidget {
             valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Lade Vertretungspläne...',
-            style: TextStyle(color: AppColors.secondaryText),
+          Text(
+            AppLocalizations.of(context)!.loadingSubstitutions,
+            style: const TextStyle(color: AppColors.secondaryText),
           ),
         ],
       ),
@@ -703,7 +704,7 @@ class _ErrorView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Serververbindung fehlgeschlagen',
+            AppLocalizations.of(context)!.serverConnectionFailed,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: AppColors.primaryText,
             ),
@@ -713,7 +714,7 @@ class _ErrorView extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh),
-            label: const Text('Erneut versuchen'),
+            label: Text(AppLocalizations.of(context)!.tryAgain),
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
@@ -859,9 +860,9 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
     
     String displayText;
     if (hasError) {
-      displayText = 'Fehler beim Laden';
+      displayText = AppLocalizations.of(context)!.errorLoading;
     } else if (weekday.isEmpty || weekday == 'weekend') {
-      displayText = 'Noch keine Infos';
+      displayText = AppLocalizations.of(context)!.noInfoYet;
     } else {
       displayText = weekday;
     }

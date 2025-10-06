@@ -7,6 +7,7 @@ import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
 import '../navigation/app_router.dart';
 import '../providers/haptic_service.dart';
+import '../l10n/app_localizations.dart';
 
 class InfoScreen extends ConsumerStatefulWidget {
   const InfoScreen({super.key});
@@ -28,25 +29,57 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
   final List<Map<String, dynamic>> _features = [
     {
       'icon': Icons.calendar_today,
-      'title': 'Vertretungsplan',
-      'description': 'Aktueller Vertretungsplan für heute/morgen',
+      'titleKey': 'featureSubstitutionTitle',
+      'descKey': 'featureSubstitutionDesc',
     },
     {
       'icon': Icons.schedule,
-      'title': 'Stundenplan',
-      'description': 'Stundenplan fürs 1./2. Halbjahr',
+      'titleKey': 'featureScheduleTitle',
+      'descKey': 'featureScheduleDesc',
     },
     {
       'icon': Icons.cloud,
-      'title': 'Wetterdaten',
-      'description': 'Zugriff auf die eigene Wetterstation der Schule',
+      'titleKey': 'featureWeatherTitle',
+      'descKey': 'featureWeatherDesc',
     },
     {
       'icon': Icons.sick,
-      'title': 'Krankmeldung',
-      'description': 'Krankmeldung direkt über die App einreichen',
+      'titleKey': 'featureSickTitle',
+      'descKey': 'featureSickDesc',
     },
   ];
+
+  String _resolveTitle(BuildContext context, String key) {
+    final l = AppLocalizations.of(context)!;
+    switch (key) {
+      case 'featureSubstitutionTitle':
+        return l.featureSubstitutionTitle;
+      case 'featureScheduleTitle':
+        return l.featureScheduleTitle;
+      case 'featureWeatherTitle':
+        return l.featureWeatherTitle;
+      case 'featureSickTitle':
+        return l.featureSickTitle;
+      default:
+        return '';
+    }
+  }
+
+  String _resolveDesc(BuildContext context, String key) {
+    final l = AppLocalizations.of(context)!;
+    switch (key) {
+      case 'featureSubstitutionDesc':
+        return l.featureSubstitutionDesc;
+      case 'featureScheduleDesc':
+        return l.featureScheduleDesc;
+      case 'featureWeatherDesc':
+        return l.featureWeatherDesc;
+      case 'featureSickDesc':
+        return l.featureSickDesc;
+      default:
+        return '';
+    }
+  }
 
   final List<Map<String, dynamic>> _accentColors = [
     {'name': 'blue', 'color': AppColors.getAccentColor('blue')},
@@ -168,7 +201,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                     children: [
                       // Header
                       Text(
-                        'Was kannst du mit der App machen?',
+                        AppLocalizations.of(context)!.infoHeader,
                         style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -188,7 +221,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
 
                               // Accent Color Section
                               Text(
-                                'Deine Akzentfarbe',
+                                AppLocalizations.of(context)!.yourAccentColor,
                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.primaryText,
@@ -198,7 +231,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                               const SizedBox(height: 8),
 
                               Text(
-                                'Wähle deine Lieblingsfarbe aus. Diese wird überall in der App verwendet.',
+                                AppLocalizations.of(context)!.chooseFavoriteColor,
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: AppColors.secondaryText,
                                   height: 1.4,
@@ -264,7 +297,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                                     ),
                                   )
                                 : Text(
-                                    'Los geht\'s!',
+                                    AppLocalizations.of(context)!.letsGo,
                                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
@@ -319,7 +352,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    feature['title'] as String,
+                    _resolveTitle(context, feature['titleKey'] as String),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: AppColors.primaryText,
@@ -327,7 +360,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    feature['description'] as String,
+                    _resolveDesc(context, feature['descKey'] as String),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.secondaryText,
                       height: 1.3,

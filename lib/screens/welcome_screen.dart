@@ -7,6 +7,7 @@ import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
 import '../navigation/app_router.dart';
 import '../providers/haptic_service.dart';
+import '../l10n/app_localizations.dart';
 
 class WelcomeScreen extends ConsumerStatefulWidget {
   const WelcomeScreen({super.key});
@@ -92,7 +93,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                 const SizedBox(height: 16),
                 
                 Text(
-                  'Willkommen!',
+                  AppLocalizations.of(context)!.welcomeHeadline,
                   style: Theme.of(context).textTheme.headlineLarge,
                   textAlign: TextAlign.center,
                 ),
@@ -100,7 +101,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                 const SizedBox(height: 16),
                 
                 Text(
-                  'Bei der neuen App fürs Lessing-Gymnasium Karlsruhe.',
+                  AppLocalizations.of(context)!.welcomeSubtitle,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: AppColors.secondaryText,
                   ),
@@ -137,7 +138,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                                 ),
                               )
                             : Text(
-                                'Weiter',
+                                AppLocalizations.of(context)!.continue_,
                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
