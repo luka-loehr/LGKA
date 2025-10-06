@@ -8,6 +8,7 @@ import '../providers/schedule_provider.dart';
 import '../providers/haptic_service.dart';
 import '../theme/app_theme.dart';
 import '../services/schedule_service.dart';
+import '../services/retry_service.dart';
 import '../l10n/app_localizations.dart';
 
 class SchedulePage extends ConsumerStatefulWidget {
