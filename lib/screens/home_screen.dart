@@ -10,6 +10,7 @@ import '../providers/app_providers.dart';
 import '../data/pdf_repository.dart';
 import '../data/preferences_manager.dart';
 import '../providers/haptic_service.dart';
+import '../providers/schedule_provider.dart';
 import '../navigation/app_router.dart';
 import '../services/retry_service.dart';
 import 'weather_page.dart';
@@ -186,8 +187,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       controller: _pageController,
       onPageChanged: (index) {
         setState(() => _currentPage = index);
-        // Add haptic feedback when switching tabs
-        HapticService.subtle();
+        // Add haptic on page switch, but avoid double haptic if Schedule page will vibrate after its spinner
+        bool shouldVibrate = true;
+        if (index == 2) {
+          final scheduleState = ref.read(scheduleProvider);
+          if (scheduleState.isLoading) {
+            shouldVibrate = false;
+          }
+        }
+        if (shouldVibrate) {
+          HapticService.subtle();
+        }
       },
       children: [
         const _SubstitutionPlanPage(),
