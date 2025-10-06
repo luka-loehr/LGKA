@@ -27,22 +27,12 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  bool _pdfLoadingPreviously = true;
 
   @override
   void initState() {
     super.initState();
     _initializeData();
-
-    // Haptic feedback when substitution data finishes loading and is available
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.listen(pdfRepositoryProvider, (previous, next) {
-        final wasLoading = previous?.isLoading ?? true;
-        final isNowLoaded = !next.isLoading && next.hasAnyData;
-        if (wasLoading && isNowLoaded) {
-          HapticService.light();
-        }
-      });
-    });
   }
 
   @override
@@ -76,6 +66,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final pdfRepo = ref.watch(pdfRepositoryProvider);
+
+    // Trigger light haptic when PDFs finish loading and data is available
+    final becameAvailable = _pdfLoadingPreviously && !pdfRepo.isLoading && pdfRepo.hasAnyData;
+    if (becameAvailable) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await HapticService.light();
+      });
+    }
+    _pdfLoadingPreviously = pdfRepo.isLoading;
+
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       appBar: _buildAppBar(),
