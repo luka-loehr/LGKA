@@ -136,6 +136,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy Policy'**
   String get privacy;
+
+  /// No description provided for @krankmeldung.
+  ///
+  /// In en, this message translates to:
+  /// **'Sick Note'**
+  String get krankmeldung;
+
+  /// No description provided for @krankmeldungDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'The sick note is provided by Lessing-Gymnasium and is independent of the LGKA+ app.'**
+  String get krankmeldungDisclaimer;
+
+  /// No description provided for @krankmeldungContact.
+  ///
+  /// In en, this message translates to:
+  /// **'For technical questions or problems, please contact Lessing-Gymnasium Karlsruhe directly.'**
+  String get krankmeldungContact;
+
+  /// No description provided for @krankmeldungButton.
+  ///
+  /// In en, this message translates to:
+  /// **'To Sick Note'**
+  String get krankmeldungButton;
+
+  /// No description provided for @serverMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance work in progress'**
+  String get serverMaintenance;
+
+  /// No description provided for @serverConnectionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Server connection failed'**
+  String get serverConnectionFailed;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get tryAgain;
+
+  /// No description provided for @liveWeatherData.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Weather Data'**
+  String get liveWeatherData;
+
+  /// No description provided for @dataBeingCollected.
+  ///
+  /// In en, this message translates to:
+  /// **'Data being collected'**
+  String get dataBeingCollected;
+
+  /// No description provided for @liveWeatherDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Directly from the school\'s own weather station on the roof. Real-time data from your school!'**
+  String get liveWeatherDescription;
+
+  /// No description provided for @dataCollectionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The weather station is currently collecting new data for today. Charts are available from 0:30 AM.'**
+  String get dataCollectionDescription;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

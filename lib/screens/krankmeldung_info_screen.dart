@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import '../providers/haptic_service.dart';
 import '../navigation/app_router.dart';
+import '../l10n/app_localizations.dart';
 
 class KrankmeldungInfoScreen extends ConsumerWidget {
   const KrankmeldungInfoScreen({super.key});
@@ -56,7 +57,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                         context,
                         Icons.warning_amber_rounded,
                         '',
-                        'Die Krankmeldung wird vom Lessing-Gymnasium bereitgestellt und ist unabhängig von der LGKA+ App.',
+                        AppLocalizations.of(context)!.krankmeldungDisclaimer,
                       ),
                       
                       const SizedBox(height: 16),
@@ -66,7 +67,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                         context,
                         Icons.support_agent,
                         '',
-                        'Bei technischen Fragen oder Problemen wende dich bitte direkt an das Lessing-Gymnasium Karlsruhe.',
+                        AppLocalizations.of(context)!.krankmeldungContact,
                       ),
                       
                       const SizedBox(height: 40),
@@ -102,7 +103,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Zur Krankmeldung',
+                        AppLocalizations.of(context)!.krankmeldungButton,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -124,7 +125,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
     // Navigate to the webview with the illness report
     context.push(AppRouter.webview, extra: {
       'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
-      'title': 'Krankmeldung',
+      'title': AppLocalizations.of(context)!.krankmeldung,
       'headers': {
         'User-Agent': 'LGKA-App-Luka-Loehr',
       },

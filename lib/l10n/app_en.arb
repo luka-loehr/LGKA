@@ -6,5 +6,16 @@
   "weather": "Weather",
   "schedule": "Schedule",
   "legal": "Legal Notice",
-  "privacy": "Privacy Policy"
+  "privacy": "Privacy Policy",
+  "krankmeldung": "Sick Note",
+  "krankmeldungDisclaimer": "The sick note is provided by Lessing-Gymnasium and is independent of the LGKA+ app.",
+  "krankmeldungContact": "For technical questions or problems, please contact Lessing-Gymnasium Karlsruhe directly.",
+  "krankmeldungButton": "To Sick Note",
+  "serverMaintenance": "Maintenance work in progress",
+  "serverConnectionFailed": "Server connection failed",
+  "tryAgain": "Try again",
+  "liveWeatherData": "Live Weather Data",
+  "dataBeingCollected": "Data being collected",
+  "liveWeatherDescription": "Directly from the school's own weather station on the roof. Real-time data from your school!",
+  "dataCollectionDescription": "The weather station is currently collecting new data for today. Charts are available from 0:30 AM."
 } 

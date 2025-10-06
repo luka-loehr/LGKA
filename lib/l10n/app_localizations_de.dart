@@ -28,4 +28,37 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy => 'Datenschutz';
+
+  @override
+  String get krankmeldung => 'Krankmeldung';
+
+  @override
+  String get krankmeldungDisclaimer => 'Die Krankmeldung wird vom Lessing-Gymnasium bereitgestellt und ist unabhängig von der LGKA+ App.';
+
+  @override
+  String get krankmeldungContact => 'Bei technischen Fragen oder Problemen wende dich bitte direkt an das Lessing-Gymnasium Karlsruhe.';
+
+  @override
+  String get krankmeldungButton => 'Zur Krankmeldung';
+
+  @override
+  String get serverMaintenance => 'Reparaturarbeiten werden durchgeführt';
+
+  @override
+  String get serverConnectionFailed => 'Serververbindung fehlgeschlagen';
+
+  @override
+  String get tryAgain => 'Erneut versuchen';
+
+  @override
+  String get liveWeatherData => 'Live Wetterdaten';
+
+  @override
+  String get dataBeingCollected => 'Daten werden gesammelt';
+
+  @override
+  String get liveWeatherDescription => 'Direkt von der schuleigenen Wetterstation auf dem Dach. Echtzeit-Daten von deiner Schule!';
+
+  @override
+  String get dataCollectionDescription => 'Die Wetterstation sammelt gerade neue Daten für heute. Diagramme sind ab 0:30 Uhr verfügbar.';
 }
