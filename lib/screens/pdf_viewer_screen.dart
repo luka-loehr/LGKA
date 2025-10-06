@@ -497,13 +497,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     // Determine the appropriate header based on the dayName
     String headerTitle;
     if (widget.dayName != null && widget.dayName!.isNotEmpty) {
-      // Check if this is a schedule (contains "Klassen" or "J11/J12")
-      if (widget.dayName!.contains('Klassen') || widget.dayName!.contains('J11/J12')) {
-        // This is a schedule PDF
+      // Check if this is a schedule (supports German and English labels)
+      final dn = widget.dayName!;
+      final isSchedule = dn.contains('Klassen') || dn.contains('Grades') || dn.contains('J11/J12');
+      if (isSchedule) {
+        // Always show generic schedule title
         headerTitle = AppLocalizations.of(context)!.scheduleTitle;
       } else {
-        // This is a substitution plan - use the day name
-        headerTitle = widget.dayName!;
+        // Substitution plan - use the localized day name as provided
+        headerTitle = dn;
       }
     } else {
       // Fallback to default
