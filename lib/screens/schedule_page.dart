@@ -250,6 +250,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () async {
+              await HapticService.light();
               await ref.read(scheduleProvider.notifier).refreshSchedules();
               await _checkScheduleAvailability();
             },

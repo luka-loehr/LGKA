@@ -135,9 +135,13 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     super.dispose();
   }
 
-  void _refreshData() {
-    // Retry all data sources for better user experience
-    ref.read(retryServiceProvider).retryAllDataSources();
+  void _refreshData() async {
+    await HapticService.light();
+    // Retry weather only; keep button visible until data arrives
+    try {
+      await ref.read(weatherDataProvider.notifier).refreshWeatherData();
+    } catch (_) {}
+    // Do not hide the error UI here; it will disappear automatically once data loads
   }
 
   Widget _buildChartPlaceholder() {
