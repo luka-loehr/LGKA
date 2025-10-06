@@ -202,6 +202,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The weather station is currently collecting new data for today. Charts are available from 0:30 AM.'**
   String get dataCollectionDescription;
+
+  /// No description provided for @welcomeHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome!'**
+  String get welcomeHeadline;
+
+  /// No description provided for @welcomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to the new app for Lessing-Gymnasium Karlsruhe.'**
+  String get welcomeSubtitle;
+
+  /// No description provided for @continue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continue;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @tomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get tomorrow;
+
+  /// No description provided for @loadingSubstitutions.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading substitution plans...'**
+  String get loadingSubstitutions;
+
+  /// No description provided for @errorLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading'**
+  String get errorLoading;
+
+  /// No description provided for @noInfoYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No info yet'**
+  String get noInfoYet;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @accentColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Accent color'**
+  String get accentColor;
+
+  /// No description provided for @chooseAccentColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your preferred accent color'**
+  String get chooseAccentColor;
+
+  /// No description provided for @classes5to7.
+  ///
+  /// In en, this message translates to:
+  /// **'Grades 5-7'**
+  String get classes5to7;
+
+  /// No description provided for @classes8to10.
+  ///
+  /// In en, this message translates to:
+  /// **'Grades 8-10'**
+  String get classes8to10;
+
+  /// No description provided for @upperSchool.
+  ///
+  /// In en, this message translates to:
+  /// **'Upper school'**
+  String get upperSchool;
+
+  /// No description provided for @privacyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyLabel;
+
+  /// No description provided for @legalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal Notice'**
+  String get legalLabel;
+
+  /// No description provided for @infoHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'What can you do with the app?'**
+  String get infoHeader;
+
+  /// No description provided for @featureSubstitutionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Substitution Plan'**
+  String get featureSubstitutionTitle;
+
+  /// No description provided for @featureSubstitutionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Current substitution plan for today/tomorrow'**
+  String get featureSubstitutionDesc;
+
+  /// No description provided for @featureScheduleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule'**
+  String get featureScheduleTitle;
+
+  /// No description provided for @featureScheduleDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule for 1st/2nd semester'**
+  String get featureScheduleDesc;
+
+  /// No description provided for @featureWeatherTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather Data'**
+  String get featureWeatherTitle;
+
+  /// No description provided for @featureWeatherDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Access the school\'s own weather station'**
+  String get featureWeatherDesc;
+
+  /// No description provided for @featureSickTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sick Note'**
+  String get featureSickTitle;
+
+  /// No description provided for @featureSickDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit a sick note directly via the app'**
+  String get featureSickDesc;
+
+  /// No description provided for @yourAccentColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Your accent color'**
+  String get yourAccentColor;
+
+  /// No description provided for @chooseFavoriteColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your favorite color. It will be used throughout the app.'**
+  String get chooseFavoriteColor;
+
+  /// No description provided for @letsGo.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s go!'**
+  String get letsGo;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

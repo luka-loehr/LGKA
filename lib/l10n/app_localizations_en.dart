@@ -61,4 +61,88 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dataCollectionDescription => 'The weather station is currently collecting new data for today. Charts are available from 0:30 AM.';
+
+  @override
+  String get welcomeHeadline => 'Welcome!';
+
+  @override
+  String get welcomeSubtitle => 'Welcome to the new app for Lessing-Gymnasium Karlsruhe.';
+
+  @override
+  String get continue => 'Continue';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get tomorrow => 'Tomorrow';
+
+  @override
+  String get loadingSubstitutions => 'Loading substitution plans...';
+
+  @override
+  String get errorLoading => 'Error loading';
+
+  @override
+  String get noInfoYet => 'No info yet';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get accentColor => 'Accent color';
+
+  @override
+  String get chooseAccentColor => 'Choose your preferred accent color';
+
+  @override
+  String get classes5to7 => 'Grades 5-7';
+
+  @override
+  String get classes8to10 => 'Grades 8-10';
+
+  @override
+  String get upperSchool => 'Upper school';
+
+  @override
+  String get privacyLabel => 'Privacy Policy';
+
+  @override
+  String get legalLabel => 'Legal Notice';
+
+  @override
+  String get infoHeader => 'What can you do with the app?';
+
+  @override
+  String get featureSubstitutionTitle => 'Substitution Plan';
+
+  @override
+  String get featureSubstitutionDesc => 'Current substitution plan for today/tomorrow';
+
+  @override
+  String get featureScheduleTitle => 'Schedule';
+
+  @override
+  String get featureScheduleDesc => 'Schedule for 1st/2nd semester';
+
+  @override
+  String get featureWeatherTitle => 'Weather Data';
+
+  @override
+  String get featureWeatherDesc => 'Access the school\'s own weather station';
+
+  @override
+  String get featureSickTitle => 'Sick Note';
+
+  @override
+  String get featureSickDesc => 'Submit a sick note directly via the app';
+
+  @override
+  String get yourAccentColor => 'Your accent color';
+
+  @override
+  String get chooseFavoriteColor => 'Choose your favorite color. It will be used throughout the app.';
+
+  @override
+  String get letsGo => 'Let\'s go!';
 }
