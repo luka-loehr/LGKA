@@ -108,10 +108,10 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
             final url = navigationAction.request.url;
             final currentUrl = WebUri(widget.url);
             
-            // If the URL is different from the initial URL, open in external browser
-            if (url != null && url.toString() != currentUrl.toString()) {
-              // Check if it's a different domain or different path
-              if (url.host != currentUrl.host || url.path != currentUrl.path) {
+            // Only open external browser if leaving the apps.lgka-online.de domain
+            if (url != null && url.host != null) {
+              // Check if the URL is leaving the apps.lgka-online.de domain
+              if (url.host != 'apps.lgka-online.de') {
                 // Open in external browser
                 final uri = Uri.parse(url.toString());
                 if (await canLaunchUrl(uri)) {
@@ -121,7 +121,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
               }
             }
             
-            // Allow navigation within the same page/domain
+            // Allow navigation within apps.lgka-online.de domain
             return NavigationActionPolicy.ALLOW;
           },
           onWebViewCreated: (controller) {
