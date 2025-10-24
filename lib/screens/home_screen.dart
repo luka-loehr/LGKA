@@ -110,53 +110,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildSegmentedControl() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 400;
-    final buttonHeight = isSmallScreen ? 32.0 : 36.0;
-    
-    // Calculate available width for segmented control
-    // Account for leading icon (48px) + trailing icon (48px) + padding (32px total)
-    final availableWidth = screenWidth - 128; // Reserve space for icons and padding
-    final maxControlWidth = availableWidth.clamp(200.0, 300.0); // Min 200px, max 300px
-    
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: maxControlWidth,
-        minWidth: 200,
+    return Container(
+      height: 36,
+      decoration: BoxDecoration(
+        color: AppColors.appSurface.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(18),
       ),
-      child: Container(
-        height: buttonHeight,
-        decoration: BoxDecoration(
-          color: AppColors.appSurface.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(buttonHeight / 2),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildSegmentedButton(0, AppLocalizations.of(context)!.substitutionPlan, Icons.calendar_today, isSmallScreen),
-            _buildSegmentedButton(1, AppLocalizations.of(context)!.weather, Icons.wb_sunny_outlined, isSmallScreen),
-            _buildSegmentedButton(2, AppLocalizations.of(context)!.schedule, Icons.schedule, isSmallScreen),
-          ],
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildSegmentedButton(0, AppLocalizations.of(context)!.substitutionPlan, Icons.calendar_today),
+          _buildSegmentedButton(1, AppLocalizations.of(context)!.weather, Icons.wb_sunny_outlined),
+          _buildSegmentedButton(2, AppLocalizations.of(context)!.schedule, Icons.schedule),
+        ],
       ),
     );
   }
 
-  Widget _buildSegmentedButton(int index, String title, IconData icon, bool isSmallScreen) {
+  Widget _buildSegmentedButton(int index, String title, IconData icon) {
     final isSelected = _currentPage == index;
     final shouldShowText = _shouldShowTextForTab(index);
-    final iconSize = isSmallScreen ? 16.0 : 18.0;
-    final fontSize = isSmallScreen ? 12.0 : 14.0;
-    final horizontalPadding = isSmallScreen ? 8.0 : 12.0;
-    final verticalPadding = isSmallScreen ? 6.0 : 8.0;
     
     return GestureDetector(
       onTap: () => _switchToPage(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.symmetric(
-          horizontal: shouldShowText ? (horizontalPadding + 4) : horizontalPadding,
-          vertical: verticalPadding,
+          horizontal: shouldShowText ? 16 : 12,
+          vertical: 8,
         ),
         decoration: BoxDecoration(
           color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
@@ -167,21 +148,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           children: [
             Icon(
               icon,
-              size: iconSize,
+              size: 18,
               color: isSelected ? Colors.white : AppColors.secondaryText,
             ),
             if (shouldShowText) ...[
-              SizedBox(width: isSmallScreen ? 4 : 6),
-              Flexible(
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: isSelected ? Colors.white : AppColors.secondaryText,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    fontSize: fontSize,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: isSelected ? Colors.white : AppColors.secondaryText,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),
             ],
@@ -249,27 +225,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     context.push(AppRouter.krankmeldungInfo);
   }
 
-  static String _localizeWeekday(BuildContext context, String weekday) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (weekday) {
-      case 'Montag':
-        return l10n.monday;
-      case 'Dienstag':
-        return l10n.tuesday;
-      case 'Mittwoch':
-        return l10n.wednesday;
-      case 'Donnerstag':
-        return l10n.thursday;
-      case 'Freitag':
-        return l10n.friday;
-      case 'Samstag':
-        return l10n.saturday;
-      case 'Sonntag':
-        return l10n.sunday;
-      default:
-        return weekday;
-    }
-  }
 }
 
 /// Substitution plan page with today and tomorrow options
@@ -391,8 +346,22 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     final pdfFile = pdfRepo.getPdfFile(isToday);
     final pdfState = isToday ? pdfRepo.todayState : pdfRepo.tomorrowState;
     String weekday = pdfState.weekday ?? (isToday ? AppLocalizations.of(context)!.today : AppLocalizations.of(context)!.tomorrow);
-    // Translate German weekdays to localized names
-    weekday = _HomeScreenState._localizeWeekday(context, weekday);
+    // Translate German weekdays to English for display when locale is English
+    final localeCode = Localizations.localeOf(context).languageCode;
+    if (localeCode == 'en') {
+      const Map<String, String> germanToEnglishWeekday = {
+        'Montag': 'Monday',
+        'Dienstag': 'Tuesday',
+        'Mittwoch': 'Wednesday',
+        'Donnerstag': 'Thursday',
+        'Freitag': 'Friday',
+        'Samstag': 'Saturday',
+        'Sonntag': 'Sunday',
+      };
+      if (germanToEnglishWeekday.containsKey(weekday)) {
+        weekday = germanToEnglishWeekday[weekday]!;
+      }
+    }
     
     if (pdfFile != null) {
       // Navigate to PDF viewer screen
@@ -953,8 +922,23 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
     } else if (weekday.isEmpty || weekday == 'weekend') {
       displayText = AppLocalizations.of(context)!.noInfoYet;
     } else {
-      // Translate German weekday names to localized names
-      displayText = _HomeScreenState._localizeWeekday(context, weekday);
+      // Translate German weekday names to English for display if needed
+      final localeCode = Localizations.localeOf(context).languageCode;
+      if (localeCode == 'en') {
+        const Map<String, String> germanToEnglishWeekday = {
+          'Montag': 'Monday',
+          'Dienstag': 'Tuesday',
+          'Mittwoch': 'Wednesday',
+          'Donnerstag': 'Thursday',
+          'Freitag': 'Friday',
+          'Samstag': 'Saturday',
+          'Sonntag': 'Sunday',
+        };
+        if (germanToEnglishWeekday.containsKey(weekday)) {
+          weekday = germanToEnglishWeekday[weekday]!;
+        }
+      }
+      displayText = weekday;
     }
 
     return Row(
