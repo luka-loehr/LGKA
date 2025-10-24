@@ -254,7 +254,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(
-                          Icons.cloud_off,
+                          Icons.wb_sunny_outlined,
                           size: 64,
                           color: AppColors.secondaryText,
                         ),
