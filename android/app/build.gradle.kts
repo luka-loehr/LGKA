@@ -64,10 +64,10 @@ android {
                 signingConfig = signingConfigs.getByName("debug")
             }
             
-            // Standard optimizations for smaller app size
-            isMinifyEnabled = false
-            isShrinkResources = false
-            // proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // Enable minification and resource shrinking for smaller app size
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     
