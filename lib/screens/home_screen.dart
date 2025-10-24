@@ -224,6 +224,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // Navigate to the info screen first
     context.push(AppRouter.krankmeldungInfo);
   }
+
+  static String _localizeWeekday(BuildContext context, String weekday) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (weekday) {
+      case 'Montag':
+        return l10n.monday;
+      case 'Dienstag':
+        return l10n.tuesday;
+      case 'Mittwoch':
+        return l10n.wednesday;
+      case 'Donnerstag':
+        return l10n.thursday;
+      case 'Freitag':
+        return l10n.friday;
+      case 'Samstag':
+        return l10n.saturday;
+      case 'Sonntag':
+        return l10n.sunday;
+      default:
+        return weekday;
+    }
+  }
 }
 
 /// Substitution plan page with today and tomorrow options
@@ -346,7 +368,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     final pdfState = isToday ? pdfRepo.todayState : pdfRepo.tomorrowState;
     String weekday = pdfState.weekday ?? (isToday ? AppLocalizations.of(context)!.today : AppLocalizations.of(context)!.tomorrow);
     // Translate German weekdays to localized names
-    weekday = _localizeWeekday(context, weekday);
+    weekday = _HomeScreenState._localizeWeekday(context, weekday);
     
     if (pdfFile != null) {
       // Navigate to PDF viewer screen
@@ -908,7 +930,7 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
       displayText = AppLocalizations.of(context)!.noInfoYet;
     } else {
       // Translate German weekday names to localized names
-      displayText = _localizeWeekday(context, weekday);
+      displayText = _HomeScreenState._localizeWeekday(context, weekday);
     }
 
     return Row(
@@ -971,28 +993,6 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
       widget.onRetry();
     } else {
       widget.onTap();
-    }
-  }
-
-  String _localizeWeekday(BuildContext context, String weekday) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (weekday) {
-      case 'Montag':
-        return l10n.monday;
-      case 'Dienstag':
-        return l10n.tuesday;
-      case 'Mittwoch':
-        return l10n.wednesday;
-      case 'Donnerstag':
-        return l10n.thursday;
-      case 'Freitag':
-        return l10n.friday;
-      case 'Samstag':
-        return l10n.saturday;
-      case 'Sonntag':
-        return l10n.sunday;
-      default:
-        return weekday;
     }
   }
 }
