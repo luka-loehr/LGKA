@@ -238,51 +238,61 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   }
 
   Widget _buildErrorState(String error) {
-    return Padding(
-      padding: const EdgeInsets.all(32.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.schedule_outlined,
-            size: 64,
-            color: AppColors.secondaryText.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            AppLocalizations.of(context)!.serverConnectionFailed,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.primaryText,
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.schedule_outlined,
+              size: 64,
+              color: AppColors.secondaryText.withValues(alpha: 0.5),
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            AppLocalizations.of(context)!.serverConnectionHint,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.secondaryText,
+            const SizedBox(height: 16),
+            Text(
+              AppLocalizations.of(context)!.serverConnectionFailed,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppColors.primaryText,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () async {
-              await HapticService.light();
-              await ref.read(scheduleProvider.notifier).refreshSchedules();
-              await _checkScheduleAvailability();
-            },
-            icon: const Icon(Icons.refresh),
-            label: Text(AppLocalizations.of(context)!.tryAgain),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            const SizedBox(height: 8),
+            Text(
+              AppLocalizations.of(context)!.serverConnectionHint,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.secondaryText,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  await HapticService.light();
+                  await ref.read(scheduleProvider.notifier).refreshSchedules();
+                  await _checkScheduleAvailability();
+                },
+                icon: const Icon(Icons.refresh),
+                label: Text(AppLocalizations.of(context)!.tryAgain),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -110,58 +110,72 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildSegmentedControl() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 400;
+    final buttonHeight = isSmallScreen ? 32.0 : 36.0;
+    final fontSize = isSmallScreen ? 12.0 : 14.0;
+    
     return Container(
-      height: 36,
+      height: buttonHeight,
       decoration: BoxDecoration(
         color: AppColors.appSurface.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(buttonHeight / 2),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildSegmentedButton(0, AppLocalizations.of(context)!.substitutionPlan, Icons.calendar_today),
-          _buildSegmentedButton(1, AppLocalizations.of(context)!.weather, Icons.wb_sunny_outlined),
-          _buildSegmentedButton(2, AppLocalizations.of(context)!.schedule, Icons.schedule),
+          _buildSegmentedButton(0, AppLocalizations.of(context)!.substitutionPlan, Icons.calendar_today, fontSize),
+          _buildSegmentedButton(1, AppLocalizations.of(context)!.weather, Icons.wb_sunny_outlined, fontSize),
+          _buildSegmentedButton(2, AppLocalizations.of(context)!.schedule, Icons.schedule, fontSize),
         ],
       ),
     );
   }
 
-  Widget _buildSegmentedButton(int index, String title, IconData icon) {
+  Widget _buildSegmentedButton(int index, String title, IconData icon, double fontSize) {
     final isSelected = _currentPage == index;
     final shouldShowText = _shouldShowTextForTab(index);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 400;
     
-    return GestureDetector(
-      onTap: () => _switchToPage(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(
-          horizontal: shouldShowText ? 16 : 12,
-          vertical: 8,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isSelected ? Colors.white : AppColors.secondaryText,
-            ),
-            if (shouldShowText) ...[
-              const SizedBox(width: 6),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: isSelected ? Colors.white : AppColors.secondaryText,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                ),
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _switchToPage(index),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: EdgeInsets.symmetric(
+            horizontal: shouldShowText ? (isSmallScreen ? 8 : 12) : (isSmallScreen ? 6 : 8),
+            vertical: 6,
+          ),
+          decoration: BoxDecoration(
+            color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: isSmallScreen ? 16 : 18,
+                color: isSelected ? Colors.white : AppColors.secondaryText,
               ),
+              if (shouldShowText) ...[
+                SizedBox(width: isSmallScreen ? 4 : 6),
+                Flexible(
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: isSelected ? Colors.white : AppColors.secondaryText,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      fontSize: fontSize,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
