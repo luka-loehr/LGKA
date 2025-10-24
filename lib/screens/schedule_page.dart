@@ -412,18 +412,23 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   }
 
   String _localizeGradeLevel(BuildContext context, String gradeLevel) {
+    final l10n = AppLocalizations.of(context)!;
     if (gradeLevel == 'Klassen 5-10') {
-      return 'Grades 5-10';
+      return l10n.grades5to10;
     }
-    return gradeLevel; // J11/J12 stays the same
+    if (gradeLevel == 'J11/J12') {
+      return l10n.j11j12;
+    }
+    return gradeLevel;
   }
 
   String _localizeHalbjahr(BuildContext context, String halbjahr) {
+    final l10n = AppLocalizations.of(context)!;
     if (halbjahr == '1. Halbjahr') {
-      return '1st semester';
+      return l10n.firstSemester;
     }
     if (halbjahr == '2. Halbjahr') {
-      return '2nd semester';
+      return l10n.secondSemester;
     }
     return halbjahr;
   }
@@ -517,7 +522,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           // PDF is not available yet
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${schedule.halbjahr} ist noch nicht verfügbar'),
+              content: Text('${_localizeHalbjahr(context, schedule.halbjahr)} ${AppLocalizations.of(context)!.scheduleNotAvailable}'),
               backgroundColor: Colors.orange,
               duration: const Duration(seconds: 3),
             ),

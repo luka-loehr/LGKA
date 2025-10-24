@@ -97,5 +97,17 @@
   "authTitle": "Authentication required",
   "authSubtitle": "Use the credentials you already know from the substitution plan"
   ,
-  "searchHint": "Enter search term..."
+  "searchHint": "Enter search term...",
+  "firstSemester": "1st semester",
+  "secondSemester": "2nd semester",
+  "grades5to10": "Grades 5-10",
+  "j11j12": "J11/J12",
+  "monday": "Monday",
+  "tuesday": "Tuesday",
+  "wednesday": "Wednesday",
+  "thursday": "Thursday",
+  "friday": "Friday",
+  "saturday": "Saturday",
+  "sunday": "Sunday",
+  "scheduleNotAvailable": "is not available yet"
 } 

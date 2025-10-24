@@ -280,4 +280,40 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get searchHint => 'Suchbegriff eingeben...';
+
+  @override
+  String get firstSemester => '1. Halbjahr';
+
+  @override
+  String get secondSemester => '2. Halbjahr';
+
+  @override
+  String get grades5to10 => 'Klassen 5-10';
+
+  @override
+  String get j11j12 => 'J11/J12';
+
+  @override
+  String get monday => 'Montag';
+
+  @override
+  String get tuesday => 'Dienstag';
+
+  @override
+  String get wednesday => 'Mittwoch';
+
+  @override
+  String get thursday => 'Donnerstag';
+
+  @override
+  String get friday => 'Freitag';
+
+  @override
+  String get saturday => 'Samstag';
+
+  @override
+  String get sunday => 'Sonntag';
+
+  @override
+  String get scheduleNotAvailable => 'ist noch nicht verfügbar';
 }
