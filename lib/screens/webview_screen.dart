@@ -197,7 +197,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.wifi_off,
+                        Icons.medical_services_outlined,
                         size: 64,
                         color: AppColors.secondaryText.withValues(alpha: 0.5),
                       ),

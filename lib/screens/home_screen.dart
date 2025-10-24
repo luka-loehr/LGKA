@@ -776,7 +776,7 @@ class _ErrorView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.description_outlined,
+            Icons.calendar_today,
             size: 64,
             color: AppColors.secondaryText.withValues(alpha: 0.5),
           ),
