@@ -174,7 +174,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
           ),
           const SizedBox(height: 12),
           Text(
-            'Diagramm wird geladen...',
+            AppLocalizations.of(context)!.chartLoading,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: AppColors.secondaryText,
             ),

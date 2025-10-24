@@ -113,69 +113,79 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 400;
     final buttonHeight = isSmallScreen ? 32.0 : 36.0;
-    final fontSize = isSmallScreen ? 12.0 : 14.0;
     
-    return Container(
-      height: buttonHeight,
-      decoration: BoxDecoration(
-        color: AppColors.appSurface.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(buttonHeight / 2),
+    // Calculate available width for segmented control
+    // Account for leading icon (48px) + trailing icon (48px) + padding (32px total)
+    final availableWidth = screenWidth - 128; // Reserve space for icons and padding
+    final maxControlWidth = availableWidth.clamp(200.0, 300.0); // Min 200px, max 300px
+    
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: maxControlWidth,
+        minWidth: 200,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildSegmentedButton(0, AppLocalizations.of(context)!.substitutionPlan, Icons.calendar_today, fontSize),
-          _buildSegmentedButton(1, AppLocalizations.of(context)!.weather, Icons.wb_sunny_outlined, fontSize),
-          _buildSegmentedButton(2, AppLocalizations.of(context)!.schedule, Icons.schedule, fontSize),
-        ],
+      child: Container(
+        height: buttonHeight,
+        decoration: BoxDecoration(
+          color: AppColors.appSurface.withValues(alpha: 0.6),
+          borderRadius: BorderRadius.circular(buttonHeight / 2),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildSegmentedButton(0, AppLocalizations.of(context)!.substitutionPlan, Icons.calendar_today, isSmallScreen),
+            _buildSegmentedButton(1, AppLocalizations.of(context)!.weather, Icons.wb_sunny_outlined, isSmallScreen),
+            _buildSegmentedButton(2, AppLocalizations.of(context)!.schedule, Icons.schedule, isSmallScreen),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildSegmentedButton(int index, String title, IconData icon, double fontSize) {
+  Widget _buildSegmentedButton(int index, String title, IconData icon, bool isSmallScreen) {
     final isSelected = _currentPage == index;
     final shouldShowText = _shouldShowTextForTab(index);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 400;
+    final iconSize = isSmallScreen ? 16.0 : 18.0;
+    final fontSize = isSmallScreen ? 12.0 : 14.0;
+    final horizontalPadding = isSmallScreen ? 8.0 : 12.0;
+    final verticalPadding = isSmallScreen ? 6.0 : 8.0;
     
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => _switchToPage(index),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: EdgeInsets.symmetric(
-            horizontal: shouldShowText ? (isSmallScreen ? 8 : 12) : (isSmallScreen ? 6 : 8),
-            vertical: 6,
-          ),
-          decoration: BoxDecoration(
-            color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: isSmallScreen ? 16 : 18,
-                color: isSelected ? Colors.white : AppColors.secondaryText,
-              ),
-              if (shouldShowText) ...[
-                SizedBox(width: isSmallScreen ? 4 : 6),
-                Flexible(
-                  child: Text(
-                    title,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: isSelected ? Colors.white : AppColors.secondaryText,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                      fontSize: fontSize,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+    return GestureDetector(
+      onTap: () => _switchToPage(index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.symmetric(
+          horizontal: shouldShowText ? (horizontalPadding + 4) : horizontalPadding,
+          vertical: verticalPadding,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: iconSize,
+              color: isSelected ? Colors.white : AppColors.secondaryText,
+            ),
+            if (shouldShowText) ...[
+              SizedBox(width: isSmallScreen ? 4 : 6),
+              Flexible(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: isSelected ? Colors.white : AppColors.secondaryText,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    fontSize: fontSize,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
+              ),
             ],
-          ),
+          ],
         ),
       ),
     );
