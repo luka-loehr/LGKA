@@ -379,12 +379,12 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
     final isSelected = _selectedColor == colorData['name'];
     final color = colorData['color'] as Color;
 
-    // Calculate responsive box size to fit 5 colors in one line with max size constraint
+    // Calculate responsive box size to fit 5 colors in one line with better constraints
     final screenWidth = MediaQuery.of(context).size.width;
     final availableWidth = screenWidth - 32; // Subtract padding (16px on each side)
     final spacingWidth = 4 * 12; // 4 gaps between 5 boxes × 12px spacing
     final calculatedSize = (availableWidth - spacingWidth) / 5;
-    final boxSize = calculatedSize.clamp(40.0, 80.0); // Min 40px, max 80px
+    final boxSize = calculatedSize.clamp(48.0, 72.0); // Better min/max constraints
 
     return GestureDetector(
       onTap: () => _selectColor(colorData['name'] as String),
