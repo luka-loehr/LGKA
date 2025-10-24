@@ -218,7 +218,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to the new app for Lessing-Gymnasium Karlsruhe.'**
+  /// **'To the new app for Lessing-Gymnasium Karlsruhe.'**
   String get welcomeSubtitle;
 
   /// No description provided for @continueLabel.
@@ -712,6 +712,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'is not available yet'**
   String get scheduleNotAvailable;
+
+  /// No description provided for @chartLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart is loading...'**
+  String get chartLoading;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

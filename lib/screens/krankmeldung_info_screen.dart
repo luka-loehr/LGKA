@@ -35,6 +35,8 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
             color: AppColors.appOnSurface,
             fontWeight: FontWeight.bold,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         centerTitle: true,
       ),
@@ -102,11 +104,15 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        AppLocalizations.of(context)!.krankmeldungButton,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                      Flexible(
+                        child: Text(
+                          AppLocalizations.of(context)!.krankmeldungButton,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -192,6 +198,8 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                       height: 1.4,
                       fontSize: 14,
                     ),
+                    maxLines: 10,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

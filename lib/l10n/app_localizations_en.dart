@@ -69,7 +69,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeHeadline => 'Welcome!';
 
   @override
-  String get welcomeSubtitle => 'Welcome to the new app for Lessing-Gymnasium Karlsruhe.';
+  String get welcomeSubtitle => 'To the new app for Lessing-Gymnasium Karlsruhe.';
 
   @override
   String get continueLabel => 'Continue';
@@ -316,4 +316,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scheduleNotAvailable => 'is not available yet';
+
+  @override
+  String get chartLoading => 'Chart is loading...';
 }
