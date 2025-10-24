@@ -271,23 +271,20 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  await HapticService.light();
-                  await ref.read(scheduleProvider.notifier).refreshSchedules();
-                  await _checkScheduleAvailability();
-                },
-                icon: const Icon(Icons.refresh),
-                label: Text(AppLocalizations.of(context)!.tryAgain),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+            ElevatedButton.icon(
+              onPressed: () async {
+                await HapticService.light();
+                await ref.read(scheduleProvider.notifier).refreshSchedules();
+                await _checkScheduleAvailability();
+              },
+              icon: const Icon(Icons.refresh),
+              label: Text(AppLocalizations.of(context)!.tryAgain),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
