@@ -94,5 +94,17 @@
   "authTitle": "Anmeldung erforderlich",
   "authSubtitle": "Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst"
   ,
-  "searchHint": "Suchbegriff eingeben..."
+  "searchHint": "Suchbegriff eingeben...",
+  "firstSemester": "1. Halbjahr",
+  "secondSemester": "2. Halbjahr",
+  "grades5to10": "Klassen 5-10",
+  "j11j12": "J11/J12",
+  "monday": "Montag",
+  "tuesday": "Dienstag",
+  "wednesday": "Mittwoch",
+  "thursday": "Donnerstag",
+  "friday": "Freitag",
+  "saturday": "Samstag",
+  "sunday": "Sonntag",
+  "scheduleNotAvailable": "ist noch nicht verfügbar"
 } 
