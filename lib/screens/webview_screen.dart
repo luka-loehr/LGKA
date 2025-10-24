@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../theme/app_theme.dart';
 import '../providers/haptic_service.dart';
@@ -103,6 +104,26 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
             verticalScrollBarEnabled: true,
             horizontalScrollBarEnabled: false,
           ),
+          shouldOverrideUrlLoading: (controller, navigationAction) async {
+            final url = navigationAction.request.url;
+            final currentUrl = WebUri(widget.url);
+            
+            // If the URL is different from the initial URL, open in external browser
+            if (url != null && url.toString() != currentUrl.toString()) {
+              // Check if it's a different domain or different path
+              if (url.host != currentUrl.host || url.path != currentUrl.path) {
+                // Open in external browser
+                final uri = Uri.parse(url.toString());
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+                return NavigationActionPolicy.CANCEL;
+              }
+            }
+            
+            // Allow navigation within the same page/domain
+            return NavigationActionPolicy.ALLOW;
+          },
           onWebViewCreated: (controller) {
             _controller = controller;
           },
