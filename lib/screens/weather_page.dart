@@ -360,137 +360,157 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                 const SizedBox(height: 16),
                                 // Current weather data cards
                                 if (weatherState.latestData != null) ...[
-                                  // Temperature and humidity row
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              _selectedChart = ChartType.temperature;
-                                              _isChartRendered = false; // Force chart re-render
-                                            });
-                                            HapticService.subtle();
-                                            // Re-render chart after a short delay
-                                            Future.delayed(const Duration(milliseconds: 50), () {
-                                              if (mounted) {
+                                  // Temperature and humidity row - responsive layout
+                                  LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      final isSmallScreen = constraints.maxWidth < 400;
+                                      final cardHeight = isSmallScreen ? 75.0 : 85.0;
+                                      final padding = isSmallScreen ? 12.0 : 16.0;
+                                      
+                                      return Row(
+                                        children: [
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {
                                                 setState(() {
-                                                  _isChartRendered = true;
+                                                  _selectedChart = ChartType.temperature;
+                                                  _isChartRendered = false; // Force chart re-render
                                                 });
-                                              }
-                                            });
-                                          },
-                                          child: AnimatedContainer(
-                                            duration: const Duration(milliseconds: 200),
-                                            height: 85,
-                                            padding: const EdgeInsets.all(16),
-                                            decoration: BoxDecoration(
-                                              color: _selectedChart == ChartType.temperature
-                                                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
-                                                  : AppColors.appSurface,
-                                              borderRadius: BorderRadius.circular(16),
-                                              border: Border.all(
-                                                color: _selectedChart == ChartType.temperature
-                                                    ? Theme.of(context).colorScheme.primary
-                                                    : AppColors.secondaryText.withValues(alpha: 0.2),
-                                                width: _selectedChart == ChartType.temperature ? 2 : 1,
-                                              ),
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  AppLocalizations.of(context)!.temperatureLabel,
-                                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                HapticService.subtle();
+                                                // Re-render chart after a short delay
+                                                Future.delayed(const Duration(milliseconds: 50), () {
+                                                  if (mounted) {
+                                                    setState(() {
+                                                      _isChartRendered = true;
+                                                    });
+                                                  }
+                                                });
+                                              },
+                                              child: AnimatedContainer(
+                                                duration: const Duration(milliseconds: 200),
+                                                height: cardHeight,
+                                                padding: EdgeInsets.all(padding),
+                                                decoration: BoxDecoration(
+                                                  color: _selectedChart == ChartType.temperature
+                                                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+                                                      : AppColors.appSurface,
+                                                  borderRadius: BorderRadius.circular(16),
+                                                  border: Border.all(
                                                     color: _selectedChart == ChartType.temperature
                                                         ? Theme.of(context).colorScheme.primary
-                                                        : AppColors.secondaryText,
-                                                    fontWeight: _selectedChart == ChartType.temperature
-                                                        ? FontWeight.w600
-                                                        : FontWeight.normal,
+                                                        : AppColors.secondaryText.withValues(alpha: 0.2),
+                                                    width: _selectedChart == ChartType.temperature ? 2 : 1,
                                                   ),
                                                 ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  '${weatherState.latestData!.temperature.toStringAsFixed(1)}°C',
-                                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                                    color: _selectedChart == ChartType.temperature
-                                                        ? Theme.of(context).colorScheme.primary
-                                                        : AppColors.primaryText,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      AppLocalizations.of(context)!.temperatureLabel,
+                                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                        color: _selectedChart == ChartType.temperature
+                                                            ? Theme.of(context).colorScheme.primary
+                                                            : AppColors.secondaryText,
+                                                        fontWeight: _selectedChart == ChartType.temperature
+                                                            ? FontWeight.w600
+                                                            : FontWeight.normal,
+                                                        fontSize: isSmallScreen ? 11 : 12,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                    SizedBox(height: isSmallScreen ? 2 : 4),
+                                                    Text(
+                                                      '${weatherState.latestData!.temperature.toStringAsFixed(1)}°C',
+                                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                                        color: _selectedChart == ChartType.temperature
+                                                            ? Theme.of(context).colorScheme.primary
+                                                            : AppColors.primaryText,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: isSmallScreen ? 18 : 20,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              _selectedChart = ChartType.humidity;
-                                              _isChartRendered = false; // Force chart re-render
-                                            });
-                                            HapticService.subtle();
-                                            // Re-render chart after a short delay
-                                            Future.delayed(const Duration(milliseconds: 50), () {
-                                              if (mounted) {
-                                                setState(() {
-                                                  _isChartRendered = true;
-                                                });
-                                              }
-                                            });
-                                          },
-                                          child: AnimatedContainer(
-                                            duration: const Duration(milliseconds: 200),
-                                            height: 85,
-                                            padding: const EdgeInsets.all(16),
-                                            decoration: BoxDecoration(
-                                              color: _selectedChart == ChartType.humidity
-                                                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
-                                                  : AppColors.appSurface,
-                                              borderRadius: BorderRadius.circular(16),
-                                              border: Border.all(
-                                                color: _selectedChart == ChartType.humidity
-                                                    ? Theme.of(context).colorScheme.primary
-                                                    : AppColors.secondaryText.withValues(alpha: 0.2),
-                                                width: _selectedChart == ChartType.humidity ? 2 : 1,
                                               ),
                                             ),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  AppLocalizations.of(context)!.humidityLabel,
-                                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                          ),
+                                          SizedBox(width: isSmallScreen ? 8 : 12),
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  _selectedChart = ChartType.humidity;
+                                                  _isChartRendered = false; // Force chart re-render
+                                                });
+                                                HapticService.subtle();
+                                                // Re-render chart after a short delay
+                                                Future.delayed(const Duration(milliseconds: 50), () {
+                                                  if (mounted) {
+                                                    setState(() {
+                                                      _isChartRendered = true;
+                                                    });
+                                                  }
+                                                });
+                                              },
+                                              child: AnimatedContainer(
+                                                duration: const Duration(milliseconds: 200),
+                                                height: cardHeight,
+                                                padding: EdgeInsets.all(padding),
+                                                decoration: BoxDecoration(
+                                                  color: _selectedChart == ChartType.humidity
+                                                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+                                                      : AppColors.appSurface,
+                                                  borderRadius: BorderRadius.circular(16),
+                                                  border: Border.all(
                                                     color: _selectedChart == ChartType.humidity
                                                         ? Theme.of(context).colorScheme.primary
-                                                        : AppColors.secondaryText,
-                                                    fontWeight: _selectedChart == ChartType.humidity
-                                                        ? FontWeight.w600
-                                                        : FontWeight.normal,
+                                                        : AppColors.secondaryText.withValues(alpha: 0.2),
+                                                    width: _selectedChart == ChartType.humidity ? 2 : 1,
                                                   ),
                                                 ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  '${weatherState.latestData!.humidity.toStringAsFixed(0)}%',
-                                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                                    color: _selectedChart == ChartType.humidity
-                                                        ? Theme.of(context).colorScheme.primary
-                                                        : AppColors.primaryText,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      AppLocalizations.of(context)!.humidityLabel,
+                                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                        color: _selectedChart == ChartType.humidity
+                                                            ? Theme.of(context).colorScheme.primary
+                                                            : AppColors.secondaryText,
+                                                        fontWeight: _selectedChart == ChartType.humidity
+                                                            ? FontWeight.w600
+                                                            : FontWeight.normal,
+                                                        fontSize: isSmallScreen ? 11 : 12,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                    SizedBox(height: isSmallScreen ? 2 : 4),
+                                                    Text(
+                                                      '${weatherState.latestData!.humidity.toStringAsFixed(0)}%',
+                                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                                        color: _selectedChart == ChartType.humidity
+                                                            ? Theme.of(context).colorScheme.primary
+                                                            : AppColors.primaryText,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: isSmallScreen ? 18 : 20,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                    ],
+                                        ],
+                                      );
+                                    },
                                   ),
                                   const SizedBox(height: 12),
                                   // Wind speed and pressure row
