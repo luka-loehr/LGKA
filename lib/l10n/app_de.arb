@@ -106,5 +106,6 @@
   "friday": "Freitag",
   "saturday": "Samstag",
   "sunday": "Sonntag",
-  "scheduleNotAvailable": "ist noch nicht verfügbar"
+  "scheduleNotAvailable": "ist noch nicht verfügbar",
+  "chartLoading": "Diagramm wird geladen..."
 } 
