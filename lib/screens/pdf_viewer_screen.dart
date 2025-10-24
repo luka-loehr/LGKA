@@ -496,10 +496,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   Widget build(BuildContext context) {
     // Determine the appropriate header based on the dayName
     String headerTitle;
+    bool isSchedule = false;
     if (widget.dayName != null && widget.dayName!.isNotEmpty) {
       // Check if this is a schedule (supports German and English labels)
       final dn = widget.dayName!;
-      final isSchedule = dn.contains('Klassen') || dn.contains('Grades') || dn.contains('J11/J12');
+      isSchedule = dn.contains('Klassen') || dn.contains('Grades') || dn.contains('J11/J12');
       if (isSchedule) {
         // Always show generic schedule title
         headerTitle = AppLocalizations.of(context)!.scheduleTitle;
@@ -534,52 +535,54 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           },
         ),
         actions: [
-          // Search functionality
-          if (_searchResults.isEmpty && !_isSearchBarVisible) ...[
-            IconButton(
-              onPressed: _showSearchBar,
-              icon: const Icon(
-                Icons.search,
-                color: AppColors.secondaryText,
+          // Search functionality - only show for schedules, not substitution plans
+          if (isSchedule) ...[
+            if (_searchResults.isEmpty && !_isSearchBarVisible) ...[
+              IconButton(
+                onPressed: _showSearchBar,
+                icon: const Icon(
+                  Icons.search,
+                  color: AppColors.secondaryText,
+                ),
+                tooltip: AppLocalizations.of(context)!.searchInPdf,
               ),
-              tooltip: AppLocalizations.of(context)!.searchInPdf,
-            ),
-          ] else if (_isSearchBarVisible) ...[
-            // Clear search when search bar is visible
-            IconButton(
-              onPressed: _hideSearchBar,
-              icon: const Icon(
-                Icons.close,
-                color: AppColors.secondaryText,
+            ] else if (_isSearchBarVisible) ...[
+              // Clear search when search bar is visible
+              IconButton(
+                onPressed: _hideSearchBar,
+                icon: const Icon(
+                  Icons.close,
+                  color: AppColors.secondaryText,
+                ),
+                tooltip: AppLocalizations.of(context)!.cancelSearch,
               ),
-              tooltip: AppLocalizations.of(context)!.cancelSearch,
-            ),
-          ] else if (_searchResults.isNotEmpty) ...[
-            // Search navigation
-            IconButton(
-              onPressed: _previousSearchResult,
-              icon: const Icon(
-                Icons.arrow_upward,
-                color: AppColors.secondaryText,
+            ] else if (_searchResults.isNotEmpty) ...[
+              // Search navigation
+              IconButton(
+                onPressed: _previousSearchResult,
+                icon: const Icon(
+                  Icons.arrow_upward,
+                  color: AppColors.secondaryText,
+                ),
+                tooltip: AppLocalizations.of(context)!.previousResult,
               ),
-              tooltip: AppLocalizations.of(context)!.previousResult,
-            ),
-            IconButton(
-              onPressed: _nextSearchResult,
-              icon: const Icon(
-                Icons.arrow_downward,
-                color: AppColors.secondaryText,
+              IconButton(
+                onPressed: _nextSearchResult,
+                icon: const Icon(
+                  Icons.arrow_downward,
+                  color: AppColors.secondaryText,
+                ),
+                tooltip: AppLocalizations.of(context)!.nextResult,
               ),
-              tooltip: AppLocalizations.of(context)!.nextResult,
-            ),
-            IconButton(
-              onPressed: _showSearchBar,
-              icon: const Icon(
-                Icons.search,
-                color: AppColors.secondaryText,
+              IconButton(
+                onPressed: _showSearchBar,
+                icon: const Icon(
+                  Icons.search,
+                  color: AppColors.secondaryText,
+                ),
+                tooltip: AppLocalizations.of(context)!.newSearch,
               ),
-              tooltip: AppLocalizations.of(context)!.newSearch,
-            ),
+            ],
           ],
           IconButton(
             key: _shareButtonKey, // Add key for position calculation
@@ -594,8 +597,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       ),
       body: Column(
         children: [
-          // Expandable search bar below app bar
-          if (_isSearchBarVisible) ...[
+          // Expandable search bar below app bar - only show for schedules
+          if (_isSearchBarVisible && isSchedule) ...[
             Container(
               padding: const EdgeInsets.all(16),
               color: AppColors.appSurface.withValues(alpha: 0.95),
