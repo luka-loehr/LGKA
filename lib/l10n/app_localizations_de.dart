@@ -316,4 +316,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get scheduleNotAvailable => 'ist noch nicht verfügbar';
+
+  @override
+  String get chartLoading => 'Diagramm wird geladen...';
 }
