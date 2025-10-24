@@ -1,11 +1,11 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/Users/Luka/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/Luka/Documents/lgka"
+export "FLUTTER_ROOT=/home/luka/development/flutter"
+export "FLUTTER_APPLICATION_PATH=/home/luka/Documents/lgka"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
-export "FLUTTER_BUILD_NAME=2.2.2"
-export "FLUTTER_BUILD_NUMBER=83"
+export "FLUTTER_BUILD_NAME=2.2.3"
+export "FLUTTER_BUILD_NUMBER=93"
 export "DART_OBFUSCATION=false"
 export "TRACK_WIDGET_CREATION=true"
 export "TREE_SHAKE_ICONS=false"
