@@ -640,6 +640,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter search term...'**
   String get searchHint;
+
+  /// No description provided for @firstSemester.
+  ///
+  /// In en, this message translates to:
+  /// **'1st semester'**
+  String get firstSemester;
+
+  /// No description provided for @secondSemester.
+  ///
+  /// In en, this message translates to:
+  /// **'2nd semester'**
+  String get secondSemester;
+
+  /// No description provided for @grades5to10.
+  ///
+  /// In en, this message translates to:
+  /// **'Grades 5-10'**
+  String get grades5to10;
+
+  /// No description provided for @j11j12.
+  ///
+  /// In en, this message translates to:
+  /// **'J11/J12'**
+  String get j11j12;
+
+  /// No description provided for @monday.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get monday;
+
+  /// No description provided for @tuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesday'**
+  String get tuesday;
+
+  /// No description provided for @wednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesday'**
+  String get wednesday;
+
+  /// No description provided for @thursday.
+  ///
+  /// In en, this message translates to:
+  /// **'Thursday'**
+  String get thursday;
+
+  /// No description provided for @friday.
+  ///
+  /// In en, this message translates to:
+  /// **'Friday'**
+  String get friday;
+
+  /// No description provided for @saturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get saturday;
+
+  /// No description provided for @sunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get sunday;
+
+  /// No description provided for @scheduleNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'is not available yet'**
+  String get scheduleNotAvailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

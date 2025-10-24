@@ -345,22 +345,8 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     final pdfFile = pdfRepo.getPdfFile(isToday);
     final pdfState = isToday ? pdfRepo.todayState : pdfRepo.tomorrowState;
     String weekday = pdfState.weekday ?? (isToday ? AppLocalizations.of(context)!.today : AppLocalizations.of(context)!.tomorrow);
-    // Translate German weekdays to English for display when locale is English
-    final localeCode = Localizations.localeOf(context).languageCode;
-    if (localeCode == 'en') {
-      const Map<String, String> germanToEnglishWeekday = {
-        'Montag': 'Monday',
-        'Dienstag': 'Tuesday',
-        'Mittwoch': 'Wednesday',
-        'Donnerstag': 'Thursday',
-        'Freitag': 'Friday',
-        'Samstag': 'Saturday',
-        'Sonntag': 'Sunday',
-      };
-      if (germanToEnglishWeekday.containsKey(weekday)) {
-        weekday = germanToEnglishWeekday[weekday]!;
-      }
-    }
+    // Translate German weekdays to localized names
+    weekday = _localizeWeekday(context, weekday);
     
     if (pdfFile != null) {
       // Navigate to PDF viewer screen
@@ -921,23 +907,8 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
     } else if (weekday.isEmpty || weekday == 'weekend') {
       displayText = AppLocalizations.of(context)!.noInfoYet;
     } else {
-      // Translate German weekday names to English for display if needed
-      final localeCode = Localizations.localeOf(context).languageCode;
-      if (localeCode == 'en') {
-        const Map<String, String> germanToEnglishWeekday = {
-          'Montag': 'Monday',
-          'Dienstag': 'Tuesday',
-          'Mittwoch': 'Wednesday',
-          'Donnerstag': 'Thursday',
-          'Freitag': 'Friday',
-          'Samstag': 'Saturday',
-          'Sonntag': 'Sunday',
-        };
-        if (germanToEnglishWeekday.containsKey(weekday)) {
-          weekday = germanToEnglishWeekday[weekday]!;
-        }
-      }
-      displayText = weekday;
+      // Translate German weekday names to localized names
+      displayText = _localizeWeekday(context, weekday);
     }
 
     return Row(
@@ -1000,6 +971,28 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
       widget.onRetry();
     } else {
       widget.onTap();
+    }
+  }
+
+  String _localizeWeekday(BuildContext context, String weekday) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (weekday) {
+      case 'Montag':
+        return l10n.monday;
+      case 'Dienstag':
+        return l10n.tuesday;
+      case 'Mittwoch':
+        return l10n.wednesday;
+      case 'Donnerstag':
+        return l10n.thursday;
+      case 'Freitag':
+        return l10n.friday;
+      case 'Samstag':
+        return l10n.saturday;
+      case 'Sonntag':
+        return l10n.sunday;
+      default:
+        return weekday;
     }
   }
 }
