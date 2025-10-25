@@ -23,7 +23,6 @@ class ColorProvider extends StateNotifier<String> {
     ColorPalette(name: 'teal', displayName: 'Türkis', color: Color(0xFF25A18E)), // Green/Teal
     ColorPalette(name: 'sky', displayName: 'Himmel', color: Color(0xFF5AA9E6)), // Light Blue
     ColorPalette(name: 'navy', displayName: 'Marine', color: Color(0xFF19647E)), // Teal (darker)
-    ColorPalette(name: 'violet', displayName: 'Violett', color: Color(0xFF8B5CF6)), // Violet (deep purple)
     ColorPalette(name: 'pink', displayName: 'Pink', color: Color(0xFFEA526F)), // Pink
     ColorPalette(name: 'burgundy', displayName: 'Burgund', color: Color(0xFF840032)), // Dark Magenta/Burgundy
     ColorPalette(name: 'gray', displayName: 'Grau', color: Color(0xFF7F7F7F)), // Gray
