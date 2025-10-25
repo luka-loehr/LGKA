@@ -18,27 +18,36 @@ class AppColors {
   static const Color primaryText = Colors.white;
   static const Color secondaryText = Color(0xB3FFFFFF); // White with 70% opacity (ARGB format)
 
-  // Accent color mapping - Aesthetic pastel Gen Z colors
+  // New vibrant accent color palette
+  static const Color goldenYellow = Color(0xFFF9C80E); // #f9c80e
+  static const Color vibrantOrange = Color(0xFFF86624); // #f86624
+  static const Color electricRed = Color(0xFFEA3546); // #ea3546
+  static const Color deepPurple = Color(0xFF662E9B); // #662e9b
+  static const Color cyanBlue = Color(0xFF43BCCD); // #43bccd
+
+  // Accent color mapping - New vibrant palette
   static Color getAccentColor(String colorName) {
     switch (colorName) {
-      case 'blue':
-        return appBlueAccent;
-      case 'lavender':
-        return Color(0xFF9B6BDF); // More saturated lavender - elegant and vibrant
-      case 'mint':
-        return Color(0xFF45A88A); // A bit more darker mint green - trendy and vibrant
-      case 'peach':
-        return Color(0xFFBF7F46); // Slightly darker peach/orange for better contrast
-      case 'rose':
-        return Color(0xFFC47A7A); // More saturated rose - gentle and vibrant
+      case 'golden':
+        return goldenYellow;
+      case 'orange':
+        return vibrantOrange;
+      case 'red':
+        return electricRed;
+      case 'purple':
+        return deepPurple;
+      case 'cyan':
+        return cyanBlue;
+      case 'blue': // Keep blue as default for backward compatibility
+        return cyanBlue; // Use cyan as the new "blue"
       default:
-        return appBlueAccent;
+        return cyanBlue; // Default to cyan
     }
   }
 }
 
 class AppTheme {
-  static ThemeData get darkTheme => getDarkThemeWithAccent('blue');
+  static ThemeData get darkTheme => getDarkThemeWithAccent('cyan');
 
   static ThemeData getDarkThemeWithAccent(String accentColorName) {
     final accentColor = AppColors.getAccentColor(accentColorName);

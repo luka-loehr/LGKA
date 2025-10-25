@@ -1079,11 +1079,11 @@ class _SettingsSheet extends ConsumerWidget {
   Widget _buildAccentColorSetting(BuildContext context, PreferencesManager preferencesManager) {
     final currentTheme = Theme.of(context);
     final presetColors = [
-      {'name': 'Blau', 'value': 'blue', 'color': AppColors.appBlueAccent},
-      {'name': 'Mint', 'value': 'mint', 'color': Color(0xFF45A88A)},
-      {'name': 'Lavendel', 'value': 'lavender', 'color': Color(0xFF9B6BDF)},
-      {'name': 'Rose', 'value': 'rose', 'color': Color(0xFFC47A7A)},
-      {'name': 'Pfirsich', 'value': 'peach', 'color': Color(0xFFBF7F46)},
+      {'name': 'Cyan', 'value': 'cyan', 'color': AppColors.cyanBlue},
+      {'name': 'Gold', 'value': 'golden', 'color': AppColors.goldenYellow},
+      {'name': 'Orange', 'value': 'orange', 'color': AppColors.vibrantOrange},
+      {'name': 'Rot', 'value': 'red', 'color': AppColors.electricRed},
+      {'name': 'Lila', 'value': 'purple', 'color': AppColors.deepPurple},
     ];
 
     return Column(
