@@ -8,6 +8,7 @@ import '../theme/app_theme.dart';
 import '../providers/haptic_service.dart';
 import '../navigation/app_router.dart';
 import '../l10n/app_localizations.dart';
+import '../providers/app_providers.dart';
 
 class KrankmeldungInfoScreen extends ConsumerWidget {
   const KrankmeldungInfoScreen({super.key});
@@ -86,7 +87,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     HapticService.subtle();
-                    _openKrankmeldung(context);
+                    _openKrankmeldung(context, ref);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
@@ -127,7 +128,11 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
   }
 
 
-  void _openKrankmeldung(BuildContext context) {
+  void _openKrankmeldung(BuildContext context, WidgetRef ref) {
+    // Mark that the krankmeldung info has been shown
+    final preferencesManager = ref.read(preferencesManagerProvider);
+    preferencesManager.setKrankmeldungInfoShown(true);
+    
     // Navigate to the webview with the illness report
     context.push(AppRouter.webview, extra: {
       'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
