@@ -7,6 +7,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
+import '../providers/color_provider.dart';
 import '../data/pdf_repository.dart';
 import '../data/preferences_manager.dart';
 import '../providers/haptic_service.dart';
@@ -1078,13 +1079,8 @@ class _SettingsSheet extends ConsumerWidget {
 
   Widget _buildAccentColorSetting(BuildContext context, PreferencesManager preferencesManager) {
     final currentTheme = Theme.of(context);
-    final presetColors = [
-      {'name': 'Cyan', 'value': 'cyan', 'color': AppColors.cyanBlue},
-      {'name': 'Gold', 'value': 'golden', 'color': AppColors.goldenYellow},
-      {'name': 'Orange', 'value': 'orange', 'color': AppColors.vibrantOrange},
-      {'name': 'Rot', 'value': 'red', 'color': AppColors.electricRed},
-      {'name': 'Lila', 'value': 'purple', 'color': AppColors.deepPurple},
-    ];
+    final choosableColors = ref.watch(choosableColorsProvider);
+    final currentColorName = ref.watch(colorProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1107,18 +1103,18 @@ class _SettingsSheet extends ConsumerWidget {
         Wrap(
           spacing: 12,
           runSpacing: 8,
-          children: presetColors.map((colorData) {
-            final isSelected = preferencesManager.accentColor == colorData['value'];
+          children: choosableColors.map((colorPalette) {
+            final isSelected = currentColorName == colorPalette.name;
             return GestureDetector(
               onTap: () {
-                preferencesManager.setAccentColor(colorData['value'] as String);
+                ref.read(colorProvider.notifier).setColor(colorPalette.name);
                 HapticService.subtle();
               },
               child: Container(
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: colorData['color'] as Color,
+                  color: colorPalette.color,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isSelected ? Colors.white : Colors.transparent,
@@ -1127,7 +1123,7 @@ class _SettingsSheet extends ConsumerWidget {
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: currentTheme.colorScheme.primary.withValues(alpha: 0.4),
+                            color: colorPalette.color.withValues(alpha: 0.5),
                             blurRadius: 8,
                             spreadRadius: 2,
                           ),
