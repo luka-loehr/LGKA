@@ -17,20 +17,20 @@ class ColorProvider extends StateNotifier<String> {
   /// The 15-color palette - first color is always the default
   static const List<ColorPalette> colorPalette = [
     ColorPalette(name: 'blue', displayName: 'Blau', color: Color(0xFF2F80ED)), // Default Blue
-    ColorPalette(name: 'sky', displayName: 'Himmel', color: Color(0xFF56CCF2)), // Sky Blue
-    ColorPalette(name: 'teal', displayName: 'Türkis', color: Color(0xFF2D9CDB)), // Teal
-    ColorPalette(name: 'aqua', displayName: 'Aqua', color: Color(0xFF27AE60)), // Aqua Green
-    ColorPalette(name: 'mint', displayName: 'Minze', color: Color(0xFF6FCF97)), // Mint
-    ColorPalette(name: 'lime', displayName: 'Limette', color: Color(0xFFA3E635)), // Lime
-    ColorPalette(name: 'yellow', displayName: 'Gelb', color: Color(0xFFF2C94C)), // Yellow
-    ColorPalette(name: 'orange', displayName: 'Orange', color: Color(0xFFF2994A)), // Orange
-    ColorPalette(name: 'deep_orange', displayName: 'Dunkel Orange', color: Color(0xFFEB5757)), // Deep Orange
-    ColorPalette(name: 'coral', displayName: 'Koralle', color: Color(0xFFF66D9B)), // Coral Pink
-    ColorPalette(name: 'magenta', displayName: 'Magenta', color: Color(0xFFBB6BD9)), // Magenta
-    ColorPalette(name: 'violet', displayName: 'Violett', color: Color(0xFF9B51E0)), // Violet
-    ColorPalette(name: 'indigo', displayName: 'Indigo', color: Color(0xFF5B6EF5)), // Indigo
-    ColorPalette(name: 'burgundy', displayName: 'Burgund', color: Color(0xFF9B1C31)), // Dark Red / Burgundy
-    ColorPalette(name: 'gray', displayName: 'Grau', color: Color(0xFF828282)), // Neutral Gray
+    ColorPalette(name: 'sky', displayName: 'Himmel', color: Color(0xFF3A9FCF)), // Sky Blue (darker)
+    ColorPalette(name: 'teal', displayName: 'Türkis', color: Color(0xFF2A8FC3)), // Teal (darker)
+    ColorPalette(name: 'aqua', displayName: 'Aqua', color: Color(0xFF1F9952)), // Aqua Green (darker)
+    ColorPalette(name: 'mint', displayName: 'Minze', color: Color(0xFF57B87A)), // Mint (darker)
+    ColorPalette(name: 'lime', displayName: 'Limette', color: Color(0xFF91CF2C)), // Lime (darker)
+    ColorPalette(name: 'yellow', displayName: 'Gelb', color: Color(0xFFDBB440)), // Yellow (darker)
+    ColorPalette(name: 'orange', displayName: 'Orange', color: Color(0xFFDD893C)), // Orange (darker)
+    ColorPalette(name: 'deep_orange', displayName: 'Dunkel Orange', color: Color(0xFFD3454A)), // Deep Orange (darker)
+    ColorPalette(name: 'coral', displayName: 'Koralle', color: Color(0xFFDC5D85)), // Coral Pink (darker)
+    ColorPalette(name: 'magenta', displayName: 'Magenta', color: Color(0xFFA558C2)), // Magenta (darker)
+    ColorPalette(name: 'violet', displayName: 'Violett', color: Color(0xFF8644C9)), // Violet (darker)
+    ColorPalette(name: 'indigo', displayName: 'Indigo', color: Color(0xFF4D5CD8)), // Indigo (darker)
+    ColorPalette(name: 'burgundy', displayName: 'Burgund', color: Color(0xFF891927)), // Dark Red / Burgundy (darker)
+    ColorPalette(name: 'gray', displayName: 'Grau', color: Color(0xFF727272)), // Neutral Gray (darker)
   ];
 
   /// Get the default color (first in palette)
