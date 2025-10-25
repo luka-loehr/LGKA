@@ -360,6 +360,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
           Builder(
             builder: (context) {
               final accentColor = ref.watch(currentColorProvider);
+              print('🎨 Confetti using accent color: ${accentColor.toString()}');
               return Align(
                 alignment: Alignment.topCenter,
                 child: ConfettiWidget(
