@@ -53,8 +53,8 @@
   <h2 id="datenverarbeitung">2. Datenverarbeitung</h2>
   <p>Die App verarbeitet ausschließlich technische Daten zur Funktionsfähigkeit und Benutzerfreundlichkeit. Es werden keine personenbezogenen Daten erhoben, ausgewertet oder an Dritte übermittelt.</p>
   
-  <h3 id="lokale-speicherung">2.1 Lokale Datenspeicherung</h3>
-  <p>Folgende Daten werden ausschließlich lokal auf deinem Gerät gespeichert:</p>
+  <h3 id="lokale-speicherung">2.1 App-spezifische Datenspeicherung</h3>
+  <p>Folgende Daten werden ausschließlich im sandboxed App-Verzeichnis auf deinem Gerät gespeichert (nur für diese App zugänglich):</p>
   <ul>
     <li><strong>App-Einstellungen:</strong> Akzentfarbe, Vibrationseinstellungen, Debug-Modus</li>
     <li><strong>Onboarding-Status:</strong> Ob die Einführung bereits durchlaufen wurde</li>
@@ -64,11 +64,12 @@
   </ul>
   
   <h3 id="temporaere-daten">2.2 Temporäre Datenspeicherung</h3>
-  <p>Folgende Daten werden temporär im App-Cache gespeichert und automatisch gelöscht:</p>
+  <p>Folgende Daten werden temporär im App-spezifischen Cache-Verzeichnis gespeichert und automatisch gelöscht:</p>
   <ul>
     <li><strong>PDF-Dateien:</strong> Vertretungspläne und Stundenpläne werden temporär zwischengespeichert</li>
     <li><strong>Wetterdaten:</strong> Aktuelle Wetterinformationen werden temporär gespeichert</li>
   </ul>
+  <p><strong>Hinweis:</strong> Diese temporären Dateien sind ausschließlich im App-spezifischen Verzeichnis gespeichert und für andere Apps nicht zugänglich.</p>
   
   <h3 id="netzwerkkommunikation">2.3 Netzwerkkommunikation</h3>
   <p>Die App kommuniziert ausschließlich mit Servern des Lessing-Gymnasiums:</p>
@@ -95,9 +96,10 @@
   <p>Die App benötigt folgende Berechtigungen:</p>
   <ul>
     <li><strong>Internetzugriff:</strong> Für den Abruf von Vertretungsplänen, Stundenplänen und Wetterdaten</li>
-    <li><strong>Lokaler Speicher:</strong> Für die Zwischenspeicherung von PDF-Dateien und App-Einstellungen</li>
+    <li><strong>App-spezifischer Speicher:</strong> Für die Zwischenspeicherung von PDF-Dateien und App-Einstellungen ausschließlich im eigenen App-Verzeichnis</li>
   </ul>
-  <p>Weitere Berechtigungen (z. B. Kamera, Standort, Kontakte) werden nicht verwendet oder angefordert. Es gibt keine Cookies, kein Tracking und keine Analysedienste.</p>
+  <p><strong>Wichtiger Hinweis:</strong> Die App hat <strong>keine Berechtigung</strong> auf deine persönlichen Dateien, Fotos, Dokumente oder andere Apps zuzugreifen. Alle Daten werden ausschließlich im sandboxed App-Verzeichnis gespeichert, das nur dieser App zugänglich ist.</p>
+  <p>Weitere Berechtigungen (z. B. Kamera, Standort, Kontakte, externer Speicher) werden nicht verwendet oder angefordert. Es gibt keine Cookies, kein Tracking und keine Analysedienste.</p>
 
   <h2 id="rechtsgrundlage">5. Rechtsgrundlage</h2>
   <p>Die Verarbeitung der technischen Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Funktionsfähigkeit der App). Die lokale Speicherung dient ausschließlich der Benutzerfreundlichkeit und erfolgt ohne personenbezogene Daten.</p>
