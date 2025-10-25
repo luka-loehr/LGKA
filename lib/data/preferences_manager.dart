@@ -11,6 +11,7 @@ class PreferencesManager extends ChangeNotifier {
   static const String _keyShowNavigationDebug = 'show_navigation_debug';
   static const String _keyAccentColor = 'accent_color';
   static const String _keyVibrationEnabled = 'vibration_enabled';
+  static const String _keyKrankmeldungInfoShown = 'krankmeldung_info_shown';
   static const String _keyLastPdfSearch = 'last_pdf_search_query';
   static const String _keyLastPdfPage = 'last_pdf_search_page';
   // Per-schedule keys (exclude substitution plans)
@@ -86,6 +87,14 @@ class PreferencesManager extends ChangeNotifier {
 
   Future<void> setVibrationEnabled(bool value) async {
     await _prefs.setBool(_keyVibrationEnabled, value);
+    notifyListeners();
+  }
+
+  // Krankmeldung info shown preference
+  bool get krankmeldungInfoShown => _prefs.getBool(_keyKrankmeldungInfoShown) ?? false;
+
+  Future<void> setKrankmeldungInfoShown(bool value) async {
+    await _prefs.setBool(_keyKrankmeldungInfoShown, value);
     notifyListeners();
   }
 

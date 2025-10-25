@@ -221,8 +221,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _onKrankmeldungPressed() {
     HapticService.subtle();
-    // Navigate to the info screen first
-    context.push(AppRouter.krankmeldungInfo);
+    
+    final preferencesManager = ref.read(preferencesManagerProvider);
+    
+    // Check if krankmeldung info has been shown before
+    if (preferencesManager.krankmeldungInfoShown) {
+      // Navigate directly to webview
+      context.push(AppRouter.webview, extra: {
+        'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
+        'title': AppLocalizations.of(context)!.krankmeldung,
+        'headers': {
+          'User-Agent': 'LGKA-App-Luka-Loehr',
+        },
+        'fromKrankmeldungInfo': false,
+      });
+    } else {
+      // Navigate to the info screen first
+      context.push(AppRouter.krankmeldungInfo);
+    }
   }
 
 }
