@@ -357,24 +357,26 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
             ),
           ),
           // Confetti widget - only from top
-          Builder(
-            builder: (context) {
-              final accentColor = ref.watch(currentColorProvider);
-              print('🎨 Confetti using accent color: ${accentColor.toString()}');
-              return Align(
-                alignment: Alignment.topCenter,
-                child: ConfettiWidget(
-                  confettiController: _confettiController,
-                  blastDirection: 1.5708, // Top to bottom (90 degrees)
-                  maxBlastForce: 3,
-                  minBlastForce: 1,
-                  emissionFrequency: 0.1,
-                  numberOfParticles: 8,
-                  gravity: 0.1,
-                  colors: [accentColor],
-                ),
-              );
-            },
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirection: 1.5708, // Top to bottom (90 degrees)
+              maxBlastForce: 3,
+              minBlastForce: 1,
+              emissionFrequency: 0.1,
+              numberOfParticles: 8,
+              gravity: 0.1,
+              colors: const [
+                Colors.blue,
+                Colors.purple,
+                Colors.pink,
+                Colors.orange,
+                Colors.yellow,
+                Colors.green,
+                Colors.red,
+              ],
+            ),
           ),
         ],
         ),
