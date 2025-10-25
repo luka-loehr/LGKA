@@ -275,7 +275,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
       parent: _fadeController,
       curve: Curves.easeOutCubic,
     ));
-    _confettiController = ConfettiController(duration: const Duration(seconds: 10));
+    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
   }
 
   @override
@@ -357,68 +357,59 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
             ),
           ),
           // Confetti widgets
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirection: 1.5708, // Top to bottom (90 degrees)
-              maxBlastForce: 5,
-              minBlastForce: 2,
-              emissionFrequency: 0.05,
-              numberOfParticles: 20,
-              gravity: 0.1,
-              colors: const [
-                Colors.blue,
-                Colors.purple,
-                Colors.pink,
-                Colors.orange,
-                Colors.yellow,
-                Colors.green,
-                Colors.red,
-              ],
-            ),
+          Builder(
+            builder: (context) {
+              final accentColor = ref.watch(currentColorProvider);
+              return Align(
+                alignment: Alignment.topCenter,
+                child: ConfettiWidget(
+                  confettiController: _confettiController,
+                  blastDirection: 1.5708, // Top to bottom (90 degrees)
+                  maxBlastForce: 3,
+                  minBlastForce: 1,
+                  emissionFrequency: 0.1,
+                  numberOfParticles: 8,
+                  gravity: 0.1,
+                  colors: [accentColor],
+                ),
+              );
+            },
           ),
-          Align(
-            alignment: Alignment.center,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirection: 3.14159, // Left to right (180 degrees)
-              maxBlastForce: 5,
-              minBlastForce: 2,
-              emissionFrequency: 0.05,
-              numberOfParticles: 20,
-              gravity: 0.1,
-              colors: const [
-                Colors.blue,
-                Colors.purple,
-                Colors.pink,
-                Colors.orange,
-                Colors.yellow,
-                Colors.green,
-                Colors.red,
-              ],
-            ),
+          Builder(
+            builder: (context) {
+              final accentColor = ref.watch(currentColorProvider);
+              return Align(
+                alignment: Alignment.center,
+                child: ConfettiWidget(
+                  confettiController: _confettiController,
+                  blastDirection: 3.14159, // Left to right (180 degrees)
+                  maxBlastForce: 3,
+                  minBlastForce: 1,
+                  emissionFrequency: 0.1,
+                  numberOfParticles: 8,
+                  gravity: 0.1,
+                  colors: [accentColor],
+                ),
+              );
+            },
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirection: -1.5708, // Bottom to top (270 degrees)
-              maxBlastForce: 5,
-              minBlastForce: 2,
-              emissionFrequency: 0.05,
-              numberOfParticles: 20,
-              gravity: 0.1,
-              colors: const [
-                Colors.blue,
-                Colors.purple,
-                Colors.pink,
-                Colors.orange,
-                Colors.yellow,
-                Colors.green,
-                Colors.red,
-              ],
-            ),
+          Builder(
+            builder: (context) {
+              final accentColor = ref.watch(currentColorProvider);
+              return Align(
+                alignment: Alignment.bottomCenter,
+                child: ConfettiWidget(
+                  confettiController: _confettiController,
+                  blastDirection: -1.5708, // Bottom to top (270 degrees)
+                  maxBlastForce: 3,
+                  minBlastForce: 1,
+                  emissionFrequency: 0.1,
+                  numberOfParticles: 8,
+                  gravity: 0.1,
+                  colors: [accentColor],
+                ),
+              );
+            },
           ),
         ],
         ),
