@@ -1062,7 +1062,7 @@ class _SettingsSheet extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildAccentColorSetting(context, preferencesManager),
+                    _buildAccentColorSetting(context, preferencesManager, ref),
                     const SizedBox(height: 20),
                     _buildDivider(),
                     const SizedBox(height: 20),
@@ -1077,7 +1077,7 @@ class _SettingsSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildAccentColorSetting(BuildContext context, PreferencesManager preferencesManager) {
+  Widget _buildAccentColorSetting(BuildContext context, PreferencesManager preferencesManager, WidgetRef ref) {
     final currentTheme = Theme.of(context);
     final choosableColors = ref.watch(choosableColorsProvider);
     final currentColorName = ref.watch(colorProvider);
