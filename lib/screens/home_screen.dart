@@ -275,7 +275,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
       parent: _fadeController,
       curve: Curves.easeOutCubic,
     ));
-    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
+    _confettiController = ConfettiController(duration: const Duration(milliseconds: 500));
   }
 
   @override
