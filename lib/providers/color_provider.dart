@@ -8,7 +8,7 @@ import 'app_providers.dart';
 /// Centralized color system provider
 /// Manages 5 colors: first is default, others are choosable
 class ColorProvider extends StateNotifier<String> {
-  ColorProvider(this._preferencesManager) : super('cyan') {
+  ColorProvider(this._preferencesManager) : super('blue') {
     _loadSavedColor();
   }
 
@@ -16,7 +16,8 @@ class ColorProvider extends StateNotifier<String> {
 
   /// The 5-color palette - first color is always the default
   static const List<ColorPalette> colorPalette = [
-    ColorPalette(name: 'cyan', displayName: 'Cyan', color: Color(0xFF43BCCD)), // Default
+    ColorPalette(name: 'blue', displayName: 'Blau', color: Color(0xFF3770D4)), // Default (original blue)
+    ColorPalette(name: 'cyan', displayName: 'Cyan', color: Color(0xFF43BCCD)),
     ColorPalette(name: 'golden', displayName: 'Gold', color: Color(0xFFF9C80E)),
     ColorPalette(name: 'orange', displayName: 'Orange', color: Color(0xFFF86624)),
     ColorPalette(name: 'red', displayName: 'Red', color: Color(0xFFEA3546)),
