@@ -259,6 +259,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
   late Animation<double> _fadeAnimation;
   late ConfettiController _confettiController;
   bool _hasShownButtons = false;
+  bool _hasTriggeredConfetti = false;
 
   @override
   void initState() {
@@ -321,10 +322,15 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onScaleStart: (details) {
-          // Detect 5-finger tap
           print('🎨 Scale start with ${details.pointerCount} pointers');
-          if (details.pointerCount >= 3) {
+          _hasTriggeredConfetti = false; // Reset flag at start of gesture
+        },
+        onScaleUpdate: (details) {
+          // Detect multi-finger tap during the gesture
+          print('🎨 Scale update with ${details.pointerCount} pointers');
+          if (details.pointerCount >= 4 && !_hasTriggeredConfetti) {
             print('🎉 ${details.pointerCount} fingers detected! Confetti time!');
+            _hasTriggeredConfetti = true; // Mark as triggered
             _confettiController.play();
             HapticService.heavy();
           }
