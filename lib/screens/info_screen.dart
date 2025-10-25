@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
+import '../providers/color_provider.dart';
 import '../navigation/app_router.dart';
 import '../providers/haptic_service.dart';
 import '../l10n/app_localizations.dart';
@@ -81,21 +82,22 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
     }
   }
 
-  final List<Map<String, dynamic>> _accentColors = [
-    {'name': 'cyan', 'color': AppColors.getAccentColor('cyan')},
-    {'name': 'golden', 'color': AppColors.getAccentColor('golden')},
-    {'name': 'orange', 'color': AppColors.getAccentColor('orange')},
-    {'name': 'red', 'color': AppColors.getAccentColor('red')},
-    {'name': 'purple', 'color': AppColors.getAccentColor('purple')},
-  ];
+  final List<Map<String, dynamic>> _accentColors = [];
 
   @override
   void initState() {
     super.initState();
 
-    // Load current accent color; default to blue on first launch
-    final prefsManager = ref.read(preferencesManagerProvider);
-    _selectedColor = prefsManager.accentColor.isNotEmpty ? prefsManager.accentColor : 'blue';
+    // Load current accent color from color provider
+    _selectedColor = ref.read(colorProvider);
+    
+    // Populate accent colors from provider
+    final allColors = ColorProvider.allColors;
+    _accentColors.clear();
+    _accentColors.addAll(allColors.map((palette) => {
+      'name': palette.name,
+      'color': palette.color,
+    }));
 
     // Button animation
     _buttonController = AnimationController(
@@ -147,9 +149,8 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
 
     await HapticService.light();
 
-    // Save color preference
-    final prefsManager = ref.read(preferencesManagerProvider);
-    await prefsManager.setAccentColor(colorName);
+    // Save color preference using color provider
+    await ref.read(colorProvider.notifier).setColor(colorName);
   }
 
   Future<void> _navigateToAuth() async {
