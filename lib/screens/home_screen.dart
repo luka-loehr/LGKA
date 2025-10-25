@@ -319,11 +319,12 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
         print('📱 Pointer down: ${event.pointer}');
       },
       child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onScaleStart: (details) {
           // Detect 5-finger tap
           print('🎨 Scale start with ${details.pointerCount} pointers');
-          if (details.pointerCount == 5) {
-            print('🎉 5 fingers detected! Confetti time!');
+          if (details.pointerCount >= 3) {
+            print('🎉 ${details.pointerCount} fingers detected! Confetti time!');
             _confettiController.play();
             HapticService.heavy();
           }
