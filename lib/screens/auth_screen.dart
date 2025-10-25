@@ -55,8 +55,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   late AnimationController _successColorController;
   late Animation<Color?> _successColorAnimation;
 
-  // Get accent color from color provider
-  Color get _activeColor => ref.watch(currentColorProvider);
+  // Store current accent color
+  late Color _activeColor;
   
   // Inactive color with transparency
   Color get _inactiveColor => _activeColor.withValues(alpha: 0.5); // 50% opacity
@@ -65,11 +65,25 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   void initState() {
     super.initState();
     
+    // Set up focus listeners
+    _usernameFocusNode.addListener(_handleFocusChange);
+    _passwordFocusNode.addListener(_handleTextChange);
+    
+    // Listen for text changes to update button state
+    _usernameController.addListener(_handleTextChange);
+    _passwordController.addListener(_handleTextChange);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Get accent color from color provider
+    _activeColor = ref.watch(currentColorProvider);
+    
     // Get initial accent color
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final prefsManager = ref.read(preferencesManagerProvider);
-      _currentAccentColor = prefsManager.accentColor;
-    });
+    final prefsManager = ref.read(preferencesManagerProvider);
+    _currentAccentColor = prefsManager.accentColor;
     
     // Setup button color animation with accent color
     _buttonColorController = AnimationController(
@@ -98,14 +112,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       parent: _successColorController,
       curve: Curves.easeInOut,
     ));
-    
-    // Set up focus listeners
-    _usernameFocusNode.addListener(_handleFocusChange);
-    _passwordFocusNode.addListener(_handleTextChange);
-    
-    // Listen for text changes to update button state
-    _usernameController.addListener(_handleTextChange);
-    _passwordController.addListener(_handleTextChange);
   }
 
   // Update animations when accent color changes
