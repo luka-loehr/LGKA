@@ -1105,8 +1105,8 @@ class _SettingsSheet extends ConsumerWidget {
                   color: colorData['color'] as Color,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSelected ? currentTheme.colorScheme.primary : Colors.transparent,
-                    width: 3,
+                    color: isSelected ? Colors.white : Colors.transparent,
+                    width: isSelected ? 3 : 0,
                   ),
                   boxShadow: isSelected
                       ? [
