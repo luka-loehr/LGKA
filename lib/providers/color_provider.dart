@@ -24,7 +24,7 @@ class ColorProvider extends StateNotifier<String> {
     ColorPalette(name: 'sky', displayName: 'Himmel', color: Color(0xFF5AA9E6)),
     ColorPalette(name: 'burgundy', displayName: 'Burgund', color: Color(0xFF840032)),
     ColorPalette(name: 'navy', displayName: 'Marine', color: Color(0xFF19647E)),
-    ColorPalette(name: 'plum', displayName: 'Pflaume', color: Color(0xFF985277)),
+    ColorPalette(name: 'pink', displayName: 'Pink', color: Color(0xFFEA526F)),
     ColorPalette(name: 'gray', displayName: 'Grau', color: Color(0xFF7F7F7F)),
   ];
 
