@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -59,6 +60,10 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   late Animation<double> _fadeAnimation;
   bool _hasShownComponents = false;
   
+  // Chart animation completion detection
+  bool _isChartAnimationComplete = false;
+  Timer? _animationTimer;
+  
   @override
   bool get wantKeepAlive => true;
   
@@ -117,6 +122,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
           setState(() {
             _isChartRendered = true;
           });
+          // Start chart animation completion detection
+          _startChartAnimation();
         }
       }
     });
@@ -129,10 +136,38 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     }
   }
 
+  void _startChartAnimation() {
+    setState(() {
+      _isChartAnimationComplete = false;
+    });
+    
+    // Cancel any existing timer
+    _animationTimer?.cancel();
+    
+    // Start timer to detect when chart animation completes (1000ms)
+    _animationTimer = Timer(const Duration(milliseconds: 1000), () {
+      if (mounted) {
+        setState(() {
+          _isChartAnimationComplete = true;
+        });
+        
+        // Chart animation completed! Do something here
+        _onChartAnimationComplete();
+      }
+    });
+  }
+
+  void _onChartAnimationComplete() {
+    print('🎨 Chart animation completed!');
+    // Add your logic here - maybe haptic feedback, analytics, etc.
+    HapticService.light();
+  }
+
   @override
   void dispose() {
     _errorAnimationController.dispose();
     _fadeController.dispose();
+    _animationTimer?.cancel();
     super.dispose();
   }
 
@@ -225,6 +260,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
           setState(() {
             _isChartRendered = true;
           });
+          // Start chart animation completion detection
+          _startChartAnimation();
         }
       });
     }
@@ -383,6 +420,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                                     setState(() {
                                                       _isChartRendered = true;
                                                     });
+                                                    // Start chart animation completion detection
+                                                    _startChartAnimation();
                                                   }
                                                 });
                                               },
@@ -453,6 +492,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                                     setState(() {
                                                       _isChartRendered = true;
                                                     });
+                                                    // Start chart animation completion detection
+                                                    _startChartAnimation();
                                                   }
                                                 });
                                               },
@@ -530,6 +571,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                                 setState(() {
                                                   _isChartRendered = true;
                                                 });
+                                                // Start chart animation completion detection
+                                                _startChartAnimation();
                                               }
                                             });
                                           },
@@ -594,6 +637,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                                 setState(() {
                                                   _isChartRendered = true;
                                                 });
+                                                // Start chart animation completion detection
+                                                _startChartAnimation();
                                               }
                                             });
                                           },
