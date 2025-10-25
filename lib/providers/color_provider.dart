@@ -50,8 +50,8 @@ class ColorProvider extends StateNotifier<String> {
     }
   }
 
-  /// Get all choosable colors (excluding default)
-  static List<ColorPalette> get choosableColors => colorPalette.skip(1).toList();
+  /// Get all choosable colors (including default - all 5 colors)
+  static List<ColorPalette> get choosableColors => colorPalette;
 
   /// Get all colors including default
   static List<ColorPalette> get allColors => colorPalette;
