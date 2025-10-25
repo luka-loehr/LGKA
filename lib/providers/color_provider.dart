@@ -17,15 +17,16 @@ class ColorProvider extends StateNotifier<String> {
   /// The 10-color palette - first color is always the default
   static const List<ColorPalette> colorPalette = [
     ColorPalette(name: 'blue', displayName: 'Blau', color: Color(0xFF3770D4)), // Default (original blue)
+    ColorPalette(name: 'purple', displayName: 'Lila', color: Color(0xFF662E9B)), // Purple
     ColorPalette(name: 'red', displayName: 'Rot', color: Color(0xFFEA3546)), // Red
     ColorPalette(name: 'orange', displayName: 'Orange', color: Color(0xFFFB6107)), // Orange
     ColorPalette(name: 'teal', displayName: 'Türkis', color: Color(0xFF25A18E)), // Green/Teal
     ColorPalette(name: 'sky', displayName: 'Himmel', color: Color(0xFF5AA9E6)), // Light Blue
-    ColorPalette(name: 'navy', displayName: 'Marine', color: Color(0xFF19647E)), // Indigo/Dark Blue
-    ColorPalette(name: 'purple', displayName: 'Lila', color: Color(0xFF662E9B)), // Violet/Purple
-    ColorPalette(name: 'pink', displayName: 'Pink', color: Color(0xFFEA526F)), // Pink (extended rainbow)
-    ColorPalette(name: 'burgundy', displayName: 'Burgund', color: Color(0xFF840032)), // Deep Red
-    ColorPalette(name: 'gray', displayName: 'Grau', color: Color(0xFF7F7F7F)), // Neutral
+    ColorPalette(name: 'navy', displayName: 'Marine', color: Color(0xFF19647E)), // Teal (darker)
+    ColorPalette(name: 'violet', displayName: 'Violett', color: Color(0xFF8B5CF6)), // Violet (deep purple)
+    ColorPalette(name: 'pink', displayName: 'Pink', color: Color(0xFFEA526F)), // Pink
+    ColorPalette(name: 'burgundy', displayName: 'Burgund', color: Color(0xFF840032)), // Dark Magenta/Burgundy
+    ColorPalette(name: 'gray', displayName: 'Grau', color: Color(0xFF7F7F7F)), // Gray
   ];
 
   /// Get the default color (first in palette)
