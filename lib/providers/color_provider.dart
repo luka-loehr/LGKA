@@ -14,18 +14,23 @@ class ColorProvider extends StateNotifier<String> {
 
   final PreferencesManager _preferencesManager;
 
-  /// The 10-color palette - first color is always the default
+  /// The 15-color palette - first color is always the default
   static const List<ColorPalette> colorPalette = [
-    ColorPalette(name: 'blue', displayName: 'Blau', color: Color(0xFF3770D4)), // Default (original blue)
-    ColorPalette(name: 'red', displayName: 'Rot', color: Color(0xFFEA3546)), // Red
-    ColorPalette(name: 'orange', displayName: 'Orange', color: Color(0xFFFB6107)), // Orange
-    ColorPalette(name: 'pink', displayName: 'Pink', color: Color(0xFFEA526F)), // Pink (warm)
-    ColorPalette(name: 'teal', displayName: 'Türkis', color: Color(0xFF25A18E)), // Green/Teal
-    ColorPalette(name: 'sky', displayName: 'Himmel', color: Color(0xFF5AA9E6)), // Light Blue
-    ColorPalette(name: 'navy', displayName: 'Marine', color: Color(0xFF19647E)), // Indigo/Navy
-    ColorPalette(name: 'purple', displayName: 'Lila', color: Color(0xFF662E9B)), // Purple/Violet
-    ColorPalette(name: 'burgundy', displayName: 'Burgund', color: Color(0xFF840032)), // Deep Magenta
-    ColorPalette(name: 'gray', displayName: 'Grau', color: Color(0xFF7F7F7F)), // Gray
+    ColorPalette(name: 'blue', displayName: 'Blau', color: Color(0xFF2F80ED)), // Default Blue
+    ColorPalette(name: 'sky', displayName: 'Himmel', color: Color(0xFF56CCF2)), // Sky Blue
+    ColorPalette(name: 'teal', displayName: 'Türkis', color: Color(0xFF2D9CDB)), // Teal
+    ColorPalette(name: 'aqua', displayName: 'Aqua', color: Color(0xFF27AE60)), // Aqua Green
+    ColorPalette(name: 'mint', displayName: 'Minze', color: Color(0xFF6FCF97)), // Mint
+    ColorPalette(name: 'lime', displayName: 'Limette', color: Color(0xFFA3E635)), // Lime
+    ColorPalette(name: 'yellow', displayName: 'Gelb', color: Color(0xFFF2C94C)), // Yellow
+    ColorPalette(name: 'orange', displayName: 'Orange', color: Color(0xFFF2994A)), // Orange
+    ColorPalette(name: 'deep_orange', displayName: 'Dunkel Orange', color: Color(0xFFEB5757)), // Deep Orange
+    ColorPalette(name: 'coral', displayName: 'Koralle', color: Color(0xFFF66D9B)), // Coral Pink
+    ColorPalette(name: 'magenta', displayName: 'Magenta', color: Color(0xFFBB6BD9)), // Magenta
+    ColorPalette(name: 'violet', displayName: 'Violett', color: Color(0xFF9B51E0)), // Violet
+    ColorPalette(name: 'indigo', displayName: 'Indigo', color: Color(0xFF5B6EF5)), // Indigo
+    ColorPalette(name: 'burgundy', displayName: 'Burgund', color: Color(0xFF9B1C31)), // Dark Red / Burgundy
+    ColorPalette(name: 'gray', displayName: 'Grau', color: Color(0xFF828282)), // Neutral Gray
   ];
 
   /// Get the default color (first in palette)
