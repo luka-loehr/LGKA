@@ -313,15 +313,22 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
       _startButtonAnimation();
     });
 
-    return GestureDetector(
-      onScaleStart: (details) {
-        // Detect 5-finger tap
-        if (details.pointerCount == 5) {
-          _confettiController.play();
-          HapticService.heavy();
-        }
+    return Listener(
+      onPointerDown: (event) {
+        // Track all pointer events
+        print('📱 Pointer down: ${event.pointer}');
       },
-      child: Stack(
+      child: GestureDetector(
+        onScaleStart: (details) {
+          // Detect 5-finger tap
+          print('🎨 Scale start with ${details.pointerCount} pointers');
+          if (details.pointerCount == 5) {
+            print('🎉 5 fingers detected! Confetti time!');
+            _confettiController.play();
+            HapticService.heavy();
+          }
+        },
+        child: Stack(
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -407,6 +414,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
             ),
           ),
         ],
+        ),
       ),
     );
   }
