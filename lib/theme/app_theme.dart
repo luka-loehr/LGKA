@@ -1,6 +1,7 @@
 // Copyright Luka Löhr 2025
 
 import 'package:flutter/material.dart';
+import '../providers/color_provider.dart';
 
 // App-specific colors based on the Kotlin version
 class AppColors {
@@ -18,39 +19,17 @@ class AppColors {
   static const Color primaryText = Colors.white;
   static const Color secondaryText = Color(0xB3FFFFFF); // White with 70% opacity (ARGB format)
 
-  // New vibrant accent color palette
-  static const Color goldenYellow = Color(0xFFF9C80E); // #f9c80e
-  static const Color vibrantOrange = Color(0xFFF86624); // #f86624
-  static const Color electricRed = Color(0xFFEA3546); // #ea3546
-  static const Color deepPurple = Color(0xFF662E9B); // #662e9b
-  static const Color cyanBlue = Color(0xFF43BCCD); // #43bccd
-
-  // Accent color mapping - New vibrant palette
+  // Legacy method for backward compatibility - now uses ColorProvider
   static Color getAccentColor(String colorName) {
-    switch (colorName) {
-      case 'golden':
-        return goldenYellow;
-      case 'orange':
-        return vibrantOrange;
-      case 'red':
-        return electricRed;
-      case 'purple':
-        return deepPurple;
-      case 'cyan':
-        return cyanBlue;
-      case 'blue': // Keep blue as default for backward compatibility
-        return cyanBlue; // Use cyan as the new "blue"
-      default:
-        return cyanBlue; // Default to cyan
-    }
+    return ColorProvider.getColorByName(colorName);
   }
 }
 
 class AppTheme {
-  static ThemeData get darkTheme => getDarkThemeWithAccent('cyan');
+  static ThemeData get darkTheme => getDarkThemeWithAccent(ColorProvider.defaultColorName);
 
   static ThemeData getDarkThemeWithAccent(String accentColorName) {
-    final accentColor = AppColors.getAccentColor(accentColorName);
+    final accentColor = ColorProvider.getColorByName(accentColorName);
     
     return ThemeData(
       useMaterial3: true,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/app_providers.dart';
+import '../providers/color_provider.dart';
 import '../navigation/app_router.dart';
 import '../providers/haptic_service.dart';
 import '../theme/app_theme.dart';
@@ -54,8 +55,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   late AnimationController _successColorController;
   late Animation<Color?> _successColorAnimation;
 
-  // Get accent color from preferences
-  Color get _activeColor => AppColors.getAccentColor(ref.read(preferencesManagerProvider).accentColor);
+  // Get accent color from color provider
+  Color get _activeColor => ref.watch(currentColorProvider);
   
   // Inactive color with transparency
   Color get _inactiveColor => _activeColor.withValues(alpha: 0.5); // 50% opacity
