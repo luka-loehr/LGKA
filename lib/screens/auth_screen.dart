@@ -156,12 +156,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     }
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Ensure keyboard animation updates when keyboard visibility changes
-    _updateOffsetState();
-  }
 
   @override
   void dispose() {

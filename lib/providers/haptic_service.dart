@@ -43,4 +43,10 @@ class HapticService {
     // Single sharp feedback for errors - more minimalistic approach
     await HapticFeedback.mediumImpact();
   }
+  
+  /// Provides heavy haptic feedback for special interactions
+  /// Used for easter eggs and important events
+  static Future<void> heavy() async {
+    await HapticFeedback.heavyImpact();
+  }
 } 
