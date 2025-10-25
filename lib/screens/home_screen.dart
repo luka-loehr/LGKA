@@ -328,7 +328,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
         onScaleUpdate: (details) {
           // Detect multi-finger tap during the gesture
           print('🎨 Scale update with ${details.pointerCount} pointers');
-          if (details.pointerCount >= 4 && !_hasTriggeredConfetti) {
+          if (details.pointerCount >= 5 && !_hasTriggeredConfetti) {
             print('🎉 ${details.pointerCount} fingers detected! Confetti time!');
             _hasTriggeredConfetti = true; // Mark as triggered
             _confettiController.play();
