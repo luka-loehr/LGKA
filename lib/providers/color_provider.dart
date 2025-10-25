@@ -18,7 +18,7 @@ class ColorProvider extends StateNotifier<String> {
   static const List<ColorPalette> colorPalette = [
     ColorPalette(name: 'blue', displayName: 'Blau', color: Color(0xFF3770D4)), // Default (original blue)
     ColorPalette(name: 'red', displayName: 'Red', color: Color(0xFFEA3546)),
-    ColorPalette(name: 'golden', displayName: 'Gold', color: Color(0xFFF9C80E)),
+    ColorPalette(name: 'green', displayName: 'Grün', color: Color(0xFF7BF1A8)),
     ColorPalette(name: 'orange', displayName: 'Orange', color: Color(0xFFF86624)),
     ColorPalette(name: 'purple', displayName: 'Purple', color: Color(0xFF662E9B)),
   ];
