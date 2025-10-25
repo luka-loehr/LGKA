@@ -356,7 +356,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
               ],
             ),
           ),
-          // Confetti widgets
+          // Confetti widget - only from top
           Builder(
             builder: (context) {
               final accentColor = ref.watch(currentColorProvider);
@@ -365,42 +365,6 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
                 child: ConfettiWidget(
                   confettiController: _confettiController,
                   blastDirection: 1.5708, // Top to bottom (90 degrees)
-                  maxBlastForce: 3,
-                  minBlastForce: 1,
-                  emissionFrequency: 0.1,
-                  numberOfParticles: 8,
-                  gravity: 0.1,
-                  colors: [accentColor],
-                ),
-              );
-            },
-          ),
-          Builder(
-            builder: (context) {
-              final accentColor = ref.watch(currentColorProvider);
-              return Align(
-                alignment: Alignment.center,
-                child: ConfettiWidget(
-                  confettiController: _confettiController,
-                  blastDirection: 3.14159, // Left to right (180 degrees)
-                  maxBlastForce: 3,
-                  minBlastForce: 1,
-                  emissionFrequency: 0.1,
-                  numberOfParticles: 8,
-                  gravity: 0.1,
-                  colors: [accentColor],
-                ),
-              );
-            },
-          ),
-          Builder(
-            builder: (context) {
-              final accentColor = ref.watch(currentColorProvider);
-              return Align(
-                alignment: Alignment.bottomCenter,
-                child: ConfettiWidget(
-                  confettiController: _confettiController,
-                  blastDirection: -1.5708, // Bottom to top (270 degrees)
                   maxBlastForce: 3,
                   minBlastForce: 1,
                   emissionFrequency: 0.1,
