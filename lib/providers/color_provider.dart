@@ -17,11 +17,11 @@ class ColorProvider extends StateNotifier<String> {
   /// The 15-color palette - first color is always the default
   static const List<ColorPalette> colorPalette = [
     ColorPalette(name: 'blue', displayName: 'Blau', color: Color(0xFF2F80ED)), // Default Blue
-    ColorPalette(name: 'cyan', displayName: 'Cyan', color: Color(0xFF00D9FF)), // Cyan
+    ColorPalette(name: 'cyan', displayName: 'Cyan', color: Color(0xFF00BCD4)), // Cyan (darker)
     ColorPalette(name: 'turquoise', displayName: 'Türkis', color: Color(0xFF1EB8AA)), // Turquoise
     ColorPalette(name: 'green', displayName: 'Grün', color: Color(0xFF27AE60)), // Green
-    ColorPalette(name: 'lime', displayName: 'Limette', color: Color(0xFFADFF00)), // Lime
-    ColorPalette(name: 'yellow', displayName: 'Gelb', color: Color(0xFFFFD600)), // Yellow
+    ColorPalette(name: 'lime', displayName: 'Limette', color: Color(0xFF9CCC65)), // Lime (darker)
+    ColorPalette(name: 'yellow', displayName: 'Gelb', color: Color(0xFFFFCA28)), // Yellow (darker)
     ColorPalette(name: 'amber', displayName: 'Bernstein', color: Color(0xFFFF9800)), // Amber
     ColorPalette(name: 'orange', displayName: 'Orange', color: Color(0xFFFF6B00)), // Orange
     ColorPalette(name: 'red', displayName: 'Rot', color: Color(0xFFEA3546)), // Red
