@@ -29,7 +29,7 @@ jobs:
       - name: Copy HTML files to docs directory
         run: |
           mkdir -p docs
-          cp impressum.html privacy.html docs/
+          # Files are already in docs directory, no need to copy
           
       - name: Setup Pages
         uses: actions/configure-pages@v5
