@@ -82,11 +82,11 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
   }
 
   final List<Map<String, dynamic>> _accentColors = [
-    {'name': 'blue', 'color': AppColors.getAccentColor('blue')},
-    {'name': 'lavender', 'color': AppColors.getAccentColor('lavender')},
-    {'name': 'mint', 'color': AppColors.getAccentColor('mint')},
-    {'name': 'peach', 'color': AppColors.getAccentColor('peach')},
-    {'name': 'rose', 'color': AppColors.getAccentColor('rose')},
+    {'name': 'cyan', 'color': AppColors.getAccentColor('cyan')},
+    {'name': 'golden', 'color': AppColors.getAccentColor('golden')},
+    {'name': 'orange', 'color': AppColors.getAccentColor('orange')},
+    {'name': 'red', 'color': AppColors.getAccentColor('red')},
+    {'name': 'purple', 'color': AppColors.getAccentColor('purple')},
   ];
 
   @override
