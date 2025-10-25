@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/preferences_manager.dart';
+import 'app_providers.dart';
 
 /// Centralized color system provider
 /// Manages 5 colors: first is default, others are choosable
@@ -65,7 +66,7 @@ class ColorProvider extends StateNotifier<String> {
 
   /// Load saved color from preferences
   Future<void> _loadSavedColor() async {
-    final savedColor = await _preferencesManager.getAccentColor();
+    final savedColor = _preferencesManager.accentColor;
     if (savedColor.isNotEmpty && colorPalette.any((palette) => palette.name == savedColor)) {
       state = savedColor;
     } else {
