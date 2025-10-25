@@ -25,12 +25,22 @@
     a:hover {
       text-decoration: underline;
     }
+    .highlight {
+      background-color: #f6f8fa;
+      padding: 16px;
+      border-radius: 6px;
+      border-left: 4px solid #0366d6;
+      margin: 16px 0;
+    }
   </style>
 </head>
 <body>
   <h1>Datenschutzerklärung – LGKA+</h1>
-  <p><strong>Stand: September 2025</strong></p>
-  <p><strong>Kurzfassung:</strong> Die App verarbeitet keine Daten.</p>
+  <p><strong>Stand: Januar 2025</strong></p>
+  
+  <div class="highlight">
+    <p><strong>Kurzfassung:</strong> Die App speichert ausschließlich technische Einstellungen und temporäre Daten lokal auf deinem Gerät. Keine personenbezogenen Daten werden an externe Server übertragen oder dauerhaft gespeichert.</p>
+  </div>
 
   <h2 id="verantwortlicher">1. Verantwortlicher im Sinne der DSGVO</h2>
   <p>Luka Löhr<br>
@@ -41,27 +51,64 @@
   <a href="https://github.com/luka-loehr/LGKA" target="_blank">github.com/luka-loehr/LGKA</a></p>
 
   <h2 id="datenverarbeitung">2. Datenverarbeitung</h2>
-  <p>Durch die App werden keine Daten erhoben, gespeichert, ausgewertet oder an Dritte übermittelt.</p>
+  <p>Die App verarbeitet ausschließlich technische Daten zur Funktionsfähigkeit und Benutzerfreundlichkeit. Es werden keine personenbezogenen Daten erhoben, ausgewertet oder an Dritte übermittelt.</p>
   
-  <h3 id="vertretung-und-stundenplaene">2.1 Vertretungs- und Stundenpläne (Abruf)</h3>
-  <p>Beim Abruf der Vertretungspläne und Stundenpläne über HTTPS wird technisch bedingt die IP-Adresse an die Server des Lessing-Gymnasiums übermittelt. Diese wird von der App nicht gespeichert oder weitergegeben.</p>
+  <h3 id="lokale-speicherung">2.1 Lokale Datenspeicherung</h3>
+  <p>Folgende Daten werden ausschließlich lokal auf deinem Gerät gespeichert:</p>
+  <ul>
+    <li><strong>App-Einstellungen:</strong> Akzentfarbe, Vibrationseinstellungen, Debug-Modus</li>
+    <li><strong>Onboarding-Status:</strong> Ob die Einführung bereits durchlaufen wurde</li>
+    <li><strong>Authentifizierungsstatus:</strong> Ob die Anmeldung erfolgreich war</li>
+    <li><strong>Krankmeldung-Info:</strong> Ob die Informationsseite bereits angezeigt wurde</li>
+    <li><strong>Suchverlauf:</strong> Letzte Suchbegriffe und Seitenzahlen für Stundenpläne (nur zur Benutzerfreundlichkeit)</li>
+  </ul>
   
-  <h3 id="wetterdaten">2.2 Wetterdaten (Abruf)</h3>
-  <p>Die App ruft aktuelle Wetterdaten von den Servern des Lessing-Gymnasiums ab. Dabei wird technisch bedingt die IP-Adresse an den Schulserver übermittelt. Diese IP-Adresse wird von der App nicht gespeichert oder weitergegeben.</p>
+  <h3 id="temporaere-daten">2.2 Temporäre Datenspeicherung</h3>
+  <p>Folgende Daten werden temporär im App-Cache gespeichert und automatisch gelöscht:</p>
+  <ul>
+    <li><strong>PDF-Dateien:</strong> Vertretungspläne und Stundenpläne werden temporär zwischengespeichert</li>
+    <li><strong>Wetterdaten:</strong> Aktuelle Wetterinformationen werden temporär gespeichert</li>
+  </ul>
   
-  <p>Alle Inhalte (Vertretungspläne, Stundenpläne, Wetterdaten und App-Einstellungen) werden ausschließlich lokal auf dem Gerät gespeichert. Es erfolgt keine Datenübertragung an Dritte.</p>
+  <h3 id="netzwerkkommunikation">2.3 Netzwerkkommunikation</h3>
+  <p>Die App kommuniziert ausschließlich mit Servern des Lessing-Gymnasiums:</p>
+  
+  <h4 id="vertretung-und-stundenplaene">2.3.1 Vertretungs- und Stundenpläne</h4>
+  <p>Beim Abruf der Vertretungspläne und Stundenpläne über HTTPS wird technisch bedingt deine IP-Adresse an die Server des Lessing-Gymnasiums übermittelt. Diese wird von der App nicht gespeichert oder weitergegeben.</p>
+  
+  <h4 id="wetterdaten">2.3.2 Wetterdaten</h4>
+  <p>Die App ruft aktuelle Wetterdaten von den Servern des Lessing-Gymnasiums ab. Dabei wird technisch bedingt deine IP-Adresse an den Schulserver übermittelt. Diese IP-Adresse wird von der App nicht gespeichert oder weitergegeben.</p>
+  
+  <h4 id="krankmeldung">2.3.3 Krankmeldung</h4>
+  <p>Die Krankmeldungsfunktion leitet dich direkt zur offiziellen Krankmeldungsseite des Lessing-Gymnasiums weiter. Die App überträgt dabei keine Daten und hat keinen Zugriff auf die dort eingegebenen Informationen.</p>
 
   <h2 id="speicherdauer">3. Speicherdauer</h2>
-  <p>Alle lokal gespeicherten Daten (PDF-Dateien, Wetterdaten, App-Einstellungen) verbleiben ausschließlich auf dem Gerät des Nutzers und werden bei Deinstallation der App automatisch entfernt. Es erfolgt keine dauerhafte Speicherung auf externen Servern.</p>
+  <p>Alle lokal gespeicherten Daten verbleiben ausschließlich auf deinem Gerät:</p>
+  <ul>
+    <li><strong>App-Einstellungen:</strong> Bleiben bis zur Deinstallation der App erhalten</li>
+    <li><strong>Temporäre Daten:</strong> Werden automatisch durch das Betriebssystem verwaltet und bei Bedarf gelöscht</li>
+    <li><strong>Cache-Daten:</strong> Werden bei App-Updates oder manueller Bereinigung entfernt</li>
+  </ul>
+  <p>Bei Deinstallation der App werden alle lokalen Daten automatisch entfernt. Es erfolgt keine dauerhafte Speicherung auf externen Servern.</p>
 
   <h2 id="berechtigungen">4. Berechtigungen</h2>
-  <p>Die App benötigt lediglich Internetzugriff für den Abruf von Vertretungs- und Stundenplänen sowie Wetterdaten. Weitere Berechtigungen (z. B. Kamera, Standort, Kontakte) werden nicht verwendet oder angefordert. Es gibt keine Cookies, kein Tracking und keine Analysedienste.</p>
+  <p>Die App benötigt folgende Berechtigungen:</p>
+  <ul>
+    <li><strong>Internetzugriff:</strong> Für den Abruf von Vertretungsplänen, Stundenplänen und Wetterdaten</li>
+    <li><strong>Lokaler Speicher:</strong> Für die Zwischenspeicherung von PDF-Dateien und App-Einstellungen</li>
+  </ul>
+  <p>Weitere Berechtigungen (z. B. Kamera, Standort, Kontakte) werden nicht verwendet oder angefordert. Es gibt keine Cookies, kein Tracking und keine Analysedienste.</p>
 
   <h2 id="rechtsgrundlage">5. Rechtsgrundlage</h2>
-  <p>Keine Rechtsgrundlage erforderlich, da keine Datenverarbeitung stattfindet.</p>
+  <p>Die Verarbeitung der technischen Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Funktionsfähigkeit der App). Die lokale Speicherung dient ausschließlich der Benutzerfreundlichkeit und erfolgt ohne personenbezogene Daten.</p>
 
   <h2 id="rechte">6. Datenschutzrechte</h2>
-  <p>Da keine personenbezogenen Daten gespeichert oder verarbeitet werden, finden die DSGVO-Betroffenenrechte (Auskunft, Berichtigung, Löschung, etc.) keine Anwendung. Bei technischen Anfragen zur Datenverarbeitung können Sie sich dennoch an den Verantwortlichen wenden.</p>
+  <p>Da keine personenbezogenen Daten gespeichert oder verarbeitet werden, finden die DSGVO-Betroffenenrechte (Auskunft, Berichtigung, Löschung, etc.) keine Anwendung. Du kannst jedoch jederzeit:</p>
+  <ul>
+    <li>Die App deinstallieren (löscht alle lokalen Daten)</li>
+    <li>Den App-Cache über die Geräteeinstellungen leeren</li>
+    <li>Bei technischen Fragen zum Datenschutz Kontakt aufnehmen</li>
+  </ul>
 
   <h2 id="aenderungen">7. Änderungen dieser Datenschutzerklärung</h2>
   <p>Diese Datenschutzerklärung kann bei Änderungen der App-Funktionalitäten angepasst werden. Die aktuelle Version ist stets unter dieser Adresse abrufbar.</p>
