@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:confetti/confetti.dart';
 import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
 import '../providers/color_provider.dart';
@@ -256,6 +257,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  late ConfettiController _confettiController;
   bool _hasShownButtons = false;
 
   @override
@@ -272,11 +274,13 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
       parent: _fadeController,
       curve: Curves.easeOutCubic,
     ));
+    _confettiController = ConfettiController(duration: const Duration(seconds: 10));
   }
 
   @override
   void dispose() {
     _fadeController.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -309,22 +313,99 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
       _startButtonAnimation();
     });
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
+    return GestureDetector(
+      onScaleStart: (details) {
+        // Detect 5-finger tap
+        if (details.pointerCount == 5) {
+          _confettiController.play();
+          HapticService.heavy();
+        }
+      },
+      child: Stack(
         children: [
-          const SizedBox(height: 24),
-          
-          // Plan options with proper fade-in animation
-          FadeTransition(
-            opacity: _fadeAnimation,
-            child: _buildPlanOptions(pdfRepo),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 24),
+                
+                // Plan options with proper fade-in animation
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: _buildPlanOptions(pdfRepo),
+                ),
+                
+                const Spacer(),
+                
+                // Footer
+                _buildFooter(context),
+              ],
+            ),
           ),
-          
-          const Spacer(),
-          
-          // Footer
-          _buildFooter(context),
+          // Confetti widgets
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirection: 1.5708, // Top to bottom (90 degrees)
+              maxBlastForce: 5,
+              minBlastForce: 2,
+              emissionFrequency: 0.05,
+              numberOfParticles: 20,
+              gravity: 0.1,
+              colors: const [
+                Colors.blue,
+                Colors.purple,
+                Colors.pink,
+                Colors.orange,
+                Colors.yellow,
+                Colors.green,
+                Colors.red,
+              ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirection: 3.14159, // Left to right (180 degrees)
+              maxBlastForce: 5,
+              minBlastForce: 2,
+              emissionFrequency: 0.05,
+              numberOfParticles: 20,
+              gravity: 0.1,
+              colors: const [
+                Colors.blue,
+                Colors.purple,
+                Colors.pink,
+                Colors.orange,
+                Colors.yellow,
+                Colors.green,
+                Colors.red,
+              ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirection: -1.5708, // Bottom to top (270 degrees)
+              maxBlastForce: 5,
+              minBlastForce: 2,
+              emissionFrequency: 0.05,
+              numberOfParticles: 20,
+              gravity: 0.1,
+              colors: const [
+                Colors.blue,
+                Colors.purple,
+                Colors.pink,
+                Colors.orange,
+                Colors.yellow,
+                Colors.green,
+                Colors.red,
+              ],
+            ),
+          ),
         ],
       ),
     );
