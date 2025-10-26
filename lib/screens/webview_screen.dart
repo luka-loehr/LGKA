@@ -97,7 +97,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
           initialUrlRequest: URLRequest(
             url: WebUri(widget.url),
             headers: {
-              'User-Agent': 'LGKA-App-Luka-Loehr',
+              'User-Agent': AppInfo.userAgent,
               ...?widget.headers,
             },
           ),
