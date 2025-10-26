@@ -362,7 +362,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
 
   void _openPdf(PdfRepository pdfRepo, bool isToday) {
     if (!pdfRepo.canOpenPdf(isToday)) return;
-adb install -r build/app/outputs/flutter-apk/app-release.apk
+
     // Get the PDF file and actual weekday from the PDF state
     final pdfFile = pdfRepo.getPdfFile(isToday);
     final pdfState = isToday ? pdfRepo.todayState : pdfRepo.tomorrowState;
