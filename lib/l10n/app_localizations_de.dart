@@ -319,4 +319,15 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get chartLoading => 'Diagramm wird geladen...';
+
+  @override
+  String get singleResultFound => '1 Ergebnis gefunden';
+
+  @override
+  String multipleResultsFound(int count) {
+    return '$count Ergebnisse gefunden';
+  }
+
+  @override
+  String get noResultsFound => 'Keine Ergebnisse gefunden';
 }
