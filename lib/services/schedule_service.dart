@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html;
 import 'package:path_provider/path_provider.dart';
 import '../utils/app_logger.dart';
+import '../utils/app_info.dart';
+import '../config/app_credentials.dart';
 
 /// Represents a schedule PDF with metadata
 class ScheduleItem {
@@ -34,8 +36,6 @@ class ScheduleItem {
 class ScheduleService {
   static const String _baseUrl = 'https://lessing-gymnasium-karlsruhe.de';
   static const String _schedulePageUrl = '$_baseUrl/cm3/index.php/unterricht/stundenplan';
-  static const String _username = 'vertretungsplan';
-  static const String _password = 'ephraim';
   static const Duration _timeout = Duration(seconds: 15);
   static const Duration _availabilityCheckTimeout = Duration(seconds: 5); // Faster timeout for availability checks
 
@@ -75,13 +75,13 @@ class ScheduleService {
 
   /// Scrape the schedule page to extract PDF links
   Future<List<ScheduleItem>> _scrapeSchedules() async {
-    final credentials = base64Encode(utf8.encode('$_username:$_password'));
+    final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
     
           final response = await http.get(
         Uri.parse(_schedulePageUrl),
         headers: {
           'Authorization': 'Basic $credentials',
-          'User-Agent': 'LGKA-App-Luka-Loehr',
+          'User-Agent': AppInfo.userAgent,
         },
       ).timeout(_timeout);
 
@@ -114,13 +114,13 @@ class ScheduleService {
     AppLogger.debug('Checking availability: ${schedule.title}', module: 'ScheduleService');
 
     try {
-      final credentials = base64Encode(utf8.encode('$_username:$_password'));
+      final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
 
       final response = await http.head(
         Uri.parse(schedule.fullUrl),
         headers: {
           'Authorization': 'Basic $credentials',
-          'User-Agent': 'LGKA-App-Luka-Loehr',
+          'User-Agent': AppInfo.userAgent,
         },
       ).timeout(_availabilityCheckTimeout);
 
@@ -151,7 +151,7 @@ class ScheduleService {
         Uri.parse(schedule.fullUrl),
         headers: {
           'Authorization': 'Basic $credentials',
-          'User-Agent': 'LGKA-App-Luka-Loehr',
+          'User-Agent': AppInfo.userAgent,
         },
       ).timeout(_timeout);
 
