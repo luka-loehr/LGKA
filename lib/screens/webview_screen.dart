@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import '../providers/haptic_service.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/app_info.dart';
 
 class InAppWebViewScreen extends StatefulWidget {
   final String url;
@@ -40,19 +41,22 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
     if (_controller != null) {
       try {
         await _controller!.reload();
-      } catch (_) {
+      } catch (e) {
         // Fallback: load initial URL again
+        AppLogger.debug('Error reloading URL: $e', module: 'WebView');
         try {
           await _controller!.loadUrl(
             urlRequest: URLRequest(
               url: WebUri(widget.url),
               headers: {
-                'User-Agent': 'LGKA-App-Luka-Loehr',
+                'User-Agent': AppInfo.userAgent,
                 ...?widget.headers,
               },
             ),
           );
-        } catch (_) {}
+        } catch (e2) {
+          AppLogger.error('Failed to load URL after retry', module: 'WebView', error: e2);
+        }
       }
     }
   }

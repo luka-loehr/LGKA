@@ -9,6 +9,7 @@ import 'package:lgka_flutter/providers/app_providers.dart';
 import 'data/preferences_manager.dart';
 import 'package:lgka_flutter/l10n/app_localizations.dart';
 import 'utils/app_logger.dart';
+import 'utils/app_info.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,10 @@ void main() async {
   
   // Enable edge-to-edge display - handled by native Android configuration now
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  
+  // Initialize app info
+  await AppInfo.initialize();
+  AppLogger.init('App version: ${AppInfo.fullVersion}');
   
   // Initialize preferences manager
   AppLogger.init('Initializing preferences manager');

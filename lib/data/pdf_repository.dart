@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
+import '../utils/app_info.dart';
+import '../config/app_credentials.dart';
 
 /// Represents the state of a single PDF (today or tomorrow)
 class PdfState {
@@ -61,8 +63,6 @@ class PdfState {
 
 /// Repository for managing PDF substitution plans
 class PdfRepository extends ChangeNotifier {
-  static const String _username = 'vertretungsplan';
-  static const String _password = 'ephraim';
   static const String _todayUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_heute.pdf';
   static const String _tomorrowUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_morgen.pdf';
   static const Duration _timeout = Duration(seconds: 10);
@@ -132,13 +132,13 @@ class PdfRepository extends ChangeNotifier {
 
   /// Download PDF from URL with authentication
   Future<File> _downloadPdf(String url) async {
-    final credentials = base64Encode(utf8.encode('$_username:$_password'));
+    final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
     
     final response = await http.get(
       Uri.parse(url),
       headers: {
         'Authorization': 'Basic $credentials',
-        'User-Agent': 'LGKA-App-Luka-Loehr',
+        'User-Agent': AppInfo.userAgent,
       },
     ).timeout(_timeout);
 
