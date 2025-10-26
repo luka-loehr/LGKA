@@ -10,6 +10,7 @@ import '../providers/haptic_service.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/app_logger.dart';
 import '../utils/app_info.dart';
+import '../widgets/app_footer.dart';
 import 'package:intl/intl.dart';
 
 
@@ -1065,34 +1066,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
 
   Widget _buildFooter(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: _isButtonNavigation(context) ? 34.0 : 8.0,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '© ${DateTime.now().year} ',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.secondaryText.withValues(alpha: 0.5),
-            ),
-          ),
-          Text(
-            'Luka Löhr',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Text(
-            ' • v${AppInfo.version}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.secondaryText.withValues(alpha: 0.5),
-            ),
-          ),
-        ],
-      ),
+    return AppFooter(
+      bottomPadding: _isButtonNavigation(context) ? 34.0 : 8.0,
     );
   }
 } 

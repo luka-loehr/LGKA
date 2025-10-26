@@ -11,6 +11,7 @@ import '../services/schedule_service.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/app_logger.dart';
 import '../utils/app_info.dart';
+import '../widgets/app_footer.dart';
 
 class SchedulePage extends ConsumerStatefulWidget {
   const SchedulePage({super.key});
@@ -452,35 +453,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   }
 
   Widget _buildFooter(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: _getFooterPadding(context),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '© ${DateTime.now().year} ',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.secondaryText.withValues(alpha: 0.5),
-            ),
-          ),
-          Text(
-            'Luka Löhr',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Text(
-            ' • v${AppInfo.version}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.secondaryText.withValues(alpha: 0.5),
-            ),
-          ),
-        ],
-      ),
-    );
+    return AppFooter(bottomPadding: _getFooterPadding(context));
   }
 
   double _getFooterPadding(BuildContext context) {
