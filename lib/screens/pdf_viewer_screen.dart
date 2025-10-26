@@ -10,6 +10,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart' as syncfusion;
+import '../utils/app_logger.dart';
 
 // Search result data class
 class SearchResult {
