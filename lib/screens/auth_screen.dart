@@ -92,29 +92,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     _passwordController.addListener(_handleTextChange);
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    
-    // Setup color animations after dependencies are available
-    final activeColor = ref.read(currentColorProvider);
-    
-    _buttonColorAnimation = ColorTween(
-      begin: activeColor, // Current accent color
-      end: _errorRedColor,
-    ).animate(CurvedAnimation(
-      parent: _buttonColorController,
-      curve: Curves.easeInOut,
-    ));
-
-    _successColorAnimation = ColorTween(
-      begin: activeColor, // Current accent color
-      end: _successGreenColor,
-    ).animate(CurvedAnimation(
-      parent: _successColorController,
-      curve: Curves.easeInOut,
-    ));
-  }
 
   // Update animations when accent color changes
   void _updateAnimations() {
@@ -161,6 +138,26 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    
+    // Setup color animations after dependencies are available
+    final activeColor = ref.read(currentColorProvider);
+    
+    _buttonColorAnimation = ColorTween(
+      begin: activeColor, // Current accent color
+      end: _errorRedColor,
+    ).animate(CurvedAnimation(
+      parent: _buttonColorController,
+      curve: Curves.easeInOut,
+    ));
+
+    _successColorAnimation = ColorTween(
+      begin: activeColor, // Current accent color
+      end: _successGreenColor,
+    ).animate(CurvedAnimation(
+      parent: _successColorController,
+      curve: Curves.easeInOut,
+    ));
+    
     // Ensure keyboard animation updates when keyboard visibility changes
     _updateOffsetState();
   }
