@@ -272,8 +272,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(results.length == 1 
-                ? '1 result found' 
-                : '${results.length} results found'),
+                ? AppLocalizations.of(context)!.singleResultFound
+                : AppLocalizations.of(context)!.multipleResultsFound(results.length)),
               duration: const Duration(seconds: 2),
               backgroundColor: Colors.green,
             ),
@@ -284,7 +284,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('No results found'),
+              content: Text(AppLocalizations.of(context)!.noResultsFound),
               duration: const Duration(seconds: 2),
               backgroundColor: Colors.orange,
             ),

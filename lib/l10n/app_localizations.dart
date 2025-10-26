@@ -718,6 +718,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Chart is loading...'**
   String get chartLoading;
+
+  /// No description provided for @singleResultFound.
+  ///
+  /// In en, this message translates to:
+  /// **'1 result found'**
+  String get singleResultFound;
+
+  /// No description provided for @multipleResultsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} results found'**
+  String multipleResultsFound(int count);
+
+  /// No description provided for @noResultsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found'**
+  String get noResultsFound;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
