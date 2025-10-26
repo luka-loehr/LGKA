@@ -57,7 +57,7 @@ class WeatherService {
 
 
   Future<List<WeatherData>> fetchWeatherData() async {
-    AppLogger.weather('Fetching weather data from network');
+    AppLogger.network('Fetching weather data');
     
     try {
       final response = await http.get(
@@ -68,21 +68,18 @@ class WeatherService {
       ).timeout(const Duration(seconds: 5));
       
       if (response.statusCode != 200) {
-        AppLogger.error('HTTP error: ${response.statusCode}', module: 'WeatherService');
+        AppLogger.error('Weather fetch failed: HTTP ${response.statusCode}', module: 'WeatherService');
         throw Exception('Failed to load weather data: ${response.statusCode}');
       }
 
-      // Decode the response body with proper encoding
       final csvString = utf8.decode(response.bodyBytes);
-      
-      // Parse CSV
       final List<List<dynamic>> csvData = const CsvToListConverter(
         eol: '\n',
         fieldDelimiter: ';',
       ).convert(csvString);
       
       if (csvData.isEmpty) {
-        AppLogger.error('CSV data is empty', module: 'WeatherService');
+        AppLogger.error('Empty weather data received', module: 'WeatherService');
         throw Exception('CSV data is empty');
       }
 
@@ -126,12 +123,12 @@ class WeatherService {
       }
       
       if (allWeatherData.isNotEmpty) {
-        AppLogger.success('Loaded ${allWeatherData.length} data points (${allWeatherData.first.temperature}°C - ${allWeatherData.last.temperature}°C)', module: 'WeatherService');
+        AppLogger.success('Loaded ${allWeatherData.length} points (${allWeatherData.first.temperature}°C → ${allWeatherData.last.temperature}°C)', module: 'WeatherService');
       }
       
       return allWeatherData;
     } catch (e) {
-      AppLogger.error('Failed to fetch weather data', module: 'WeatherService', error: e);
+      AppLogger.error('Weather fetch failed', module: 'WeatherService', error: e);
       throw Exception('Error fetching weather data: $e');
     }
   }
@@ -147,7 +144,7 @@ class WeatherService {
       ).timeout(const Duration(seconds: 5));
       
       if (response.statusCode != 200) {
-        AppLogger.error('HTTP error: ${response.statusCode}', module: 'WeatherService');
+        AppLogger.error('Failed to fetch latest weather: HTTP ${response.statusCode}', module: 'WeatherService');
         throw Exception('Failed to load weather data: ${response.statusCode}');
       }
 
@@ -158,14 +155,12 @@ class WeatherService {
       ).convert(csvString);
       
       if (csvData.length < 2) {
-        AppLogger.warning('Not enough data in CSV', module: 'WeatherService');
         return null;
       }
 
       final lastRow = csvData.last;
       
       if (lastRow.length < 7) {
-        AppLogger.warning('Last row incomplete', module: 'WeatherService');
         return null;
       }
       
@@ -230,8 +225,8 @@ class WeatherService {
       sampledData.add(fullData.last);
     }
     
-    AppLogger.chart('Downsampled $length points to ${sampledData.length}');
-    return sampledData;
+      AppLogger.debug('Downsampled $length → ${sampledData.length} points', module: 'WeatherService');
+      return sampledData;
   }
 
   double _parseDouble(dynamic value) {
