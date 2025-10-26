@@ -9,8 +9,8 @@ import '../services/retry_service.dart';
 import '../providers/haptic_service.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/app_logger.dart';
+import '../utils/app_info.dart';
 import 'package:intl/intl.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 
 // Helper function for robust navigation bar detection across all Android devices
@@ -1069,35 +1069,29 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       padding: EdgeInsets.only(
         bottom: _isButtonNavigation(context) ? 34.0 : 8.0,
       ),
-      child: FutureBuilder<PackageInfo>(
-        future: PackageInfo.fromPlatform(),
-        builder: (context, snapshot) {
-          final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '© ${DateTime.now().year} ',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.secondaryText.withValues(alpha: 0.5),
-                ),
-              ),
-              Text(
-                'Luka Löhr',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                ' • v$version',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.secondaryText.withValues(alpha: 0.5),
-                ),
-              ),
-            ],
-          );
-        },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '© ${DateTime.now().year} ',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.secondaryText.withValues(alpha: 0.5),
+            ),
+          ),
+          Text(
+            'Luka Löhr',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Text(
+            ' • v${AppInfo.version}',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.secondaryText.withValues(alpha: 0.5),
+            ),
+          ),
+        ],
       ),
     );
   }
