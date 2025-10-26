@@ -156,7 +156,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       _hasJumpedToSavedPage = true;
       AppLogger.pdf('Navigated to page $pageNumber in "${widget.dayName}"');
     } catch (e) {
-      AppLogger.warning('Failed to jump to page $pageNumber', module: 'PDFViewer');
+      // Don't log failure here - let the retry mechanism handle final failure logging
     }
   }
 
@@ -168,15 +168,17 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
     void retry() {
       if (_hasJumpedToSavedPage || retryCount >= maxRetries) return;
-      
+
       retryCount++;
-      
+
       Future.delayed(retryDelay, () {
         if (mounted && !_hasJumpedToSavedPage) {
           _tryJumpToPage(pageNumber);
-          
+
           if (!_hasJumpedToSavedPage && retryCount < maxRetries) {
             retry(); // Continue retrying
+          } else if (retryCount >= maxRetries) {
+            AppLogger.warning('Failed to jump to page $pageNumber after $maxRetries attempts', module: 'PDFViewer');
           }
         }
       });
