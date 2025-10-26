@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html;
 import 'package:path_provider/path_provider.dart';
+import '../utils/app_logger.dart';
 
 /// Represents a schedule PDF with metadata
 class ScheduleItem {
@@ -137,10 +138,8 @@ class ScheduleService {
   /// Download a specific schedule PDF
   Future<File?> downloadSchedule(ScheduleItem schedule) async {
     try {
+      AppLogger.schedule('Downloading: ${schedule.title}');
       final credentials = base64Encode(utf8.encode('$_username:$_password'));
-
-      print('Downloading schedule: ${schedule.title}');
-      print('URL: ${schedule.fullUrl}');
 
       final response = await http.get(
         Uri.parse(schedule.fullUrl),
@@ -150,64 +149,54 @@ class ScheduleService {
         },
       ).timeout(_timeout);
 
-      print('Response status: ${response.statusCode}');
-      print('Response headers: ${response.headers}');
-
-      // Handle 404 errors gracefully - PDF might not be available yet
       if (response.statusCode == 404) {
-        print('PDF not available yet: ${schedule.title} (404)');
-        return null; // Return null instead of throwing exception
+        AppLogger.warning('PDF not available yet: ${schedule.title}', module: 'ScheduleService');
+        return null;
       }
 
       if (response.statusCode != 200) {
         throw Exception('Failed to download PDF: HTTP ${response.statusCode}');
       }
 
-      // Save to temporary directory with descriptive filename
       final cacheDir = await getTemporaryDirectory();
       final sanitizedGradeLevel = schedule.gradeLevel.replaceAll('/', '_');
       final sanitizedHalbjahr = schedule.halbjahr.replaceAll('.', '_');
       final filename = '${sanitizedGradeLevel}_$sanitizedHalbjahr.pdf';
       final file = File('${cacheDir.path}/$filename');
       
-      print('Saving PDF with filename: $filename');
-      
       await file.writeAsBytes(response.bodyBytes);
-      print('PDF saved successfully: ${file.path}');
+      AppLogger.success('PDF saved: ${schedule.title}', module: 'ScheduleService');
       
-      // Validate that the PDF is actually valid and non-empty
+      // Validate PDF content
       if (response.bodyBytes.length < 1000) {
-        // PDF is suspiciously small (likely empty or corrupted)
-        print('PDF appears to be empty or corrupted: ${schedule.title} (${response.bodyBytes.length} bytes)');
-        await file.delete(); // Clean up the invalid file
+        AppLogger.warning('PDF too small, deleting', module: 'ScheduleService');
+        await file.delete();
         return null;
       }
       
-      // Check if server returned HTML instead of PDF (common error case)
       final responseText = String.fromCharCodes(response.bodyBytes.take(100));
       if (responseText.contains('<html') || responseText.contains('<!DOCTYPE') || responseText.contains('error')) {
-        print('Server returned HTML instead of PDF: ${schedule.title}');
-        await file.delete(); // Clean up the invalid file
+        AppLogger.warning('Server returned HTML instead of PDF', module: 'ScheduleService');
+        await file.delete();
         return null;
       }
       
-      // Try to validate PDF structure (basic check)
       try {
         final pdfBytes = await file.readAsBytes();
         if (pdfBytes.isNotEmpty && !_isValidPdfContent(pdfBytes)) {
-          print('PDF content appears invalid: ${schedule.title}');
-          await file.delete(); // Clean up the invalid file
+          AppLogger.warning('Invalid PDF content', module: 'ScheduleService');
+          await file.delete();
           return null;
         }
       } catch (e) {
-        print('Error validating PDF: ${schedule.title} - $e');
-        await file.delete(); // Clean up the invalid file
+        AppLogger.error('Error validating PDF', module: 'ScheduleService', error: e);
+        await file.delete();
         return null;
       }
       
       return file;
     } catch (e) {
-      print('Error downloading schedule ${schedule.title}: $e');
+      AppLogger.error('Failed to download schedule', module: 'ScheduleService', error: e);
       rethrow;
     }
   }
@@ -268,15 +257,10 @@ List<ScheduleItem> _parseScheduleHtml(String htmlContent) {
           fullUrl = 'https://lessing-gymnasium-karlsruhe.de$href';
         }
 
-        print('Parsed schedule: $title');
-        print('  Original href: $href');
-        print('  Converted URL: $fullUrl');
-
-        // Extract halbjahr and grade level from title
         final halbjahr = _extractHalbjahr(title);
         final gradeLevel = _extractGradeLevel(title);
-
-        print('  Halbjahr: $halbjahr, Grade Level: $gradeLevel');
+        
+        AppLogger.debug('Parsed schedule: $title ($halbjahr, $gradeLevel)', module: 'ScheduleService');
 
         schedules.add(ScheduleItem(
           title: title,

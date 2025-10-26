@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:csv/csv.dart';
 import 'dart:convert';
+import '../utils/app_logger.dart';
 
 class WeatherData {
   final DateTime time;
@@ -56,53 +57,33 @@ class WeatherService {
 
 
   Future<List<WeatherData>> fetchWeatherData() async {
-    print('🌤️ [WeatherService] Starting fetchWeatherData - fetching fresh data from network');
-    
-    print('🌤️ [WeatherService] URL: $csvUrl');
+    AppLogger.weather('Fetching weather data from network');
     
     try {
-          print('🌤️ [WeatherService] Making HTTP request...');
-    final response = await http.get(
-      Uri.parse(csvUrl),
-      headers: {
-        'User-Agent': 'LGKA-App-Luka-Loehr',
-      },
-    ).timeout(const Duration(seconds: 5));
-      
-      print('🌤️ [WeatherService] Response status code: ${response.statusCode}');
-      print('🌤️ [WeatherService] Response headers: ${response.headers}');
-      print('🌤️ [WeatherService] Response body length: ${response.bodyBytes.length} bytes');
+      final response = await http.get(
+        Uri.parse(csvUrl),
+        headers: {
+          'User-Agent': 'LGKA-App-Luka-Loehr',
+        },
+      ).timeout(const Duration(seconds: 5));
       
       if (response.statusCode != 200) {
-        print('❌ [WeatherService] HTTP error: ${response.statusCode}');
-        print('❌ [WeatherService] Response body: ${response.body}');
+        AppLogger.error('HTTP error: ${response.statusCode}', module: 'WeatherService');
         throw Exception('Failed to load weather data: ${response.statusCode}');
       }
 
       // Decode the response body with proper encoding
       final csvString = utf8.decode(response.bodyBytes);
-      print('🌤️ [WeatherService] Decoded CSV string length: ${csvString.length} characters');
-      print('🌤️ [WeatherService] First 500 characters of CSV:');
-      print(csvString.length > 500 ? csvString.substring(0, 500) + '...' : csvString);
       
       // Parse CSV
-      print('🌤️ [WeatherService] Parsing CSV data...');
       final List<List<dynamic>> csvData = const CsvToListConverter(
         eol: '\n',
-        fieldDelimiter: ';',  // Changed from comma to semicolon!
+        fieldDelimiter: ';',
       ).convert(csvString);
       
-      print('🌤️ [WeatherService] CSV parsed. Total rows: ${csvData.length}');
-      
       if (csvData.isEmpty) {
-        print('❌ [WeatherService] CSV data is empty');
+        AppLogger.error('CSV data is empty', module: 'WeatherService');
         throw Exception('CSV data is empty');
-      }
-
-      // Print header row for debugging
-      if (csvData.isNotEmpty) {
-        print('🌤️ [WeatherService] Header row: ${csvData[0]}');
-        print('🌤️ [WeatherService] Header row length: ${csvData[0].length}');
       }
 
       // Parse all data - no sampling, use every data point for maximum accuracy
@@ -116,82 +97,48 @@ class WeatherService {
         final row = csvData[i];
         
         if (row.length < 7) {
-          if (skippedRows == 0) {
-            print('⚠️ [WeatherService] Skipping incomplete rows...');
-          }
           skippedRows++;
-          continue; // Skip incomplete rows
+          continue;
         }
         
         try {
-          // Calculate time from row number (row 2 = 00:01, row 3 = 00:02, etc.)
           final minutesSinceMidnight = i - 1;
           final now = DateTime.now();
           final time = DateTime(now.year, now.month, now.day, 0, 0)
               .add(Duration(minutes: minutesSinceMidnight));
           
-          final windSpeed = _parseDouble(row[0]);
-          final windDirection = row[1].toString();
-          final temperature = _parseDouble(row[2]);
-          final humidity = _parseDouble(row[3]);
-          final precipitation = _parseDouble(row[4]);
-          final pressure = _parseDouble(row[5]);
-          final radiation = _parseDouble(row[6]);
-          
           final weatherData = WeatherData(
             time: time,
-            windSpeed: windSpeed,
-            windDirection: windDirection,
-            temperature: temperature,
-            humidity: humidity,
-            precipitation: precipitation,
-            pressure: pressure,
-            radiation: radiation,
+            windSpeed: _parseDouble(row[0]),
+            windDirection: row[1].toString(),
+            temperature: _parseDouble(row[2]),
+            humidity: _parseDouble(row[3]),
+            precipitation: _parseDouble(row[4]),
+            pressure: _parseDouble(row[5]),
+            radiation: _parseDouble(row[6]),
           );
           
           allWeatherData.add(weatherData);
           successfulRows++;
-          
-          // Only log first 3 successful rows to avoid spam
-          if (successfulRows <= 3) {
-            print('✅ [WeatherService] Successfully added weather data for $time');
-          }
         } catch (e) {
-          // Skip malformed rows
-          print('❌ [WeatherService] Error parsing row $i: $e');
-          print('❌ [WeatherService] Problematic row data: $row');
           errorRows++;
         }
       }
       
-      print('🌤️ [WeatherService] Processing complete:');
-      print('    Total rows in CSV: ${csvData.length - 1}');
-      print('    Successful rows: $successfulRows');
-      print('    Skipped rows: $skippedRows');
-      print('    Error rows: $errorRows');
-      print('    Final weather data points: ${allWeatherData.length}');
-      
       if (allWeatherData.isNotEmpty) {
-        print('🌤️ [WeatherService] First data point: ${allWeatherData.first.time} - ${allWeatherData.first.temperature}°C');
-        print('🌤️ [WeatherService] Last data point: ${allWeatherData.last.time} - ${allWeatherData.last.temperature}°C');
+        AppLogger.success('Loaded ${allWeatherData.length} data points (${allWeatherData.first.temperature}°C - ${allWeatherData.last.temperature}°C)', module: 'WeatherService');
       }
-      
-      print('🌤️ [WeatherService] Data fetched successfully');
       
       return allWeatherData;
     } catch (e) {
-      print('❌ [WeatherService] Fatal error in fetchWeatherData: $e');
-      print('❌ [WeatherService] Stack trace: ${StackTrace.current}');
+      AppLogger.error('Failed to fetch weather data', module: 'WeatherService', error: e);
       throw Exception('Error fetching weather data: $e');
     }
   }
 
   /// Get the latest weather data point for real-time display
   Future<WeatherData?> getLatestWeatherData() async {
-    print('🌤️ [WeatherService] Getting latest weather data');
-    
     try {
-      print('🌤️ [WeatherService] Making HTTP request for latest data...');
       final response = await http.get(
         Uri.parse(csvUrl),
         headers: {
@@ -200,7 +147,7 @@ class WeatherService {
       ).timeout(const Duration(seconds: 5));
       
       if (response.statusCode != 200) {
-        print('❌ [WeatherService] HTTP error: ${response.statusCode}');
+        AppLogger.error('HTTP error: ${response.statusCode}', module: 'WeatherService');
         throw Exception('Failed to load weather data: ${response.statusCode}');
       }
 
@@ -211,20 +158,18 @@ class WeatherService {
       ).convert(csvString);
       
       if (csvData.length < 2) {
-        print('❌ [WeatherService] Not enough data in CSV');
+        AppLogger.warning('Not enough data in CSV', module: 'WeatherService');
         return null;
       }
 
-      // Get the last row (most recent data)
       final lastRow = csvData.last;
       
       if (lastRow.length < 7) {
-        print('❌ [WeatherService] Last row incomplete');
+        AppLogger.warning('Last row incomplete', module: 'WeatherService');
         return null;
       }
       
-      // Calculate time for the last row
-      final minutesSinceMidnight = csvData.length - 2; // -1 for header, -1 for 0-based index
+      final minutesSinceMidnight = csvData.length - 2;
       final now = DateTime.now();
       final time = DateTime(now.year, now.month, now.day, 0, 0)
           .add(Duration(minutes: minutesSinceMidnight));
@@ -240,10 +185,9 @@ class WeatherService {
         radiation: _parseDouble(lastRow[6]),
       );
       
-      print('🌤️ [WeatherService] Latest data: ${weatherData.time} - ${weatherData.temperature}°C');
       return weatherData;
     } catch (e) {
-      print('❌ [WeatherService] Error getting latest weather data: $e');
+      AppLogger.error('Error getting latest weather data', module: 'WeatherService', error: e);
       return null;
     }
   }
@@ -271,26 +215,22 @@ class WeatherService {
     }
     
     if (samplingRate == 1) {
-      print('📊 [WeatherService] No downsampling needed for ${length} data points');
       return fullData;
     }
     
     final List<WeatherData> sampledData = [];
     
-    // Always include the first data point
     sampledData.add(fullData.first);
     
-    // Sample intermediate points with better distribution
     for (int i = samplingRate; i < length - samplingRate; i += samplingRate) {
       sampledData.add(fullData[i]);
     }
     
-    // Always include the last data point (most recent)
     if (fullData.length > 1) {
       sampledData.add(fullData.last);
     }
     
-    print('📊 [WeatherService] Downsampled ${length} points to ${sampledData.length} (every ${samplingRate}th value)');
+    AppLogger.chart('Downsampled $length points to ${sampledData.length}');
     return sampledData;
   }
 

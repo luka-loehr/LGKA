@@ -8,26 +8,35 @@ import 'package:lgka_flutter/navigation/app_router.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'data/preferences_manager.dart';
 import 'package:lgka_flutter/l10n/app_localizations.dart';
+import 'utils/app_logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Print welcome message
+  AppLogger.welcome();
   
   // Enable edge-to-edge display - handled by native Android configuration now
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   
   // Initialize preferences manager
+  AppLogger.init('Initializing preferences manager');
   final preferencesManager = PreferencesManager();
   await preferencesManager.init();
+  AppLogger.success('Preferences manager initialized');
   
   // Determine initial route with onboarding + auth gating
   String initialRoute;
   if (preferencesManager.isFirstLaunch || !preferencesManager.onboardingCompleted) {
     // Force Welcome → Info flow on fresh install or if onboarding not completed
     initialRoute = AppRouter.welcome;
+    AppLogger.navigation('Routing to welcome screen (first launch: ${preferencesManager.isFirstLaunch}, onboarding: ${preferencesManager.onboardingCompleted})');
   } else if (preferencesManager.isAuthenticated) {
     initialRoute = AppRouter.home;
+    AppLogger.navigation('Routing to home screen');
   } else {
     initialRoute = AppRouter.auth;
+    AppLogger.navigation('Routing to auth screen');
   }
   
   runApp(
@@ -73,28 +82,34 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
 
   Future<void> _preloadPdfs() async {
     try {
+      AppLogger.init('Preloading PDF repository');
       final pdfRepo = ref.read(pdfRepositoryProvider);
       await pdfRepo.initialize();
+      AppLogger.success('PDF repository preloaded');
     } catch (e) {
-      debugPrint('Error preloading PDFs: $e');
+      AppLogger.error('Failed to preload PDFs', error: e);
     }
   }
 
   Future<void> _preloadWeatherData() async {
     try {
+      AppLogger.init('Preloading weather data');
       final weatherDataNotifier = ref.read(weatherDataProvider.notifier);
       await weatherDataNotifier.preloadWeatherData();
+      AppLogger.success('Weather data preloaded');
     } catch (e) {
-      debugPrint('Error preloading weather data: $e');
+      AppLogger.error('Failed to preload weather data', error: e);
     }
   }
 
   Future<void> _preloadSchedules() async {
     try {
+      AppLogger.init('Preloading schedules');
       final scheduleNotifier = ref.read(scheduleProvider.notifier);
       await scheduleNotifier.loadSchedules();
+      AppLogger.success('Schedules preloaded');
     } catch (e) {
-      debugPrint('Error preloading schedules: $e');
+      AppLogger.error('Failed to preload schedules', error: e);
     }
   }
 
