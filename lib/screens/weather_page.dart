@@ -49,7 +49,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   ChartType _selectedChart = ChartType.temperature;
   bool _isChartRendered = false;
   bool _isInitialRenderComplete = false;
-  int _debugCounter = 0; // Debug counter for logging
   bool _forceShowErrorUntilSuccess = false; // Keep error UI visible during retries until data arrives
 
   late AnimationController _errorAnimationController;
@@ -158,8 +157,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
 
   void _onChartAnimationComplete() {
-    print('🎨 Chart animation completed!');
-    // Add your logic here - maybe haptic feedback, analytics, etc.
     HapticService.light();
   }
 
@@ -848,7 +845,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   /// Calculate optimal Y-axis range to prevent data cutoff
   Map<String, double> _calculateOptimalYAxisRange(List<WeatherData> chartData) {
     if (chartData.isEmpty) {
-      print('📊 [WeatherPage] No chart data available for Y-axis calculation');
       return {'min': 0.0, 'max': 100.0};
     }
     
@@ -859,17 +855,12 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     final validYValues = yValues.where((value) => value.isFinite && !value.isNaN).toList();
     
     if (validYValues.isEmpty) {
-      print('📊 [WeatherPage] No valid Y values found for chart type: $_selectedChart');
       return {'min': 0.0, 'max': 100.0};
     }
     
     // Find min and max values
     final minValue = validYValues.reduce((a, b) => a < b ? a : b);
     final maxValue = validYValues.reduce((a, b) => a > b ? a : b);
-    
-    print('📊 [WeatherPage] Chart type: $_selectedChart');
-    print('📊 [WeatherPage] Y values range: $minValue to $maxValue');
-    print('📊 [WeatherPage] Sample Y values: ${validYValues.take(5).toList()}');
     
     // Calculate range and add padding
     final range = maxValue - minValue;
@@ -910,8 +901,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       niceMin = center - 0.5;
       niceMax = center + 0.5;
     }
-    
-    print('📊 [WeatherPage] Final Y-axis range: $niceMin to $niceMax');
     
     return {
       'min': niceMin,
@@ -976,12 +965,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.pressure:
         value = data.pressure;
         break;
-    }
-    
-    // Debug logging for first few data points
-    if (_debugCounter < 3) {
-      print('📊 [WeatherPage] _getYValue: ChartType.$_selectedChart = $value (from data: ${data.time})');
-      _debugCounter++;
     }
     
     return value;

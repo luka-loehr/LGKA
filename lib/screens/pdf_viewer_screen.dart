@@ -198,8 +198,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       return;
     }
 
-    print('🔍 [PDFViewer] Starting search for: "$query"');
-    
     // Show loading state
     setState(() {
       _currentSearchIndex = -1;
@@ -207,11 +205,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
     try {
       final bytes = await widget.pdfFile.readAsBytes();
-      print('🔍 [PDFViewer] PDF file size: ${bytes.length} bytes');
       
       final document = syncfusion.PdfDocument(inputBytes: bytes);
       final pageCount = document.pages.count;
-      print('🔍 [PDFViewer] Searching ${pageCount} pages for "$query"');
       
       final results = <SearchResult>[];
 
@@ -224,8 +220,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           );
 
           if (pageText.toLowerCase().contains(query.toLowerCase())) {
-            print('🔍 [PDFViewer] Found match on page ${pageIndex + 2}');
-            
             // Find all occurrences on this page
             final lowerText = pageText.toLowerCase();
             final lowerQuery = query.toLowerCase();
@@ -251,14 +245,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
             }
           }
         } catch (e) {
-          print('🔍 [PDFViewer] Error processing page ${pageIndex + 1}: $e');
           // Skip pages with extraction errors
           continue;
         }
       }
 
       document.dispose();
-      print('🔍 [PDFViewer] Search completed: ${results.length} results found');
 
       setState(() {
         _searchResults = results;
@@ -270,7 +262,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         
         // Automatically navigate to the first result
         if (results.isNotEmpty) {
-          print('🔍 [PDFViewer] Auto-navigating to first result: page ${results.first.pageNumber}');
           _navigateToSearchResult(results.first);
         }
         
@@ -299,7 +290,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         }
       }
     } catch (e) {
-      print('🔍 [PDFViewer] Search error: $e');
       if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -331,9 +321,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       // Provide haptic feedback
       HapticService.subtle();
       
-      print('🔍 [PDFViewer] Navigated to page ${result.pageNumber}');
+
     } catch (e) {
-      print('🔍 [PDFViewer] Error navigating to page ${result.pageNumber}: $e');
       if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
