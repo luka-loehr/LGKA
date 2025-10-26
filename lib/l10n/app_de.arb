@@ -107,5 +107,15 @@
   "saturday": "Samstag",
   "sunday": "Sonntag",
   "scheduleNotAvailable": "ist noch nicht verfügbar",
-  "chartLoading": "Diagramm wird geladen..."
+  "chartLoading": "Diagramm wird geladen...",
+  "singleResultFound": "1 Ergebnis gefunden",
+  "multipleResultsFound": "{count} Ergebnisse gefunden",
+  "@multipleResultsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noResultsFound": "Keine Ergebnisse gefunden"
 } 
