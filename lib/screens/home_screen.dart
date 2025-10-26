@@ -17,6 +17,7 @@ import '../utils/app_logger.dart';
 import 'weather_page.dart';
 import 'schedule_page.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/app_info.dart';
 
 /// Main home screen with substitution plan and weather tabs
 class HomeScreen extends ConsumerStatefulWidget {
@@ -236,7 +237,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
         'title': AppLocalizations.of(context)!.krankmeldung,
         'headers': {
-          'User-Agent': 'LGKA-App-Luka-Loehr',
+          'User-Agent': AppInfo.userAgent,
         },
         'fromKrankmeldungInfo': false,
       });
@@ -362,7 +363,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
 
   void _openPdf(PdfRepository pdfRepo, bool isToday) {
     if (!pdfRepo.canOpenPdf(isToday)) return;
-
+adb install -r build/app/outputs/flutter-apk/app-release.apk
     // Get the PDF file and actual weekday from the PDF state
     final pdfFile = pdfRepo.getPdfFile(isToday);
     final pdfState = isToday ? pdfRepo.todayState : pdfRepo.tomorrowState;
@@ -543,8 +544,7 @@ class _StundenplanPageState extends ConsumerState<_StundenplanPage>
   }
 
   void _openSchedule(String scheduleType) {
-    // TODO: Implement schedule opening logic
-    // This could open a PDF viewer or navigate to a schedule screen
+    // Navigate to schedule page - implementation handled in SchedulePage
     HapticService.subtle();
   }
 

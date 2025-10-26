@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:csv/csv.dart';
 import 'dart:convert';
 import '../utils/app_logger.dart';
+import '../utils/app_info.dart';
 
 class WeatherData {
   final DateTime time;
@@ -64,7 +65,7 @@ class WeatherService {
       final response = await http.get(
         Uri.parse(csvUrl),
         headers: {
-          'User-Agent': 'LGKA-App-Luka-Loehr',
+          'User-Agent': AppInfo.userAgent,
         },
       ).timeout(const Duration(seconds: 5));
       
@@ -146,7 +147,7 @@ class WeatherService {
       final response = await http.get(
         Uri.parse(csvUrl),
         headers: {
-          'User-Agent': 'LGKA-App-Luka-Loehr',
+          'User-Agent': AppInfo.userAgent,
         },
       ).timeout(const Duration(seconds: 5));
       
