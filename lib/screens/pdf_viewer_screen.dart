@@ -154,11 +154,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     try {
       _pdfController.jumpToPage(pageNumber - 1); // Convert to 0-based index
       _hasJumpedToSavedPage = true;
-      if (attemptNumber == 1) {
-        AppLogger.pdf('Navigated to page $pageNumber in "${widget.dayName}"');
-      } else {
-        AppLogger.pdf('Navigated to page $pageNumber in "${widget.dayName}" (attempt $attemptNumber)');
-      }
+      AppLogger.pdf('Navigated to page $pageNumber in "${widget.dayName}" (attempt $attemptNumber)');
     } catch (e) {
       // Don't log failure here - let the retry mechanism handle final failure logging
     }
