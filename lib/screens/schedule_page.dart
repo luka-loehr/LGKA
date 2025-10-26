@@ -89,6 +89,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   Future<void> _checkScheduleAvailability() async {
     if (_isCheckingAvailability) return;
     
+    if (!mounted) return;
     setState(() {
       _isCheckingAvailability = true;
     });
@@ -105,14 +106,16 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       // Check availability concurrently instead of sequentially
       final availabilityFutures = allSchedules.map((schedule) async {
         final isAvailable = await scheduleNotifier.isScheduleAvailable(schedule);
-        // Update progress after each check completes
-        setState(() {
-        });
+        if (mounted) {
+          setState(() {});
+        }
         return {'schedule': schedule, 'isAvailable': isAvailable};
       });
       
       // Wait for all availability checks to complete
       final results = await Future.wait(availabilityFutures);
+      
+      if (!mounted) return;
       
       // Separate results by halbjahr
       _availableFirstHalbjahr = [];
@@ -136,10 +139,12 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       
       setState(() {});
     } finally {
-      setState(() {
-        _isCheckingAvailability = false;
-        _lastAvailabilityCheck = DateTime.now();
-      });
+      if (mounted) {
+        setState(() {
+          _isCheckingAvailability = false;
+          _lastAvailabilityCheck = DateTime.now();
+        });
+      }
     }
   }
 
