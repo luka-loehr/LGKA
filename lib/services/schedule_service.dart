@@ -144,7 +144,7 @@ class ScheduleService {
   Future<File?> downloadSchedule(ScheduleItem schedule) async {
     try {
       AppLogger.schedule('Starting download: ${schedule.title} (${schedule.halbjahr}, ${schedule.gradeLevel})');
-      final credentials = base64Encode(utf8.encode('$_username:$_password'));
+      final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
 
       AppLogger.debug('Making HTTP request for PDF', module: 'ScheduleService');
       final response = await http.get(
