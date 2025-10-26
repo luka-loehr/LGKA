@@ -13,7 +13,7 @@ class AppLogger {
   static void welcome() {
     print('╔═══════════════════════════════════════════════════╗');
     print('║                                                   ║');
-    print('║  🏫 Welcome to $appName App                      ║');
+    print('║  🏫 Welcome to $_appName App                      ║');
     print('║     Made with ❤️ by $_developer                     ║');
     print('║                                                   ║');
     print('║  Initializing app...                              ║');
