@@ -144,19 +144,17 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         }
       }
     } catch (e) {
-      debugPrint('📄 [PDFViewer] Error in saved page detection: $e');
+      // Error in saved page detection
     }
   }
 
   /// Try to jump to a specific page
   void _tryJumpToPage(int pageNumber) {
     try {
-      debugPrint('📄 [PDFViewer] Attempting to jump to saved schedule page $pageNumber');
       _pdfController.jumpToPage(pageNumber - 1); // Convert to 0-based index
       _hasJumpedToSavedPage = true;
-      debugPrint('📄 [PDFViewer] Successfully jumped to page $pageNumber');
     } catch (e) {
-      debugPrint('📄 [PDFViewer] Failed to jump to page $pageNumber: $e');
+      // Failed to jump to page
     }
   }
 
@@ -170,7 +168,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       if (_hasJumpedToSavedPage || retryCount >= maxRetries) return;
       
       retryCount++;
-      debugPrint('📄 [PDFViewer] Retry attempt $retryCount to jump to page $pageNumber');
       
       Future.delayed(retryDelay, () {
         if (mounted && !_hasJumpedToSavedPage) {
@@ -178,8 +175,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           
           if (!_hasJumpedToSavedPage && retryCount < maxRetries) {
             retry(); // Continue retrying
-          } else if (retryCount >= maxRetries) {
-            debugPrint('📄 [PDFViewer] Max retries reached, staying on page 1');
           }
         }
       });
@@ -665,10 +660,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     // Mark PDF as ready when first page is being built
     if (!_isPdfReady) {
       _isPdfReady = true;
-      // Only log jump attempt for Klassen 5–10 to avoid noise
-      if ((widget.dayName ?? '').contains('Klassen')) {
-        debugPrint('📄 [PDFViewer] PDF is ready, attempting to jump to saved page');
-      }
       
       // Try to jump to saved page now that PDF is ready
       WidgetsBinding.instance.addPostFrameCallback((_) {
