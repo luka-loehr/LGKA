@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import '../providers/schedule_provider.dart';
 import '../providers/haptic_service.dart';
 import '../theme/app_theme.dart';
@@ -11,6 +10,7 @@ import '../services/schedule_service.dart';
 // import '../services/retry_service.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/app_logger.dart';
+import '../utils/app_info.dart';
 
 class SchedulePage extends ConsumerStatefulWidget {
   const SchedulePage({super.key});
@@ -456,35 +456,29 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       padding: EdgeInsets.only(
         bottom: _getFooterPadding(context),
       ),
-      child: FutureBuilder<PackageInfo>(
-        future: PackageInfo.fromPlatform(),
-        builder: (context, snapshot) {
-          final version = snapshot.hasData ? snapshot.data!.version : '1.5.5';
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '© ${DateTime.now().year} ',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.secondaryText.withValues(alpha: 0.5),
-                ),
-              ),
-              Text(
-                'Luka Löhr',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                ' • v$version',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.secondaryText.withValues(alpha: 0.5),
-                ),
-              ),
-            ],
-          );
-        },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '© ${DateTime.now().year} ',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.secondaryText.withValues(alpha: 0.5),
+            ),
+          ),
+          Text(
+            'Luka Löhr',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Text(
+            ' • v${AppInfo.version}',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.secondaryText.withValues(alpha: 0.5),
+            ),
+          ),
+        ],
       ),
     );
   }
