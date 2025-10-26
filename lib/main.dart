@@ -72,12 +72,14 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
   }
 
   Future<void> _preloadData() async {
+    AppLogger.info('Starting background data preload');
     // Run all preloading operations in parallel for faster startup
     await Future.wait([
       _preloadPdfs(),
       _preloadWeatherData(),
       _preloadSchedules(),
     ]);
+    AppLogger.success('Background preload complete');
   }
 
   Future<void> _preloadPdfs() async {
@@ -93,12 +95,12 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
 
   Future<void> _preloadWeatherData() async {
     try {
-      AppLogger.init('Preloading weather data');
+      AppLogger.init('Starting weather preload', module: 'Main');
       final weatherDataNotifier = ref.read(weatherDataProvider.notifier);
       await weatherDataNotifier.preloadWeatherData();
-      AppLogger.success('Weather data preloaded');
+      AppLogger.success('Weather preload complete', module: 'Main');
     } catch (e) {
-      AppLogger.error('Failed to preload weather data', error: e);
+      AppLogger.error('Weather preload failed', module: 'Main', error: e);
     }
   }
 
