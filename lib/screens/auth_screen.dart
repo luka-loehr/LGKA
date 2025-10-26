@@ -77,27 +77,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       vsync: this,
     );
 
-    _buttonColorAnimation = ColorTween(
-      begin: _activeColor, // Current accent color
-      end: _errorRedColor,
-    ).animate(CurvedAnimation(
-      parent: _buttonColorController,
-      curve: Curves.easeInOut,
-    ));
-
     // Setup success color animation
     _successColorController = AnimationController(
       duration: _buttonAnimationDuration,
       vsync: this,
     );
-
-    _successColorAnimation = ColorTween(
-      begin: _activeColor, // Current accent color
-      end: _successGreenColor, // Green
-    ).animate(CurvedAnimation(
-      parent: _successColorController,
-      curve: Curves.easeInOut,
-    ));
     
     // Set up focus listeners
     _usernameFocusNode.addListener(_handleFocusChange);
@@ -106,6 +90,30 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     // Listen for text changes to update button state
     _usernameController.addListener(_handleTextChange);
     _passwordController.addListener(_handleTextChange);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Setup color animations after dependencies are available
+    final activeColor = ref.read(currentColorProvider);
+    
+    _buttonColorAnimation = ColorTween(
+      begin: activeColor, // Current accent color
+      end: _errorRedColor,
+    ).animate(CurvedAnimation(
+      parent: _buttonColorController,
+      curve: Curves.easeInOut,
+    ));
+
+    _successColorAnimation = ColorTween(
+      begin: activeColor, // Current accent color
+      end: _successGreenColor,
+    ).animate(CurvedAnimation(
+      parent: _successColorController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   // Update animations when accent color changes
