@@ -153,8 +153,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     try {
       _pdfController.jumpToPage(pageNumber - 1); // Convert to 0-based index
       _hasJumpedToSavedPage = true;
+      AppLogger.pdf('Navigated to page $pageNumber in "${widget.dayName}"');
     } catch (e) {
-      // Failed to jump to page
+      AppLogger.warning('Failed to jump to page $pageNumber', module: 'PDFViewer');
     }
   }
 
@@ -252,11 +253,14 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         _currentSearchIndex = results.isNotEmpty ? 0 : -1;
       });
 
+      AppLogger.search('Search completed: ${results.length} results for "$query"');
+
       if (results.isNotEmpty) {
         HapticService.subtle();
-        
+
         // Automatically navigate to the first result
         if (results.isNotEmpty) {
+          AppLogger.search('Auto-navigating to first result: page ${results.first.pageNumber}');
           _navigateToSearchResult(results.first);
         }
         

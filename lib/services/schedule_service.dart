@@ -101,15 +101,18 @@ class ScheduleService {
   Future<bool> isScheduleAvailable(ScheduleItem schedule) async {
     // Check cache first
     final cacheKey = '${schedule.fullUrl}_${schedule.halbjahr}_${schedule.gradeLevel}';
-    
+
     // Check if cache is still valid
     if (_availabilityCache.containsKey(cacheKey) && _lastAvailabilityCheck != null) {
       final timeSinceLastCheck = DateTime.now().difference(_lastAvailabilityCheck!);
       if (timeSinceLastCheck < _availabilityCacheValidity) {
+        AppLogger.debug('Cache hit: ${schedule.title}', module: 'ScheduleService');
         return _availabilityCache[cacheKey]!;
       }
     }
-    
+
+    AppLogger.debug('Checking availability: ${schedule.title}', module: 'ScheduleService');
+
     try {
       final credentials = base64Encode(utf8.encode('$_username:$_password'));
 
@@ -125,12 +128,14 @@ class ScheduleService {
       final isAvailable = response.statusCode == 200;
       _availabilityCache[cacheKey] = isAvailable;
       _lastAvailabilityCheck = DateTime.now();
-      
+
+      AppLogger.debug('Availability check result: ${schedule.title} = ${isAvailable ? 'available' : 'not available'}', module: 'ScheduleService');
       return isAvailable;
     } catch (e) {
       // If there's any error (timeout, network issue, etc.), assume not available
       _availabilityCache[cacheKey] = false;
       _lastAvailabilityCheck = DateTime.now();
+      AppLogger.debug('Availability check failed: ${schedule.title}', module: 'ScheduleService');
       return false;
     }
   }
@@ -138,9 +143,10 @@ class ScheduleService {
   /// Download a specific schedule PDF
   Future<File?> downloadSchedule(ScheduleItem schedule) async {
     try {
-      AppLogger.schedule('Downloading: ${schedule.title}');
+      AppLogger.schedule('Starting download: ${schedule.title} (${schedule.halbjahr}, ${schedule.gradeLevel})');
       final credentials = base64Encode(utf8.encode('$_username:$_password'));
 
+      AppLogger.debug('Making HTTP request for PDF', module: 'ScheduleService');
       final response = await http.get(
         Uri.parse(schedule.fullUrl),
         headers: {
@@ -150,7 +156,7 @@ class ScheduleService {
       ).timeout(_timeout);
 
       if (response.statusCode == 404) {
-        AppLogger.warning('PDF not available yet: ${schedule.title}', module: 'ScheduleService');
+        AppLogger.warning('PDF not available (404): ${schedule.title}', module: 'ScheduleService');
         return null;
       }
 
@@ -163,9 +169,10 @@ class ScheduleService {
       final sanitizedHalbjahr = schedule.halbjahr.replaceAll('.', '_');
       final filename = '${sanitizedGradeLevel}_$sanitizedHalbjahr.pdf';
       final file = File('${cacheDir.path}/$filename');
-      
+
+      AppLogger.debug('Saving PDF: ${response.bodyBytes.length} bytes', module: 'ScheduleService');
       await file.writeAsBytes(response.bodyBytes);
-      AppLogger.success('PDF saved: ${schedule.title}', module: 'ScheduleService');
+      AppLogger.success('PDF downloaded successfully: ${schedule.title} (${(response.bodyBytes.length / 1024).toStringAsFixed(1)}KB)', module: 'ScheduleService');
       
       // Validate PDF content
       if (response.bodyBytes.length < 1000) {
@@ -259,7 +266,7 @@ List<ScheduleItem> _parseScheduleHtml(String htmlContent) {
 
         final halbjahr = _extractHalbjahr(title);
         final gradeLevel = _extractGradeLevel(title);
-        
+
         AppLogger.debug('Parsed schedule: $title ($halbjahr, $gradeLevel)', module: 'ScheduleService');
 
         schedules.add(ScheduleItem(

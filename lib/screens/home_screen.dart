@@ -13,6 +13,7 @@ import '../data/preferences_manager.dart';
 import '../providers/haptic_service.dart';
 import '../navigation/app_router.dart';
 import '../services/retry_service.dart';
+import '../utils/app_logger.dart';
 import 'weather_page.dart';
 import 'schedule_page.dart';
 import '../l10n/app_localizations.dart';
@@ -179,6 +180,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       HapticService.subtle();
       _pageController.jumpToPage(index);
       setState(() => _currentPage = index);
+
+      final tabNames = ['Substitution Plan', 'Weather', 'Schedule'];
+      AppLogger.navigation('Switched to ${tabNames[index]} tab');
     }
   }
 
@@ -358,7 +362,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
 
   void _openPdf(PdfRepository pdfRepo, bool isToday) {
     if (!pdfRepo.canOpenPdf(isToday)) return;
-    
+
     // Get the PDF file and actual weekday from the PDF state
     final pdfFile = pdfRepo.getPdfFile(isToday);
     final pdfState = isToday ? pdfRepo.todayState : pdfRepo.tomorrowState;
@@ -379,7 +383,9 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
         weekday = germanToEnglishWeekday[weekday]!;
       }
     }
-    
+
+    AppLogger.pdf('Opening PDF: $weekday (${isToday ? 'today' : 'tomorrow'})');
+
     if (pdfFile != null) {
       // Navigate to PDF viewer screen
       context.push(AppRouter.pdfViewer, extra: {
