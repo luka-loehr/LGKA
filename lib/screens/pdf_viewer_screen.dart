@@ -150,11 +150,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   }
 
   /// Try to jump to a specific page
-  void _tryJumpToPage(int pageNumber) {
+  void _tryJumpToPage(int pageNumber, {int attemptNumber = 1}) {
     try {
       _pdfController.jumpToPage(pageNumber - 1); // Convert to 0-based index
       _hasJumpedToSavedPage = true;
-      AppLogger.pdf('Navigated to page $pageNumber in "${widget.dayName}"');
+      if (attemptNumber == 1) {
+        AppLogger.pdf('Navigated to page $pageNumber in "${widget.dayName}"');
+      } else {
+        AppLogger.pdf('Navigated to page $pageNumber in "${widget.dayName}" (attempt $attemptNumber)');
+      }
     } catch (e) {
       // Don't log failure here - let the retry mechanism handle final failure logging
     }
@@ -173,7 +177,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
       Future.delayed(retryDelay, () {
         if (mounted && !_hasJumpedToSavedPage) {
-          _tryJumpToPage(pageNumber);
+          _tryJumpToPage(pageNumber, attemptNumber: retryCount);
 
           if (!_hasJumpedToSavedPage && retryCount < maxRetries) {
             retry(); // Continue retrying
