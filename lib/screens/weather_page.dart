@@ -8,6 +8,7 @@ import '../providers/app_providers.dart';
 import '../services/retry_service.dart';
 import '../providers/haptic_service.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/app_logger.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -160,6 +161,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
 
   void _onChartAnimationComplete() {
     HapticService.light();
+    AppLogger.chart('Chart animation completed for ${_getChartTitle().toLowerCase()}');
   }
 
   @override
@@ -172,6 +174,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
 
   void _refreshData() async {
     await HapticService.light();
+    AppLogger.chart('Manual refresh requested');
     // Ensure error UI stays visible while retrying, until data successfully loads
     if (mounted) {
       setState(() {
@@ -180,7 +183,10 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     }
     try {
       await ref.read(weatherDataProvider.notifier).refreshWeatherData();
-    } catch (_) {}
+      AppLogger.success('Weather data refreshed successfully', module: 'WeatherPage');
+    } catch (e) {
+      AppLogger.error('Weather refresh failed', module: 'WeatherPage', error: e);
+    }
   }
 
   Widget _buildChartPlaceholder() {
@@ -250,6 +256,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       }
       // Light haptic to signal data loaded successfully
       HapticService.light();
+      AppLogger.chart('Weather data loaded successfully');
     }
 
     // Trigger chart rendering when data becomes available
@@ -259,6 +266,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
           setState(() {
             _isChartRendered = true;
           });
+          AppLogger.chart('Chart rendering started');
           // Start chart animation completion detection
           _startChartAnimation();
         }

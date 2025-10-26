@@ -98,17 +98,19 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
   /// Download a specific schedule PDF
   Future<File?> downloadSchedule(ScheduleItem schedule) async {
     try {
+      AppLogger.schedule('Downloading schedule PDF: ${schedule.title}');
       final result = await _scheduleService.downloadSchedule(schedule);
-      
+
       // If result is null, the PDF is not available yet (404 error)
       if (result == null) {
-        // Don't show an error - this is expected behavior
+        AppLogger.warning('Schedule PDF not available: ${schedule.title}', module: 'ScheduleProvider');
         return null;
       }
-      
+
+      AppLogger.success('Schedule PDF downloaded: ${schedule.title}', module: 'ScheduleProvider');
       return result;
     } catch (e) {
-      // Only show error for actual failures, not for missing PDFs
+      AppLogger.error('Failed to download schedule PDF', module: 'ScheduleProvider', error: e);
       state = state.copyWith(
         error: 'Serververbindung fehlgeschlagen',
       );
