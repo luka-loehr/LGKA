@@ -78,7 +78,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Found pages: ${widget.targetPages!.join(", ")}'),
+              content: Text(AppLocalizations.of(context)!.foundPages(widget.targetPages!.join(", "))),
               duration: const Duration(seconds: 3),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
@@ -328,7 +328,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-                content: Text('Error navigating to page ${result.pageNumber}'),
+                content: Text(AppLocalizations.of(context)!.errorNavigatingToPage(result.pageNumber.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -475,7 +475,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Fehler beim Teilen: ${e.toString()}'),
+            content: Text('${AppLocalizations.of(context)!.shareError}: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -631,7 +631,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                   IconButton(
                     onPressed: _hideSearchBar,
                     icon: const Icon(Icons.close, color: AppColors.secondaryText),
-                    tooltip: 'Suche abbrechen',
+                    tooltip: AppLocalizations.of(context)!.cancelSearch,
                   ),
                 ],
               ),

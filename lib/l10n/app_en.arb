@@ -120,5 +120,22 @@
       }
     }
   },
-  "noResultsFound": "No results found"
+  "noResultsFound": "No results found",
+  "shareError": "Error sharing",
+  "errorNavigatingToPage": "Error navigating to page {page}",
+  "@errorNavigatingToPage": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "foundPages": "Found pages: {pages}",
+  "@foundPages": {
+    "placeholders": {
+      "pages": {
+        "type": "String"
+      }
+    }
+  }
 } 

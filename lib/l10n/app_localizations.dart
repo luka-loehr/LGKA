@@ -736,6 +736,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No results found'**
   String get noResultsFound;
+
+  /// No description provided for @shareError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error sharing'**
+  String get shareError;
+
+  /// No description provided for @errorNavigatingToPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Error navigating to page {page}'**
+  String errorNavigatingToPage(String page);
+
+  /// No description provided for @foundPages.
+  ///
+  /// In en, this message translates to:
+  /// **'Found pages: {pages}'**
+  String foundPages(String pages);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
