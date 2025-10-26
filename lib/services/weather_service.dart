@@ -60,6 +60,7 @@ class WeatherService {
     AppLogger.network('Fetching weather data');
     
     try {
+      AppLogger.debug('Making HTTP request to weather service', module: 'WeatherService');
       final response = await http.get(
         Uri.parse(csvUrl),
         headers: {
@@ -67,16 +68,22 @@ class WeatherService {
         },
       ).timeout(const Duration(seconds: 5));
       
+      AppLogger.debug('Response status: ${response.statusCode}', module: 'WeatherService');
+      
       if (response.statusCode != 200) {
         AppLogger.error('Weather fetch failed: HTTP ${response.statusCode}', module: 'WeatherService');
         throw Exception('Failed to load weather data: ${response.statusCode}');
       }
 
       final csvString = utf8.decode(response.bodyBytes);
+      AppLogger.debug('Decoded ${csvString.length} characters', module: 'WeatherService');
+      
       final List<List<dynamic>> csvData = const CsvToListConverter(
         eol: '\n',
         fieldDelimiter: ';',
       ).convert(csvString);
+      
+      AppLogger.debug('Parsed ${csvData.length} CSV rows', module: 'WeatherService');
       
       if (csvData.isEmpty) {
         AppLogger.error('Empty weather data received', module: 'WeatherService');
