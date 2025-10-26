@@ -123,7 +123,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
       // Determine schedule type based on dayName labeling used in UI
       final dayLabel = (widget.dayName ?? '');
-      final isSchedule5to10 = dayLabel.contains('Klassen');
+      final isSchedule5to10 = dayLabel.contains('Klassen') || dayLabel.contains('Grades');
       final isScheduleJ11J12 = dayLabel.contains('J11/J12');
       final isSubstitution = !isSchedule5to10 && !isScheduleJ11J12; // everything else
 
@@ -316,7 +316,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         final container = ProviderScope.containerOf(context, listen: false);
         final prefs = container.read(preferencesManagerProvider);
         // Store per schedule type only; ignore substitution plans
-        final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen');
+        final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen') || (widget.dayName ?? '').contains('Grades');
         if (isSchedule5to10) {
           prefs.setLastScheduleQuery5to10(result.query);
           prefs.setLastSchedulePage5to10(result.pageNumber);
@@ -403,7 +403,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       try {
         final container = ProviderScope.containerOf(context, listen: false);
         final prefs = container.read(preferencesManagerProvider);
-        final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen');
+        final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen') || (widget.dayName ?? '').contains('Grades');
         final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
         if (isSchedule5to10) {
           prefs.setLastScheduleQuery5to10(query.trim());
