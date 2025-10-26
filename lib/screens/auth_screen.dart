@@ -9,6 +9,7 @@ import '../navigation/app_router.dart';
 import '../providers/haptic_service.dart';
 import '../theme/app_theme.dart';
 import '../l10n/app_localizations.dart';
+import '../config/app_credentials.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   final VoidCallback? onLoginSuccess;
@@ -31,6 +32,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   bool _showSuccessFlash = false;
   bool _shouldShowOffset = false;
   String _currentAccentColor = 'blue';
+  bool _hasInitializedAnimations = false;
   
   // Adaptive offset calculation based on screen height
   double _getAdaptiveOffset(BuildContext context) {
@@ -139,24 +141,28 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   void didChangeDependencies() {
     super.didChangeDependencies();
     
-    // Setup color animations after dependencies are available
-    final activeColor = ref.read(currentColorProvider);
-    
-    _buttonColorAnimation = ColorTween(
-      begin: activeColor, // Current accent color
-      end: _errorRedColor,
-    ).animate(CurvedAnimation(
-      parent: _buttonColorController,
-      curve: Curves.easeInOut,
-    ));
+    // Setup color animations only once after dependencies are available
+    if (!_hasInitializedAnimations) {
+      final activeColor = ref.read(currentColorProvider);
+      
+      _buttonColorAnimation = ColorTween(
+        begin: activeColor, // Current accent color
+        end: _errorRedColor,
+      ).animate(CurvedAnimation(
+        parent: _buttonColorController,
+        curve: Curves.easeInOut,
+      ));
 
-    _successColorAnimation = ColorTween(
-      begin: activeColor, // Current accent color
-      end: _successGreenColor,
-    ).animate(CurvedAnimation(
-      parent: _successColorController,
-      curve: Curves.easeInOut,
-    ));
+      _successColorAnimation = ColorTween(
+        begin: activeColor, // Current accent color
+        end: _successGreenColor,
+      ).animate(CurvedAnimation(
+        parent: _successColorController,
+        curve: Curves.easeInOut,
+      ));
+      
+      _hasInitializedAnimations = true;
+    }
     
     // Ensure keyboard animation updates when keyboard visibility changes
     _updateOffsetState();
@@ -177,7 +183,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (username == "vertretungsplan" && password == "ephraim") {
+    if (username == AppCredentials.username && password == AppCredentials.password) {
       // Show success flash immediately
       setState(() {
         _showSuccessFlash = true;

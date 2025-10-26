@@ -60,6 +60,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   // PDF loading state
   bool _isPdfReady = false;
   bool _hasJumpedToSavedPage = false;
+  
+  // Timer for retry mechanism (to prevent memory leaks)
+  Timer? _retryTimer;
 
   @override
   void initState() {
@@ -93,6 +96,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   
   @override
   void dispose() {
+    _retryTimer?.cancel();
     _pdfController.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();
@@ -146,6 +150,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       }
     } catch (e) {
       // Error in saved page detection
+      AppLogger.debug('Error detecting saved page: $e', module: 'PDFViewer');
     }
   }
 
@@ -157,34 +162,31 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       AppLogger.pdf('Navigated to page $pageNumber in "${widget.dayName}" (attempt $attemptNumber)');
     } catch (e) {
       // Don't log failure here - let the retry mechanism handle final failure logging
+      AppLogger.debug('Jump to page failed: $e', module: 'PDFViewer');
     }
   }
 
-  /// Set up retry mechanism for page jumping
+  /// Set up retry mechanism for page jumping using a Timer to prevent memory leaks
   void _setupRetryMechanism(int pageNumber) {
     int retryCount = 0;
     const maxRetries = 10;
     const retryDelay = Duration(milliseconds: 200);
 
-    void retry() {
-      if (_hasJumpedToSavedPage || retryCount >= maxRetries) return;
+    // Cancel any existing timer
+    _retryTimer?.cancel();
+
+    _retryTimer = Timer.periodic(retryDelay, (timer) {
+      if (!mounted || _hasJumpedToSavedPage || retryCount >= maxRetries) {
+        timer.cancel();
+        if (retryCount >= maxRetries && !_hasJumpedToSavedPage) {
+          AppLogger.warning('Failed to jump to page $pageNumber after $maxRetries attempts', module: 'PDFViewer');
+        }
+        return;
+      }
 
       retryCount++;
-
-      Future.delayed(retryDelay, () {
-        if (mounted && !_hasJumpedToSavedPage) {
-          _tryJumpToPage(pageNumber, attemptNumber: retryCount);
-
-          if (!_hasJumpedToSavedPage && retryCount < maxRetries) {
-            retry(); // Continue retrying
-          } else if (retryCount >= maxRetries) {
-            AppLogger.warning('Failed to jump to page $pageNumber after $maxRetries attempts', module: 'PDFViewer');
-          }
-        }
-      });
-    }
-    
-    retry();
+      _tryJumpToPage(pageNumber, attemptNumber: retryCount);
+    });
   }
 
   // Search functionality
@@ -245,6 +247,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           }
         } catch (e) {
           // Skip pages with extraction errors
+          AppLogger.debug('Error extracting text from page $pageIndex: $e', module: 'PDFViewer');
           continue;
         }
       }
@@ -318,7 +321,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           prefs.setLastSchedulePage5to10(result.pageNumber);
         }
         // J11/J12 schedules no longer use page persistence
-      } catch (_) {}
+      } catch (e) {
+        AppLogger.debug('Error saving search result: $e', module: 'PDFViewer');
+      }
       
       // Provide haptic feedback
       HapticService.subtle();
@@ -404,7 +409,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         } else if (isScheduleJ11J12) {
           prefs.setLastScheduleQueryJ11J12(query.trim());
         }
-      } catch (_) {}
+      } catch (e) {
+        AppLogger.debug('Error saving search query: $e', module: 'PDFViewer');
+      }
     }
   }
 

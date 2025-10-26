@@ -9,6 +9,7 @@ import '../providers/haptic_service.dart';
 import '../navigation/app_router.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/app_providers.dart';
+import '../utils/app_info.dart';
 
 class KrankmeldungInfoScreen extends ConsumerWidget {
   const KrankmeldungInfoScreen({super.key});
@@ -138,7 +139,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
       'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
       'title': AppLocalizations.of(context)!.krankmeldung,
       'headers': {
-        'User-Agent': 'LGKA-App-Luka-Loehr',
+        'User-Agent': AppInfo.userAgent,
       },
       'fromKrankmeldungInfo': true, // Flag to indicate we came from info screen
     });
