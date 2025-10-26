@@ -244,7 +244,6 @@ Map<String, String> _extractPdfData(List<int> bytes) {
         .firstMatch(text);
     if (footerMatch != null) {
       detectedYearFromFooter = footerMatch.group(3);
-      debugPrint('DEBUG: Footer year detected: $detectedYearFromFooter');
     }
 
     // Header pattern strictly scoped to the title line (robust against other dates on page)
@@ -261,10 +260,6 @@ Map<String, String> _extractPdfData(List<int> bytes) {
       // Also log the header line around the match for verification
       final lineStart = text.lastIndexOf('\n', headerMatch.start);
       final lineEnd = text.indexOf('\n', headerMatch.end);
-      final headerLine = text.substring(
-          lineStart == -1 ? 0 : lineStart + 1,
-          lineEnd == -1 ? text.length : lineEnd);
-      debugPrint('DEBUG: Header matched. line="$headerLine" weekday=$weekday partial=$partialDate footerYear=$detectedYearFromFooter -> date=$date');
     } else {
       // Fallback specifically on the header line if pattern failed due to stray characters
       final headerLineMatch = RegExp(r'Lessing\S*Klassen[^\n]+', caseSensitive: false)
@@ -280,9 +275,6 @@ Map<String, String> _extractPdfData(List<int> bytes) {
           weekday = weekdayLoose;
           final year = detectedYearFromFooter ?? DateTime.now().year.toString();
           date = '$partialDate$year';
-          debugPrint('DEBUG: Header line parsed. line="$headerLine" weekday=$weekday partial=$partialDate footerYear=$detectedYearFromFooter -> date=$date');
-        } else {
-          debugPrint('DEBUG: Header line found but could not parse. line="$headerLine"');
         }
       }
     }
@@ -309,7 +301,6 @@ Map<String, String> _extractPdfData(List<int> bytes) {
         RegExp(r'^(\d{1,2})\.(\d{1,2})\.(\d{2})$'),
         (m) => '${m.group(1)!.padLeft(2, '0')}.${m.group(2)!.padLeft(2, '0')}.20${m.group(3)}',
       );
-      debugPrint('DEBUG: PatternA matched. weekday=$weekday rawDate=${matchA.group(2)} -> date=$date');
     } else if (date.isEmpty && matchB != null) {
       final partialDate = matchB.group(1)!; // with trailing dot
       weekday = matchB.group(2)!;
@@ -328,7 +319,6 @@ Map<String, String> _extractPdfData(List<int> bytes) {
 
       final year = (detectedYearFromFooter ?? yearInContext ?? tsYear) ?? DateTime.now().year.toString();
       date = '$partialDate$year';
-      debugPrint('DEBUG: PatternB matched. weekday=$weekday partial=$partialDate ctxYear=$yearInContext tsYear=$tsYear -> date=$date');
     } else if (date.isEmpty) {
       // Fallback: try to find both independently, preferring weekday first
       final weekdayOnly = RegExp(r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)', caseSensitive: false)
@@ -352,7 +342,6 @@ Map<String, String> _extractPdfData(List<int> bytes) {
           date = '${anyDate.group(1)!.padLeft(2, '0')}.${anyDate.group(2)!.padLeft(2, '0')}.${anyDate.group(0)!.split('.').last}';
         }
       }
-      debugPrint('DEBUG: Fallback matched. weekday=$weekday date=$date');
     }
 
     // Normalize date format if present
@@ -382,7 +371,6 @@ Map<String, String> _extractPdfData(List<int> bytes) {
             DateTime.sunday: 'Sonntag',
           };
           weekday = deWeekdays[dt.weekday] ?? '';
-          debugPrint('DEBUG: Weekday derived from date fallback -> $weekday');
         } catch (_) {
           // ignore invalid dates
         }
@@ -394,11 +382,6 @@ Map<String, String> _extractPdfData(List<int> bytes) {
       final lower = weekday.toLowerCase();
       weekday = lower[0].toUpperCase() + lower.substring(1);
     }
-
-    // Extra diagnostics: show nearby header context and bottom date if present
-    final headerContext = RegExp(r'Lessing-?Klassen\s+[^\n]{0,80}', caseSensitive: false).firstMatch(text)?.group(0) ?? '';
-    final footerDate = RegExp(r'\b(\d{1,2}\.\d{1,2}\.((?:19|20)\d{2}))\b\s*\(\d+\)').firstMatch(text)?.group(1) ?? '';
-    debugPrint('DEBUG: Parsed weekday="$weekday" date="$date" headerCtx="$headerContext" footerDate="$footerDate"');
 
     // Extract last updated timestamp
     final timestampPattern = RegExp(r'(\d{1,2}\.\d{1,2}\.\d{4}\s+\d{1,2}:\d{2})');
