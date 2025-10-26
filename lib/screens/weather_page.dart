@@ -94,6 +94,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
 
     // Check if data needs to be loaded (fallback for edge cases)
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      
       final weatherState = ref.read(weatherDataProvider);
       if (!weatherState.isPreloaded && weatherState.chartData.isEmpty && !weatherState.isLoading) {
         ref.read(weatherDataProvider.notifier).preloadWeatherData();
