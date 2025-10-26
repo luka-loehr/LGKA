@@ -108,24 +108,7 @@ class AppLogger {
   
   /// Core logging method with consistent formatting
   static void _log(String prefix, String message) {
-    if (kDebugMode) {
-      developer.log(
-        message,
-        name: _appName,
-        level: _getLogLevel(prefix),
-      );
-    } else {
-      print('$prefix $message');
-    }
-  }
-  
-  /// Determine log level from prefix
-  static int _getLogLevel(String prefix) {
-    if (prefix.contains('❌')) return 900; // severe
-    if (prefix.contains('⚠️')) return 800; // warning
-    if (prefix.contains('✅')) return 700; // info
-    if (prefix.contains('🔍')) return 500; // fine
-    return 600; // info
+    print('$prefix $message');
   }
 }
 
