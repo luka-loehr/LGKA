@@ -330,4 +330,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get noResultsFound => 'Keine Ergebnisse gefunden';
+
+  @override
+  String get shareError => 'Fehler beim Teilen';
+
+  @override
+  String errorNavigatingToPage(String page) {
+    return 'Fehler beim Navigieren zur Seite $page';
+  }
+
+  @override
+  String foundPages(String pages) {
+    return 'Gefundene Seiten: $pages';
+  }
 }
