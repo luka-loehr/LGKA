@@ -67,7 +67,7 @@ class AppLogger {
   
   /// PDF/Repository specific logs
   static void pdf(String message) {
-    _log('📄 [PDFRepository]', message);
+    _log('📄 [PDF]', message);
   }
   
   /// Schedule service specific logs
