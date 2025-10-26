@@ -10,6 +10,7 @@ import '../theme/app_theme.dart';
 import '../services/schedule_service.dart';
 // import '../services/retry_service.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/app_logger.dart';
 
 class SchedulePage extends ConsumerStatefulWidget {
   const SchedulePage({super.key});
@@ -51,7 +52,9 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     
     // Load schedules when page initializes
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      AppLogger.schedule('Schedule page initialized');
       await ref.read(scheduleProvider.notifier).loadSchedules();
+      AppLogger.debug('Schedule loading complete', module: 'SchedulePage');
       // Check availability only if it hasn't been checked recently
       if (_shouldCheckAvailability()) {
         await _checkScheduleAvailability();
@@ -134,9 +137,11 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       
       // EXCLUSIVE LOGIC: If second half-year is available, clear first half-year
       if (_availableSecondHalbjahr.isNotEmpty) {
+        AppLogger.schedule('Second half-year available: ${results.length} schedules checked');
         _availableFirstHalbjahr.clear(); // Only show second half-year
       }
-      
+
+      AppLogger.success('Schedule availability check complete: ${results.where((r) => r['isAvailable'] as bool).length} available', module: 'SchedulePage');
       setState(() {});
     } finally {
       if (mounted) {
@@ -228,6 +233,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       if (hasAnyButtons && !_hasShownButtons) {
         _hasShownButtons = true;
         _fadeController.forward();
+        AppLogger.schedule('Schedule buttons shown: ${_availableFirstHalbjahr.length + _availableSecondHalbjahr.length} available');
         // Vibrate only once per app launch after the initial spinner has been shown
         if (_didShowInitialSpinner && !_didVibrateOnInitialLoad) {
           _didVibrateOnInitialLoad = true;

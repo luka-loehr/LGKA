@@ -62,6 +62,7 @@ class PreferencesManager extends ChangeNotifier {
   Future<void> setDebugMode(bool value) async {
     await _prefs.setBool(_keyDebugMode, value);
     notifyListeners();
+    AppLogger.info('Debug mode ${value ? 'enabled' : 'disabled'}', module: 'Preferences');
   }
 
 
@@ -78,16 +79,20 @@ class PreferencesManager extends ChangeNotifier {
   String get accentColor => _prefs.getString(_keyAccentColor) ?? 'blue';
 
   Future<void> setAccentColor(String color) async {
+    final previousColor = accentColor;
     await _prefs.setString(_keyAccentColor, color);
     notifyListeners();
+    AppLogger.info('Accent color changed: $previousColor → $color', module: 'Preferences');
   }
 
   // Vibration preference
   bool get vibrationEnabled => _prefs.getBool(_keyVibrationEnabled) ?? true;
 
   Future<void> setVibrationEnabled(bool value) async {
+    final previousValue = vibrationEnabled;
     await _prefs.setBool(_keyVibrationEnabled, value);
     notifyListeners();
+    AppLogger.info('Vibration ${value ? 'enabled' : 'disabled'}', module: 'Preferences');
   }
 
   // Krankmeldung info shown preference
