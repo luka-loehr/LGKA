@@ -117,5 +117,22 @@
       }
     }
   },
-  "noResultsFound": "Keine Ergebnisse gefunden"
+  "noResultsFound": "Keine Ergebnisse gefunden",
+  "shareError": "Fehler beim Teilen",
+  "errorNavigatingToPage": "Fehler beim Navigieren zur Seite {page}",
+  "@errorNavigatingToPage": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "foundPages": "Gefundene Seiten: {pages}",
+  "@foundPages": {
+    "placeholders": {
+      "pages": {
+        "type": "String"
+      }
+    }
+  }
 } 
