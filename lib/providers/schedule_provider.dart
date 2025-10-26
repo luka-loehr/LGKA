@@ -103,7 +103,6 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
       // If result is null, the PDF is not available yet (404 error)
       if (result == null) {
         // Don't show an error - this is expected behavior
-        print('PDF not available yet: ${schedule.title}');
         return null;
       }
       
