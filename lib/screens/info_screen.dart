@@ -39,11 +39,6 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
       'descKey': 'featureScheduleDesc',
     },
     {
-      'icon': Icons.cloud,
-      'titleKey': 'featureWeatherTitle',
-      'descKey': 'featureWeatherDesc',
-    },
-    {
       'icon': Icons.sick,
       'titleKey': 'featureSickTitle',
       'descKey': 'featureSickDesc',
@@ -57,8 +52,6 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
         return l.featureSubstitutionTitle;
       case 'featureScheduleTitle':
         return l.featureScheduleTitle;
-      case 'featureWeatherTitle':
-        return l.featureWeatherTitle;
       case 'featureSickTitle':
         return l.featureSickTitle;
       default:
@@ -73,8 +66,6 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
         return l.featureSubstitutionDesc;
       case 'featureScheduleDesc':
         return l.featureScheduleDesc;
-      case 'featureWeatherDesc':
-        return l.featureWeatherDesc;
       case 'featureSickDesc':
         return l.featureSickDesc;
       default:

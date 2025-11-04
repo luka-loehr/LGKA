@@ -15,11 +15,10 @@ import '../services/retry_service.dart';
 import '../utils/app_logger.dart';
 import '../utils/app_info.dart';
 import '../widgets/app_footer.dart';
-import 'weather_page.dart';
 import 'schedule_page.dart';
 import '../l10n/app_localizations.dart';
 
-/// Main home screen with substitution plan and weather tabs
+/// Main home screen with substitution plan and schedule tabs
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -44,26 +43,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  /// Initialize PDF repository and preload weather data
+  /// Initialize PDF repository
   Future<void> _initializeData() async {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final pdfRepo = ref.read(pdfRepositoryProvider);
       await pdfRepo.initialize();
-      
-      // Preload weather data in background
-      _preloadWeatherData();
-    });
-  }
-
-  /// Preload weather data without blocking UI
-  void _preloadWeatherData() {
-    Future(() async {
-      try {
-        final weatherService = ref.read(weatherServiceProvider);
-        await weatherService.fetchWeatherData();
-      } catch (e) {
-        // Silent failure for background preloading
-      }
     });
   }
 
@@ -123,8 +107,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildSegmentedButton(0, AppLocalizations.of(context)!.substitutionPlan, Icons.calendar_today),
-          _buildSegmentedButton(1, AppLocalizations.of(context)!.weather, Icons.wb_sunny_outlined),
-          _buildSegmentedButton(2, AppLocalizations.of(context)!.schedule, Icons.schedule),
+          _buildSegmentedButton(1, AppLocalizations.of(context)!.schedule, Icons.schedule),
         ],
       ),
     );
@@ -182,7 +165,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _pageController.jumpToPage(index);
       setState(() => _currentPage = index);
 
-      final tabNames = ['Substitution Plan', 'Weather', 'Schedule'];
+      final tabNames = ['Substitution Plan', 'Schedule'];
       AppLogger.navigation('Switched to ${tabNames[index]} tab');
     }
   }
@@ -194,7 +177,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         setState(() => _currentPage = index);
         // Add haptic on page switch, but avoid double haptic if Schedule page will vibrate after its spinner
         bool shouldVibrate = true;
-        if (index == 2) {
+        if (index == 1) {
           final scheduleState = ref.read(scheduleProvider);
           if (scheduleState.isLoading) {
             shouldVibrate = false;
@@ -206,7 +189,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       },
       children: [
         const _SubstitutionPlanPage(),
-        const WeatherPage(),
         const SchedulePage(),
       ],
     );
