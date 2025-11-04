@@ -14,13 +14,6 @@ class RetryService {
   /// This method just triggers the retries and doesn't wait for results
   void retryAllDataSources() {
     try {
-      // Retry weather data - fire and forget
-      _ref.read(weatherDataProvider.notifier).refreshWeatherData();
-    } catch (e) {
-      // Silently ignore any errors - don't crash the retry service
-    }
-    
-    try {
       // Retry PDF substitution plans - fire and forget
       final pdfRepo = _ref.read(pdfRepositoryProvider);
       pdfRepo.retryAll();
@@ -31,15 +24,6 @@ class RetryService {
     try {
       // Retry schedule data - fire and forget
       _ref.read(scheduleProvider.notifier).refreshSchedules();
-    } catch (e) {
-      // Silently ignore any errors - don't crash the retry service
-    }
-  }
-
-  /// Retry only weather data
-  void retryWeatherData() {
-    try {
-      _ref.read(weatherDataProvider.notifier).refreshWeatherData();
     } catch (e) {
       // Silently ignore any errors - don't crash the retry service
     }

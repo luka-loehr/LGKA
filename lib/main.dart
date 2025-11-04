@@ -70,7 +70,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
   void initState() {
     super.initState();
     
-    // Preload PDFs and weather data in background
+    // Preload PDFs and schedules in background
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _preloadData();
     });
@@ -81,7 +81,6 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
     // Run all preloading operations in parallel for faster startup
     await Future.wait([
       _preloadPdfs(),
-      _preloadWeatherData(),
       _preloadSchedules(),
     ]);
     AppLogger.success('Background preload complete');
@@ -95,17 +94,6 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
       AppLogger.success('PDF repository preloaded');
     } catch (e) {
       AppLogger.error('Failed to preload PDFs', error: e);
-    }
-  }
-
-  Future<void> _preloadWeatherData() async {
-    try {
-      AppLogger.init('Starting weather preload', module: 'Main');
-      final weatherDataNotifier = ref.read(weatherDataProvider.notifier);
-      await weatherDataNotifier.preloadWeatherData();
-      AppLogger.success('Weather preload complete', module: 'Main');
-    } catch (e) {
-      AppLogger.error('Weather preload failed', module: 'Main', error: e);
     }
   }
 
