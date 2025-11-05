@@ -1,5 +1,7 @@
 // Copyright Luka Löhr 2025
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -65,15 +67,24 @@ class LGKAApp extends ConsumerStatefulWidget {
 
 class _LGKAAppState extends ConsumerState<LGKAApp> {
   late final _router = AppRouter.createRouter(initialLocation: widget.initialRoute);
+  static const Duration _cacheValidity = Duration(minutes: 5);
+  Timer? _cacheRefreshTimer;
 
   @override
   void initState() {
     super.initState();
-    
+
     // Preload PDFs and weather data in background
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _preloadData();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _preloadData();
+      _startCacheRefreshTimer();
     });
+  }
+
+  @override
+  void dispose() {
+    _cacheRefreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _preloadData() async {
@@ -85,6 +96,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
       _preloadSchedules(),
     ]);
     AppLogger.success('Background preload complete');
+    await _refreshExpiredCaches();
   }
 
   Future<void> _preloadPdfs() async {
@@ -117,6 +129,32 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
       AppLogger.success('Schedules preloaded');
     } catch (e) {
       AppLogger.error('Failed to preload schedules', error: e);
+    }
+  }
+
+  void _startCacheRefreshTimer() {
+    _cacheRefreshTimer?.cancel();
+    _cacheRefreshTimer = Timer.periodic(_cacheValidity, (_) {
+      unawaited(_refreshExpiredCaches());
+    });
+  }
+
+  Future<void> _refreshExpiredCaches() async {
+    final pdfRepository = ref.read(pdfRepositoryProvider);
+    if (!pdfRepository.isCacheValid && pdfRepository.hasAnyData) {
+      unawaited(pdfRepository.refreshInBackground());
+    }
+
+    final scheduleService = ref.read(scheduleServiceProvider);
+    if (!scheduleService.hasValidCache && scheduleService.cachedSchedules != null) {
+      unawaited(ref.read(scheduleProvider.notifier).refreshInBackground());
+    }
+
+    final weatherState = ref.read(weatherDataProvider);
+    final weatherLastUpdate = weatherState.lastUpdateTime;
+    if (weatherLastUpdate == null ||
+        DateTime.now().difference(weatherLastUpdate) >= _cacheValidity) {
+      unawaited(ref.read(weatherDataProvider.notifier).updateDataInBackground());
     }
   }
 
