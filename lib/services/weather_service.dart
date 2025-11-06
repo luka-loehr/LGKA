@@ -78,12 +78,19 @@ class WeatherService {
 
       final csvString = utf8.decode(response.bodyBytes);
       AppLogger.debug('Decoded ${csvString.length} characters', module: 'WeatherService');
-      
-      final List<List<dynamic>> csvData = const CsvToListConverter(
-        eol: '\n',
-        fieldDelimiter: ';',
-      ).convert(csvString);
-      
+
+      // Add safety check for CSV parsing to handle corrupted data
+      List<List<dynamic>> csvData;
+      try {
+        csvData = const CsvToListConverter(
+          eol: '\n',
+          fieldDelimiter: ';',
+        ).convert(csvString);
+      } catch (e) {
+        AppLogger.error('Failed to parse CSV data', module: 'WeatherService', error: e);
+        throw Exception('Invalid CSV format received from weather service');
+      }
+
       AppLogger.debug('Parsed ${csvData.length} CSV rows', module: 'WeatherService');
       
       if (csvData.isEmpty) {
@@ -167,10 +174,18 @@ class WeatherService {
       }
 
       final csvString = utf8.decode(response.bodyBytes);
-      final List<List<dynamic>> csvData = const CsvToListConverter(
-        eol: '\n',
-        fieldDelimiter: ';',
-      ).convert(csvString);
+
+      // Add safety check for CSV parsing to handle corrupted data
+      List<List<dynamic>> csvData;
+      try {
+        csvData = const CsvToListConverter(
+          eol: '\n',
+          fieldDelimiter: ';',
+        ).convert(csvString);
+      } catch (e) {
+        AppLogger.error('Failed to parse latest weather CSV data', module: 'WeatherService', error: e);
+        return null; // Return null instead of throwing for latest data
+      }
       
       if (csvData.length < 2) {
         return null;
