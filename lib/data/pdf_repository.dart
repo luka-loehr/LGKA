@@ -66,7 +66,7 @@ class PdfState {
 class PdfRepository extends ChangeNotifier {
   static const String _todayUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_heute.pdf';
   static const String _tomorrowUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_morgen.pdf';
-  static const Duration _timeout = Duration(seconds: 7);
+  static const Duration _timeout = Duration(seconds: 10);
   static const Duration _cacheValidity = Duration(minutes: 5);
 
   PdfState _todayState = const PdfState();
