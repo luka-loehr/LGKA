@@ -67,7 +67,7 @@ class WeatherService {
         headers: {
           'User-Agent': AppInfo.userAgent,
         },
-      ).timeout(const Duration(seconds: 7));
+      ).timeout(const Duration(seconds: 10));
       
       AppLogger.debug('Response status: ${response.statusCode}', module: 'WeatherService');
       
@@ -149,7 +149,7 @@ class WeatherService {
         headers: {
           'User-Agent': AppInfo.userAgent,
         },
-      ).timeout(const Duration(seconds: 7));
+      ).timeout(const Duration(seconds: 10));
       
       if (response.statusCode != 200) {
         AppLogger.error('Failed to fetch latest weather: HTTP ${response.statusCode}', module: 'WeatherService');

@@ -36,9 +36,9 @@ class ScheduleItem {
 class ScheduleService {
   static const String _baseUrl = 'https://lessing-gymnasium-karlsruhe.de';
   static const String _schedulePageUrl = '$_baseUrl/cm3/index.php/unterricht/stundenplan';
-  // Unified 7 second timeout across all schedule-related requests
-  static const Duration _timeout = Duration(seconds: 7);
-  static const Duration _availabilityCheckTimeout = Duration(seconds: 7);
+  // Unified 10 second timeout across all schedule-related requests
+  static const Duration _timeout = Duration(seconds: 10);
+  static const Duration _availabilityCheckTimeout = Duration(seconds: 10);
 
   List<ScheduleItem>? _cachedSchedules;
   DateTime? _lastFetchTime;
