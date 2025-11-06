@@ -111,7 +111,14 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
       final results = await Future.wait([chartDataFuture, latestDataFuture]);
       final fullData = results[0] as List<WeatherData>;
       final latestData = results[1] as WeatherData?;
-      final downsampledData = _weatherService.downsampleForChart(fullData);
+
+      // Additional safety check: limit data points to prevent UI issues
+      const int maxChartPoints = 500; // Reasonable limit for chart rendering
+      final limitedData = fullData.length > maxChartPoints
+          ? fullData.sublist(fullData.length - maxChartPoints)
+          : fullData;
+
+      final downsampledData = _weatherService.downsampleForChart(limitedData);
 
       state = state.copyWith(
         chartData: downsampledData,

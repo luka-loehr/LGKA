@@ -91,14 +91,22 @@ class WeatherService {
         throw Exception('CSV data is empty');
       }
 
-      // Parse all data - no sampling, use every data point for maximum accuracy
+      // Limit data processing to prevent memory issues with massive CSVs
+      // Only process the most recent 24 hours of data (1440 minutes max)
+      const int maxDataPoints = 1440; // 24 hours * 60 minutes
+      final int startIndex = csvData.length > maxDataPoints + 1 ? csvData.length - maxDataPoints : 1;
+      final int actualRows = csvData.length - startIndex;
+
+      AppLogger.debug('Processing ${actualRows} data points (limited to last 24h)', module: 'WeatherService');
+
+      // Parse data with memory safety limits
       final List<WeatherData> allWeatherData = [];
       int successfulRows = 0;
       int skippedRows = 0;
       int errorRows = 0;
-      
-      // Skip header row and process all data
-      for (int i = 1; i < csvData.length; i++) {
+
+      // Skip header row and process limited data range
+      for (int i = startIndex; i < csvData.length; i++) {
         final row = csvData[i];
         
         if (row.length < 7) {
@@ -107,7 +115,9 @@ class WeatherService {
         }
         
         try {
-          final minutesSinceMidnight = i - 1;
+          // Calculate minutes from midnight based on actual data position
+          final dataIndex = i - startIndex;
+          final minutesSinceMidnight = dataIndex;
           final now = DateTime.now();
           final time = DateTime(now.year, now.month, now.day, 0, 0)
               .add(Duration(minutes: minutesSinceMidnight));
