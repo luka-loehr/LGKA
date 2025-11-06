@@ -977,7 +977,12 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
         value = data.pressure;
         break;
     }
-    
+
+    // Final safety check: ensure value is valid for chart rendering
+    if (!value.isFinite || value.isNaN) {
+      return 0.0; // Return safe default for corrupted data
+    }
+
     return value;
   }
 
