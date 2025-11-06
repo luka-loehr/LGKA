@@ -1,5 +1,6 @@
 // Copyright Luka Löhr 2025
 
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/schedule_service.dart';
@@ -58,16 +59,34 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
 
   ScheduleNotifier(this._scheduleService) : super(const ScheduleState());
 
-  /// Load schedules from the web
-  Future<void> loadSchedules() async {
-    if (state.isLoading) return;
+  /// Load schedules from the web or cache
+  Future<void> loadSchedules({bool forceRefresh = false}) async {
+    if (state.isLoading && !forceRefresh) return;
+
+    final cachedSchedules = _scheduleService.cachedSchedules;
+    final lastFetchTime = _scheduleService.lastFetchTime;
+
+    if (!forceRefresh && cachedSchedules != null) {
+      state = state.copyWith(
+        schedules: cachedSchedules,
+        isLoading: false,
+        clearError: true,
+        lastUpdated: lastFetchTime ?? state.lastUpdated,
+      );
+
+      if (_scheduleService.hasValidCache) {
+        return;
+      }
+
+      unawaited(_refreshSchedulesSilently());
+      return;
+    }
 
     state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      final schedules = await _scheduleService.getSchedules();
-      
-      // Check if we got any schedules
+      final schedules = await _scheduleService.getSchedules(forceRefresh: true);
+
       if (schedules.isEmpty) {
         state = state.copyWith(
           isLoading: false,
@@ -75,12 +94,12 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
         );
         return;
       }
-      
+
       state = state.copyWith(
         schedules: schedules,
         isLoading: false,
         clearError: true,
-        lastUpdated: DateTime.now(),
+        lastUpdated: _scheduleService.lastFetchTime ?? DateTime.now(),
       );
     } catch (e) {
       state = state.copyWith(
@@ -92,8 +111,24 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
 
   /// Refresh schedules (force reload)
   Future<void> refreshSchedules() async {
-    _scheduleService.clearCache();
-    await loadSchedules();
+    await loadSchedules(forceRefresh: true);
+  }
+
+  Future<void> _refreshSchedulesSilently() async {
+    await _scheduleService.refreshInBackground();
+    final updatedSchedules = _scheduleService.cachedSchedules;
+    if (updatedSchedules != null) {
+      state = state.copyWith(
+        schedules: updatedSchedules,
+        isLoading: false,
+        clearError: true,
+        lastUpdated: _scheduleService.lastFetchTime ?? DateTime.now(),
+      );
+    }
+  }
+
+  Future<void> refreshInBackground() async {
+    await _refreshSchedulesSilently();
   }
 
   /// Download a specific schedule PDF
