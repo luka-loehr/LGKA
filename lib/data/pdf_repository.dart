@@ -1,5 +1,6 @@
 // Copyright Luka Löhr 2025
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -66,10 +67,13 @@ class PdfRepository extends ChangeNotifier {
   static const String _todayUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_heute.pdf';
   static const String _tomorrowUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_morgen.pdf';
   static const Duration _timeout = Duration(seconds: 7);
+  static const Duration _cacheValidity = Duration(minutes: 5);
 
   PdfState _todayState = const PdfState();
   PdfState _tomorrowState = const PdfState();
   bool _isInitialized = false;
+  DateTime? _lastFetchTime;
+  bool _isRefreshing = false;
 
   PdfRepository(Ref ref);
 
@@ -80,37 +84,58 @@ class PdfRepository extends ChangeNotifier {
   bool get hasAnyData => _todayState.hasData || _tomorrowState.hasData;
   bool get hasAnyError => _todayState.error != null || _tomorrowState.error != null;
   bool get isLoading => _todayState.isLoading || _tomorrowState.isLoading;
+  DateTime? get lastFetchTime => _lastFetchTime;
+  bool get isCacheValid => _isCacheValid;
+
+  bool get _isCacheValid {
+    if (_lastFetchTime == null) return false;
+    return DateTime.now().difference(_lastFetchTime!) < _cacheValidity;
+  }
 
   /// Initialize the repository by loading both PDFs
   Future<void> initialize() async {
-    if (_isInitialized) return;
-    
+    if (_isInitialized) {
+      if (_isCacheValid && hasAnyData) {
+        return;
+      }
+
+      if (hasAnyData && !_isCacheValid) {
+        unawaited(refreshInBackground());
+        return;
+      }
+    }
+
     await _loadBothPdfs();
     _isInitialized = true;
+    _lastFetchTime = DateTime.now();
     notifyListeners();
   }
 
   /// Load both PDFs simultaneously
-  Future<void> _loadBothPdfs() async {
-    final futures = [
-      _loadPdf(_todayUrl, true),
-      _loadPdf(_tomorrowUrl, false),
-    ];
+  Future<void> _loadBothPdfs({bool silent = false}) async {
+    final results = await Future.wait<bool>([
+      _loadPdf(_todayUrl, true, silent: silent),
+      _loadPdf(_tomorrowUrl, false, silent: silent),
+    ]);
 
-    await Future.wait(futures);
+    if (results.any((success) => success)) {
+      _lastFetchTime = DateTime.now();
+    }
   }
 
   /// Load a single PDF and update its state
-  Future<void> _loadPdf(String url, bool isToday) async {
-    final state = isToday ? _todayState : _tomorrowState;
-    
+  Future<bool> _loadPdf(String url, bool isToday, {bool silent = false}) async {
+    final previousState = isToday ? _todayState : _tomorrowState;
+
     // Set loading state
-    _updatePdfState(isToday, state.copyWith(isLoading: true, error: null));
-    
+    if (!silent) {
+      _updatePdfState(isToday, previousState.copyWith(isLoading: true, error: null));
+    }
+
     try {
       final file = await _downloadPdf(url);
       final metadata = await _extractMetadata(file);
-      
+
       // Update state with success
       _updatePdfState(isToday, PdfState(
         isLoading: false,
@@ -120,13 +145,20 @@ class PdfRepository extends ChangeNotifier {
         lastUpdated: metadata['lastUpdated'],
         file: file,
       ));
-      
+
+      return true;
     } catch (e) {
-      // Update state with error
-      _updatePdfState(isToday, state.copyWith(
-        isLoading: false,
-        error: 'Serververbindung fehlgeschlagen',
-      ));
+      if (!silent) {
+        // Update state with error
+        _updatePdfState(isToday, previousState.copyWith(
+          isLoading: false,
+          error: 'Serververbindung fehlgeschlagen',
+        ));
+      } else {
+        // Restore previous state when running silently
+        _updatePdfState(isToday, previousState);
+      }
+      return false;
     }
   }
 
@@ -183,8 +215,10 @@ class PdfRepository extends ChangeNotifier {
 
   /// Refresh all PDFs (force reload)
   Future<void> refresh() async {
-    _isInitialized = false;
-    await initialize();
+    await _loadBothPdfs();
+    _isInitialized = true;
+    _lastFetchTime = DateTime.now();
+    notifyListeners();
   }
 
   /// Get the file for a specific PDF if available
@@ -197,6 +231,19 @@ class PdfRepository extends ChangeNotifier {
   bool canOpenPdf(bool isToday) {
     final state = isToday ? _todayState : _tomorrowState;
     return state.canDisplay;
+  }
+
+  /// Trigger a silent background refresh when cache is stale
+  Future<void> refreshInBackground() async {
+    if (_isRefreshing) return;
+
+    _isRefreshing = true;
+    try {
+      await _loadBothPdfs(silent: true);
+      notifyListeners();
+    } finally {
+      _isRefreshing = false;
+    }
   }
 }
 

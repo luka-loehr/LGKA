@@ -42,35 +42,73 @@ class ScheduleService {
 
   List<ScheduleItem>? _cachedSchedules;
   DateTime? _lastFetchTime;
-  static const Duration _cacheValidity = Duration(minutes: 30);
-  
+  static const Duration _cacheValidity = Duration(minutes: 5);
+
   // Cache for availability checks
   Map<String, bool> _availabilityCache = {};
   DateTime? _lastAvailabilityCheck;
   static const Duration _availabilityCacheValidity = Duration(minutes: 15);
+  bool _isRefreshing = false;
+
+  List<ScheduleItem>? get cachedSchedules => _cachedSchedules;
+  DateTime? get lastFetchTime => _lastFetchTime;
+  bool get hasValidCache {
+    if (_cachedSchedules == null || _lastFetchTime == null) {
+      return false;
+    }
+    return DateTime.now().difference(_lastFetchTime!) < _cacheValidity;
+  }
 
   /// Get all available schedules, using cache if valid
-  Future<List<ScheduleItem>> getSchedules() async {
-    // Check if cache is still valid
-    if (_cachedSchedules != null && _lastFetchTime != null) {
-      final timeSinceLastFetch = DateTime.now().difference(_lastFetchTime!);
-      if (timeSinceLastFetch < _cacheValidity) {
+  Future<List<ScheduleItem>> getSchedules({bool forceRefresh = false}) async {
+    if (!forceRefresh && _cachedSchedules != null) {
+      if (hasValidCache) {
         return _cachedSchedules!;
       }
+
+      _refreshCacheInBackground();
+      return _cachedSchedules!;
     }
 
-    // Fetch fresh data
     try {
       final schedules = await _scrapeSchedules();
       _cachedSchedules = schedules;
       _lastFetchTime = DateTime.now();
       return schedules;
     } catch (e) {
-      // Return cached data if available, even if expired
       if (_cachedSchedules != null) {
         return _cachedSchedules!;
       }
       rethrow;
+    }
+  }
+
+  void _refreshCacheInBackground() {
+    if (_isRefreshing) return;
+
+    _isRefreshing = true;
+    _scrapeSchedules().then((schedules) {
+      _cachedSchedules = schedules;
+      _lastFetchTime = DateTime.now();
+    }).catchError((_) {
+      // Ignore background refresh errors
+    }).whenComplete(() {
+      _isRefreshing = false;
+    });
+  }
+
+  Future<void> refreshInBackground() async {
+    if (_isRefreshing) return;
+
+    _isRefreshing = true;
+    try {
+      final schedules = await _scrapeSchedules();
+      _cachedSchedules = schedules;
+      _lastFetchTime = DateTime.now();
+    } catch (_) {
+      // Ignore background refresh errors
+    } finally {
+      _isRefreshing = false;
     }
   }
 
@@ -215,6 +253,7 @@ class ScheduleService {
     _lastFetchTime = null;
     _availabilityCache.clear();
     _lastAvailabilityCheck = null;
+    _isRefreshing = false;
   }
   
   /// Check if PDF content appears to be valid

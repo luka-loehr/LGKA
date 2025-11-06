@@ -1,5 +1,7 @@
 // Copyright Luka Löhr 2025
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import '../data/preferences_manager.dart';
@@ -82,14 +84,23 @@ final weatherDataProvider = StateNotifierProvider<WeatherDataNotifier, WeatherDa
 
 class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
   final WeatherService _weatherService;
+  static const Duration _cacheValidity = Duration(minutes: 5);
 
   WeatherDataNotifier(this._weatherService) : super(const WeatherDataState());
 
   /// Preload weather data from network
   Future<void> preloadWeatherData() async {
-    if (state.isPreloaded && state.chartData.isNotEmpty) {
+    if (state.chartData.isNotEmpty && state.lastUpdateTime != null) {
+      final isFresh = DateTime.now().difference(state.lastUpdateTime!) < _cacheValidity;
+      if (isFresh) {
+        return;
+      }
+
+      unawaited(updateDataInBackground());
       return;
     }
+
+    if (state.isLoading) return;
 
     state = state.copyWith(isLoading: true, error: null);
 
