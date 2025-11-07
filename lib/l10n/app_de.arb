@@ -35,7 +35,10 @@
   "classes8to10": "Klassenstufe 8-10",
   "upperSchool": "Oberstufe",
   "privacyLabel": "Datenschutzerklärung",
-  "legalLabel": "Impressum"
+  "legalLabel": "Impressum",
+  "featureRequest": "Idee zur App?",
+  "featureRequestTitle": "Feature Request",
+  "loading": "Lädt..."
   ,
   "infoHeader": "Was kannst du mit der App machen?",
   "featureSubstitutionTitle": "Vertretungsplan",
