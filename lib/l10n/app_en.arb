@@ -37,6 +37,8 @@
   "legalLabel": "Legal Notice",
   "featureRequest": "Have an idea?",
   "featureRequestTitle": "Feature Request",
+  "bugReport": "Report a bug?",
+  "bugReportTitle": "Bug Report",
   "loading": "Loading...",
   "formLoadError": "Form could not be loaded",
   "formLoadErrorHint": "Please check your internet connection and try again.",

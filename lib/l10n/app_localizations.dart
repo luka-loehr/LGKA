@@ -317,6 +317,18 @@ abstract class AppLocalizations {
   /// **'Feature Request'**
   String get featureRequestTitle;
 
+  /// No description provided for @bugReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a bug?'**
+  String get bugReport;
+
+  /// No description provided for @bugReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bug Report'**
+  String get bugReportTitle;
+
   /// No description provided for @loading.
   ///
   /// In en, this message translates to:

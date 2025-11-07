@@ -38,6 +38,8 @@
   "legalLabel": "Impressum",
   "featureRequest": "Idee zur App?",
   "featureRequestTitle": "Feature Request",
+  "bugReport": "Bug melden?",
+  "bugReportTitle": "Bug Report",
   "loading": "Lädt...",
   "formLoadError": "Formular konnte nicht geladen werden",
   "formLoadErrorHint": "Bitte überprüfe deine Internetverbindung und versuche es erneut."
