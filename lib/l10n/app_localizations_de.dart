@@ -123,6 +123,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get loading => 'Lädt...';
 
   @override
+  String get formLoadError => 'Formular konnte nicht geladen werden';
+
+  @override
+  String get formLoadErrorHint => 'Bitte überprüfe deine Internetverbindung und versuche es erneut.';
+
+  @override
   String get krankmeldungInfoHeader => 'Hinweis zur Krankmeldung';
 
   @override

@@ -38,6 +38,8 @@
   "featureRequest": "Have an idea?",
   "featureRequestTitle": "Feature Request",
   "loading": "Loading...",
+  "formLoadError": "Form could not be loaded",
+  "formLoadErrorHint": "Please check your internet connection and try again.",
   "settings": "Settings",
   "accentColor": "Accent color",
   "chooseAccentColor": "Choose your preferred accent color",
