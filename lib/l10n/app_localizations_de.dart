@@ -114,6 +114,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get legalLabel => 'Impressum';
 
   @override
+  String get featureRequest => 'Idee zur App?';
+
+  @override
+  String get featureRequestTitle => 'Feature Request';
+
+  @override
+  String get loading => 'Lädt...';
+
+  @override
   String get krankmeldungInfoHeader => 'Hinweis zur Krankmeldung';
 
   @override
