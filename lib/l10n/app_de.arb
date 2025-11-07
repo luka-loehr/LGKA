@@ -38,7 +38,9 @@
   "legalLabel": "Impressum",
   "featureRequest": "Idee zur App?",
   "featureRequestTitle": "Feature Request",
-  "loading": "Lädt..."
+  "loading": "Lädt...",
+  "formLoadError": "Formular konnte nicht geladen werden",
+  "formLoadErrorHint": "Bitte überprüfe deine Internetverbindung und versuche es erneut."
   ,
   "infoHeader": "Was kannst du mit der App machen?",
   "featureSubstitutionTitle": "Vertretungsplan",
