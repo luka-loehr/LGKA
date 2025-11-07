@@ -12,6 +12,7 @@ import '../screens/legal_screen.dart';
 import '../screens/webview_screen.dart';
 import '../screens/krankmeldung_info_screen.dart';
 import '../screens/feature_request_screen.dart';
+import '../screens/bug_report_screen.dart';
 
 class AppRouter {
   // Route names
@@ -25,6 +26,7 @@ class AppRouter {
   static const String webview = '/webview';
   static const String krankmeldungInfo = '/krankmeldung-info';
   static const String featureRequest = '/feature-request';
+  static const String bugReport = '/bug-report';
 
   static GoRouter createRouter({required String initialLocation}) {
     return GoRouter(
@@ -100,6 +102,27 @@ class AppRouter {
           pageBuilder: (context, state) {
             return CustomTransitionPage(
               child: const FeatureRequestScreen(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeInOut,
+                  )),
+                  child: child,
+                );
+              },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+        GoRoute(
+          path: bugReport,
+          pageBuilder: (context, state) {
+            return CustomTransitionPage(
+              child: const BugReportScreen(),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return SlideTransition(
                   position: Tween<Offset>(
