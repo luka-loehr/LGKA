@@ -187,7 +187,7 @@ class _FeatureRequestScreenState extends State<FeatureRequestScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        AppLocalizations.of(context)!.serverConnectionFailed,
+                        AppLocalizations.of(context)!.formLoadError,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: AppColors.primaryText,
                         ),
@@ -195,7 +195,7 @@ class _FeatureRequestScreenState extends State<FeatureRequestScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        AppLocalizations.of(context)!.serverConnectionHint,
+                        AppLocalizations.of(context)!.formLoadErrorHint,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.secondaryText,
                         ),
