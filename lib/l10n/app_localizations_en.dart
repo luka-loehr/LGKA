@@ -120,6 +120,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get featureRequestTitle => 'Feature Request';
 
   @override
+  String get bugReport => 'Report a bug?';
+
+  @override
+  String get bugReportTitle => 'Bug Report';
+
+  @override
   String get loading => 'Loading...';
 
   @override
