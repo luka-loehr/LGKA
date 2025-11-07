@@ -1094,6 +1094,8 @@ class _SettingsSheet extends ConsumerWidget {
   Widget _buildLegalLinks(BuildContext context) {
     return Column(
       children: [
+        _buildFeatureRequestLink(context),
+        const SizedBox(height: 12),
         _buildLegalLink(
           context,
           Icons.privacy_tip_outlined, 
@@ -1111,6 +1113,43 @@ class _SettingsSheet extends ConsumerWidget {
     );
   }
 
+
+  Widget _buildFeatureRequestLink(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        HapticService.subtle();
+        context.push(AppRouter.featureRequest);
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Row(
+          children: [
+            Icon(
+              Icons.feedback_outlined,
+              color: AppColors.secondaryText,
+              size: 18,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context)!.featureRequest,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.secondaryText,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: AppColors.secondaryText.withValues(alpha: 0.6),
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildLegalLink(BuildContext context, IconData icon, String text, String url) {
     return InkWell(

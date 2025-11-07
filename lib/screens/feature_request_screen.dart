@@ -1,0 +1,231 @@
+// Copyright Luka Löhr 2025
+
+import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
+import '../theme/app_theme.dart';
+import '../providers/haptic_service.dart';
+import '../l10n/app_localizations.dart';
+import '../utils/app_info.dart';
+import '../utils/app_logger.dart';
+import '../config/app_credentials.dart';
+
+class FeatureRequestScreen extends StatefulWidget {
+  const FeatureRequestScreen({super.key});
+
+  @override
+  State<FeatureRequestScreen> createState() => _FeatureRequestScreenState();
+}
+
+class _FeatureRequestScreenState extends State<FeatureRequestScreen> {
+  final GlobalKey webViewKey = GlobalKey();
+  InAppWebViewController? _controller;
+  double _progress = 0;
+  bool _hasTriggeredLoadedHaptic = false;
+  bool _hasError = false;
+  String? _errorText;
+
+  @override
+  void dispose() {
+    // Clear all cookies and cache data when leaving the screen
+    _clearWebViewData();
+    super.dispose();
+  }
+
+  Future<void> _clearWebViewData() async {
+    try {
+      await CookieManager.instance().deleteAllCookies();
+      await _controller?.clearCache();
+      AppLogger.debug('Cleared WebView data for privacy', module: 'FeatureRequest');
+    } catch (e) {
+      AppLogger.error('Failed to clear WebView data', module: 'FeatureRequest', error: e);
+    }
+  }
+
+  Future<void> _retryLoad() async {
+    setState(() {
+      _hasError = false;
+      _errorText = null;
+      _progress = 0;
+      _hasTriggeredLoadedHaptic = false;
+    });
+    await HapticService.light();
+    if (_controller != null) {
+      try {
+        await _controller!.reload();
+      } catch (e) {
+        AppLogger.debug('Error reloading URL: $e', module: 'FeatureRequest');
+        try {
+          await _controller!.loadUrl(
+            urlRequest: URLRequest(
+              url: WebUri(AppCredentials.featureRequestFormUrl),
+              headers: {
+                'User-Agent': AppInfo.userAgent,
+              },
+            ),
+          );
+        } catch (e2) {
+          AppLogger.error('Failed to load URL after retry', module: 'FeatureRequest', error: e2);
+        }
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.appBackground,
+      appBar: AppBar(
+        backgroundColor: AppColors.appBackground,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: AppColors.secondaryText),
+          onPressed: () {
+            HapticService.subtle();
+            Navigator.of(context).maybePop();
+          },
+        ),
+        title: Text(
+          AppLocalizations.of(context)!.featureRequestTitle,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.primaryText),
+        ),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            InAppWebView(
+              key: webViewKey,
+              initialUrlRequest: URLRequest(
+                url: WebUri(AppCredentials.featureRequestFormUrl),
+                headers: {
+                  'User-Agent': AppInfo.userAgent,
+                },
+              ),
+              initialSettings: InAppWebViewSettings(
+                transparentBackground: true,
+                mediaPlaybackRequiresUserGesture: true,
+                allowsInlineMediaPlayback: true,
+                useHybridComposition: true,
+                verticalScrollBarEnabled: true,
+                horizontalScrollBarEnabled: false,
+                // Privacy-focused settings
+                thirdPartyCookiesEnabled: false,
+                cacheEnabled: false,
+                clearCache: true,
+                incognito: true,
+              ),
+              onWebViewCreated: (controller) {
+                _controller = controller;
+              },
+              onProgressChanged: (controller, progress) {
+                setState(() => _progress = progress / 100);
+                
+                // Trigger haptic feedback when page is fully loaded
+                if (progress == 100 && !_hasTriggeredLoadedHaptic) {
+                  _hasTriggeredLoadedHaptic = true;
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Future.delayed(const Duration(milliseconds: 500), () {
+                      if (mounted) {
+                        HapticService.light();
+                      }
+                    });
+                  });
+                }
+              },
+              onLoadStop: (controller, url) async {
+                // Clear cache after each page load for additional privacy
+                await controller.clearCache();
+              },
+              onReceivedError: (controller, request, error) {
+                setState(() {
+                  _hasError = true;
+                  _errorText = error.description;
+                });
+              },
+              onReceivedHttpError: (controller, request, error) {
+                setState(() {
+                  _hasError = true;
+                  _errorText = 'HTTP ${error.statusCode}';
+                });
+              },
+            ),
+            if (_progress < 1.0 && !_hasError)
+              Container(
+                color: AppColors.appBackground,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+                        strokeWidth: 3,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        AppLocalizations.of(context)!.loading,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.secondaryText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            if (_hasError)
+              Container(
+                color: AppColors.appBackground,
+                padding: const EdgeInsets.all(32.0),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.feedback_outlined,
+                        size: 64,
+                        color: AppColors.secondaryText.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        AppLocalizations.of(context)!.serverConnectionFailed,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: AppColors.primaryText,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        AppLocalizations.of(context)!.serverConnectionHint,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.secondaryText,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          await HapticService.light();
+                          _retryLoad();
+                        },
+                        icon: const Icon(Icons.refresh),
+                        label: Text(AppLocalizations.of(context)!.tryAgain),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
