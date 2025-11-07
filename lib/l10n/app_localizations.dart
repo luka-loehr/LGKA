@@ -323,6 +323,18 @@ abstract class AppLocalizations {
   /// **'Loading...'**
   String get loading;
 
+  /// No description provided for @formLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Form could not be loaded'**
+  String get formLoadError;
+
+  /// No description provided for @formLoadErrorHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your internet connection and try again.'**
+  String get formLoadErrorHint;
+
   /// No description provided for @krankmeldungInfoHeader.
   ///
   /// In en, this message translates to:
