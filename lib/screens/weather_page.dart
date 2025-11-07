@@ -147,8 +147,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     // Cancel any existing timer
     _animationTimer?.cancel();
     
-    // Start timer to detect when chart animation completes (1000ms)
-    _animationTimer = Timer(const Duration(milliseconds: 1000), () {
+    // Start timer to detect when chart animation completes (800ms)
+    _animationTimer = Timer(const Duration(milliseconds: 800), () {
       if (mounted) {
         setState(() {
           _isChartAnimationComplete = true;
