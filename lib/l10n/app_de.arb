@@ -65,7 +65,7 @@
   "pressureLabel": "Luftdruck",
   "temperatureTodayTitle": "Temperaturverlauf",
   "humidityTodayTitle": "Luftfeuchtigkeitsverlauf",
-  "windSpeedTodayTitle": "Windverlauf",
+  "windSpeedTodayTitle": "Windgeschwindigkeit",
   "pressureTodayTitle": "Luftdruckverlauf",
   "yAxisTemperature": "Temperatur (°C)",
   "yAxisHumidity": "Luftfeuchtigkeit (%)",
