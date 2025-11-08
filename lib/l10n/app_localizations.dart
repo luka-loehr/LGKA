@@ -374,7 +374,7 @@ abstract class AppLocalizations {
   /// No description provided for @windSpeedLabel.
   ///
   /// In en, this message translates to:
-  /// **'Wind speed'**
+  /// **'Wind'**
   String get windSpeedLabel;
 
   /// No description provided for @pressureLabel.
@@ -398,7 +398,7 @@ abstract class AppLocalizations {
   /// No description provided for @windSpeedTodayTitle.
   ///
   /// In en, this message translates to:
-  /// **'Wind speed'**
+  /// **'Wind'**
   String get windSpeedTodayTitle;
 
   /// No description provided for @pressureTodayTitle.
@@ -422,7 +422,7 @@ abstract class AppLocalizations {
   /// No description provided for @yAxisWindSpeed.
   ///
   /// In en, this message translates to:
-  /// **'Wind speed (km/h)'**
+  /// **'Wind (km/h)'**
   String get yAxisWindSpeed;
 
   /// No description provided for @yAxisPressure.
