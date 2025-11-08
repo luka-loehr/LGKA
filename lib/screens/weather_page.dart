@@ -1001,9 +1001,11 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
 
   bool _isChartAvailable() {
-    final weatherState = ref.read(weatherDataProvider);
-    // Charts are available when we have at least 60 data points
-    return weatherState.chartData.length >= 60;
+    // TEMPORARY: Simulating 60 data points for testing
+    return true;
+    // final weatherState = ref.read(weatherDataProvider);
+    // // Charts are available when we have at least 60 data points
+    // return weatherState.chartData.length >= 60;
   }
   
   /// Check if weather data values have been the same for more than 60 minutes
@@ -1034,13 +1036,26 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
   
   /// Calculate optimal x-axis interval to prevent overlapping time labels
+  /// Ensures at least 2 time labels are always shown
   double _calculateOptimalInterval(List<WeatherData> chartData, BuildContext context) {
     if (chartData.isEmpty) return 2.0;
     
     // Get the time range of the data
     final firstTime = chartData.first.time;
     final lastTime = chartData.last.time;
-    final totalHours = lastTime.difference(firstTime).inHours;
+    final totalDuration = lastTime.difference(firstTime);
+    final totalHours = totalDuration.inHours.toDouble();
+    
+    // Handle edge case: if all data points are at the same time or very close
+    // Use a minimum interval to ensure at least 2 labels
+    if (totalHours < 0.5) {
+      // For very short time ranges (< 30 min), use 15-minute intervals
+      // This ensures we show at least 2 labels
+      return 0.25; // 15 minutes in hours
+    }
+    
+    // Ensure we always have at least 2 labels by limiting interval to half the range
+    final maxIntervalForTwoLabels = totalHours / 2.0;
     
     // Get the actual chart width from MediaQuery
     final mediaQuery = MediaQuery.of(context);
@@ -1059,19 +1074,25 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     double minInterval = totalHours / targetLabels;
     
     // Round up to the nearest "nice" interval
+    double interval;
     if (minInterval <= 1.0) {
-      return 1.0; // Show every hour
+      interval = 1.0; // Show every hour
     } else if (minInterval <= 2.0) {
-      return 2.0; // Show every 2 hours
+      interval = 2.0; // Show every 2 hours
     } else if (minInterval <= 3.0) {
-      return 3.0; // Show every 3 hours
+      interval = 3.0; // Show every 3 hours
     } else if (minInterval <= 4.0) {
-      return 4.0; // Show every 4 hours
+      interval = 4.0; // Show every 4 hours
     } else if (minInterval <= 6.0) {
-      return 6.0; // Show every 6 hours
+      interval = 6.0; // Show every 6 hours
     } else {
-      return 12.0; // Show every 12 hours for very long ranges
+      interval = 12.0; // Show every 12 hours for very long ranges
     }
+    
+    // Ensure we always have at least 2 labels by capping the interval
+    // But never return 0 or negative - use a minimum of 0.25 hours (15 minutes)
+    final finalInterval = interval > maxIntervalForTwoLabels ? maxIntervalForTwoLabels : interval;
+    return finalInterval > 0 ? finalInterval : 0.25;
   }
   
   String _getChartUnavailableMessage() {
