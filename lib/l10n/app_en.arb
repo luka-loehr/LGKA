@@ -53,7 +53,7 @@
   "pressureLabel": "Air pressure",
   "temperatureTodayTitle": "Temperature",
   "humidityTodayTitle": "Humidity",
-  "windSpeedTodayTitle": "Wind",
+  "windSpeedTodayTitle": "Wind Speed",
   "pressureTodayTitle": "Air pressure",
   "yAxisTemperature": "Temperature (°C)",
   "yAxisHumidity": "Humidity (%)",
