@@ -156,7 +156,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
