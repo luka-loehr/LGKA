@@ -305,18 +305,6 @@ abstract class AppLocalizations {
   /// **'Legal Notice'**
   String get legalLabel;
 
-  /// No description provided for @featureRequest.
-  ///
-  /// In en, this message translates to:
-  /// **'Have an idea?'**
-  String get featureRequest;
-
-  /// No description provided for @featureRequestTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Feature Request'**
-  String get featureRequestTitle;
-
   /// No description provided for @bugReport.
   ///
   /// In en, this message translates to:

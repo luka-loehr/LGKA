@@ -114,12 +114,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get legalLabel => 'Legal Notice';
 
   @override
-  String get featureRequest => 'Have an idea?';
-
-  @override
-  String get featureRequestTitle => 'Feature Request';
-
-  @override
   String get bugReport => 'Report a bug?';
 
   @override
