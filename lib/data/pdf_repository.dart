@@ -164,10 +164,16 @@ class PdfRepository extends ChangeNotifier {
 
   /// Download PDF from URL with authentication
   Future<File> _downloadPdf(String url) async {
+    // Validate URL before making request
+    final uri = Uri.tryParse(url);
+    if (uri == null || !uri.hasScheme || !uri.hasAuthority) {
+      throw Exception('Invalid URL format: $url');
+    }
+    
     final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
     
     final response = await http.get(
-      Uri.parse(url),
+      uri,
       headers: {
         'Authorization': 'Basic $credentials',
         'User-Agent': AppInfo.userAgent,
@@ -300,28 +306,30 @@ Map<String, String> _extractPdfData(List<int> bytes) {
     );
     final headerMatch = headerPattern.firstMatch(text);
     if (headerMatch != null) {
-      final partialDate = headerMatch.group(1)!;
-      weekday = headerMatch.group(2)!;
-      final year = detectedYearFromFooter ?? DateTime.now().year.toString();
-      date = '$partialDate$year';
-      // Also log the header line around the match for verification
-      final lineStart = text.lastIndexOf('\n', headerMatch.start);
-      final lineEnd = text.indexOf('\n', headerMatch.end);
+      final partialDate = headerMatch.group(1);
+      final weekdayGroup = headerMatch.group(2);
+      if (partialDate != null && weekdayGroup != null) {
+        weekday = weekdayGroup;
+        final year = detectedYearFromFooter ?? DateTime.now().year.toString();
+        date = '$partialDate$year';
+      }
     } else {
       // Fallback specifically on the header line if pattern failed due to stray characters
       final headerLineMatch = RegExp(r'Lessing\S*Klassen[^\n]+', caseSensitive: false)
           .firstMatch(text);
       if (headerLineMatch != null) {
-        final headerLine = headerLineMatch.group(0)!;
-        final partialDate = RegExp(r'(\d{1,2}\.\d{1,2}\.)').firstMatch(headerLine)?.group(1);
-        final weekdayLoose = RegExp(
-          r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)',
-          caseSensitive: false,
-        ).firstMatch(headerLine)?.group(1);
-        if (partialDate != null && weekdayLoose != null) {
-          weekday = weekdayLoose;
-          final year = detectedYearFromFooter ?? DateTime.now().year.toString();
-          date = '$partialDate$year';
+        final headerLine = headerLineMatch.group(0);
+        if (headerLine != null) {
+          final partialDate = RegExp(r'(\d{1,2}\.\d{1,2}\.)').firstMatch(headerLine)?.group(1);
+          final weekdayLoose = RegExp(
+            r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)',
+            caseSensitive: false,
+          ).firstMatch(headerLine)?.group(1);
+          if (partialDate != null && weekdayLoose != null) {
+            weekday = weekdayLoose;
+            final year = detectedYearFromFooter ?? DateTime.now().year.toString();
+            date = '$partialDate$year';
+          }
         }
       }
     }
@@ -341,44 +349,67 @@ Map<String, String> _extractPdfData(List<int> bytes) {
     final matchB = patternB.firstMatch(text);
 
     if (date.isEmpty && matchA != null) {
-      weekday = matchA.group(1)!;
-      date = matchA.group(2)!;
-      // Normalize 2-digit year to 4-digit by assuming 2000+
-      date = date.replaceAllMapped(
-        RegExp(r'^(\d{1,2})\.(\d{1,2})\.(\d{2})$'),
-        (m) => '${m.group(1)!.padLeft(2, '0')}.${m.group(2)!.padLeft(2, '0')}.20${m.group(3)}',
-      );
+      final weekdayGroup = matchA.group(1);
+      final dateGroup = matchA.group(2);
+      if (weekdayGroup != null && dateGroup != null) {
+        weekday = weekdayGroup;
+        date = dateGroup;
+        // Normalize 2-digit year to 4-digit by assuming 2000+
+        date = date.replaceAllMapped(
+          RegExp(r'^(\d{1,2})\.(\d{1,2})\.(\d{2})$'),
+          (m) {
+            final g1 = m.group(1);
+            final g2 = m.group(2);
+            final g3 = m.group(3);
+            if (g1 != null && g2 != null && g3 != null) {
+              return '${g1.padLeft(2, '0')}.${g2.padLeft(2, '0')}.20$g3';
+            }
+            return date;
+          },
+        );
+      }
     } else if (date.isEmpty && matchB != null) {
-      final partialDate = matchB.group(1)!; // with trailing dot
-      weekday = matchB.group(2)!;
+      final partialDate = matchB.group(1); // with trailing dot
+      final weekdayGroup = matchB.group(2);
+      if (partialDate != null && weekdayGroup != null) {
+        weekday = weekdayGroup;
 
-      // Find a 4-digit year near this match to avoid picking up unrelated numbers
-      final start = (matchB.start - 200).clamp(0, text.length);
-      final end = (matchB.end + 200).clamp(0, text.length);
-      final localContext = text.substring(start as int, end as int);
-      // Prefer real years only (19xx or 20xx). This avoids picking up '7613' from ZIP '76135'.
-      final yearInContext = RegExp(r'\b(19|20)\d{2}\b').firstMatch(localContext)?.group(0);
+        // Find a 4-digit year near this match to avoid picking up unrelated numbers
+        final start = (matchB.start - 200).clamp(0, text.length);
+        final end = (matchB.end + 200).clamp(0, text.length);
+        final localContext = text.substring(start as int, end as int);
+        // Prefer real years only (19xx or 20xx). This avoids picking up '7613' from ZIP '76135'.
+        final yearInContext = RegExp(r'\b(19|20)\d{2}\b').firstMatch(localContext)?.group(0);
 
-      // As a more reliable fallback, use the document timestamp year if present
-      final tsYear = RegExp(r'\b\d{1,2}\.\d{1,2}\.(\d{4})\s+\d{1,2}:\d{2}\b')
-          .firstMatch(text)
-          ?.group(1);
+        // As a more reliable fallback, use the document timestamp year if present
+        final tsYear = RegExp(r'\b\d{1,2}\.\d{1,2}\.(\d{4})\s+\d{1,2}:\d{2}\b')
+            .firstMatch(text)
+            ?.group(1);
 
-      final year = (detectedYearFromFooter ?? yearInContext ?? tsYear) ?? DateTime.now().year.toString();
-      date = '$partialDate$year';
+        final year = (detectedYearFromFooter ?? yearInContext ?? tsYear) ?? DateTime.now().year.toString();
+        date = '$partialDate$year';
+      }
     } else if (date.isEmpty) {
       // Fallback: try to find both independently, preferring weekday first
       final weekdayOnly = RegExp(r'(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)', caseSensitive: false)
           .firstMatch(text);
       if (weekdayOnly != null) {
-        weekday = weekdayOnly.group(1)!;
-        // Try to find a complete date near the weekday mention
-        final start = (weekdayOnly.start - 200).clamp(0, text.length);
-        final end = (weekdayOnly.end + 200).clamp(0, text.length);
-        final localContext = text.substring(start as int, end as int);
-        final dateNearby = RegExp(r'(\d{1,2})\.(\d{1,2})\.((?:19|20)\d{2})').firstMatch(localContext);
-        if (dateNearby != null) {
-          date = '${dateNearby.group(1)!.padLeft(2, '0')}.${dateNearby.group(2)!.padLeft(2, '0')}.${dateNearby.group(3)}';
+        final weekdayGroup = weekdayOnly.group(1);
+        if (weekdayGroup != null) {
+          weekday = weekdayGroup;
+          // Try to find a complete date near the weekday mention
+          final start = (weekdayOnly.start - 200).clamp(0, text.length);
+          final end = (weekdayOnly.end + 200).clamp(0, text.length);
+          final localContext = text.substring(start as int, end as int);
+          final dateNearby = RegExp(r'(\d{1,2})\.(\d{1,2})\.((?:19|20)\d{2})').firstMatch(localContext);
+          if (dateNearby != null) {
+            final g1 = dateNearby.group(1);
+            final g2 = dateNearby.group(2);
+            final g3 = dateNearby.group(3);
+            if (g1 != null && g2 != null && g3 != null) {
+              date = '${g1.padLeft(2, '0')}.${g2.padLeft(2, '0')}.$g3';
+            }
+          }
         }
       }
       // As a last resort, look for any full date on the page
@@ -386,7 +417,15 @@ Map<String, String> _extractPdfData(List<int> bytes) {
         final anyDate = RegExp(r'(\d{1,2})\.(\d{1,2})\.(19|20)\d{2}')
             .firstMatch(text);
         if (anyDate != null) {
-          date = '${anyDate.group(1)!.padLeft(2, '0')}.${anyDate.group(2)!.padLeft(2, '0')}.${anyDate.group(0)!.split('.').last}';
+          final g1 = anyDate.group(1);
+          final g2 = anyDate.group(2);
+          final fullMatch = anyDate.group(0);
+          if (g1 != null && g2 != null && fullMatch != null) {
+            final parts = fullMatch.split('.');
+            if (parts.length >= 3) {
+              date = '${g1.padLeft(2, '0')}.${g2.padLeft(2, '0')}.${parts.last}';
+            }
+          }
         }
       }
     }
@@ -395,7 +434,15 @@ Map<String, String> _extractPdfData(List<int> bytes) {
     if (date.isNotEmpty) {
       date = date.replaceAllMapped(
         RegExp(r'^(\d{1,2})\.(\d{1,2})\.(\d{4})$'),
-        (m) => '${m.group(1)!.padLeft(2, '0')}.${m.group(2)!.padLeft(2, '0')}.${m.group(3)}',
+        (m) {
+          final g1 = m.group(1);
+          final g2 = m.group(2);
+          final g3 = m.group(3);
+          if (g1 != null && g2 != null && g3 != null) {
+            return '${g1.padLeft(2, '0')}.${g2.padLeft(2, '0')}.$g3';
+          }
+          return date;
+        },
       );
     }
 
@@ -403,31 +450,47 @@ Map<String, String> _extractPdfData(List<int> bytes) {
     if ((weekday.isEmpty || weekday == 'weekend') && date.isNotEmpty) {
       final m = RegExp(r'^(\d{2})\.(\d{2})\.(\d{4})$').firstMatch(date);
       if (m != null) {
-        final day = int.parse(m.group(1)!);
-        final month = int.parse(m.group(2)!);
-        final year = int.parse(m.group(3)!);
-        try {
-          final dt = DateTime(year, month, day);
-          const deWeekdays = {
-            DateTime.monday: 'Montag',
-            DateTime.tuesday: 'Dienstag',
-            DateTime.wednesday: 'Mittwoch',
-            DateTime.thursday: 'Donnerstag',
-            DateTime.friday: 'Freitag',
-            DateTime.saturday: 'Samstag',
-            DateTime.sunday: 'Sonntag',
-          };
-          weekday = deWeekdays[dt.weekday] ?? '';
-        } catch (_) {
-          // ignore invalid dates
+        final dayGroup = m.group(1);
+        final monthGroup = m.group(2);
+        final yearGroup = m.group(3);
+        
+        if (dayGroup != null && monthGroup != null && yearGroup != null) {
+          try {
+            final day = int.tryParse(dayGroup) ?? 1;
+            final month = int.tryParse(monthGroup) ?? 1;
+            final year = int.tryParse(yearGroup) ?? DateTime.now().year;
+            
+            // Validate date ranges before creating DateTime
+            if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && year >= 1900 && year <= 2100) {
+              final dt = DateTime(year, month, day);
+              const deWeekdays = {
+                DateTime.monday: 'Montag',
+                DateTime.tuesday: 'Dienstag',
+                DateTime.wednesday: 'Mittwoch',
+                DateTime.thursday: 'Donnerstag',
+                DateTime.friday: 'Freitag',
+                DateTime.saturday: 'Samstag',
+                DateTime.sunday: 'Sonntag',
+              };
+              weekday = deWeekdays[dt.weekday] ?? '';
+            }
+          } catch (_) {
+            // ignore invalid dates
+          }
         }
       }
     }
 
     // Normalize weekday capitalization (first letter uppercase, rest lowercase)
     if (weekday.isNotEmpty && weekday != 'weekend') {
-      final lower = weekday.toLowerCase();
-      weekday = lower[0].toUpperCase() + lower.substring(1);
+      try {
+        final lower = weekday.toLowerCase();
+        if (lower.isNotEmpty) {
+          weekday = lower[0].toUpperCase() + (lower.length > 1 ? lower.substring(1) : '');
+        }
+      } catch (_) {
+        // Keep original weekday if capitalization fails
+      }
     }
 
     // Extract last updated timestamp
