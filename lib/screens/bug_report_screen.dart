@@ -35,8 +35,8 @@ class _BugReportScreenState extends State<BugReportScreen> {
   Future<void> _clearWebViewData() async {
     try {
       await CookieManager.instance().deleteAllCookies();
-      await _controller?.clearCache();
-      AppLogger.debug('Cleared WebView data for privacy', module: 'BugReport');
+      // Cache is already disabled via incognito mode and cacheEnabled: false
+      AppLogger.debug('Cleared WebView cookies for privacy', module: 'BugReport');
     } catch (e) {
       AppLogger.error('Failed to clear WebView data', module: 'BugReport', error: e);
     }
@@ -134,8 +134,8 @@ class _BugReportScreenState extends State<BugReportScreen> {
                 }
               },
               onLoadStop: (controller, url) async {
-                // Clear cache after each page load for additional privacy
-                await controller.clearCache();
+                // Cache is already disabled via incognito mode and cacheEnabled: false
+                // No need to manually clear cache
               },
               onReceivedError: (controller, request, error) {
                 setState(() {

@@ -398,13 +398,13 @@ abstract class AppLocalizations {
   /// No description provided for @windSpeedTodayTitle.
   ///
   /// In en, this message translates to:
-  /// **'Wind'**
+  /// **'Wind Speed'**
   String get windSpeedTodayTitle;
 
   /// No description provided for @pressureTodayTitle.
   ///
   /// In en, this message translates to:
-  /// **'Sun'**
+  /// **'Solar Radiation'**
   String get pressureTodayTitle;
 
   /// No description provided for @yAxisTemperature.
