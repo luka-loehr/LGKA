@@ -153,16 +153,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pressureLabel => 'Air pressure';
 
   @override
-  String get temperatureTodayTitle => 'Temperature today';
+  String get temperatureTodayTitle => 'Temperature';
 
   @override
-  String get humidityTodayTitle => 'Humidity today';
+  String get humidityTodayTitle => 'Humidity';
 
   @override
-  String get windSpeedTodayTitle => 'Wind speed today';
+  String get windSpeedTodayTitle => 'Wind speed';
 
   @override
-  String get pressureTodayTitle => 'Air pressure today';
+  String get pressureTodayTitle => 'Air pressure';
 
   @override
   String get yAxisTemperature => 'Temperature (°C)';

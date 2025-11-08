@@ -386,25 +386,25 @@ abstract class AppLocalizations {
   /// No description provided for @temperatureTodayTitle.
   ///
   /// In en, this message translates to:
-  /// **'Temperature today'**
+  /// **'Temperature'**
   String get temperatureTodayTitle;
 
   /// No description provided for @humidityTodayTitle.
   ///
   /// In en, this message translates to:
-  /// **'Humidity today'**
+  /// **'Humidity'**
   String get humidityTodayTitle;
 
   /// No description provided for @windSpeedTodayTitle.
   ///
   /// In en, this message translates to:
-  /// **'Wind speed today'**
+  /// **'Wind speed'**
   String get windSpeedTodayTitle;
 
   /// No description provided for @pressureTodayTitle.
   ///
   /// In en, this message translates to:
-  /// **'Air pressure today'**
+  /// **'Air pressure'**
   String get pressureTodayTitle;
 
   /// No description provided for @yAxisTemperature.

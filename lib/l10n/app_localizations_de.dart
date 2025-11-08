@@ -153,16 +153,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pressureLabel => 'Luftdruck';
 
   @override
-  String get temperatureTodayTitle => 'Temperaturverlauf heute';
+  String get temperatureTodayTitle => 'Temperaturverlauf';
 
   @override
-  String get humidityTodayTitle => 'Luftfeuchtigkeitsverlauf heute';
+  String get humidityTodayTitle => 'Luftfeuchtigkeitsverlauf';
 
   @override
-  String get windSpeedTodayTitle => 'Windgeschwindigkeitsverlauf heute';
+  String get windSpeedTodayTitle => 'Windgeschwindigkeitsverlauf';
 
   @override
-  String get pressureTodayTitle => 'Luftdruckverlauf heute';
+  String get pressureTodayTitle => 'Luftdruckverlauf';
 
   @override
   String get yAxisTemperature => 'Temperatur (°C)';
