@@ -114,7 +114,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get legalLabel => 'Impressum';
 
   @override
-  String get bugReport => 'Bug melden?';
+  String get bugReport => 'Fehler gefunden?';
 
   @override
   String get bugReportTitle => 'Bug Report';
