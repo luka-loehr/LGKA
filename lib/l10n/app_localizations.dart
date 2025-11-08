@@ -380,7 +380,7 @@ abstract class AppLocalizations {
   /// No description provided for @pressureLabel.
   ///
   /// In en, this message translates to:
-  /// **'Solar radiation'**
+  /// **'Sun'**
   String get pressureLabel;
 
   /// No description provided for @temperatureTodayTitle.
@@ -404,7 +404,7 @@ abstract class AppLocalizations {
   /// No description provided for @pressureTodayTitle.
   ///
   /// In en, this message translates to:
-  /// **'Solar radiation'**
+  /// **'Sun'**
   String get pressureTodayTitle;
 
   /// No description provided for @yAxisTemperature.
@@ -428,7 +428,7 @@ abstract class AppLocalizations {
   /// No description provided for @yAxisPressure.
   ///
   /// In en, this message translates to:
-  /// **'Solar radiation (W/m²)'**
+  /// **'Sun (W/m²)'**
   String get yAxisPressure;
 
   /// No description provided for @timeLabel.
