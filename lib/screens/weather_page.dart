@@ -274,6 +274,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       });
     }
     
+    // Check if chart is not available (less than 60 data points)
+    final isChartUnavailable = !_isChartAvailable();
+    
     return weatherState.isLoading && weatherState.chartData.isEmpty
           ? Center(
               child: Column(
@@ -339,6 +342,36 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                     ),
                   ),
                 )
+              : isChartUnavailable
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.hourglass_empty_rounded,
+                            size: 64,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            AppLocalizations.of(context)!.dataBeingCollected,
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: AppColors.primaryText,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            AppLocalizations.of(context)!.dataCollectionDescription,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.secondaryText,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    )
               : weatherState.chartData.isEmpty
                   ? Center(
                       child: Text(
@@ -359,52 +392,47 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                             padding: const EdgeInsets.all(16.0),
                             child: Column(
                               children: [
-                                // Weather station explanation or waiting message
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(20),
-                                  decoration: BoxDecoration(
-                                    color: _isChartAvailable() 
-                                      ? AppColors.appSurface
-                                      : AppColors.appSurface,
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: _isChartAvailable() 
-                                        ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
-                                        : Colors.orange.withValues(alpha: 0.3),
-                                      width: 1.5,
+                                // Weather station explanation - only show when chart is available
+                                if (_isChartAvailable()) ...[
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.appSurface,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          AppLocalizations.of(context)!.liveWeatherData,
+                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                            color: Theme.of(context).colorScheme.primary,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          AppLocalizations.of(context)!.liveWeatherDescription,
+                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            color: AppColors.secondaryText,
+                                            height: 1.5,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        _isChartAvailable()
-                                          ? AppLocalizations.of(context)!.liveWeatherData
-                                          : AppLocalizations.of(context)!.dataBeingCollected,
-                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                          color: _isChartAvailable() 
-                                            ? Theme.of(context).colorScheme.primary
-                                            : Colors.orange,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        _isChartAvailable()
-                                          ? AppLocalizations.of(context)!.liveWeatherDescription
-                                          : AppLocalizations.of(context)!.dataCollectionDescription,
-                                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                          color: AppColors.secondaryText,
-                                          height: 1.4,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                // Current weather data cards
-                                if (weatherState.latestData != null) ...[
+                                  const SizedBox(height: 16),
+                                ],
+                                // Current weather data cards - only show when chart is available
+                                if (weatherState.latestData != null && _isChartAvailable()) ...[
                                   // Temperature and humidity row - responsive layout
                                   LayoutBuilder(
                                     builder: (context, constraints) {
@@ -699,151 +727,137 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                     ],
                                   ),
                                 ],
-                                const SizedBox(height: 16),
-                                // Chart or time-based message
-                                Expanded(
-                                  child: Container(
-                                    padding: const EdgeInsets.all(20),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.appSurface,
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: _isChartAvailable()
-                                      ? Column(
-                                          children: [
-                                            // Chart title
-                                            Text(
-                                              _getChartTitle(),
-                                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                                color: AppColors.primaryText,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              textAlign: TextAlign.center,
+                                // Chart - only show when chart is available
+                                if (_isChartAvailable()) ...[
+                                  const SizedBox(height: 16),
+                                  Expanded(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.appSurface,
+                                        borderRadius: BorderRadius.circular(20),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          // Chart title
+                                          Text(
+                                            _getChartTitle(),
+                                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                              color: AppColors.primaryText,
+                                              fontWeight: FontWeight.w600,
                                             ),
-                                            const SizedBox(height: 16),
-                                            // Progressive chart rendering
-                                            Expanded(
-                                              child: _isChartRendered
-                                                ? SfCartesianChart(
-                                                    backgroundColor: Colors.transparent,
-                                                    plotAreaBackgroundColor: Colors.transparent,
-                                                    primaryXAxis: DateTimeAxis(
-                                                      dateFormat: DateFormat.Hm(),
-                                                      intervalType: DateTimeIntervalType.hours,
-                                                      interval: _calculateOptimalInterval(weatherState.chartData, context),
-                                                      majorGridLines: MajorGridLines(
-                                                        color: AppColors.secondaryText.withValues(alpha: 0.2),
-                                                        width: 0.5,
-                                                        ),
-                                                      minorGridLines: const MinorGridLines(width: 0),
-                                                      axisLine: AxisLine(
-                                                        color: AppColors.secondaryText.withValues(alpha: 0.3),
-                                                        width: 1,
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          const SizedBox(height: 16),
+                                          // Progressive chart rendering
+                                          Expanded(
+                                            child: _isChartRendered
+                                              ? SfCartesianChart(
+                                                  backgroundColor: Colors.transparent,
+                                                  plotAreaBackgroundColor: Colors.transparent,
+                                                  primaryXAxis: DateTimeAxis(
+                                                    dateFormat: DateFormat.Hm(),
+                                                    intervalType: DateTimeIntervalType.hours,
+                                                    interval: _calculateOptimalInterval(weatherState.chartData, context),
+                                                    majorGridLines: MajorGridLines(
+                                                      color: AppColors.secondaryText.withValues(alpha: 0.2),
+                                                      width: 0.5,
                                                       ),
-                                                      majorTickLines: MajorTickLines(
-                                                        color: AppColors.secondaryText.withValues(alpha: 0.2),
-                                                        width: 1,
-                                                      ),
-                                                      labelStyle: TextStyle(
-                                                        color: AppColors.secondaryText,
-                                                        fontSize: 11,
-                                                      ),
-                                                      title: AxisTitle(
-                                                        text: AppLocalizations.of(context)!.timeLabel,
-                                                        textStyle: TextStyle(
-                                                          color: AppColors.secondaryText,
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
+                                                    minorGridLines: const MinorGridLines(width: 0),
+                                                    axisLine: AxisLine(
+                                                      color: AppColors.secondaryText.withValues(alpha: 0.3),
+                                                      width: 1,
                                                     ),
-                                                    primaryYAxis: NumericAxis(
-                                                      title: AxisTitle(
-                                                        text: _getYAxisTitle(),
-                                                        textStyle: TextStyle(
-                                                          color: AppColors.secondaryText,
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                      minimum: _calculateOptimalYAxisRange(weatherState.chartData)['min'],
-                                                      maximum: _calculateOptimalYAxisRange(weatherState.chartData)['max'],
-                                                      majorGridLines: MajorGridLines(
-                                                        color: AppColors.secondaryText.withValues(alpha: 0.2),
-                                                        width: 0.5,
-                                                      ),
-                                                      minorGridLines: const MinorGridLines(width: 0),
-                                                      axisLine: AxisLine(
-                                                        color: AppColors.secondaryText.withValues(alpha: 0.3),
-                                                        width: 1,
-                                                      ),
-                                                      majorTickLines: MajorTickLines(
-                                                        color: AppColors.secondaryText.withValues(alpha: 0.3),
-                                                        width: 1,
-                                                      ),
-                                                      labelStyle: TextStyle(
-                                                        color: AppColors.secondaryText,
-                                                        fontSize: 11,
-                                                      ),
+                                                    majorTickLines: MajorTickLines(
+                                                      color: AppColors.secondaryText.withValues(alpha: 0.2),
+                                                      width: 1,
                                                     ),
-                                                    margin: const EdgeInsets.all(8),
-                                                    legend: const Legend(isVisible: false),
-                                                    tooltipBehavior: TooltipBehavior(
-                                                      enable: true,
-                                                      color: AppColors.appSurface,
-                                                      textStyle: const TextStyle(
-                                                        color: AppColors.primaryText,
+                                                    labelStyle: TextStyle(
+                                                      color: AppColors.secondaryText,
+                                                      fontSize: 11,
+                                                    ),
+                                                    title: AxisTitle(
+                                                      text: AppLocalizations.of(context)!.timeLabel,
+                                                      textStyle: TextStyle(
+                                                        color: AppColors.secondaryText,
                                                         fontSize: 12,
                                                       ),
-                                                      borderColor: Theme.of(context).colorScheme.primary,
-                                                      borderWidth: 1,
-                                                      format: _getTooltipFormat(),
                                                     ),
-                                                    series: <CartesianSeries<dynamic, dynamic>>[
-                                                      SplineSeries<WeatherData, DateTime>(
-                                                        dataSource: weatherState.chartData,
-                                                        xValueMapper: (WeatherData data, _) => data.time,
-                                                        yValueMapper: (WeatherData data, _) => _getYValue(data),
-                                                        color: Theme.of(context).colorScheme.primary,
-                                                        width: 3,
-                                                        splineType: SplineType.cardinal,
-                                                        cardinalSplineTension: 0.7,
-                                                        animationDuration: 800, // Smooth animation for better visual appeal
-                                                        markerSettings: const MarkerSettings(
-                                                          isVisible: false,
-                                                        ),
+                                                  ),
+                                                  primaryYAxis: NumericAxis(
+                                                    title: AxisTitle(
+                                                      text: _getYAxisTitle(),
+                                                      textStyle: TextStyle(
+                                                        color: AppColors.secondaryText,
+                                                        fontSize: 12,
                                                       ),
-                                                    ],
-                                                  )
-                                                : _buildChartPlaceholder(),
-                                            ),
-                                          ],
-                                        )
-                                      : Column(
-                                          children: [
-                                            Icon(
-                                              Icons.hourglass_empty,
-                                              size: 48,
-                                              color: AppColors.secondaryText.withValues(alpha: 0.5),
-                                            ),
-                                            const SizedBox(height: 16),
-                                            Text(
-                                              _getChartUnavailableMessage(),
-                                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                color: AppColors.primaryText,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ],
-                                        ),
+                                                    ),
+                                                    minimum: _calculateOptimalYAxisRange(weatherState.chartData)['min'],
+                                                    maximum: _calculateOptimalYAxisRange(weatherState.chartData)['max'],
+                                                    majorGridLines: MajorGridLines(
+                                                      color: AppColors.secondaryText.withValues(alpha: 0.2),
+                                                      width: 0.5,
+                                                    ),
+                                                    minorGridLines: const MinorGridLines(width: 0),
+                                                    axisLine: AxisLine(
+                                                      color: AppColors.secondaryText.withValues(alpha: 0.3),
+                                                      width: 1,
+                                                    ),
+                                                    majorTickLines: MajorTickLines(
+                                                      color: AppColors.secondaryText.withValues(alpha: 0.3),
+                                                      width: 1,
+                                                    ),
+                                                    labelStyle: TextStyle(
+                                                      color: AppColors.secondaryText,
+                                                      fontSize: 11,
+                                                    ),
+                                                  ),
+                                                  margin: const EdgeInsets.all(8),
+                                                  legend: const Legend(isVisible: false),
+                                                  tooltipBehavior: TooltipBehavior(
+                                                    enable: true,
+                                                    color: AppColors.appSurface,
+                                                    textStyle: const TextStyle(
+                                                      color: AppColors.primaryText,
+                                                      fontSize: 12,
+                                                    ),
+                                                    borderColor: Theme.of(context).colorScheme.primary,
+                                                    borderWidth: 1,
+                                                    format: _getTooltipFormat(),
+                                                  ),
+                                                  series: <CartesianSeries<dynamic, dynamic>>[
+                                                    SplineSeries<WeatherData, DateTime>(
+                                                      dataSource: weatherState.chartData,
+                                                      xValueMapper: (WeatherData data, _) => data.time,
+                                                      yValueMapper: (WeatherData data, _) => _getYValue(data),
+                                                      color: Theme.of(context).colorScheme.primary,
+                                                      width: 3,
+                                                      splineType: SplineType.cardinal,
+                                                      cardinalSplineTension: 0.7,
+                                                      animationDuration: 800, // Smooth animation for better visual appeal
+                                                      markerSettings: const MarkerSettings(
+                                                        isVisible: false,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              : _buildChartPlaceholder(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 16),
+                                ],
+                                // Add spacer when chart is not available to push footer down
+                                if (!_isChartAvailable()) const Spacer(),
+                                if (_isChartAvailable()) const SizedBox(height: 16),
                                 _buildFooter(context),
                               ],
                             ),
@@ -987,9 +1001,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
 
   bool _isChartAvailable() {
-    final now = DateTime.now();
-    // Charts are available after 0:30 (00:30)
-    return now.hour > 0 || (now.hour == 0 && now.minute >= 30);
+    final weatherState = ref.read(weatherDataProvider);
+    // Charts are available when we have at least 60 data points
+    return weatherState.chartData.length >= 60;
   }
   
   /// Check if weather data values have been the same for more than 60 minutes

@@ -63,7 +63,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveWeatherDescription => 'Directly from the school\'s own weather station on the roof. Real-time data from your school!';
 
   @override
-  String get dataCollectionDescription => 'The weather station is currently collecting new data for today. Charts are available from 0:30 AM.';
+  String get dataCollectionDescription => 'The weather station is currently collecting new data for today. Charts and additional values will be displayed once enough data points are available.';
 
   @override
   String get welcomeHeadline => 'Welcome!';
