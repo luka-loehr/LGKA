@@ -15,10 +15,6 @@ class AppCredentials {
   static const String username = 'vertretungsplan';
   static const String password = 'ephraim';
   
-  // Feature request form URL
-  // Google Form configured to NOT collect email addresses automatically
-  static const String featureRequestFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeySL2T8c-7rM-dC6F9aNhg1BA-BqYgtoPCSOflq9Frdp-47g/viewform?usp=dialog';
-  
   // Bug report form URL
   // Google Form configured to NOT collect email addresses automatically
   static const String bugReportFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdknGu7-xgFurrghbUYOwoYu-Vsaftar6PGLzMv64UFpwJtRw/viewform?usp=publish-editor';
