@@ -1,8 +1,11 @@
 // Copyright Luka Löhr 2025
 
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 import '../providers/schedule_provider.dart';
 import '../providers/haptic_service.dart';
 import '../theme/app_theme.dart';
@@ -144,6 +147,9 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
 
       AppLogger.success('Schedule availability check complete: ${results.where((r) => r['isAvailable'] as bool).length} available', module: 'SchedulePage');
       setState(() {});
+      
+      // Preload PDFs for available schedules in the background
+      _preloadSchedulePDFs();
     } finally {
       if (mounted) {
         setState(() {
@@ -152,6 +158,30 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
         });
       }
     }
+  }
+  
+  /// Preload PDFs for available schedules in the background
+  void _preloadSchedulePDFs() {
+    final allAvailableSchedules = [
+      ..._availableFirstHalbjahr,
+      ..._availableSecondHalbjahr,
+    ];
+    
+    if (allAvailableSchedules.isEmpty) return;
+    
+    // Preload all available schedules in the background
+    for (final schedule in allAvailableSchedules) {
+      // Download schedule PDF in background (downloadSchedule handles caching)
+      // This will download if not cached, or return cached file if it exists
+      unawaited(
+        ref.read(scheduleProvider.notifier).downloadSchedule(schedule).catchError((e) {
+          // Silently handle errors - preloading shouldn't show errors to user
+          AppLogger.debug('Failed to preload schedule PDF: ${schedule.title}', module: 'SchedulePage');
+        })
+      );
+    }
+    
+    AppLogger.debug('Started preloading ${allAvailableSchedules.length} schedule PDF(s)', module: 'SchedulePage');
   }
 
   @override
@@ -472,10 +502,36 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     }
   }
 
-  void _openSchedule(ScheduleItem schedule) {
+  /// Get the cached schedule file path (same logic as ScheduleService)
+  Future<File?> _getCachedScheduleFile(ScheduleItem schedule) async {
+    try {
+      final cacheDir = await getTemporaryDirectory();
+      final sanitizedGradeLevel = schedule.gradeLevel.replaceAll('/', '_');
+      final sanitizedHalbjahr = schedule.halbjahr.replaceAll('.', '_');
+      final filename = '${sanitizedGradeLevel}_$sanitizedHalbjahr.pdf';
+      return File('${cacheDir.path}/$filename');
+    } catch (e) {
+      return null;
+    }
+  }
+
+  void _openSchedule(ScheduleItem schedule) async {
     HapticService.subtle();
     
-    // Show loading dialog
+    // Check if PDF is already downloaded (from preloading)
+    final cachedFile = await _getCachedScheduleFile(schedule);
+    if (cachedFile != null && await cachedFile.exists()) {
+      // PDF is already cached, open immediately
+      if (mounted) {
+        context.push('/pdf-viewer', extra: {
+          'file': cachedFile,
+          'dayName': '${_localizeGradeLevel(context, schedule.gradeLevel)} - ${_localizeHalbjahr(context, schedule.halbjahr)}',
+        });
+      }
+      return;
+    }
+    
+    // Show loading dialog if PDF needs to be downloaded
     showDialog(
       context: context,
       barrierDismissible: false,
