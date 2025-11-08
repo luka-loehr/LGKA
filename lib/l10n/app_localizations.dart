@@ -398,7 +398,7 @@ abstract class AppLocalizations {
   /// No description provided for @windSpeedTodayTitle.
   ///
   /// In en, this message translates to:
-  /// **'Wind Speed'**
+  /// **'Wind'**
   String get windSpeedTodayTitle;
 
   /// No description provided for @pressureTodayTitle.
