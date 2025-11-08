@@ -147,7 +147,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get humidityLabel => 'Humidity';
 
   @override
-  String get windSpeedLabel => 'Wind speed';
+  String get windSpeedLabel => 'Wind';
 
   @override
   String get pressureLabel => 'Air pressure';
@@ -159,7 +159,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get humidityTodayTitle => 'Humidity';
 
   @override
-  String get windSpeedTodayTitle => 'Wind speed';
+  String get windSpeedTodayTitle => 'Wind';
 
   @override
   String get pressureTodayTitle => 'Air pressure';
@@ -171,7 +171,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yAxisHumidity => 'Humidity (%)';
 
   @override
-  String get yAxisWindSpeed => 'Wind speed (km/h)';
+  String get yAxisWindSpeed => 'Wind (km/h)';
 
   @override
   String get yAxisPressure => 'Air pressure (hPa)';
