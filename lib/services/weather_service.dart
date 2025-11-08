@@ -40,16 +40,52 @@ class WeatherData {
   }
 
   factory WeatherData.fromJson(Map<String, dynamic> json) {
-    return WeatherData(
-      time: DateTime.fromMillisecondsSinceEpoch(json['time']),
-      temperature: json['temperature'].toDouble(),
-      humidity: json['humidity'].toDouble(),
-      windSpeed: json['windSpeed'].toDouble(),
-      windDirection: json['windDirection'],
-      precipitation: json['precipitation'].toDouble(),
-      pressure: json['pressure'].toDouble(),
-      radiation: json['radiation'].toDouble(),
-    );
+    try {
+      // Safe parsing with defaults for all fields
+      final timeValue = json['time'];
+      final time = timeValue != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              timeValue is int ? timeValue : int.tryParse(timeValue.toString()) ?? 0)
+          : DateTime.now();
+
+      return WeatherData(
+        time: time,
+        temperature: _safeToDouble(json['temperature'], 0.0),
+        humidity: _safeToDouble(json['humidity'], 0.0),
+        windSpeed: _safeToDouble(json['windSpeed'], 0.0),
+        windDirection: json['windDirection']?.toString() ?? '',
+        precipitation: _safeToDouble(json['precipitation'], 0.0),
+        pressure: _safeToDouble(json['pressure'], 0.0),
+        radiation: _safeToDouble(json['radiation'], 0.0),
+      );
+    } catch (e) {
+      // Return default WeatherData if parsing fails completely
+      return WeatherData(
+        time: DateTime.now(),
+        temperature: 0.0,
+        humidity: 0.0,
+        windSpeed: 0.0,
+        windDirection: '',
+        precipitation: 0.0,
+        pressure: 0.0,
+        radiation: 0.0,
+      );
+    }
+  }
+
+  /// Safely convert a value to double with a default fallback
+  static double _safeToDouble(dynamic value, double defaultValue) {
+    if (value == null) return defaultValue;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      return double.tryParse(value) ?? defaultValue;
+    }
+    try {
+      return (value as num).toDouble();
+    } catch (_) {
+      return defaultValue;
+    }
   }
 }
 
@@ -76,7 +112,14 @@ class WeatherService {
         throw Exception('Failed to load weather data: ${response.statusCode}');
       }
 
-      final csvString = utf8.decode(response.bodyBytes);
+      // Safe UTF-8 decoding with error handling
+      String csvString;
+      try {
+        csvString = utf8.decode(response.bodyBytes, allowMalformed: true);
+      } catch (e) {
+        AppLogger.error('Failed to decode UTF-8 response', module: 'WeatherService', error: e);
+        throw Exception('Invalid response encoding');
+      }
       AppLogger.debug('Decoded ${csvString.length} characters', module: 'WeatherService');
 
       // Add safety check for CSV parsing to handle corrupted data
@@ -122,6 +165,15 @@ class WeatherService {
         }
         
         try {
+          // Safe element access with null checks
+          final windSpeedValue = row.length > 0 ? row[0] : null;
+          final windDirectionValue = row.length > 1 ? row[1] : null;
+          final temperatureValue = row.length > 2 ? row[2] : null;
+          final humidityValue = row.length > 3 ? row[3] : null;
+          final precipitationValue = row.length > 4 ? row[4] : null;
+          final pressureValue = row.length > 5 ? row[5] : null;
+          final radiationValue = row.length > 6 ? row[6] : null;
+
           // Calculate minutes from midnight based on actual data position
           final dataIndex = i - startIndex;
           final minutesSinceMidnight = dataIndex;
@@ -131,13 +183,13 @@ class WeatherService {
           
           final weatherData = WeatherData(
             time: time,
-            windSpeed: _parseDouble(row[0]),
-            windDirection: row[1].toString(),
-            temperature: _parseDouble(row[2]),
-            humidity: _parseDouble(row[3]),
-            precipitation: _parseDouble(row[4]),
-            pressure: _parseDouble(row[5]),
-            radiation: _parseDouble(row[6]),
+            windSpeed: _parseDouble(windSpeedValue),
+            windDirection: windDirectionValue?.toString() ?? '',
+            temperature: _parseDouble(temperatureValue),
+            humidity: _parseDouble(humidityValue),
+            precipitation: _parseDouble(precipitationValue),
+            pressure: _parseDouble(pressureValue),
+            radiation: _parseDouble(radiationValue),
           );
           
           allWeatherData.add(weatherData);
@@ -148,7 +200,9 @@ class WeatherService {
       }
       
       if (allWeatherData.isNotEmpty) {
-        AppLogger.success('Loaded ${allWeatherData.length} points (${allWeatherData.first.temperature}°C → ${allWeatherData.last.temperature}°C)', module: 'WeatherService');
+        final firstTemp = allWeatherData.first.temperature;
+        final lastTemp = allWeatherData.last.temperature;
+        AppLogger.success('Loaded ${allWeatherData.length} points ($firstTemp°C → $lastTemp°C)', module: 'WeatherService');
       }
       
       return allWeatherData;
@@ -173,7 +227,14 @@ class WeatherService {
         throw Exception('Failed to load weather data: ${response.statusCode}');
       }
 
-      final csvString = utf8.decode(response.bodyBytes);
+      // Safe UTF-8 decoding with error handling
+      String csvString;
+      try {
+        csvString = utf8.decode(response.bodyBytes, allowMalformed: true);
+      } catch (e) {
+        AppLogger.error('Failed to decode UTF-8 response for latest weather', module: 'WeatherService', error: e);
+        return null;
+      }
 
       // Add safety check for CSV parsing to handle corrupted data
       List<List<dynamic>> csvData;
@@ -196,6 +257,15 @@ class WeatherService {
       if (lastRow.length < 7) {
         return null;
       }
+
+      // Safe element access with null checks
+      final windSpeedValue = lastRow.length > 0 ? lastRow[0] : null;
+      final windDirectionValue = lastRow.length > 1 ? lastRow[1] : null;
+      final temperatureValue = lastRow.length > 2 ? lastRow[2] : null;
+      final humidityValue = lastRow.length > 3 ? lastRow[3] : null;
+      final precipitationValue = lastRow.length > 4 ? lastRow[4] : null;
+      final pressureValue = lastRow.length > 5 ? lastRow[5] : null;
+      final radiationValue = lastRow.length > 6 ? lastRow[6] : null;
       
       final minutesSinceMidnight = csvData.length - 2;
       final now = DateTime.now();
@@ -204,13 +274,13 @@ class WeatherService {
       
       final weatherData = WeatherData(
         time: time,
-        windSpeed: _parseDouble(lastRow[0]),
-        windDirection: lastRow[1].toString(),
-        temperature: _parseDouble(lastRow[2]),
-        humidity: _parseDouble(lastRow[3]),
-        precipitation: _parseDouble(lastRow[4]),
-        pressure: _parseDouble(lastRow[5]),
-        radiation: _parseDouble(lastRow[6]),
+        windSpeed: _parseDouble(windSpeedValue),
+        windDirection: windDirectionValue?.toString() ?? '',
+        temperature: _parseDouble(temperatureValue),
+        humidity: _parseDouble(humidityValue),
+        precipitation: _parseDouble(precipitationValue),
+        pressure: _parseDouble(pressureValue),
+        radiation: _parseDouble(radiationValue),
       );
       
       return weatherData;
@@ -248,14 +318,19 @@ class WeatherService {
     
     final List<WeatherData> sampledData = [];
     
-    sampledData.add(fullData.first);
-    
-    for (int i = samplingRate; i < length - samplingRate; i += samplingRate) {
-      sampledData.add(fullData[i]);
-    }
-    
-    if (fullData.length > 1) {
-      sampledData.add(fullData.last);
+    // Safe access - already checked isEmpty above
+    if (fullData.isNotEmpty) {
+      sampledData.add(fullData.first);
+      
+      for (int i = samplingRate; i < length - samplingRate; i += samplingRate) {
+        if (i < fullData.length) {
+          sampledData.add(fullData[i]);
+        }
+      }
+      
+      if (fullData.length > 1 && fullData.last != sampledData.last) {
+        sampledData.add(fullData.last);
+      }
     }
     
       AppLogger.debug('Downsampled $length → ${sampledData.length} points', module: 'WeatherService');

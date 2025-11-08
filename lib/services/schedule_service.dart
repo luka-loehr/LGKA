@@ -153,10 +153,19 @@ class ScheduleService {
     AppLogger.debug('Checking availability: ${schedule.title}', module: 'ScheduleService');
 
     try {
+      // Validate URL before making request
+      final uri = Uri.tryParse(schedule.fullUrl);
+      if (uri == null || !uri.hasScheme || !uri.hasAuthority) {
+        AppLogger.warning('Invalid URL format: ${schedule.fullUrl}', module: 'ScheduleService');
+        _availabilityCache[cacheKey] = false;
+        _lastAvailabilityCheck = DateTime.now();
+        return false;
+      }
+      
       final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
 
       final response = await http.head(
-        Uri.parse(schedule.fullUrl),
+        uri,
         headers: {
           'Authorization': 'Basic $credentials',
           'User-Agent': AppInfo.userAgent,
@@ -183,11 +192,19 @@ class ScheduleService {
   Future<File?> downloadSchedule(ScheduleItem schedule) async {
     try {
       AppLogger.schedule('Starting download: ${schedule.title} (${schedule.halbjahr}, ${schedule.gradeLevel})');
+      
+      // Validate URL before making request
+      final uri = Uri.tryParse(schedule.fullUrl);
+      if (uri == null || !uri.hasScheme || !uri.hasAuthority) {
+        AppLogger.error('Invalid URL format: ${schedule.fullUrl}', module: 'ScheduleService');
+        throw Exception('Invalid URL format');
+      }
+      
       final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
 
       AppLogger.debug('Making HTTP request for PDF', module: 'ScheduleService');
       final response = await http.get(
-        Uri.parse(schedule.fullUrl),
+        uri,
         headers: {
           'Authorization': 'Basic $credentials',
           'User-Agent': AppInfo.userAgent,
@@ -260,19 +277,30 @@ class ScheduleService {
   bool _isValidPdfContent(List<int> bytes) {
     if (bytes.length < 8) return false;
     
-    // Check for PDF header signature (%PDF-)
-    final header = String.fromCharCodes(bytes.take(8));
-    if (!header.startsWith('%PDF-')) {
+    try {
+      // Check for PDF header signature (%PDF-)
+      final header = String.fromCharCodes(bytes.take(8));
+      if (!header.startsWith('%PDF-')) {
+        return false;
+      }
+      
+      // Check for PDF trailer (basic validation) - only if bytes are long enough
+      if (bytes.length >= 100) {
+        final trailerStart = bytes.length - 100;
+        final trailer = String.fromCharCodes(bytes.skip(trailerStart).take(100));
+        if (!trailer.contains('trailer') && !trailer.contains('startxref')) {
+          return false;
+        }
+      } else {
+        // For small PDFs, just check header is valid
+        // Some very small PDFs might not have trailer in last 100 bytes
+      }
+      
+      return true;
+    } catch (e) {
+      // If any string conversion fails, PDF is invalid
       return false;
     }
-    
-    // Check for PDF trailer (basic validation)
-    final trailer = String.fromCharCodes(bytes.skip(bytes.length - 100).take(100));
-    if (!trailer.contains('trailer') && !trailer.contains('startxref')) {
-      return false;
-    }
-    
-    return true;
   }
 }
 
@@ -296,12 +324,24 @@ List<ScheduleItem> _parseScheduleHtml(String htmlContent) {
       final title = link.attributes['title'] ?? link.text.trim();
       
       if (href != null && title.isNotEmpty) {
-        // Convert relative URL to absolute
+        // Convert relative URL to absolute with validation
         String fullUrl = href;
-        if (href.startsWith('/cm3/../')) {
-          fullUrl = href.replaceFirst('/cm3/../', 'https://lessing-gymnasium-karlsruhe.de/');
-        } else if (href.startsWith('/')) {
-          fullUrl = 'https://lessing-gymnasium-karlsruhe.de$href';
+        try {
+          if (href.startsWith('/cm3/../')) {
+            fullUrl = href.replaceFirst('/cm3/../', 'https://lessing-gymnasium-karlsruhe.de/');
+          } else if (href.startsWith('/')) {
+            fullUrl = 'https://lessing-gymnasium-karlsruhe.de$href';
+          }
+          
+          // Validate URL format before using
+          final uri = Uri.tryParse(fullUrl);
+          if (uri == null || !uri.hasScheme || !uri.hasAuthority) {
+            AppLogger.warning('Invalid URL format: $fullUrl', module: 'ScheduleService');
+            continue; // Skip this invalid URL
+          }
+        } catch (e) {
+          AppLogger.warning('Error processing URL: $href', module: 'ScheduleService', error: e);
+          continue; // Skip this URL if processing fails
         }
 
         final halbjahr = _extractHalbjahr(title);
