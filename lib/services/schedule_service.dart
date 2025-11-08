@@ -340,7 +340,7 @@ List<ScheduleItem> _parseScheduleHtml(String htmlContent) {
             continue; // Skip this invalid URL
           }
         } catch (e) {
-          AppLogger.warning('Error processing URL: $href', module: 'ScheduleService', error: e);
+          AppLogger.warning('Error processing URL: $href - $e', module: 'ScheduleService');
           continue; // Skip this URL if processing fails
         }
 
