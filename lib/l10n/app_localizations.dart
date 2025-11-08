@@ -206,7 +206,7 @@ abstract class AppLocalizations {
   /// No description provided for @dataCollectionDescription.
   ///
   /// In en, this message translates to:
-  /// **'The weather station is currently collecting new data for today. Charts are available from 0:30 AM.'**
+  /// **'The weather station is currently collecting new data for today. Charts and additional values will be displayed once enough data points are available.'**
   String get dataCollectionDescription;
 
   /// No description provided for @welcomeHeadline.

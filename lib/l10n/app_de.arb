@@ -18,7 +18,7 @@
   "liveWeatherData": "Live Wetterdaten",
   "dataBeingCollected": "Daten werden gesammelt",
   "liveWeatherDescription": "Direkt von der schuleigenen Wetterstation auf dem Dach. Echtzeit-Daten von deiner Schule!",
-  "dataCollectionDescription": "Die Wetterstation sammelt gerade neue Daten für heute. Diagramme sind ab 0:30 Uhr verfügbar."
+  "dataCollectionDescription": "Die Wetterstation sammelt gerade neue Daten für heute. Diagramme und weitere Werte werden angezeigt, sobald genügend Datenpunkte vorhanden sind."
   ,
   "welcomeHeadline": "Willkommen!",
   "welcomeSubtitle": "Bei der neuen App fürs Lessing-Gymnasium Karlsruhe.",
