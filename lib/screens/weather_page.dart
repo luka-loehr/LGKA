@@ -1001,11 +1001,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
 
   bool _isChartAvailable() {
-    // TEMPORARY: Simulating 60 data points for testing
-    return true;
-    // final weatherState = ref.read(weatherDataProvider);
-    // // Charts are available when we have at least 60 data points
-    // return weatherState.chartData.length >= 60;
+    final weatherState = ref.read(weatherDataProvider);
+    // Charts are available when we have at least 60 data points
+    return weatherState.chartData.length >= 60;
   }
   
   /// Check if weather data values have been the same for more than 60 minutes
