@@ -308,7 +308,7 @@ abstract class AppLocalizations {
   /// No description provided for @bugReport.
   ///
   /// In en, this message translates to:
-  /// **'Report a bug?'**
+  /// **'Found a Bug?'**
   String get bugReport;
 
   /// No description provided for @bugReportTitle.
