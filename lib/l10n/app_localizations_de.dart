@@ -159,7 +159,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get humidityTodayTitle => 'Luftfeuchtigkeitsverlauf';
 
   @override
-  String get windSpeedTodayTitle => 'Windverlauf';
+  String get windSpeedTodayTitle => 'Windgeschwindigkeit';
 
   @override
   String get pressureTodayTitle => 'Luftdruckverlauf';
