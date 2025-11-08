@@ -147,7 +147,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get humidityLabel => 'Luftfeuchtigkeit';
 
   @override
-  String get windSpeedLabel => 'Windgeschwindigkeit';
+  String get windSpeedLabel => 'Wind';
 
   @override
   String get pressureLabel => 'Luftdruck';
@@ -159,7 +159,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get humidityTodayTitle => 'Luftfeuchtigkeitsverlauf';
 
   @override
-  String get windSpeedTodayTitle => 'Windgeschwindigkeitsverlauf';
+  String get windSpeedTodayTitle => 'Windverlauf';
 
   @override
   String get pressureTodayTitle => 'Luftdruckverlauf';
@@ -171,7 +171,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get yAxisHumidity => 'Luftfeuchtigkeit (%)';
 
   @override
-  String get yAxisWindSpeed => 'Windgeschwindigkeit (km/h)';
+  String get yAxisWindSpeed => 'Wind (km/h)';
 
   @override
   String get yAxisPressure => 'Luftdruck (hPa)';
