@@ -30,6 +30,9 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
   bool _hasTriggeredLoadedHaptic = false;
   bool _hasError = false;
   String? _errorText;
+  
+  // Check if this is the absence reporting (krankmeldung) webview
+  bool get _isKrankmeldungWebView => widget.url.contains('krankmeldung');
 
   Future<void> _retryLoad() async {
     setState(() {
@@ -108,6 +111,11 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
             useHybridComposition: true,
             verticalScrollBarEnabled: true,
             horizontalScrollBarEnabled: false,
+            // Enable cookies and cache for absence reporting to keep user logged in
+            // For privacy pages (legal/privacy), cookies are disabled by default
+            cacheEnabled: _isKrankmeldungWebView,
+            thirdPartyCookiesEnabled: _isKrankmeldungWebView,
+            incognito: !_isKrankmeldungWebView, // Only use incognito for non-krankmeldung pages
           ),
           shouldOverrideUrlLoading: (controller, navigationAction) async {
             final url = navigationAction.request.url;
