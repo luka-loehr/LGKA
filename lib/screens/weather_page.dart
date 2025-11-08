@@ -44,7 +44,7 @@ enum ChartType {
   temperature,
   humidity,
   windSpeed,
-  pressure,
+  radiation,
 }
 
 class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
@@ -635,7 +635,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                         child: GestureDetector(
                                           onTap: () {
                                             setState(() {
-                                              _selectedChart = ChartType.pressure;
+                                              _selectedChart = ChartType.radiation;
                                               _isChartRendered = false; // Force chart re-render
                                             });
                                             HapticService.subtle();
@@ -655,15 +655,15 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                             height: 85,
                                             padding: const EdgeInsets.all(16),
                                             decoration: BoxDecoration(
-                                              color: _selectedChart == ChartType.pressure
+                                              color: _selectedChart == ChartType.radiation
                                                   ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
                                                   : AppColors.appSurface,
                                               borderRadius: BorderRadius.circular(16),
                                               border: Border.all(
-                                                color: _selectedChart == ChartType.pressure
+                                                color: _selectedChart == ChartType.radiation
                                                     ? Theme.of(context).colorScheme.primary
                                                     : AppColors.secondaryText.withValues(alpha: 0.2),
-                                                width: _selectedChart == ChartType.pressure ? 2 : 1,
+                                                width: _selectedChart == ChartType.radiation ? 2 : 1,
                                               ),
                                             ),
                                             child: Column(
@@ -673,19 +673,19 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                                 Text(
                                                   AppLocalizations.of(context)!.pressureLabel,
                                                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                    color: _selectedChart == ChartType.pressure
+                                                    color: _selectedChart == ChartType.radiation
                                                         ? Theme.of(context).colorScheme.primary
                                                         : AppColors.secondaryText,
-                                                    fontWeight: _selectedChart == ChartType.pressure
+                                                    fontWeight: _selectedChart == ChartType.radiation
                                                         ? FontWeight.w600
                                                         : FontWeight.normal,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
-                                                  '${weatherState.latestData!.pressure.toStringAsFixed(0)} hPa',
+                                                  '${weatherState.latestData!.radiation.toStringAsFixed(0)} W/m²',
                                                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                                    color: _selectedChart == ChartType.pressure
+                                                    color: _selectedChart == ChartType.radiation
                                                         ? Theme.of(context).colorScheme.primary
                                                         : AppColors.primaryText,
                                                     fontWeight: FontWeight.bold,
@@ -899,8 +899,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
         niceMin = (minValue - adjustedPadding).floorToDouble();
         niceMax = (maxValue + adjustedPadding).ceilToDouble();
         break;
-      case ChartType.pressure:
-        // Pressure: round to nearest 1 hPa
+      case ChartType.radiation:
+        // Radiation: round to nearest 1 W/m²
         niceMin = (minValue - adjustedPadding).floorToDouble();
         niceMax = (maxValue + adjustedPadding).ceilToDouble();
         break;
@@ -927,7 +927,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
         return AppLocalizations.of(context)!.humidityTodayTitle;
       case ChartType.windSpeed:
         return AppLocalizations.of(context)!.windSpeedTodayTitle;
-      case ChartType.pressure:
+      case ChartType.radiation:
         return AppLocalizations.of(context)!.pressureTodayTitle;
     }
     return AppLocalizations.of(context)!.liveWeatherData; // Fallback
@@ -941,8 +941,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
         return 'point.x : point.y%';
       case ChartType.windSpeed:
         return 'point.x : point.y km/h';
-      case ChartType.pressure:
-        return 'point.x : point.y hPa';
+      case ChartType.radiation:
+        return 'point.x : point.y W/m²';
     }
     return 'point.x : point.y'; // Default fallback
   }
@@ -955,7 +955,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
         return AppLocalizations.of(context)!.yAxisHumidity;
       case ChartType.windSpeed:
         return AppLocalizations.of(context)!.yAxisWindSpeed;
-      case ChartType.pressure:
+      case ChartType.radiation:
         return AppLocalizations.of(context)!.yAxisPressure;
     }
     return AppLocalizations.of(context)!.liveWeatherData; // Fallback
@@ -973,8 +973,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.windSpeed:
         value = data.windSpeed;
         break;
-      case ChartType.pressure:
-        value = data.pressure;
+      case ChartType.radiation:
+        value = data.radiation;
         break;
     }
 
@@ -1014,7 +1014,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
         data.temperature == firstData.temperature &&
         data.humidity == firstData.humidity &&
         data.windSpeed == firstData.windSpeed &&
-        data.pressure == firstData.pressure &&
         data.radiation == firstData.radiation);
     
     return allSame;
