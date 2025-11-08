@@ -150,7 +150,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get windSpeedLabel => 'Wind';
 
   @override
-  String get pressureLabel => 'Air pressure';
+  String get pressureLabel => 'Solar radiation';
 
   @override
   String get temperatureTodayTitle => 'Temperature';
@@ -162,7 +162,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get windSpeedTodayTitle => 'Wind';
 
   @override
-  String get pressureTodayTitle => 'Air pressure';
+  String get pressureTodayTitle => 'Solar radiation';
 
   @override
   String get yAxisTemperature => 'Temperature (°C)';
@@ -174,7 +174,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yAxisWindSpeed => 'Wind (km/h)';
 
   @override
-  String get yAxisPressure => 'Air pressure (hPa)';
+  String get yAxisPressure => 'Solar radiation (W/m²)';
 
   @override
   String get timeLabel => 'Time';
