@@ -49,6 +49,7 @@ class WeatherDataState {
   final bool isPreloaded;
   final String? error;
   final DateTime? lastUpdateTime;
+  final int fullDataCount; // Track full data count before downsampling
 
   const WeatherDataState({
     this.chartData = const [],
@@ -57,6 +58,7 @@ class WeatherDataState {
     this.isPreloaded = false,
     this.error,
     this.lastUpdateTime,
+    this.fullDataCount = 0,
   });
 
   WeatherDataState copyWith({
@@ -66,6 +68,7 @@ class WeatherDataState {
     bool? isPreloaded,
     String? error,
     DateTime? lastUpdateTime,
+    int? fullDataCount,
   }) {
     return WeatherDataState(
       chartData: chartData ?? this.chartData,
@@ -74,6 +77,7 @@ class WeatherDataState {
       isPreloaded: isPreloaded ?? this.isPreloaded,
       error: error,
       lastUpdateTime: lastUpdateTime ?? this.lastUpdateTime,
+      fullDataCount: fullDataCount ?? this.fullDataCount,
     );
   }
 }
@@ -122,6 +126,7 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
         isLoading: false,
         isPreloaded: true,
         lastUpdateTime: DateTime.now(),
+        fullDataCount: fullData.length,
       );
     } catch (e) {
       // Handle errors gracefully - don't freeze the app
@@ -158,6 +163,7 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
         isLoading: false,
         isPreloaded: true,
         lastUpdateTime: DateTime.now(),
+        fullDataCount: fullData.length,
       );
     } catch (e) {
       // Handle errors gracefully - don't freeze the app
@@ -191,6 +197,7 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
           chartData: downsampledData,
           latestData: latestData ?? fullData.last,
           lastUpdateTime: DateTime.now(),
+          fullDataCount: fullData.length,
         );
       }
     } catch (e) {
