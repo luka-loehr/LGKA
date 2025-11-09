@@ -841,7 +841,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                                       width: 3,
                                                       splineType: SplineType.cardinal,
                                                       cardinalSplineTension: 0.7,
-                                                      animationDuration: 800, // Smooth animation for better visual appeal
+                                                      animationDuration: 1000, // 1 second animation for dramatic effect
                                                       markerSettings: const MarkerSettings(
                                                         isVisible: false,
                                                       ),
