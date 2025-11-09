@@ -91,11 +91,26 @@ class WeatherData {
 
 class WeatherService {
   static const String csvUrl = 'https://lessing-gymnasium-karlsruhe.de/wetter/lg_wetter_heute.csv';
-
+  
+  // Safety limits to prevent memory exhaustion and freezing
+  static const int maxCsvSizeBytes = 10 * 1024 * 1024; // 10MB max
+  static const int maxCsvRows = 100000; // Max rows to parse
+  static const Duration parseTimeout = Duration(seconds: 30); // Timeout for parsing
 
   Future<List<WeatherData>> fetchWeatherData() async {
     AppLogger.network('Fetching weather data');
     
+    // Wrap entire operation in timeout to prevent freezing
+    return await _fetchWeatherDataInternal().timeout(
+      parseTimeout,
+      onTimeout: () {
+        AppLogger.error('Weather data fetch timed out after ${parseTimeout.inSeconds}s', module: 'WeatherService');
+        throw Exception('Weather data fetch timed out - CSV may be too large or corrupted');
+      },
+    );
+  }
+  
+  Future<List<WeatherData>> _fetchWeatherDataInternal() async {
     try {
       AppLogger.debug('Making HTTP request to weather service', module: 'WeatherService');
       final response = await http.get(
@@ -120,7 +135,14 @@ class WeatherService {
         AppLogger.error('Failed to decode UTF-8 response', module: 'WeatherService', error: e);
         throw Exception('Invalid response encoding');
       }
+      
       AppLogger.debug('Decoded ${csvString.length} characters', module: 'WeatherService');
+      
+      // Check file size to prevent memory exhaustion
+      if (csvString.length > maxCsvSizeBytes) {
+        AppLogger.warning('CSV string too large (${csvString.length} bytes) after decoding, rejecting', module: 'WeatherService');
+        throw Exception('CSV data too large (${(csvString.length / 1024 / 1024).toStringAsFixed(1)}MB). Maximum allowed: ${(maxCsvSizeBytes / 1024 / 1024).toStringAsFixed(1)}MB');
+      }
 
       // Add safety check for CSV parsing to handle corrupted data
       List<List<dynamic>> csvData;
@@ -129,6 +151,12 @@ class WeatherService {
           eol: '\n',
           fieldDelimiter: ';',
         ).convert(csvString);
+        
+        // Limit number of rows to prevent memory issues
+        if (csvData.length > maxCsvRows) {
+          AppLogger.warning('CSV has too many rows (${csvData.length}), limiting to last $maxCsvRows', module: 'WeatherService');
+          csvData = csvData.sublist(csvData.length - maxCsvRows);
+        }
       } catch (e) {
         AppLogger.error('Failed to parse CSV data', module: 'WeatherService', error: e);
         throw Exception('Invalid CSV format received from weather service');
