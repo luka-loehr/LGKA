@@ -10,6 +10,7 @@ import '../services/weather_service.dart';
 import '../providers/schedule_provider.dart';
 import '../services/schedule_service.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_logger.dart';
 
 // Preferences Manager Provider
 final preferencesManagerProvider = ChangeNotifierProvider<PreferencesManager>((ref) {
@@ -123,9 +124,17 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
         lastUpdateTime: DateTime.now(),
       );
     } catch (e) {
+      // Handle errors gracefully - don't freeze the app
+      AppLogger.error('Failed to preload weather data', module: 'WeatherProvider', error: e);
+      final errorMessage = e.toString().contains('too large') || e.toString().contains('timed out')
+          ? 'CSV-Datei zu groß oder beschädigt'
+          : 'Fehler beim Laden der Wetterdaten';
+      
       state = state.copyWith(
         isLoading: false,
-        error: e.toString(),
+        error: errorMessage,
+        // Keep existing data if available, don't clear it on error
+        chartData: state.chartData.isNotEmpty ? state.chartData : const [],
       );
     }
   }
@@ -151,9 +160,17 @@ class WeatherDataNotifier extends StateNotifier<WeatherDataState> {
         lastUpdateTime: DateTime.now(),
       );
     } catch (e) {
+      // Handle errors gracefully - don't freeze the app
+      AppLogger.error('Failed to refresh weather data', module: 'WeatherProvider', error: e);
+      final errorMessage = e.toString().contains('too large') || e.toString().contains('timed out')
+          ? 'CSV-Datei zu groß oder beschädigt'
+          : 'Fehler beim Laden der Wetterdaten';
+      
       state = state.copyWith(
         isLoading: false,
-        error: e.toString(),
+        error: errorMessage,
+        // Keep existing data if available, don't clear it on error
+        chartData: state.chartData.isNotEmpty ? state.chartData : const [],
       );
     }
   }
