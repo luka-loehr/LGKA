@@ -1,7 +1,7 @@
-import 'dart:convert';
+
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -24,12 +24,12 @@ class InAppWebViewScreen extends StatefulWidget {
 }
 
 class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
-  final GlobalKey webViewKey = GlobalKey();
+
   InAppWebViewController? _controller;
   double _progress = 0;
   bool _hasTriggeredLoadedHaptic = false;
   bool _hasError = false;
-  String? _errorText;
+
   
   // Check if this is the absence reporting (krankmeldung) webview
   bool get _isKrankmeldungWebView => widget.url.contains('krankmeldung');
@@ -37,7 +37,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
   Future<void> _retryLoad() async {
     setState(() {
       _hasError = false;
-      _errorText = null;
+
       _progress = 0;
       _hasTriggeredLoadedHaptic = false;
     });
@@ -96,7 +96,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
         child: Stack(
           children: [
             InAppWebView(
-          key: webViewKey,
+
           initialUrlRequest: URLRequest(
             url: WebUri(widget.url),
             headers: {
@@ -119,10 +119,10 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
           ),
           shouldOverrideUrlLoading: (controller, navigationAction) async {
             final url = navigationAction.request.url;
-            final currentUrl = WebUri(widget.url);
+
             
             // Only open external browser if leaving the apps.lgka-online.de domain
-            if (url != null && url.host != null) {
+            if (url != null) {
               // Check if the URL is leaving the apps.lgka-online.de domain
               if (url.host != 'apps.lgka-online.de') {
                 // Open in external browser
@@ -158,13 +158,13 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
           onReceivedError: (controller, request, error) {
             setState(() {
               _hasError = true;
-              _errorText = error.description;
+
             });
           },
           onReceivedHttpError: (controller, request, error) {
             setState(() {
               _hasError = true;
-              _errorText = 'HTTP ${error.statusCode}';
+
             });
           },
           onReceivedHttpAuthRequest: (controller, challenge) async {
