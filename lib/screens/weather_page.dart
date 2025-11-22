@@ -5,11 +5,11 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import '../services/weather_service.dart';
 import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
-import '../services/retry_service.dart';
+
 import '../providers/haptic_service.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/app_logger.dart';
-import '../utils/app_info.dart';
+
 import '../widgets/app_footer.dart';
 import 'package:intl/intl.dart';
 
@@ -62,7 +62,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   bool _hasShownComponents = false;
   
   // Chart animation completion detection
-  bool _isChartAnimationComplete = false;
+
   Timer? _animationTimer;
   
   @override
@@ -140,9 +140,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
 
   void _startChartAnimation() {
-    setState(() {
-      _isChartAnimationComplete = false;
-    });
+
     
     // Cancel any existing timer
     _animationTimer?.cancel();
@@ -150,9 +148,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     // Start timer to detect when chart animation completes (800ms)
     _animationTimer = Timer(const Duration(milliseconds: 800), () {
       if (mounted) {
-        setState(() {
-          _isChartAnimationComplete = true;
-        });
+
         
         // Chart animation completed! Do something here
         _onChartAnimationComplete();
@@ -944,7 +940,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.radiation:
         return AppLocalizations.of(context)!.pressureTodayTitle;
     }
-    return AppLocalizations.of(context)!.liveWeatherData; // Fallback
+
   }
   
   String _getTooltipFormat() {
@@ -958,7 +954,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.radiation:
         return 'point.x : point.y W/m²';
     }
-    return 'point.x : point.y'; // Default fallback
+
   }
   
   String _getYAxisTitle() {
@@ -972,7 +968,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       case ChartType.radiation:
         return AppLocalizations.of(context)!.yAxisPressure;
     }
-    return AppLocalizations.of(context)!.liveWeatherData; // Fallback
+
   }
   
   double _getYValue(WeatherData data) {
@@ -1094,14 +1090,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     return finalInterval > 0 ? finalInterval : 0.25;
   }
   
-  String _getChartUnavailableMessage() {
-    final now = DateTime.now();
-    if (now.hour == 0 && now.minute < 30) {
-      final minutesLeft = 30 - now.minute;
-      return AppLocalizations.of(context)!.chartsAvailableAt;
-    }
-    return AppLocalizations.of(context)!.chartsAvailableAt;
-  }
+
 
   Widget _buildFooter(BuildContext context) {
     return AppFooter(
