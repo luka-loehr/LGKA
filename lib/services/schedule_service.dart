@@ -45,7 +45,7 @@ class ScheduleService {
   static const Duration _cacheValidity = Duration(minutes: 5);
 
   // Cache for availability checks
-  Map<String, bool> _availabilityCache = {};
+  final Map<String, bool> _availabilityCache = {};
   DateTime? _lastAvailabilityCheck;
   static const Duration _availabilityCacheValidity = Duration(minutes: 15);
   bool _isRefreshing = false;
