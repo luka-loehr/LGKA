@@ -1,6 +1,6 @@
 // Copyright Luka Löhr 2025
 
-import 'dart:developer' as developer;
+
 import 'package:flutter/foundation.dart';
 
 /// Centralized logging system for the LGKA app
@@ -11,13 +11,13 @@ class AppLogger {
   
   /// Print a welcome message at app startup
   static void welcome() {
-    print('╔═══════════════════════════════════════════════════╗');
-    print('║                                                   ║');
-    print('║  🏫 Welcome to $_appName App                      ║');
-    print('║     Made with ❤️ by $_developer                     ║');
-    print('║                                                   ║');
-    print('║  Initializing app...                              ║');
-    print('╚═══════════════════════════════════════════════════╝');
+    debugPrint('╔═══════════════════════════════════════════════════╗');
+    debugPrint('║                                                   ║');
+    debugPrint('║  🏫 Welcome to $_appName App                      ║');
+    debugPrint('║     Made with ❤️ by $_developer                     ║');
+    debugPrint('║                                                   ║');
+    debugPrint('║  Initializing app...                              ║');
+    debugPrint('╚═══════════════════════════════════════════════════╝');
   }
   
   /// General info logs
@@ -108,7 +108,7 @@ class AppLogger {
   
   /// Core logging method with consistent formatting
   static void _log(String prefix, String message) {
-    print('$prefix $message');
+    debugPrint('$prefix $message');
   }
 }
 

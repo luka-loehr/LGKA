@@ -21,7 +21,7 @@ class AppInfo {
   static String get buildNumber => _packageInfo?.buildNumber ?? 'unknown';
   
   /// Get full version string (e.g., "2.2.6+158")
-  static String get fullVersion => '${version}+${buildNumber}';
+  static String get fullVersion => '$version+$buildNumber';
   
   /// Get User-Agent header value (e.g., "LGKA-App-Luka-Loehr/2.2.6")
   static String get userAgent => '$appName/$version';
