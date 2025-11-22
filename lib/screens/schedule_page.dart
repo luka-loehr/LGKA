@@ -574,12 +574,12 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       if (mounted) {
         Navigator.of(context).pop(); // Close loading dialog
         
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${AppLocalizations.of(context)!.errorLoadingGeneric}: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(AppLocalizations.of(context)!.errorLoadingGeneric),
+                backgroundColor: Colors.red,
+              ),
+            );
       }
     });
   }

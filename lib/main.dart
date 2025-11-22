@@ -1,6 +1,7 @@
 // Copyright Luka Löhr 2025
 
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +19,51 @@ void main() async {
   
   // Print welcome message
   AppLogger.welcome();
+  
+  // Global error handling
+  FlutterError.onError = (FlutterErrorDetails details) {
+    AppLogger.error('Flutter Error', error: details.exception, stackTrace: details.stack);
+    // In debug mode, print to console as well
+    if (!const bool.fromEnvironment('dart.vm.product')) {
+      FlutterError.dumpErrorToConsole(details);
+    }
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    AppLogger.error('Platform Error', error: error, stackTrace: stack);
+    return true;
+  };
+
+  // Custom Error Widget for Release Mode
+  if (const bool.fromEnvironment('dart.vm.product')) {
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      return const Material(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 48),
+                SizedBox(height: 16),
+                Text(
+                  'Ein unerwarteter Fehler ist aufgetreten.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Bitte starte die App neu.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    };
+  }
   
   // Enable edge-to-edge display - handled by native Android configuration now
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
