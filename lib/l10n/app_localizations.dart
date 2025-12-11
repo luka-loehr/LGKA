@@ -668,7 +668,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchHint.
   ///
   /// In en, this message translates to:
-  /// **'Enter search term...'**
+  /// **'Enter your class'**
   String get searchHint;
 
   /// No description provided for @firstSemester.
@@ -752,8 +752,8 @@ abstract class AppLocalizations {
   /// No description provided for @singleResultFound.
   ///
   /// In en, this message translates to:
-  /// **'1 result found'**
-  String get singleResultFound;
+  /// **'We\'ll always show class {query} for you now.'**
+  String singleResultFound(String query);
 
   /// No description provided for @multipleResultsFound.
   ///
@@ -764,8 +764,8 @@ abstract class AppLocalizations {
   /// No description provided for @noResultsFound.
   ///
   /// In en, this message translates to:
-  /// **'No results found'**
-  String get noResultsFound;
+  /// **'Class {query} was not found.'**
+  String noResultsFound(String query);
 
   /// No description provided for @shareError.
   ///
