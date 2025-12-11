@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
 import '../providers/color_provider.dart';
+import '../providers/schedule_provider.dart';
 import '../data/pdf_repository.dart';
 import '../data/preferences_manager.dart';
 import '../providers/haptic_service.dart';
@@ -47,8 +48,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// Initialize PDF repository and preload weather data
   Future<void> _initializeData() async {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final pdfRepo = ref.read(pdfRepositoryProvider);
-      await pdfRepo.initialize();
+      await ref.read(pdfRepositoryProvider.notifier).initialize();
       
       // Preload weather data in background
       _preloadWeatherData();
@@ -323,7 +323,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
           // Plan options with proper fade-in animation
           FadeTransition(
             opacity: _fadeAnimation,
-            child: _buildPlanOptions(pdfRepo),
+            child: _buildPlanOptions(pdfRepo, ref),
           ),
           
           const Spacer(),
@@ -335,13 +335,13 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     );
   }
 
-  Widget _buildPlanOptions(PdfRepository pdfRepo) {
+  Widget _buildPlanOptions(PdfRepositoryState pdfRepoState, WidgetRef ref) {
     return Column(
       children: [
         _PlanOptionButton(
-          pdfState: pdfRepo.todayState,
+          pdfState: pdfRepoState.todayState,
           label: AppLocalizations.of(context)!.today,
-          onTap: () => _openPdf(pdfRepo, true),
+          onTap: () => _openPdf(pdfRepoState, ref, true),
           onRetry: () {
             HapticService.light();
             ref.read(retryServiceProvider).retryAllDataSources();
@@ -349,9 +349,9 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
         ),
         const SizedBox(height: 16),
         _PlanOptionButton(
-          pdfState: pdfRepo.tomorrowState,
+          pdfState: pdfRepoState.tomorrowState,
           label: AppLocalizations.of(context)!.tomorrow,
-          onTap: () => _openPdf(pdfRepo, false),
+          onTap: () => _openPdf(pdfRepoState, ref, false),
           onRetry: () {
             HapticService.light();
             ref.read(retryServiceProvider).retryAllDataSources();
@@ -361,12 +361,13 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     );
   }
 
-  void _openPdf(PdfRepository pdfRepo, bool isToday) {
-    if (!pdfRepo.canOpenPdf(isToday)) return;
+  void _openPdf(PdfRepositoryState pdfRepoState, WidgetRef ref, bool isToday) {
+    final pdfRepoNotifier = ref.read(pdfRepositoryProvider.notifier);
+    if (!pdfRepoNotifier.canOpenPdf(isToday)) return;
 
     // Get the PDF file and actual weekday from the PDF state
-    final pdfFile = pdfRepo.getPdfFile(isToday);
-    final pdfState = isToday ? pdfRepo.todayState : pdfRepo.tomorrowState;
+    final pdfFile = pdfRepoNotifier.getPdfFile(isToday);
+    final pdfState = isToday ? pdfRepoState.todayState : pdfRepoState.tomorrowState;
     String weekday = pdfState.weekday ?? (isToday ? AppLocalizations.of(context)!.today : AppLocalizations.of(context)!.tomorrow);
     // Translate German weekdays to English for display when locale is English
     final localeCode = Localizations.localeOf(context).languageCode;
@@ -998,7 +999,7 @@ class _SettingsSheet extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildAccentColorSetting(context, preferencesManager, ref),
+                    _buildAccentColorSetting(context, ref),
                     const SizedBox(height: 20),
                     _buildDivider(),
                     const SizedBox(height: 20),
@@ -1013,7 +1014,7 @@ class _SettingsSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildAccentColorSetting(BuildContext context, PreferencesManager preferencesManager, WidgetRef ref) {
+  Widget _buildAccentColorSetting(BuildContext context, WidgetRef ref) {
     final choosableColors = ref.watch(choosableColorsProvider);
     final currentColorName = ref.watch(colorProvider);
 
