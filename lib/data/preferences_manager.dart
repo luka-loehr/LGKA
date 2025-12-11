@@ -1,10 +1,9 @@
 // Copyright Luka Löhr 2025
 
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/app_logger.dart';
 
-class PreferencesManager extends ChangeNotifier {
+class PreferencesManager {
   static const String _keyFirstLaunch = 'is_first_launch';
   static const String _keyAuthenticated = 'is_authenticated';
   static const String _keyOnboardingCompleted = 'onboarding_completed';
@@ -51,7 +50,6 @@ class PreferencesManager extends ChangeNotifier {
 
   Future<void> setFirstLaunch(bool value) async {
     await _safePrefs.setBool(_keyFirstLaunch, value);
-    notifyListeners();
   }
 
   // Authentication status
@@ -59,7 +57,6 @@ class PreferencesManager extends ChangeNotifier {
 
   Future<void> setAuthenticated(bool value) async {
     await _safePrefs.setBool(_keyAuthenticated, value);
-    notifyListeners();
   }
 
   // Onboarding completed (welcome + info)
@@ -67,7 +64,6 @@ class PreferencesManager extends ChangeNotifier {
 
   Future<void> setOnboardingCompleted(bool value) async {
     await _safePrefs.setBool(_keyOnboardingCompleted, value);
-    notifyListeners();
   }
 
   // Debug mode status
@@ -75,7 +71,6 @@ class PreferencesManager extends ChangeNotifier {
 
   Future<void> setDebugMode(bool value) async {
     await _safePrefs.setBool(_keyDebugMode, value);
-    notifyListeners();
     AppLogger.info('Debug mode ${value ? 'enabled' : 'disabled'}', module: 'Preferences');
   }
 
@@ -86,7 +81,6 @@ class PreferencesManager extends ChangeNotifier {
 
   Future<void> setShowNavigationDebug(bool value) async {
     await _safePrefs.setBool(_keyShowNavigationDebug, value);
-    notifyListeners();
   }
 
   // Accent color preference
@@ -95,7 +89,6 @@ class PreferencesManager extends ChangeNotifier {
   Future<void> setAccentColor(String color) async {
     final previousColor = accentColor;
     await _safePrefs.setString(_keyAccentColor, color);
-    notifyListeners();
     AppLogger.info('Accent color changed: $previousColor → $color', module: 'Preferences');
   }
 
@@ -104,7 +97,6 @@ class PreferencesManager extends ChangeNotifier {
 
   Future<void> setVibrationEnabled(bool value) async {
     await _safePrefs.setBool(_keyVibrationEnabled, value);
-    notifyListeners();
     AppLogger.info('Vibration ${value ? 'enabled' : 'disabled'}', module: 'Preferences');
   }
 
@@ -113,7 +105,6 @@ class PreferencesManager extends ChangeNotifier {
 
   Future<void> setKrankmeldungInfoShown(bool value) async {
     await _safePrefs.setBool(_keyKrankmeldungInfoShown, value);
-    notifyListeners();
   }
 
   // Last PDF search query (for schedule convenience)
@@ -125,7 +116,6 @@ class PreferencesManager extends ChangeNotifier {
     } else {
       await _safePrefs.setString(_keyLastPdfSearch, value);
     }
-    notifyListeners();
   }
 
   // Last matched PDF page (1-based for readability)
@@ -141,7 +131,6 @@ class PreferencesManager extends ChangeNotifier {
     } else {
       await _safePrefs.setInt(_keyLastPdfPage, page);
     }
-    notifyListeners();
   }
 
   // Per-schedule: last page (1-based)
@@ -157,7 +146,6 @@ class PreferencesManager extends ChangeNotifier {
     } else {
       await _safePrefs.setInt(_keyLastPage5to10, page);
     }
-    notifyListeners();
   }
 
   int? get lastSchedulePageJ11J12 {
@@ -172,7 +160,6 @@ class PreferencesManager extends ChangeNotifier {
     } else {
       await _safePrefs.setInt(_keyLastPageJ11J12, page);
     }
-    notifyListeners();
   }
 
   // Per-schedule: last query (optional convenience)
@@ -184,7 +171,6 @@ class PreferencesManager extends ChangeNotifier {
     } else {
       await _safePrefs.setString(_keyLastQuery5to10, value);
     }
-    notifyListeners();
   }
 
   String? get lastScheduleQueryJ11J12 => _safePrefs.getString(_keyLastQueryJ11J12);
@@ -195,12 +181,10 @@ class PreferencesManager extends ChangeNotifier {
     } else {
       await _safePrefs.setString(_keyLastQueryJ11J12, value);
     }
-    notifyListeners();
   }
 
   // Clear all preferences
   Future<void> clearAllPreferences() async {
     await _safePrefs.clear();
-    notifyListeners();
   }
 } 

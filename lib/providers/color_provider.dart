@@ -7,12 +7,17 @@ import 'app_providers.dart';
 
 /// Centralized color system provider
 /// Manages 5 colors: blue (default), mint, lavender, rose, peach
-class ColorProvider extends StateNotifier<String> {
-  ColorProvider(this._preferencesManager) : super('blue') {
-    _loadSavedColor();
-  }
+class ColorProvider extends Notifier<String> {
+  PreferencesManagerState get _preferencesManagerState => ref.watch(preferencesManagerProvider);
 
-  final PreferencesManager _preferencesManager;
+  @override
+  String build() {
+    final savedColor = _preferencesManagerState.accentColor;
+    if (savedColor.isNotEmpty && colorPalette.any((palette) => palette.name == savedColor)) {
+      return savedColor;
+    }
+    return defaultColorName;
+  }
 
   /// The 5-color palette - first color is always the default
   static const List<ColorPalette> colorPalette = [
@@ -60,17 +65,7 @@ class ColorProvider extends StateNotifier<String> {
   Future<void> setColor(String colorName) async {
     if (colorPalette.any((palette) => palette.name == colorName)) {
       state = colorName;
-      await _preferencesManager.setAccentColor(colorName);
-    }
-  }
-
-  /// Load saved color from preferences
-  Future<void> _loadSavedColor() async {
-    final savedColor = _preferencesManager.accentColor;
-    if (savedColor.isNotEmpty && colorPalette.any((palette) => palette.name == savedColor)) {
-      state = savedColor;
-    } else {
-      state = defaultColorName; // Use default if no valid saved color
+      await ref.read(preferencesManagerProvider.notifier).setAccentColor(colorName);
     }
   }
 
@@ -94,10 +89,7 @@ class ColorPalette {
 }
 
 /// Provider for the color system
-final colorProvider = StateNotifierProvider<ColorProvider, String>((ref) {
-  final preferencesManager = ref.watch(preferencesManagerProvider);
-  return ColorProvider(preferencesManager);
-});
+final colorProvider = NotifierProvider<ColorProvider, String>(ColorProvider.new);
 
 /// Provider to get current color directly
 final currentColorProvider = Provider<Color>((ref) {
