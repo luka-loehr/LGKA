@@ -44,14 +44,14 @@ dependencies:
   flutter_riverpod: ^2.6.1
   
   # Local Storage
-  shared_preferences: ^2.3.4
+  shared_preferences: ^2.5.4
   
   # Network
-  http: ^1.2.2
+  http: ^1.6.0
   
   # File Handling
   path_provider: ^2.1.5
-  share_plus: ^12.0.0
+  share_plus: ^12.0.1
   
   # PDF Processing
   syncfusion_flutter_pdf: ^30.2.7
