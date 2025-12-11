@@ -662,7 +662,7 @@ abstract class AppLocalizations {
   /// No description provided for @authSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Use the credentials you already know from the substitution plan'**
+  /// **'Use the credentials you already know from the school website'**
   String get authSubtitle;
 
   /// No description provided for @searchHint.
@@ -812,7 +812,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyConsentPrefix.
   ///
   /// In en, this message translates to:
-  /// **'By clicking you confirm that you have read the '**
+  /// **'I have read the '**
   String get privacyConsentPrefix;
 
   /// No description provided for @privacyPolicy.

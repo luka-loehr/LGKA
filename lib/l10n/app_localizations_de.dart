@@ -291,7 +291,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get authTitle => 'Anmeldung erforderlich';
 
   @override
-  String get authSubtitle => 'Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst';
+  String get authSubtitle => 'Verwende die Zugangsdaten, die du bereits von der Schulwebsite kennst';
 
   @override
   String get searchHint => 'Gib deine Klasse ein';
@@ -378,11 +378,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get privacyConsentPrefix => 'Durch Klicken bestätigst du, dass du die ';
+  String get privacyConsentPrefix => 'Ich habe die ';
 
   @override
   String get privacyPolicy => 'Datenschutzerklärung';
 
   @override
-  String get privacyConsentSuffix => ' gelesen hast.';
+  String get privacyConsentSuffix => ' gelesen.';
 }

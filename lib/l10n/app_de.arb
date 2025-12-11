@@ -94,7 +94,7 @@
   "password": "Passwort",
   "login": "Anmelden",
   "authTitle": "Anmeldung erforderlich",
-  "authSubtitle": "Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst",
+  "authSubtitle": "Verwende die Zugangsdaten, die du bereits von der Schulwebsite kennst",
   "searchHint": "Gib deine Klasse ein",
   "firstSemester": "1. Halbjahr",
   "secondSemester": "2. Halbjahr",
@@ -159,7 +159,7 @@
       }
     }
   },
-  "privacyConsentPrefix": "Durch Klicken bestätigst du, dass du die ",
+  "privacyConsentPrefix": "Ich habe die ",
   "privacyPolicy": "Datenschutzerklärung",
-  "privacyConsentSuffix": " gelesen hast."
+  "privacyConsentSuffix": " gelesen."
 }
