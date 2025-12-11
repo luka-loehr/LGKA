@@ -147,6 +147,19 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       _showClassModal = false;
     });
     
+    // Show success message
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.classChanged(classInput),
+          ),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+    
     // Perform search with the entered class
     _onSearchSubmitted(classInput);
   }
@@ -633,23 +646,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 tooltip: AppLocalizations.of(context)!.cancelSearch,
               ),
             ] else if (_searchResults.isNotEmpty) ...[
-              // Search navigation
-              IconButton(
-                onPressed: _previousSearchResult,
-                icon: const Icon(
-                  Icons.arrow_upward,
-                  color: AppColors.secondaryText,
-                ),
-                tooltip: AppLocalizations.of(context)!.previousResult,
-              ),
-              IconButton(
-                onPressed: _nextSearchResult,
-                icon: const Icon(
-                  Icons.arrow_downward,
-                  color: AppColors.secondaryText,
-                ),
-                tooltip: AppLocalizations.of(context)!.nextResult,
-              ),
+              // Search icon only - navigation arrows removed
               IconButton(
                 onPressed: _showSearchBar,
                 icon: const Icon(
