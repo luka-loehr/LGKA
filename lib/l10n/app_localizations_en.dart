@@ -376,4 +376,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String classChanged(String className) {
     return 'Your class has been changed to $className.';
   }
+
+  @override
+  String get privacyConsentPrefix => 'By clicking you confirm that you have read the ';
+
+  @override
+  String get privacyPolicy => 'privacy policy';
+
+  @override
+  String get privacyConsentSuffix => '.';
 }

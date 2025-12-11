@@ -808,6 +808,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your class has been changed to {className}.'**
   String classChanged(String className);
+
+  /// No description provided for @privacyConsentPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'By clicking you confirm that you have read the '**
+  String get privacyConsentPrefix;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'privacy policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @privacyConsentSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'.'**
+  String get privacyConsentSuffix;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
