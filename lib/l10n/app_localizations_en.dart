@@ -291,7 +291,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authTitle => 'Authentication required';
 
   @override
-  String get authSubtitle => 'Use the credentials you already know from the substitution plan';
+  String get authSubtitle => 'Use the credentials you already know from the school website';
 
   @override
   String get searchHint => 'Enter your class';
@@ -378,7 +378,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get privacyConsentPrefix => 'By clicking you confirm that you have read the ';
+  String get privacyConsentPrefix => 'I have read the ';
 
   @override
   String get privacyPolicy => 'privacy policy';
