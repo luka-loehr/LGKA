@@ -376,4 +376,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String classChanged(String className) {
     return 'Deine Klasse wurde auf $className geändert.';
   }
+
+  @override
+  String get privacyConsentPrefix => 'Durch Klicken bestätigst du, dass du die ';
+
+  @override
+  String get privacyPolicy => 'Datenschutzerklärung';
+
+  @override
+  String get privacyConsentSuffix => ' gelesen hast.';
 }
