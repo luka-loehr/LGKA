@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
 import 'package:lgka_flutter/providers/haptic_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -68,6 +69,14 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   @override
   void initState() {
     super.initState();
+    // Allow all orientations for PDF viewing (landscape is useful for documents)
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    
     _pdfController = pdfx.PdfController(
       document: pdfx.PdfDocument.openFile(widget.pdfFile.path),
     );
@@ -101,6 +110,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     _pdfController.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();
+    // Restore portrait-only orientation when leaving PDF viewer
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.dispose();
   }
 
@@ -124,8 +138,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       // Determine schedule type based on dayName labeling used in UI
       final dayLabel = (widget.dayName ?? '');
       final isSchedule5to10 = dayLabel.contains('Klassen') || dayLabel.contains('Grades');
-      final isScheduleJ11J12 = dayLabel.contains('J11/J12');
-      final isSubstitution = !isSchedule5to10 && !isScheduleJ11J12; // everything else
 
       // Only run jumper for Klassen 5–10
       if (!isSchedule5to10) {
@@ -273,11 +285,14 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         
         // Show success message
         if (mounted) {
+          final firstQuery = results.first.query;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(results.length == 1 
-                ? AppLocalizations.of(context)!.singleResultFound
-                : AppLocalizations.of(context)!.multipleResultsFound(results.length)),
+              content: Text(
+                results.length == 1
+                    ? AppLocalizations.of(context)!.singleResultFound(firstQuery)
+                    : AppLocalizations.of(context)!.multipleResultsFound(results.length),
+              ),
               duration: const Duration(seconds: 2),
               backgroundColor: Colors.green,
             ),
@@ -288,7 +303,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)!.noResultsFound),
+              content: Text(AppLocalizations.of(context)!.noResultsFound(query)),
               duration: const Duration(seconds: 2),
               backgroundColor: Colors.orange,
             ),
@@ -417,8 +432,16 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   }
 
   Future<void> _sharePdf() async {
+    // Capture localization before async operations to avoid BuildContext usage across async gaps
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
+    
     // Subtle haptic feedback when share button is pressed
     await HapticService.subtle();
+    
+    // Check mounted again after async operation
+    if (!mounted) return;
     
     try {
       // Create a nice filename for sharing
@@ -434,13 +457,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               .replaceAll('J11/J12', 'J11-12')
               .replaceAll(' - ', '_')
               .replaceAll(' ', '');
-          fileName = '${AppLocalizations.of(context)!.filenameSchedulePrefix}$cleanName.pdf';
-          subject = AppLocalizations.of(context)!.subjectSchedule;
+          fileName = '${l10n.filenameSchedulePrefix}$cleanName.pdf';
+          subject = l10n.subjectSchedule;
         } else {
           // This is a substitution plan
           final dayFormatted = widget.dayName!.toLowerCase();
-          fileName = '${AppLocalizations.of(context)!.filenameSubstitutionPrefix}$dayFormatted.pdf';
-          subject = AppLocalizations.of(context)!.subjectSubstitution;
+          fileName = '${l10n.filenameSubstitutionPrefix}$dayFormatted.pdf';
+          subject = l10n.subjectSubstitution;
         }
       } else {
         fileName = 'LGKA_Document.pdf';
@@ -467,10 +490,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         }
       }
 
-      await Share.shareXFiles(
-        [XFile(tempFile.path)],
-        subject: subject,
-        sharePositionOrigin: sharePositionOrigin,
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(tempFile.path)],
+          subject: subject,
+          sharePositionOrigin: sharePositionOrigin,
+        ),
       );
 
       // Clean up temporary file
@@ -608,6 +633,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                       controller: _searchController,
                       focusNode: _searchFocusNode,
                       autofocus: true,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(3),
+                      ],
                       decoration: InputDecoration(
                         hintText: AppLocalizations.of(context)!.searchHint,
                         prefixIcon: const Icon(Icons.search, color: AppColors.secondaryText),

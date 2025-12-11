@@ -294,7 +294,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authSubtitle => 'Use the credentials you already know from the substitution plan';
 
   @override
-  String get searchHint => 'Enter search term...';
+  String get searchHint => 'Enter your class';
 
   @override
   String get firstSemester => '1st semester';
@@ -336,7 +336,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chartLoading => 'Chart is loading...';
 
   @override
-  String get singleResultFound => '1 result found';
+  String singleResultFound(String query) {
+    return 'We\'ll always show class $query for you now.';
+  }
 
   @override
   String multipleResultsFound(int count) {
@@ -344,7 +346,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get noResultsFound => 'No results found';
+  String noResultsFound(String query) {
+    return 'Class $query was not found.';
+  }
 
   @override
   String get shareError => 'Error sharing';
