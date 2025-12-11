@@ -148,5 +148,8 @@
     "placeholders": {
       "pages": { "type": "String" }
     }
-  }
+  },
+  "setClassTitle": "Enter Class",
+  "setClassMessage": "Please enter your class to view the schedule.",
+  "setClassButton": "Save"
 }
