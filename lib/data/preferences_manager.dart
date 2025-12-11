@@ -103,7 +103,6 @@ class PreferencesManager extends ChangeNotifier {
   bool get vibrationEnabled => _safePrefs.getBool(_keyVibrationEnabled) ?? true;
 
   Future<void> setVibrationEnabled(bool value) async {
-    final previousValue = vibrationEnabled;
     await _safePrefs.setBool(_keyVibrationEnabled, value);
     notifyListeners();
     AppLogger.info('Vibration ${value ? 'enabled' : 'disabled'}', module: 'Preferences');

@@ -93,16 +93,13 @@
   "featureSickDesc": "Submit a sick note directly via the app",
   "yourAccentColor": "Your accent color",
   "chooseFavoriteColor": "Choose your favorite color. It will be used throughout the app.",
-  "letsGo": "Let's go!"
-  ,
+  "letsGo": "Let's go!",
   "username": "Username",
   "password": "Password",
-  "login": "Log in"
-  ,
+  "login": "Log in",
   "authTitle": "Authentication required",
-  "authSubtitle": "Use the credentials you already know from the substitution plan"
-  ,
-  "searchHint": "Enter search term...",
+  "authSubtitle": "Use the credentials you already know from the substitution plan",
+  "searchHint": "Enter your class",
   "firstSemester": "1st semester",
   "secondSemester": "2nd semester",
   "grades5to10": "Grades 5-10",
@@ -116,7 +113,12 @@
   "sunday": "Sunday",
   "scheduleNotAvailable": "is not available yet",
   "chartLoading": "Chart is loading...",
-  "singleResultFound": "1 result found",
+  "singleResultFound": "We'll always show class {query} for you now.",
+  "@singleResultFound": {
+    "placeholders": {
+      "query": { "type": "String" }
+    }
+  },
   "multipleResultsFound": "{count} results found",
   "@multipleResultsFound": {
     "placeholders": {
@@ -125,22 +127,26 @@
       }
     }
   },
-  "noResultsFound": "No results found",
+  "noResultsFound": "Class {query} was not found.",
+  "@noResultsFound": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "shareError": "Error sharing",
   "errorNavigatingToPage": "Error navigating to page {page}",
   "@errorNavigatingToPage": {
     "placeholders": {
       "page": {
-        "type": "String"
-      }
+        "type": "String" }
     }
   },
   "foundPages": "Found pages: {pages}",
   "@foundPages": {
     "placeholders": {
-      "pages": {
-        "type": "String"
-      }
+      "pages": { "type": "String" }
     }
   }
-} 
+}

@@ -787,8 +787,6 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
 
   @override
   Widget build(BuildContext context) {
-    final preferencesManager = ref.watch(preferencesManagerProvider);
-    
     final isDisabled = !widget.pdfState.canDisplay;
     final hasError = widget.pdfState.error != null;
     final isLoading = widget.pdfState.isLoading;
@@ -1016,7 +1014,6 @@ class _SettingsSheet extends ConsumerWidget {
   }
 
   Widget _buildAccentColorSetting(BuildContext context, PreferencesManager preferencesManager, WidgetRef ref) {
-    final currentTheme = Theme.of(context);
     final choosableColors = ref.watch(choosableColorsProvider);
     final currentColorName = ref.watch(colorProvider);
 

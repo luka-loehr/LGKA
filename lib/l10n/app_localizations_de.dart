@@ -294,7 +294,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get authSubtitle => 'Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst';
 
   @override
-  String get searchHint => 'Suchbegriff eingeben...';
+  String get searchHint => 'Gib deine Klasse ein';
 
   @override
   String get firstSemester => '1. Halbjahr';
@@ -336,7 +336,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chartLoading => 'Diagramm wird geladen...';
 
   @override
-  String get singleResultFound => '1 Ergebnis gefunden';
+  String singleResultFound(String query) {
+    return 'Dir wird jetzt immer Klasse $query angezeigt.';
+  }
 
   @override
   String multipleResultsFound(int count) {
@@ -344,7 +346,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get noResultsFound => 'Keine Ergebnisse gefunden';
+  String noResultsFound(String query) {
+    return 'Klasse $query wurde nicht gefunden.';
+  }
 
   @override
   String get shareError => 'Fehler beim Teilen';
