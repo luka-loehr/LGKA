@@ -802,6 +802,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save'**
   String get setClassButton;
+
+  /// No description provided for @classChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Your class has been changed to {className}.'**
+  String classChanged(String className);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
