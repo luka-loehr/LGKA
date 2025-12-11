@@ -784,6 +784,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Found pages: {pages}'**
   String foundPages(String pages);
+
+  /// No description provided for @setClassTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Class'**
+  String get setClassTitle;
+
+  /// No description provided for @setClassMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your class to view the schedule.'**
+  String get setClassMessage;
+
+  /// No description provided for @setClassButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get setClassButton;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

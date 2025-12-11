@@ -63,12 +63,21 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   bool _isPdfReady = false;
   bool _hasJumpedToSavedPage = false;
   
+  // Class input modal state
+  bool _showClassModal = false;
+  final TextEditingController _classInputController = TextEditingController();
+  
   // Timer for retry mechanism (to prevent memory leaks)
   Timer? _retryTimer;
 
   @override
   void initState() {
     super.initState();
+    // Listen to text changes to enable/disable save button
+    _classInputController.addListener(() {
+      setState(() {});
+    });
+    
     // Allow all orientations for PDF viewing (landscape is useful for documents)
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -76,6 +85,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+    
+    // Check if this is a 5-10 schedule and if class needs to be set
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndShowClassModal();
+    });
     
     _pdfController = pdfx.PdfController(
       document: pdfx.PdfDocument.openFile(widget.pdfFile.path),
@@ -104,12 +118,46 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     _initializePdfReadyDetection();
   }
   
+  void _checkAndShowClassModal() {
+    final dayLabel = widget.dayName ?? '';
+    final isSchedule5to10 = dayLabel.contains('Klassen') || dayLabel.contains('Grades');
+    
+    if (isSchedule5to10) {
+      final container = ProviderScope.containerOf(context, listen: false);
+      final prefs = container.read(preferencesManagerProvider);
+      final currentClass = prefs.lastScheduleQuery5to10;
+      
+      if (currentClass == null || currentClass.trim().isEmpty) {
+        setState(() {
+          _showClassModal = true;
+        });
+      }
+    }
+  }
+  
+  Future<void> _saveClassAndContinue() async {
+    final classInput = _classInputController.text.trim();
+    if (classInput.isEmpty) return;
+    
+    final container = ProviderScope.containerOf(context, listen: false);
+    final prefs = container.read(preferencesManagerProvider);
+    await prefs.setLastScheduleQuery5to10(classInput);
+    
+    setState(() {
+      _showClassModal = false;
+    });
+    
+    // Perform search with the entered class
+    _onSearchSubmitted(classInput);
+  }
+  
   @override
   void dispose() {
     _retryTimer?.cancel();
     _pdfController.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _classInputController.dispose();
     // Restore portrait-only orientation when leaving PDF viewer
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -537,6 +585,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       headerTitle = AppLocalizations.of(context)!.documentTitle;
     }
 
+    if (_showClassModal) {
+      return _buildClassInputModal(context);
+    }
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -736,5 +788,102 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   // Custom transition that removes all animations
   static Widget _noTransition(Widget child, Animation<double> animation) {
     return child; // Return the widget directly without any animation
+  }
+  
+  Widget _buildClassInputModal(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.appBackground,
+      appBar: AppBar(
+        backgroundColor: AppColors.appBackground,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          color: AppColors.primaryText,
+          onPressed: () {
+            HapticService.subtle();
+            Navigator.of(context).pop();
+          },
+        ),
+        title: Text(
+          AppLocalizations.of(context)!.setClassTitle,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryText,
+              ),
+        ),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.setClassMessage,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: AppColors.primaryText,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              TextField(
+                controller: _classInputController,
+                autofocus: true,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(3),
+                ],
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.searchHint,
+                  prefixIcon: const Icon(Icons.school, color: AppColors.secondaryText),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 2,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: AppColors.appSurface,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: AppColors.primaryText,
+                    ),
+                onSubmitted: (_) => _saveClassAndContinue(),
+                textCapitalization: TextCapitalization.characters,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _classInputController.text.trim().isNotEmpty 
+                    ? _saveClassAndContinue 
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  AppLocalizations.of(context)!.setClassButton,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 } 

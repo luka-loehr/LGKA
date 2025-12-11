@@ -147,5 +147,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "setClassTitle": "Klasse eingeben",
+  "setClassMessage": "Bitte gib deine Klasse ein, um den Stundenplan anzuzeigen.",
+  "setClassButton": "Speichern"
 }
