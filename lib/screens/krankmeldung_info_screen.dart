@@ -128,10 +128,9 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
   }
 
 
-  void _openKrankmeldung(BuildContext context, WidgetRef ref) {
+  Future<void> _openKrankmeldung(BuildContext context, WidgetRef ref) async {
     // Mark that the krankmeldung info has been shown
-    final preferencesManager = ref.read(preferencesManagerProvider);
-    preferencesManager.setKrankmeldungInfoShown(true);
+    await ref.read(preferencesManagerProvider.notifier).setKrankmeldungInfoShown(true);
     
     // Navigate to the webview with the illness report
     context.push(AppRouter.webview, extra: {

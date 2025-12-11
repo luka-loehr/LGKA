@@ -68,8 +68,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     
     // Get initial accent color
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final prefsManager = ref.read(preferencesManagerProvider);
-      _currentAccentColor = prefsManager.accentColor;
+      final prefsState = ref.read(preferencesManagerProvider);
+      _currentAccentColor = prefsState.accentColor;
     });
     
     // Setup button color animation with accent color
@@ -216,8 +216,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       if (!mounted) return;
       
       // Update authentication state
-      final prefsManager = ref.read(preferencesManagerProvider);
-      await prefsManager.setAuthenticated(true);
+      await ref.read(preferencesManagerProvider.notifier).setAuthenticated(true);
       ref.read(isAuthenticatedProvider.notifier).state = true;
       
       // Additional success haptic just before navigation

@@ -2,6 +2,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
+import '../providers/schedule_provider.dart';
 
 
 /// Centralized service for retrying all data sources
@@ -12,7 +13,7 @@ class RetryService {
 
   /// Retry all data sources simultaneously
   /// This method just triggers the retries and doesn't wait for results
-  void retryAllDataSources() {
+  Future<void> retryAllDataSources() async {
     try {
       // Retry weather data - fire and forget
       _ref.read(weatherDataProvider.notifier).refreshWeatherData();
@@ -22,8 +23,7 @@ class RetryService {
     
     try {
       // Retry PDF substitution plans - fire and forget
-      final pdfRepo = _ref.read(pdfRepositoryProvider);
-      pdfRepo.retryAll();
+      await _ref.read(pdfRepositoryProvider.notifier).retryAll();
     } catch (e) {
       // Silently ignore any errors - don't crash the retry service
     }
@@ -37,7 +37,7 @@ class RetryService {
   }
 
   /// Retry only weather data
-  void retryWeatherData() {
+  Future<void> retryWeatherData() async {
     try {
       _ref.read(weatherDataProvider.notifier).refreshWeatherData();
     } catch (e) {
@@ -46,17 +46,16 @@ class RetryService {
   }
 
   /// Retry only PDF substitution plans
-  void retryPdfData() {
+  Future<void> retryPdfData() async {
     try {
-      final pdfRepo = _ref.read(pdfRepositoryProvider);
-      pdfRepo.retryAll();
+      await _ref.read(pdfRepositoryProvider.notifier).retryAll();
     } catch (e) {
       // Silently ignore any errors - don't crash the retry service
     }
   }
 
   /// Retry only schedule data
-  void retryScheduleData() {
+  Future<void> retryScheduleData() async {
     try {
       _ref.read(scheduleProvider.notifier).refreshSchedules();
     } catch (e) {
