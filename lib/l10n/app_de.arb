@@ -150,5 +150,13 @@
   },
   "setClassTitle": "Klasse eingeben",
   "setClassMessage": "Bitte gib deine Klasse ein, um den Stundenplan anzuzeigen.",
-  "setClassButton": "Speichern"
+  "setClassButton": "Speichern",
+  "classChanged": "Deine Klasse wurde auf {className} geändert.",
+  "@classChanged": {
+    "placeholders": {
+      "className": {
+        "type": "String"
+      }
+    }
+  }
 }
