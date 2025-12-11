@@ -18,8 +18,7 @@
   "liveWeatherData": "Live Wetterdaten",
   "dataBeingCollected": "Daten werden gesammelt",
   "liveWeatherDescription": "Direkt von der schuleigenen Wetterstation auf dem Dach. Echtzeit-Daten von deiner Schule!",
-  "dataCollectionDescription": "Die Wetterstation sammelt gerade neue Daten für heute. Diagramme und weitere Werte werden angezeigt, sobald genügend Datenpunkte vorhanden sind."
-  ,
+  "dataCollectionDescription": "Die Wetterstation sammelt gerade neue Daten für heute. Diagramme und weitere Werte werden angezeigt, sobald genügend Datenpunkte vorhanden sind.",
   "welcomeHeadline": "Willkommen!",
   "welcomeSubtitle": "Bei der neuen App fürs Lessing-Gymnasium Karlsruhe.",
   "continueLabel": "Weiter",
@@ -40,8 +39,7 @@
   "bugReportTitle": "Bug Report",
   "loading": "Lädt...",
   "formLoadError": "Formular konnte nicht geladen werden",
-  "formLoadErrorHint": "Bitte überprüfe deine Internetverbindung und versuche es erneut."
-  ,
+  "formLoadErrorHint": "Bitte überprüfe deine Internetverbindung und versuche es erneut.",
   "infoHeader": "Was kannst du mit der App machen?",
   "featureSubstitutionTitle": "Vertretungsplan",
   "featureSubstitutionDesc": "Aktueller Vertretungsplan für heute/morgen",
@@ -53,8 +51,7 @@
   "featureSickDesc": "Krankmeldung direkt über die App einreichen",
   "yourAccentColor": "Deine Akzentfarbe",
   "chooseFavoriteColor": "Wähle deine Lieblingsfarbe aus. Diese wird überall in der App verwendet.",
-  "letsGo": "Los geht's!"
-  ,
+  "letsGo": "Los geht's!",
   "krankmeldungInfoHeader": "Hinweis zur Krankmeldung",
   "loadingSickNote": "Lade Krankmeldung...",
   "loadingWeather": "Lade Wetterdaten...",
@@ -97,9 +94,8 @@
   "password": "Passwort",
   "login": "Anmelden",
   "authTitle": "Anmeldung erforderlich",
-  "authSubtitle": "Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst"
-  ,
-  "searchHint": "Suchbegriff eingeben...",
+  "authSubtitle": "Verwende die Zugangsdaten, die du bereits\nvom Vertretungsplan kennst",
+  "searchHint": "Gib deine Klasse ein",
   "firstSemester": "1. Halbjahr",
   "secondSemester": "2. Halbjahr",
   "grades5to10": "Klassen 5-10",
@@ -113,7 +109,12 @@
   "sunday": "Sonntag",
   "scheduleNotAvailable": "ist noch nicht verfügbar",
   "chartLoading": "Diagramm wird geladen...",
-  "singleResultFound": "1 Ergebnis gefunden",
+  "singleResultFound": "Dir wird jetzt immer Klasse {query} angezeigt.",
+  "@singleResultFound": {
+    "placeholders": {
+      "query": { "type": "String" }
+    }
+  },
   "multipleResultsFound": "{count} Ergebnisse gefunden",
   "@multipleResultsFound": {
     "placeholders": {
@@ -122,7 +123,14 @@
       }
     }
   },
-  "noResultsFound": "Keine Ergebnisse gefunden",
+  "noResultsFound": "Klasse {query} wurde nicht gefunden.",
+  "@noResultsFound": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "shareError": "Fehler beim Teilen",
   "errorNavigatingToPage": "Fehler beim Navigieren zur Seite {page}",
   "@errorNavigatingToPage": {
@@ -140,4 +148,4 @@
       }
     }
   }
-} 
+}

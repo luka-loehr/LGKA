@@ -7,7 +7,6 @@ import '../providers/app_providers.dart';
 import '../providers/color_provider.dart';
 import '../navigation/app_router.dart';
 import '../providers/haptic_service.dart';
-import '../theme/app_theme.dart';
 import '../l10n/app_localizations.dart';
 import '../config/app_credentials.dart';
 
@@ -427,7 +426,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               Container(
                                 height: 1,
                                 margin: const EdgeInsets.symmetric(horizontal: 16),
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                               ),
                               
                               // Password Field with rounded corners

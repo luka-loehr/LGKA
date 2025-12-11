@@ -68,6 +68,13 @@ void main() async {
   // Enable edge-to-edge display - handled by native Android configuration now
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   
+  // Restrict orientation to portrait only for phones (tablets can rotate)
+  // This matches iOS behavior where iPhone is portrait-only but iPad supports all orientations
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  
   // Initialize app info
   await AppInfo.initialize();
   AppLogger.init('App version: ${AppInfo.fullVersion}');

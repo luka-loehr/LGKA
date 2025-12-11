@@ -13,7 +13,6 @@ import '../services/schedule_service.dart';
 // import '../services/retry_service.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/app_logger.dart';
-import '../utils/app_info.dart';
 import '../widgets/app_footer.dart';
 
 class SchedulePage extends ConsumerStatefulWidget {
@@ -72,13 +71,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     super.dispose();
   }
 
-  void _startButtonAnimation() {
-    if (!_hasShownButtons) {
-      _hasShownButtons = true;
-      _fadeController.forward();
-    }
-  }
-  
   /// Check if availability should be checked (based on timing and cached data)
   bool _shouldCheckAvailability() {
     // If we have cached results and they're recent, don't check again
@@ -177,6 +169,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
         ref.read(scheduleProvider.notifier).downloadSchedule(schedule).catchError((e) {
           // Silently handle errors - preloading shouldn't show errors to user
           AppLogger.debug('Failed to preload schedule PDF: ${schedule.title}', module: 'SchedulePage');
+          return null; // Return null to satisfy Future<File?> return type
         })
       );
     }
@@ -530,6 +523,9 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       }
       return;
     }
+    
+    // Check mounted before using context after async operation
+    if (!mounted) return;
     
     // Show loading dialog if PDF needs to be downloaded
     showDialog(
