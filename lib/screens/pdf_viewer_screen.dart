@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
@@ -124,8 +125,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     
     if (isSchedule5to10) {
       final container = ProviderScope.containerOf(context, listen: false);
-      final prefs = container.read(preferencesManagerProvider);
-      final currentClass = prefs.lastScheduleQuery5to10;
+      final prefsState = container.read(preferencesManagerProvider);
+      final currentClass = prefsState.lastScheduleQuery5to10;
       
       if (currentClass == null || currentClass.trim().isEmpty) {
         setState(() {
@@ -140,8 +141,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     if (classInput.isEmpty) return;
     
     final container = ProviderScope.containerOf(context, listen: false);
-    final prefs = container.read(preferencesManagerProvider);
-    await prefs.setLastScheduleQuery5to10(classInput);
+      await container.read(preferencesManagerProvider.notifier).setLastScheduleQuery5to10(classInput);
     
     setState(() {
       _showClassModal = false;
@@ -377,12 +377,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       // Persist last successful search result
       try {
         final container = ProviderScope.containerOf(context, listen: false);
-        final prefs = container.read(preferencesManagerProvider);
+        final prefsNotifier = container.read(preferencesManagerProvider.notifier);
         // Store per schedule type only; ignore substitution plans
         final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen') || (widget.dayName ?? '').contains('Grades');
         if (isSchedule5to10) {
-          prefs.setLastScheduleQuery5to10(result.query);
-          prefs.setLastSchedulePage5to10(result.pageNumber);
+          unawaited(prefsNotifier.setLastScheduleQuery5to10(result.query));
+          unawaited(prefsNotifier.setLastSchedulePage5to10(result.pageNumber));
         }
         // J11/J12 schedules no longer use page persistence
       } catch (e) {
@@ -465,13 +465,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       // Optimistically store query; page will be stored on navigation
       try {
         final container = ProviderScope.containerOf(context, listen: false);
-        final prefs = container.read(preferencesManagerProvider);
+        final prefsNotifier = container.read(preferencesManagerProvider.notifier);
         final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen') || (widget.dayName ?? '').contains('Grades');
         final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
         if (isSchedule5to10) {
-          prefs.setLastScheduleQuery5to10(query.trim());
+          unawaited(prefsNotifier.setLastScheduleQuery5to10(query.trim()));
         } else if (isScheduleJ11J12) {
-          prefs.setLastScheduleQueryJ11J12(query.trim());
+          unawaited(prefsNotifier.setLastScheduleQueryJ11J12(query.trim()));
         }
       } catch (e) {
         AppLogger.debug('Error saving search query: $e', module: 'PDFViewer');

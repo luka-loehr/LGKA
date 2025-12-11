@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/schedule_service.dart';
 import '../utils/app_logger.dart';
+import 'app_providers.dart';
 
 /// State class for schedule data
 class ScheduleState {
@@ -54,10 +55,11 @@ class ScheduleState {
 }
 
 /// Notifier for managing schedule state
-class ScheduleNotifier extends StateNotifier<ScheduleState> {
-  final ScheduleService _scheduleService;
+class ScheduleNotifier extends Notifier<ScheduleState> {
+  ScheduleService get _scheduleService => ref.read(scheduleServiceProvider);
 
-  ScheduleNotifier(this._scheduleService) : super(const ScheduleState());
+  @override
+  ScheduleState build() => const ScheduleState();
 
   /// Load schedules from the web or cache
   Future<void> loadSchedules({bool forceRefresh = false}) async {
@@ -181,13 +183,5 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
   }
 }
 
-/// Provider for schedule service
-final scheduleServiceProvider = Provider<ScheduleService>((ref) {
-  return ScheduleService();
-});
-
 /// Provider for schedule state
-final scheduleProvider = StateNotifierProvider<ScheduleNotifier, ScheduleState>((ref) {
-  final scheduleService = ref.watch(scheduleServiceProvider);
-  return ScheduleNotifier(scheduleService);
-}); 
+final scheduleProvider = NotifierProvider<ScheduleNotifier, ScheduleState>(ScheduleNotifier.new); 

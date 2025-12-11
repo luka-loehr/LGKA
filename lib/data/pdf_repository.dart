@@ -63,7 +63,7 @@ class PdfState {
 }
 
 /// Repository for managing PDF substitution plans
-class PdfRepository extends ChangeNotifier {
+class PdfRepository {
   static const String _todayUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_heute.pdf';
   static const String _tomorrowUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_morgen.pdf';
   static const Duration _timeout = Duration(seconds: 10);
@@ -75,7 +75,7 @@ class PdfRepository extends ChangeNotifier {
   DateTime? _lastFetchTime;
   bool _isRefreshing = false;
 
-  PdfRepository(Ref ref);
+  PdfRepository();
 
   // Getters
   PdfState get todayState => _todayState;
@@ -108,7 +108,6 @@ class PdfRepository extends ChangeNotifier {
     await _loadBothPdfs();
     _isInitialized = true;
     _lastFetchTime = DateTime.now();
-    notifyListeners();
   }
 
   /// Load both PDFs simultaneously
@@ -198,14 +197,13 @@ class PdfRepository extends ChangeNotifier {
     return await compute(_extractPdfData, await file.readAsBytes());
   }
 
-  /// Update the state of a specific PDF and notify listeners
+  /// Update the state of a specific PDF
   void _updatePdfState(bool isToday, PdfState newState) {
     if (isToday) {
       _todayState = newState;
     } else {
       _tomorrowState = newState;
     }
-    notifyListeners();
   }
 
   /// Retry loading a specific PDF
@@ -224,7 +222,6 @@ class PdfRepository extends ChangeNotifier {
     await _loadBothPdfs();
     _isInitialized = true;
     _lastFetchTime = DateTime.now();
-    notifyListeners();
   }
 
   /// Get the file for a specific PDF if available
@@ -246,7 +243,6 @@ class PdfRepository extends ChangeNotifier {
     _isRefreshing = true;
     try {
       await _loadBothPdfs(silent: true);
-      notifyListeners();
     } finally {
       _isRefreshing = false;
     }

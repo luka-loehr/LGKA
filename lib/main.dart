@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:lgka_flutter/navigation/app_router.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
+import 'package:lgka_flutter/providers/schedule_provider.dart';
 import 'data/preferences_manager.dart';
 import 'package:lgka_flutter/l10n/app_localizations.dart';
 import 'utils/app_logger.dart';
@@ -79,7 +80,7 @@ void main() async {
   await AppInfo.initialize();
   AppLogger.init('App version: ${AppInfo.fullVersion}');
   
-  // Initialize preferences manager
+  // Initialize preferences manager for initial route determination
   AppLogger.init('Initializing preferences manager');
   final preferencesManager = PreferencesManager();
   await preferencesManager.init();
@@ -101,9 +102,6 @@ void main() async {
   
   runApp(
     ProviderScope(
-      overrides: [
-        preferencesManagerProvider.overrideWith((ref) => preferencesManager),
-      ],
       child: LGKAApp(initialRoute: initialRoute),
     ),
   );
@@ -155,8 +153,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
   Future<void> _preloadPdfs() async {
     try {
       AppLogger.init('Preloading PDF repository');
-      final pdfRepo = ref.read(pdfRepositoryProvider);
-      await pdfRepo.initialize();
+      await ref.read(pdfRepositoryProvider.notifier).initialize();
       AppLogger.success('PDF repository preloaded');
     } catch (e) {
       AppLogger.error('Failed to preload PDFs', error: e);
@@ -195,7 +192,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
   Future<void> _refreshExpiredCaches() async {
     final pdfRepository = ref.read(pdfRepositoryProvider);
     if (!pdfRepository.isCacheValid && pdfRepository.hasAnyData) {
-      unawaited(pdfRepository.refreshInBackground());
+      unawaited(ref.read(pdfRepositoryProvider.notifier).refreshInBackground());
     }
 
     final scheduleService = ref.read(scheduleServiceProvider);
