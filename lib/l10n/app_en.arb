@@ -98,7 +98,7 @@
   "password": "Password",
   "login": "Log in",
   "authTitle": "Authentication required",
-  "authSubtitle": "Use the credentials you already know from the substitution plan",
+  "authSubtitle": "Use the credentials you already know from the school website",
   "searchHint": "Enter your class",
   "firstSemester": "1st semester",
   "secondSemester": "2nd semester",
@@ -160,7 +160,7 @@
       }
     }
   },
-  "privacyConsentPrefix": "By clicking you confirm that you have read the ",
+  "privacyConsentPrefix": "I have read the ",
   "privacyPolicy": "privacy policy",
   "privacyConsentSuffix": "."
 }
