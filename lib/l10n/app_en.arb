@@ -159,5 +159,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "privacyConsentPrefix": "By clicking you confirm that you have read the ",
+  "privacyPolicy": "privacy policy",
+  "privacyConsentSuffix": "."
 }
