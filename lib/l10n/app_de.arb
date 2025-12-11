@@ -158,5 +158,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "privacyConsentPrefix": "Durch Klicken bestätigst du, dass du die ",
+  "privacyPolicy": "Datenschutzerklärung",
+  "privacyConsentSuffix": " gelesen hast."
 }

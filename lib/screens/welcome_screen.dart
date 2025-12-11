@@ -1,8 +1,10 @@
 // Copyright Luka Löhr 2025
 
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 
 import '../navigation/app_router.dart';
@@ -176,12 +178,60 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                       },
                     ),
                     
+                    SizedBox(height: isSmallScreen ? 8 : 12),
+                    
+                    // Privacy consent footer
+                    _buildPrivacyConsent(context, isSmallScreen),
+                    
                     SizedBox(height: isSmallScreen ? 40 : 80),
                   ],
                 ),
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildPrivacyConsent(BuildContext context, bool isSmallScreen) {
+    final l10n = AppLocalizations.of(context)!;
+    final privacyPolicyUrl = 'https://luka-loehr.github.io/LGKA/privacy.html';
+    
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 8.0 : 16.0),
+      child: RichText(
+        textAlign: TextAlign.center,
+        text: TextSpan(
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: AppColors.secondaryText,
+            fontSize: isSmallScreen ? 11 : 12,
+          ),
+          children: [
+            TextSpan(
+              text: l10n.privacyConsentPrefix,
+            ),
+            TextSpan(
+              text: l10n.privacyPolicy,
+              style: TextStyle(
+                color: AppColors.appBlueAccent,
+                fontWeight: FontWeight.w500,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () async {
+                  HapticService.subtle();
+                  try {
+                    final uri = Uri.parse(privacyPolicyUrl);
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  } catch (e) {
+                    debugPrint('Could not launch privacy policy URL: $e');
+                  }
+                },
+            ),
+            TextSpan(
+              text: l10n.privacyConsentSuffix,
+            ),
+          ],
         ),
       ),
     );
