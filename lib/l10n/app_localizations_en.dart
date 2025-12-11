@@ -362,4 +362,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String foundPages(String pages) {
     return 'Found pages: $pages';
   }
+
+  @override
+  String get setClassTitle => 'Enter Class';
+
+  @override
+  String get setClassMessage => 'Please enter your class to view the schedule.';
+
+  @override
+  String get setClassButton => 'Save';
 }

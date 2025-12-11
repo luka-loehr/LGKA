@@ -362,4 +362,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String foundPages(String pages) {
     return 'Gefundene Seiten: $pages';
   }
+
+  @override
+  String get setClassTitle => 'Klasse eingeben';
+
+  @override
+  String get setClassMessage => 'Bitte gib deine Klasse ein, um den Stundenplan anzuzeigen.';
+
+  @override
+  String get setClassButton => 'Speichern';
 }
