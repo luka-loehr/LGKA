@@ -151,5 +151,13 @@
   },
   "setClassTitle": "Enter Class",
   "setClassMessage": "Please enter your class to view the schedule.",
-  "setClassButton": "Save"
+  "setClassButton": "Save",
+  "classChanged": "Your class has been changed to {className}.",
+  "@classChanged": {
+    "placeholders": {
+      "className": {
+        "type": "String"
+      }
+    }
+  }
 }

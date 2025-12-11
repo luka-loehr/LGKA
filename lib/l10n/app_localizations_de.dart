@@ -371,4 +371,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get setClassButton => 'Speichern';
+
+  @override
+  String classChanged(String className) {
+    return 'Deine Klasse wurde auf $className geändert.';
+  }
 }
