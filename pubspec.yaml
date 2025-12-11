@@ -70,6 +70,9 @@ dependencies:
   # Internationalization
   intl: ^0.20.2
   
+  # Timezone
+  timezone: ^0.9.4
+  
   # App Info
   package_info_plus: ^9.0.0
   url_launcher: ^6.2.5

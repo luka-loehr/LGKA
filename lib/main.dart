@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:lgka_flutter/navigation/app_router.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:lgka_flutter/providers/schedule_provider.dart';
@@ -17,6 +18,9 @@ import 'utils/app_info.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize timezone data
+  tz.initializeTimeZones();
   
   // Print welcome message
   AppLogger.welcome();

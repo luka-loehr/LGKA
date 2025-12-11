@@ -12,6 +12,8 @@
   "krankmeldungContact": "Bei technischen Fragen oder Problemen wende dich bitte direkt an das Lessing-Gymnasium Karlsruhe.",
   "krankmeldungButton": "Zur Krankmeldung",
   "serverMaintenance": "Reparaturarbeiten werden durchgeführt",
+  "weatherStationRepair": "Reparaturarbeiten werden durchgeführt",
+  "weatherStationRepairFooter": "Die Wetterstation wird bald wieder verfügbar sein",
   "serverConnectionFailed": "Serververbindung fehlgeschlagen",
   "serverConnectionHint": "Möglicherweise besteht keine Internetverbindung oder es finden gerade Wartungsarbeiten am Lessing-Gymnasium statt.",
   "tryAgain": "Erneut versuchen",
