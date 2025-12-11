@@ -45,6 +45,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverMaintenance => 'Maintenance work in progress';
 
   @override
+  String get weatherStationRepair => 'Repair work in progress';
+
+  @override
+  String get weatherStationRepairFooter => 'The weather station will be available again soon';
+
+  @override
   String get serverConnectionFailed => 'Server connection failed';
 
   @override

@@ -45,6 +45,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get serverMaintenance => 'Reparaturarbeiten werden durchgeführt';
 
   @override
+  String get weatherStationRepair => 'Reparaturarbeiten werden durchgeführt';
+
+  @override
+  String get weatherStationRepairFooter => 'Die Wetterstation wird bald wieder verfügbar sein';
+
+  @override
   String get serverConnectionFailed => 'Serververbindung fehlgeschlagen';
 
   @override
