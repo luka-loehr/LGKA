@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest_all.dart' as tz;
 import '../services/weather_service.dart';
 import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
@@ -231,8 +233,9 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     final hasNoChartData = weatherState.chartData.isEmpty;
     final shouldShowWeatherError = weatherState.error != null && hasNoChartData;
     final shouldShowStaleDataError = _isDataStale() && weatherState.chartData.isNotEmpty;
+    final shouldShowRepairError = _isWeatherStationRepair();
     // Keep showing the error placeholder while retrying until data loads
-    final shouldShowAnyError = _forceShowErrorUntilSuccess || shouldShowWeatherError || shouldShowStaleDataError;
+    final shouldShowAnyError = _forceShowErrorUntilSuccess || shouldShowWeatherError || shouldShowStaleDataError || shouldShowRepairError;
     
     if (shouldShowAnyError) {
       if (_errorAnimationController.status == AnimationStatus.dismissed) {
@@ -270,7 +273,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       });
     }
     
-    // Check if chart is not available (less than 60 data points)
+    // Check if chart is not available (data collection window or repair)
     final isChartUnavailable = !_isChartAvailable();
     
     return weatherState.isLoading && weatherState.chartData.isEmpty
@@ -297,16 +300,22 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
-                          Icons.wb_sunny_outlined,
+                        Icon(
+                          shouldShowRepairError
+                            ? Icons.build_outlined
+                            : Icons.wb_sunny_outlined,
                           size: 64,
-                          color: AppColors.secondaryText,
+                          color: shouldShowRepairError
+                            ? Theme.of(context).colorScheme.primary
+                            : AppColors.secondaryText,
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          shouldShowStaleDataError 
-                            ? AppLocalizations.of(context)!.serverMaintenance
-                            : AppLocalizations.of(context)!.serverConnectionFailed,
+                          shouldShowRepairError
+                            ? AppLocalizations.of(context)!.weatherStationRepair
+                            : shouldShowStaleDataError 
+                              ? AppLocalizations.of(context)!.serverMaintenance
+                              : AppLocalizations.of(context)!.serverConnectionFailed,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: AppColors.primaryText,
                           ),
@@ -314,26 +323,30 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          AppLocalizations.of(context)!.serverConnectionHint,
+                          shouldShowRepairError
+                            ? AppLocalizations.of(context)!.weatherStationRepairFooter
+                            : AppLocalizations.of(context)!.serverConnectionHint,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppColors.secondaryText,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 24),
-                        ElevatedButton.icon(
-                          onPressed: _refreshData,
-                          icon: const Icon(Icons.refresh),
-                          label: Text(AppLocalizations.of(context)!.tryAgain),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.primary,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        if (!shouldShowRepairError) ...[
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: _refreshData,
+                            icon: const Icon(Icons.refresh),
+                            label: Text(AppLocalizations.of(context)!.tryAgain),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
@@ -998,9 +1011,47 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
 
   bool _isChartAvailable() {
     final weatherState = ref.read(weatherDataProvider);
-    // Charts are available when we have at least 60 data points in the full dataset
+    
+    // Check if we're in the data collection window (0:00 - 1:00 AM German time)
+    try {
+      final berlin = tz.getLocation('Europe/Berlin');
+      final now = tz.TZDateTime.now(berlin);
+      final isDataCollectionWindow = now.hour == 0; // Between 0:00 and 0:59
+      
+      // If we're in the data collection window, chart is not available
+      if (isDataCollectionWindow) {
+        return false;
+      }
+    } catch (e) {
+      // If timezone initialization fails, fall back to checking data count
+      AppLogger.error('Timezone check failed', module: 'WeatherPage', error: e);
+    }
+    
+    // Charts are available when we have at least 1 data point in the full dataset
     // (before downsampling for chart rendering)
-    return weatherState.fullDataCount >= 60;
+    return weatherState.fullDataCount >= 1;
+  }
+  
+  /// Check if weather station is in repair mode (after 1 AM and less than 50 data points)
+  bool _isWeatherStationRepair() {
+    final weatherState = ref.read(weatherDataProvider);
+    
+    try {
+      final berlin = tz.getLocation('Europe/Berlin');
+      final now = tz.TZDateTime.now(berlin);
+      final isAfter1AM = now.hour >= 1; // After 1:00 AM (not during 0:00-0:59 data collection window)
+      
+      // After 1 AM, if we have less than 50 data points, show repair error
+      // This indicates the weather station should have collected enough data by now
+      if (isAfter1AM && weatherState.fullDataCount < 50) {
+        return true;
+      }
+    } catch (e) {
+      // If timezone check fails, don't show repair error to avoid false positives
+      AppLogger.error('Timezone check failed for repair mode', module: 'WeatherPage', error: e);
+    }
+    
+    return false;
   }
   
   /// Check if weather data values have been the same for more than 60 minutes

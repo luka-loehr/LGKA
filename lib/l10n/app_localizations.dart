@@ -167,6 +167,18 @@ abstract class AppLocalizations {
   /// **'Maintenance work in progress'**
   String get serverMaintenance;
 
+  /// No description provided for @weatherStationRepair.
+  ///
+  /// In en, this message translates to:
+  /// **'Repair work in progress'**
+  String get weatherStationRepair;
+
+  /// No description provided for @weatherStationRepairFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'The weather station will be available again soon'**
+  String get weatherStationRepairFooter;
+
   /// No description provided for @serverConnectionFailed.
   ///
   /// In en, this message translates to:
