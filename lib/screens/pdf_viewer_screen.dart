@@ -217,6 +217,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       _showClassModal = false;
     });
     
+    // Wait for modal to close before performing search
+    await Future.delayed(const Duration(milliseconds: 100));
+    
+    if (!mounted) return;
+    
     // Perform search with the entered class (will show success message if found)
     _onSearchSubmitted(classInput);
   }
