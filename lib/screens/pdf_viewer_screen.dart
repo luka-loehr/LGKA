@@ -1100,7 +1100,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                             highlightColor: Colors.transparent,
                             child: Center(
                               child: _isValidatingClass
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       width: 22,
                                       height: 22,
                                       child: CircularProgressIndicator(
