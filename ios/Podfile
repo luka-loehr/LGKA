@@ -39,6 +39,26 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    
+    # Suppress deprecation warnings from third-party plugins
+    target.build_configurations.each do |config|
+      # Suppress Objective-C deprecation warnings
+      config.build_settings['WARNING_CFLAGS'] ||= ['$(inherited)']
+      config.build_settings['WARNING_CFLAGS'] << '-Wno-deprecated-declarations'
+      
+      # Suppress Swift deprecation warnings
+      swift_flags = config.build_settings['OTHER_SWIFT_FLAGS'] || ['$(inherited)']
+      swift_flags = [swift_flags] unless swift_flags.is_a?(Array)
+      swift_flags << '-suppress-warnings' unless swift_flags.include?('-suppress-warnings')
+      config.build_settings['OTHER_SWIFT_FLAGS'] = swift_flags
+      
+      # Fix deployment target for storyboards (fixes flutter_inappwebview_ios storyboard warning)
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+      
+      # Suppress interface builder/storyboard warnings
+      config.build_settings['IBSCANNOTATION_WARNINGS'] = 'NO'
+      config.build_settings['IBSCANNOTATION_ALL_WARNINGS_ARE_ERRORS'] = 'NO'
+    end
   end
   
   # Add WebKit framework for flutter_inappwebview_ios
