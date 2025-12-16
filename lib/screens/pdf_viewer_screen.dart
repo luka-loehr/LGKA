@@ -46,7 +46,8 @@ class PDFViewerScreen extends StatefulWidget {
   State<PDFViewerScreen> createState() => _PDFViewerScreenState();
 }
 
-class _PDFViewerScreenState extends State<PDFViewerScreen> {
+class _PDFViewerScreenState extends State<PDFViewerScreen>
+    with TickerProviderStateMixin {
   late final pdfx.PdfController _pdfController;
   bool _hasTriggeredLoadedHaptic = false;
   final GlobalKey _shareButtonKey = GlobalKey(); // Key for share button position
@@ -67,6 +68,14 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   // Class input modal state
   bool _showClassModal = false;
   final TextEditingController _classInputController = TextEditingController();
+  bool _isValidatingClass = false;
+  bool _showClassNotFoundError = false;
+  
+  // Button animation state
+  late AnimationController _buttonColorController;
+  late Animation<Color?> _buttonColorAnimation;
+  static const Duration _buttonAnimationDuration = Duration(milliseconds: 300);
+  static const Color _errorRedColor = Colors.red;
   
   // Timer for retry mechanism (to prevent memory leaks)
   Timer? _retryTimer;
@@ -74,8 +83,30 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   @override
   void initState() {
     super.initState();
-    // Listen to text changes to enable/disable save button
+    
+    // Setup button color animation
+    _buttonColorController = AnimationController(
+      duration: _buttonAnimationDuration,
+      vsync: this,
+    );
+    
+    // Initialize animation - will be updated in didChangeDependencies with actual theme color
+    _buttonColorAnimation = ColorTween(
+      begin: Colors.blue, // Temporary, will be updated
+      end: _errorRedColor,
+    ).animate(CurvedAnimation(
+      parent: _buttonColorController,
+      curve: Curves.easeInOut,
+    ));
+    
+    // Listen to text changes to enable/disable save button and clear errors
     _classInputController.addListener(() {
+      if (_showClassNotFoundError) {
+        setState(() {
+          _showClassNotFoundError = false;
+        });
+        _buttonColorController.reverse();
+      }
       setState(() {});
     });
     
@@ -136,34 +167,115 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     }
   }
   
-  Future<void> _saveClassAndContinue() async {
+  Future<void> _validateAndSaveClass() async {
     final classInput = _classInputController.text.trim();
-    if (classInput.isEmpty) return;
+    if (classInput.isEmpty || _isValidatingClass) return;
+    
+    // Start loading state
+    setState(() {
+      _isValidatingClass = true;
+      _showClassNotFoundError = false;
+    });
+    
+    // Validate class exists in PDF
+    final classExists = await _checkClassExistsInPdf(classInput);
+    
+    if (!mounted) return;
+    
+    if (!classExists) {
+      // Class not found - show error
+      setState(() {
+        _isValidatingClass = false;
+        _showClassNotFoundError = true;
+      });
+      
+      // Animate button to red
+      _buttonColorController.forward();
+      
+      // Haptic feedback
+      await HapticService.error();
+      
+      // Reset button color after delay
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (mounted) {
+          _buttonColorController.reverse();
+        }
+      });
+      
+      return;
+    }
+    
+    // Class found - save and continue
+    setState(() {
+      _isValidatingClass = false;
+    });
     
     final container = ProviderScope.containerOf(context, listen: false);
-      await container.read(preferencesManagerProvider.notifier).setLastScheduleQuery5to10(classInput);
+    await container.read(preferencesManagerProvider.notifier).setLastScheduleQuery5to10(classInput);
     
     setState(() {
       _showClassModal = false;
     });
     
-    // Show success message
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.classChanged(classInput),
-          ),
-          duration: const Duration(seconds: 2),
-          backgroundColor: Colors.green,
-        ),
-      );
-    }
-    
-    // Perform search with the entered class
+    // Perform search with the entered class (will show success message if found)
     _onSearchSubmitted(classInput);
   }
   
+  Future<bool> _checkClassExistsInPdf(String className) async {
+    try {
+      final bytes = await widget.pdfFile.readAsBytes();
+      final document = syncfusion.PdfDocument(inputBytes: bytes);
+      final pageCount = document.pages.count;
+      
+      final textExtractor = syncfusion.PdfTextExtractor(document);
+      final allText = textExtractor.extractText(
+        startPageIndex: 0,
+        endPageIndex: pageCount - 1,
+      );
+      
+      document.dispose();
+      
+      // Check if class name exists in PDF (case-insensitive)
+      return allText.toLowerCase().contains(className.toLowerCase());
+    } catch (e) {
+      AppLogger.debug('Error checking class in PDF: $e', module: 'PDFViewer');
+      // If validation fails, allow saving anyway (fail gracefully)
+      return true;
+    }
+  }
+  
+  bool get _canSaveClass {
+    return _classInputController.text.trim().isNotEmpty && 
+           !_isValidatingClass && 
+           !_showClassNotFoundError;
+  }
+  
+  Color get _currentButtonColor {
+    if (_showClassNotFoundError) {
+      return _buttonColorAnimation.value ?? _errorRedColor;
+    }
+    
+    if (_canSaveClass) {
+      return Theme.of(context).colorScheme.primary;
+    }
+    
+    return Theme.of(context).colorScheme.primary.withValues(alpha: 0.5);
+  }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Update button color animation with actual theme color
+    _buttonColorAnimation = ColorTween(
+      begin: Theme.of(context).colorScheme.primary,
+      end: _errorRedColor,
+    ).animate(CurvedAnimation(
+      parent: _buttonColorController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
   @override
   void dispose() {
     _retryTimer?.cancel();
@@ -171,6 +283,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     _searchController.dispose();
     _searchFocusNode.dispose();
     _classInputController.dispose();
+    _buttonColorController.dispose();
     // Restore portrait-only orientation when leaving PDF viewer
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -836,13 +949,17 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                      color: _showClassNotFoundError 
+                          ? Colors.red 
+                          : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: _showClassNotFoundError 
+                          ? Colors.red 
+                          : Theme.of(context).colorScheme.primary,
                       width: 2,
                     ),
                   ),
@@ -853,29 +970,69 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppColors.primaryText,
                     ),
-                onSubmitted: (_) => _saveClassAndContinue(),
+                onSubmitted: (_) {
+                  if (_canSaveClass) {
+                    _validateAndSaveClass();
+                  }
+                },
                 textCapitalization: TextCapitalization.characters,
+                onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _classInputController.text.trim().isNotEmpty 
-                    ? _saveClassAndContinue 
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  AppLocalizations.of(context)!.setClassButton,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                ),
+              AnimatedBuilder(
+                animation: _buttonColorAnimation,
+                builder: (context, child) {
+                  return SizedBox(
+                    width: double.infinity,
+                    height: 46,
+                    child: Stack(
+                      children: [
+                        // Animated background button
+                        Positioned.fill(
+                          child: AnimatedContainer(
+                            duration: _buttonAnimationDuration,
+                            curve: Curves.easeInOut,
+                            decoration: BoxDecoration(
+                              color: _currentButtonColor,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                        
+                        // Clickable transparent button with always-white text
+                        SizedBox(
+                          width: double.infinity,
+                          height: double.infinity,
+                          child: InkWell(
+                            onTap: _canSaveClass ? _validateAndSaveClass : null,
+                            borderRadius: BorderRadius.circular(12),
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            child: Center(
+                              child: _isValidatingClass
+                                  ? const SizedBox(
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        strokeCap: StrokeCap.round,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      ),
+                                    )
+                                  : Text(
+                                      AppLocalizations.of(context)!.setClassButton,
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),
