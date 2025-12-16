@@ -70,12 +70,16 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   final TextEditingController _classInputController = TextEditingController();
   bool _isValidatingClass = false;
   bool _showClassNotFoundError = false;
+  bool _showClassSuccessFlash = false;
   
   // Button animation state
   late AnimationController _buttonColorController;
   late Animation<Color?> _buttonColorAnimation;
+  late AnimationController _successColorController;
+  late Animation<Color?> _successColorAnimation;
   static const Duration _buttonAnimationDuration = Duration(milliseconds: 300);
   static const Color _errorRedColor = Colors.red;
+  static const Color _successGreenColor = Colors.green;
   
   // Timer for retry mechanism (to prevent memory leaks)
   Timer? _retryTimer;
@@ -90,12 +94,27 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       vsync: this,
     );
     
+    // Setup success color animation
+    _successColorController = AnimationController(
+      duration: _buttonAnimationDuration,
+      vsync: this,
+    );
+    
     // Initialize animation - will be updated in didChangeDependencies with actual theme color
     _buttonColorAnimation = ColorTween(
       begin: Colors.blue, // Temporary, will be updated
       end: _errorRedColor,
     ).animate(CurvedAnimation(
       parent: _buttonColorController,
+      curve: Curves.easeInOut,
+    ));
+    
+    // Initialize success animation - will be updated in didChangeDependencies with actual theme color
+    _successColorAnimation = ColorTween(
+      begin: Colors.blue, // Temporary, will be updated
+      end: _successGreenColor,
+    ).animate(CurvedAnimation(
+      parent: _successColorController,
       curve: Curves.easeInOut,
     ));
     
@@ -106,6 +125,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
           _showClassNotFoundError = false;
         });
         _buttonColorController.reverse();
+      }
+      if (_showClassSuccessFlash) {
+        setState(() {
+          _showClassSuccessFlash = false;
+        });
+        _successColorController.reset();
       }
       setState(() {});
     });
@@ -205,17 +230,36 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       return;
     }
     
-    // Class found - save and continue
+    // Class found - show success flash immediately
     setState(() {
       _isValidatingClass = false;
+      _showClassSuccessFlash = true;
+      _showClassNotFoundError = false;
     });
+    
+    // Start success animation with smooth fade
+    _successColorController.forward();
+    
+    // Success with haptic feedback
+    await HapticService.success();
+    
+    if (!mounted) return;
     
     final container = ProviderScope.containerOf(context, listen: false);
     await container.read(preferencesManagerProvider.notifier).setLastScheduleQuery5to10(classInput);
     
+    // Hold the green color briefly
+    await Future.delayed(const Duration(milliseconds: 600));
+    
+    if (!mounted) return;
+    
     setState(() {
       _showClassModal = false;
+      _showClassSuccessFlash = false;
     });
+    
+    // Reset success animation
+    _successColorController.reset();
     
     // Wait for modal to close before performing search
     await Future.delayed(const Duration(milliseconds: 100));
@@ -256,6 +300,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   }
   
   Color get _currentButtonColor {
+    if (_showClassSuccessFlash) {
+      return _successColorAnimation.value ?? _successGreenColor;
+    }
+    
     if (_showClassNotFoundError) {
       return _buttonColorAnimation.value ?? _errorRedColor;
     }
@@ -279,6 +327,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       parent: _buttonColorController,
       curve: Curves.easeInOut,
     ));
+    
+    // Update success color animation with actual theme color
+    _successColorAnimation = ColorTween(
+      begin: Theme.of(context).colorScheme.primary,
+      end: _successGreenColor,
+    ).animate(CurvedAnimation(
+      parent: _successColorController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
@@ -289,6 +346,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     _searchFocusNode.dispose();
     _classInputController.dispose();
     _buttonColorController.dispose();
+    _successColorController.dispose();
     // Restore portrait-only orientation when leaving PDF viewer
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
