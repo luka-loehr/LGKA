@@ -261,8 +261,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     // Reset success animation
     _successColorController.reset();
     
-    // Wait for modal to close before performing search
-    await Future.delayed(const Duration(milliseconds: 100));
+    // Wait for PDF to be ready before performing search
+    await _waitForPdfReady();
     
     if (!mounted) return;
     
@@ -291,6 +291,33 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       // If validation fails, allow saving anyway (fail gracefully)
       return true;
     }
+  }
+  
+  /// Wait for PDF to be ready for navigation, with a timeout
+  Future<void> _waitForPdfReady() async {
+    // If PDF is already ready, return immediately
+    if (_isPdfReady) {
+      // Small delay to ensure UI has updated after modal close
+      await Future.delayed(const Duration(milliseconds: 50));
+      return;
+    }
+    
+    // Wait for PDF to be ready with a timeout
+    const maxWaitTime = Duration(seconds: 5);
+    const checkInterval = Duration(milliseconds: 50);
+    final startTime = DateTime.now();
+    
+    while (!_isPdfReady && mounted) {
+      if (DateTime.now().difference(startTime) > maxWaitTime) {
+        // Timeout reached - proceed anyway (PDF might be ready but flag not set)
+        AppLogger.debug('PDF ready check timeout, proceeding with search', module: 'PDFViewer');
+        break;
+      }
+      await Future.delayed(checkInterval);
+    }
+    
+    // Small delay to ensure UI has updated after modal close
+    await Future.delayed(const Duration(milliseconds: 50));
   }
   
   bool get _canSaveClass {
