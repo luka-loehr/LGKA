@@ -16,6 +16,7 @@ github.com/luka-loehr/LGKA/releases/tag/vx.x.x
 - German language
 - Simple, concise bullet points (one per line, no dashes)
 - User-friendly language focusing on what users will notice
+- Student-friendly tone: Write in a way that is accessible and relatable to students, avoiding overly technical jargon
 - End with "Mehr Infos:" followed by GitHub release link
 - Replace vx.x.x with actual version number (e.g., v2.3.0)
 - Maximum 4000 characters
