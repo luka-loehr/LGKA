@@ -4,13 +4,13 @@ import 'dart:io';
 import 'package:yaml/yaml.dart';
 
 void main() async {
-  print('🚀 Applying centralized app configuration...\n');
+  print('Applying centralized app configuration...\n');
 
   try {
     // Read the centralized configuration
     final configFile = File('app_config/app_config.yaml');
     if (!configFile.existsSync()) {
-      print('❌ Error: app_config/app_config.yaml not found');
+      print('[ERROR] app_config/app_config.yaml not found');
       exit(1);
     }
 
@@ -23,21 +23,21 @@ void main() async {
     configWithVersion['version_name'] = versionInfo['version_name'];
     configWithVersion['version_code'] = versionInfo['version_code'];
 
-    print('📋 Using version from pubspec.yaml: ${versionInfo['version_name']}+${versionInfo['version_code']}');
+    print('[INFO] Using version from pubspec.yaml: ${versionInfo['version_name']}+${versionInfo['version_code']}');
 
     // Apply configuration to all platforms
     await updateAndroidConfig(configWithVersion);
     await updateiOSConfig(configWithVersion);
     await updateFlutterLauncherIcons(configWithVersion);
 
-    print('\n✅ App configuration applied successfully!');
+    print('\n[OK] App configuration applied successfully!');
     print('\nNext steps:');
     print('1. Run: flutter pub get');
     print('2. Run: dart run flutter_launcher_icons');
     print('3. Rebuild your app');
 
   } catch (e) {
-    print('❌ Error applying configuration: $e');
+    print('[ERROR] Error applying configuration: $e');
     exit(1);
   }
 }
@@ -65,7 +65,7 @@ Future<Map<String, String>> getVersionFromPubspec() async {
 }
 
 Future<void> updatePubspecDescription(Map config) async {
-  print('📝 Updating pubspec.yaml description...');
+  print('[INFO] Updating pubspec.yaml description...');
 
   final pubspecFile = File('pubspec.yaml');
   final content = await pubspecFile.readAsString();
@@ -77,11 +77,11 @@ Future<void> updatePubspecDescription(Map config) async {
   );
 
   await pubspecFile.writeAsString(updatedContent);
-  print('   ✓ Description updated (version managed directly in pubspec.yaml)');
+  print('       Description updated (version managed directly in pubspec.yaml)');
 }
 
 Future<void> updateAndroidConfig(Map config) async {
-  print('🤖 Updating Android configuration...');
+  print('[Android] Updating configuration...');
   
   // Update build.gradle.kts
   final buildGradleFile = File('android/app/build.gradle.kts');
@@ -98,7 +98,7 @@ Future<void> updateAndroidConfig(Map config) async {
         );
     
     await buildGradleFile.writeAsString(updatedContent);
-    print('   ✓ Package name updated');
+    print('         Package name updated');
   }
 
   // Update AndroidManifest.xml
@@ -111,12 +111,12 @@ Future<void> updateAndroidConfig(Map config) async {
     );
     
     await manifestFile.writeAsString(updatedContent);
-    print('   ✓ App name updated in manifest');
+    print('         App name updated in manifest');
   }
 }
 
 Future<void> updateiOSConfig(Map config) async {
-  print('🍎 Updating iOS configuration...');
+  print('[iOS] Updating configuration...');
   
   // Update app_config.xcconfig
   final xconfigFile = File('ios/Runner/app_config.xcconfig');
@@ -126,14 +126,14 @@ APP_DISPLAY_NAME = ${config['app_name']}
 ''';
   
   await xconfigFile.writeAsString(xconfigContent);
-  print('   ✓ iOS app name updated');
+  print('      App name updated');
 
   // Update Info.plist bundle identifier reference (already uses variables)
-  print('   ✓ iOS Info.plist already configured for dynamic values');
+  print('      Info.plist already configured for dynamic values');
 }
 
 Future<void> updateFlutterLauncherIcons(Map config) async {
-  print('🎨 Updating launcher icons configuration...');
+  print('[Icons] Updating launcher icons configuration...');
   
   // Update pubspec.yaml with new icon path
   final pubspecFile = File('pubspec.yaml');
@@ -159,5 +159,5 @@ flutter_launcher_icons:
   );
   
   await pubspecFile.writeAsString(updatedContent);
-  print('   ✓ Icon path updated to ${config['app_icon_path']}');
-} 
+  print('        Icon path updated to ${config['app_icon_path']}');
+}
