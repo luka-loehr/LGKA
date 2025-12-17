@@ -1,16 +1,16 @@
 # LGKA Flutter App - Build Notes
 
-## ⚠️ License Notice
+## License Notice
 
 **ATTENTION**: This app is licensed under **Creative Commons BY-NC-ND 4.0 License**.
 
-🚫 **Not Allowed:**
+**Not Allowed:**
 - Creating and publishing your own app versions
 - Uploading to App Stores by third parties
 - Commercial use
 - Distribution of modified versions
 
-✅ **Allowed:**
+**Allowed:**
 - Studying and understanding the code
 - Local development builds for learning
 - Contributing via Pull Requests
@@ -19,7 +19,7 @@
 
 ---
 
-## 🏗️ Build Configuration
+## Build Configuration
 
 ### Optimizations
 - **R8 Full Mode**: Enabled in `gradle.properties`
@@ -27,7 +27,7 @@
 - **ProGuard**: Dead-code elimination
 - **Icon Tree-Shaking**: 99%+ font reduction
 
-## 📱 Production Builds
+## Production Builds
 
 ### Google Play Store
 ```bash
@@ -41,7 +41,7 @@ flutter build appbundle --release
 flutter build ios --release
 ```
 
-## 🔧 Development Builds
+## Development Builds
 
 ### Split APKs for Testing
 ```bash
@@ -62,7 +62,7 @@ adb shell getprop ro.product.cpu.abi
 adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
 
-## 📊 Build Sizes
+## Build Sizes
 
 | Build Type | Size | Usage |
 |-----------|-------|------------|
@@ -71,7 +71,7 @@ adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 | ARMv7 APK | ~9.5MB | Development/Testing |
 | x86_64 APK | ~10.0MB | Emulator/Testing |
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### APK Installation Failed
 ```bash
