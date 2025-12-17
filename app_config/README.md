@@ -33,23 +33,23 @@ That's it! The script will automatically update all platform-specific files and 
 
 ## What Gets Updated
 
-### ✅ Cross-Platform
+### Cross-Platform
 - **App Name**: Displayed on home screen and app switcher
 - **App Version**: Version name and build number
 - **App Icon**: Generated for all required sizes on both platforms
 - **Package/Bundle Identifier**: Consistent across platforms
 
-### 🤖 Android Specific
+### Android Specific
 - `android/app/build.gradle.kts` - applicationId, namespace
 - `android/app/src/main/AndroidManifest.xml` - app label
 - All app icon sizes in `android/app/src/main/res/mipmap-*`
 
-### 🍎 iOS Specific  
+### iOS Specific  
 - `ios/Runner/app_config.xcconfig` - display name
 - `ios/Runner/Info.plist` - uses variables from xcconfig
 - All app icon sizes in `ios/Runner/Assets.xcassets/AppIcon.appiconset/`
 
-### 📦 Flutter
+### Flutter
 - `pubspec.yaml` - version, description, launcher icons config
 
 ## Configuration Options
@@ -105,7 +105,7 @@ If you need to make changes manually:
 
 ### Common Issues
 
-**"❌ Error: app_config/app_config.yaml not found"**
+**"[ERROR] app_config/app_config.yaml not found"**
 - Ensure you're in the project root directory
 - Check that the config file exists
 
@@ -148,4 +148,4 @@ cat ios/Runner/app_config.xcconfig
    - Run the update script
    - Icons are automatically generated for all sizes
 
-This system ensures consistency across platforms and eliminates the need to manually edit multiple configuration files. 
+This system ensures consistency across platforms and eliminates the need to manually edit multiple configuration files.

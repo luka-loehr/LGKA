@@ -31,17 +31,17 @@ This folder contains all assets needed for app store submissions.
 
 ## Current Status
 
-✅ **iOS Screenshots:** Ready for App Store Connect
+**iOS Screenshots:** Ready for App Store Connect
 - iPhone 6.5" and 6.9" screenshots created
 - iPad 13" screenshots created
 - All properly sized and organized
 
-✅ **Android Screenshots:** Ready for Google Play Console
+**Android Screenshots:** Ready for Google Play Console
 - Phone screenshots (1080×2400) - native quality
 - 10-inch tablet screenshots (2560×1600) - native quality
 - All properly sized and organized
 
-✅ **Banners:** Ready for promotional use
+**Banners:** Ready for promotional use
 - Feature graphic banner (1024×500) created
 - Suitable for Google Play Console feature graphic
 

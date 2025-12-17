@@ -13,27 +13,27 @@ of the Lessing-Gymnasium Karlsruhe. Built with Flutter, featuring a clean Materi
 
 ---
 
-## ✨ Features
+## Features
 
-- 📅 Substitution plans (today & tomorrow) and official timetables (PDF)
-- 📄 Integrated PDF viewer with zoom & share
-- 🌤️ Local weather with smooth charts and stale-data detection
-- 🎨 Dark-only Material Design 3 with dynamic accent colors
-- 📝 Absence reporting via official school form
+- Substitution plans (today & tomorrow) and official timetables (PDF)
+- Integrated PDF viewer with zoom & share
+- Local weather with smooth charts and stale-data detection
+- Dark-only Material Design 3 with dynamic accent colors
+- Absence reporting via official school form
 
 ---
 
-## 📜 License
+## License
 
 [Creative Commons BY-NC-ND 4.0](LICENSE)  
 Private student project – non-commercial use only.
 
 ---
 
-## 🛠 Support
+## Support
 
-- 🐞 [Report bugs](https://github.com/luka-loehr/LGKA/issues)  
-- ✉️ Questions: [contact@lukaloehr.de](mailto:contact@lukaloehr.de)  
+- [Report bugs](https://github.com/luka-loehr/LGKA/issues)  
+- Questions: [contact@lukaloehr.de](mailto:contact@lukaloehr.de)  
 
 ---
 
