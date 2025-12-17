@@ -34,6 +34,7 @@ Get all changes between `[previous_tag]` and HEAD:
 
 1. Build: `flutter build apk --release --target-platform android-arm64`
 2. Upload APK to the GitHub release via `gh release upload`
+   - **Important**: The APK must be named exactly `app-release.apk` when uploaded
 
 ### Task 5: Build Google Play App Bundle
 
