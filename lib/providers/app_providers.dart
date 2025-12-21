@@ -10,6 +10,7 @@ import '../data/pdf_repository.dart';
 import '../services/weather_service.dart';
 import '../providers/schedule_provider.dart';
 import '../services/schedule_service.dart';
+import '../services/news_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_logger.dart';
 
@@ -519,4 +520,9 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
 // Schedule Provider
 final scheduleServiceProvider = Provider<ScheduleService>((ref) {
   return ScheduleService();
+});
+
+// News Service Provider
+final newsServiceProvider = Provider<NewsService>((ref) {
+  return NewsService();
 });
