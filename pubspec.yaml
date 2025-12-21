@@ -77,6 +77,9 @@ dependencies:
   package_info_plus: ^9.0.0
   url_launcher: ^6.2.5
   flutter_inappwebview: ^6.1.5
+  
+  # Fireworks
+  flutter_fireworks: ^1.0.8
 
 dev_dependencies:
   flutter_test:
