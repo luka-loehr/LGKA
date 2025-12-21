@@ -617,6 +617,18 @@ abstract class AppLocalizations {
   /// **'Access the school\'s own weather station'**
   String get featureWeatherDesc;
 
+  /// No description provided for @featureNewsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'News'**
+  String get featureNewsTitle;
+
+  /// No description provided for @featureNewsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest news and announcements from the school'**
+  String get featureNewsDesc;
+
   /// No description provided for @featureSickTitle.
   ///
   /// In en, this message translates to:
@@ -838,6 +850,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'.'**
   String get privacyConsentSuffix;
+
+  /// No description provided for @accentColorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your accent color'**
+  String get accentColorTitle;
+
+  /// No description provided for @accentColorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your favorite color. It will be used throughout the app.'**
+  String get accentColorDescription;
 
   /// No description provided for @news.
   ///

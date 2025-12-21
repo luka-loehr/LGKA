@@ -3,7 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/welcome_screen.dart';
-import '../screens/info_screen.dart';
+import '../screens/what_you_can_do_screen.dart';
+import '../screens/accent_color_screen.dart';
 import '../screens/auth_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/pdf_viewer_screen.dart';
@@ -17,7 +18,8 @@ import '../screens/news_screen.dart';
 class AppRouter {
   // Route names
   static const String welcome = '/welcome';
-  static const String info = '/info';
+  static const String whatYouCanDo = '/what-you-can-do';
+  static const String accentColor = '/accent-color';
   static const String auth = '/auth';
   static const String home = '/';
   static const String pdfViewer = '/pdf-viewer';
@@ -37,8 +39,12 @@ class AppRouter {
           builder: (context, state) => const WelcomeScreen(),
         ),
         GoRoute(
-          path: info,
-          builder: (context, state) => const InfoScreen(),
+          path: whatYouCanDo,
+          builder: (context, state) => const WhatYouCanDoScreen(),
+        ),
+        GoRoute(
+          path: accentColor,
+          builder: (context, state) => const AccentColorScreen(),
         ),
         GoRoute(
           path: auth,

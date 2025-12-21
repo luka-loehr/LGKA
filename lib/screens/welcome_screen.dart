@@ -55,7 +55,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     // Premium haptic feedback
     await HapticService.light();
     
-    // Do not mark first launch here; onboarding completes on InfoScreen
+    // Do not mark first launch here; onboarding completes on AccentColorScreen
     
     // Release button animation
     _buttonController.reverse();
@@ -63,9 +63,9 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     // Small delay for the animation to feel natural
     await Future.delayed(const Duration(milliseconds: 50));
     
-    // Navigate to info screen
+    // Navigate to what you can do screen
     if (mounted) {
-      context.go(AppRouter.info);
+      context.go(AppRouter.whatYouCanDo);
     }
   }
 
