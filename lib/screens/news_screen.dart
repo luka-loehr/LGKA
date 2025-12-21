@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import '../providers/news_provider.dart';
 import '../providers/haptic_service.dart';
+import '../providers/color_provider.dart';
 import '../services/news_service.dart';
 import '../l10n/app_localizations.dart';
 
@@ -33,7 +34,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
     final surfaceColor = AppColors.appSurface;
     final primaryTextColor = AppColors.primaryText;
     final secondaryTextColor = AppColors.secondaryText;
-    final accentColor = AppColors.appBlueAccent;
+    final accentColor = ref.watch(currentColorProvider);
 
     return Scaffold(
       backgroundColor: backgroundColor,
