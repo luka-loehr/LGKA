@@ -108,9 +108,8 @@ class _FireworksOverlayState extends ConsumerState<FireworksOverlay> {
     _stopParticleHaptics();
     
     // Random small fast light vibrations as particles emerge
-    // Duration matches explosion duration (5-8 seconds)
-    final explosionDuration = 5000 + _random.nextInt(3000); // 5-8 seconds
-    final endTime = DateTime.now().millisecondsSinceEpoch + explosionDuration;
+    // Only last 1 second per rocket
+    final endTime = DateTime.now().millisecondsSinceEpoch + 1000; // 1 second
     
     void scheduleNextHaptic() {
       if (DateTime.now().millisecondsSinceEpoch >= endTime) {
