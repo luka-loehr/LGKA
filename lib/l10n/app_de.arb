@@ -42,7 +42,7 @@
   "loading": "Lädt...",
   "formLoadError": "Formular konnte nicht geladen werden",
   "formLoadErrorHint": "Bitte überprüfe deine Internetverbindung und versuche es erneut.",
-  "infoHeader": "Was bietet die App dir?",
+  "infoHeader": "Alle Funktionen im Überblick",
   "featureSubstitutionTitle": "Vertretungsplan",
   "featureSubstitutionDesc": "Aktueller Vertretungsplan für heute/morgen",
   "featureScheduleTitle": "Stundenplan",
