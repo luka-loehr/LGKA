@@ -249,7 +249,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subjectSubstitution => 'LGKA+ Substitution';
 
   @override
-  String get infoHeader => 'What can you do with the app?';
+  String get infoHeader => 'What the App offers';
 
   @override
   String get featureSubstitutionTitle => 'Substitution Plan';
