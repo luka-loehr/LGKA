@@ -24,17 +24,11 @@ class FireworksNotifier extends Notifier<bool> {
 
   /// Check if current time is New Year's Day (January 1st) in German timezone
   bool _isNewYearsDay() {
-    // TEMPORARY: Force fireworks for testing - remove this return true before release
-    return true;
-    
     try {
       final berlin = tz.getLocation('Europe/Berlin');
       final now = tz.TZDateTime.now(berlin);
-      
-      // Check if it's January 1st
       return now.month == 1 && now.day == 1;
     } catch (e) {
-      // Fallback to local time if timezone fails
       final now = DateTime.now();
       return now.month == 1 && now.day == 1;
     }
