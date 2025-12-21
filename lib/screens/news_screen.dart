@@ -202,15 +202,39 @@ class _NewsCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  event.createdDate == 'Unknown'
-                      ? AppLocalizations.of(context)!.unknown
-                      : event.createdDate,
-                  style: TextStyle(
-                    color: secondaryTextColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      event.createdDate == 'Unknown'
+                          ? AppLocalizations.of(context)!.unknown
+                          : event.createdDate,
+                      style: TextStyle(
+                        color: secondaryTextColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.visibility_outlined,
+                          size: 14,
+                          color: secondaryTextColor.withValues(alpha: 0.6),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${event.views}',
+                          style: TextStyle(
+                            color: secondaryTextColor.withValues(alpha: 0.6),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 if (event.description.isNotEmpty)
