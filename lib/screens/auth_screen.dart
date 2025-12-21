@@ -219,6 +219,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       await ref.read(preferencesManagerProvider.notifier).setAuthenticated(true);
       ref.read(isAuthenticatedProvider.notifier).state = true;
       
+      // Mark onboarding as completed only after successful authentication
+      final notifier = ref.read(preferencesManagerProvider.notifier);
+      await notifier.setOnboardingCompleted(true);
+      await notifier.setFirstLaunch(false);
+      
       // Additional success haptic just before navigation
       await HapticService.light();
       

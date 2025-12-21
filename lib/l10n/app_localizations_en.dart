@@ -270,6 +270,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get featureWeatherDesc => 'Access the school\'s own weather station';
 
   @override
+  String get featureNewsTitle => 'News';
+
+  @override
+  String get featureNewsDesc => 'Latest news and announcements from the school';
+
+  @override
   String get featureSickTitle => 'Sick Note';
 
   @override
@@ -391,6 +397,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyConsentSuffix => '.';
+
+  @override
+  String get accentColorTitle => 'Your accent color';
+
+  @override
+  String get accentColorDescription => 'Choose your favorite color. It will be used throughout the app.';
 
   @override
   String get news => 'News';

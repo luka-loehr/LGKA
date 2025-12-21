@@ -4,20 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
-import '../providers/app_providers.dart';
 import '../providers/color_provider.dart';
 import '../navigation/app_router.dart';
 import '../providers/haptic_service.dart';
 import '../l10n/app_localizations.dart';
 
-class InfoScreen extends ConsumerStatefulWidget {
-  const InfoScreen({super.key});
+class WhatYouCanDoScreen extends ConsumerStatefulWidget {
+  const WhatYouCanDoScreen({super.key});
 
   @override
-  ConsumerState<InfoScreen> createState() => _InfoScreenState();
+  ConsumerState<WhatYouCanDoScreen> createState() => _WhatYouCanDoScreenState();
 }
 
-class _InfoScreenState extends ConsumerState<InfoScreen>
+class _WhatYouCanDoScreenState extends ConsumerState<WhatYouCanDoScreen>
     with TickerProviderStateMixin {
   late AnimationController _buttonController;
   late Animation<double> _buttonScale;
@@ -44,6 +43,11 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
       'descKey': 'featureWeatherDesc',
     },
     {
+      'icon': Icons.newspaper_outlined,
+      'titleKey': 'featureNewsTitle',
+      'descKey': 'featureNewsDesc',
+    },
+    {
       'icon': Icons.sick,
       'titleKey': 'featureSickTitle',
       'descKey': 'featureSickDesc',
@@ -59,6 +63,8 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
         return l.featureScheduleTitle;
       case 'featureWeatherTitle':
         return l.featureWeatherTitle;
+      case 'featureNewsTitle':
+        return l.featureNewsTitle;
       case 'featureSickTitle':
         return l.featureSickTitle;
       default:
@@ -75,6 +81,8 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
         return l.featureScheduleDesc;
       case 'featureWeatherDesc':
         return l.featureWeatherDesc;
+      case 'featureNewsDesc':
+        return l.featureNewsDesc;
       case 'featureSickDesc':
         return l.featureSickDesc;
       default:
@@ -82,22 +90,12 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
     }
   }
 
-  final List<Map<String, dynamic>> _accentColors = [];
-
   @override
   void initState() {
     super.initState();
 
-    // Load current accent color from color provider
+    // Load current accent color from color provider for feature icons
     _selectedColor = ref.read(colorProvider);
-    
-    // Populate accent colors from provider
-    final allColors = ColorProvider.allColors;
-    _accentColors.clear();
-    _accentColors.addAll(allColors.map((palette) => {
-      'name': palette.name,
-      'color': palette.color,
-    }));
 
     // Button animation
     _buttonController = AnimationController(
@@ -142,18 +140,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
     super.dispose();
   }
 
-  Future<void> _selectColor(String colorName) async {
-    setState(() {
-      _selectedColor = colorName;
-    });
-
-    await HapticService.light();
-
-    // Save color preference using color provider
-    await ref.read(colorProvider.notifier).setColor(colorName);
-  }
-
-  Future<void> _navigateToAuth() async {
+  Future<void> _navigateToAccentColor() async {
     if (_isNavigating) return;
 
     setState(() {
@@ -169,17 +156,12 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
     // Small delay for the animation to feel natural
     await Future.delayed(const Duration(milliseconds: 50));
 
-    // Mark onboarding as completed (welcome + info) and mark first launch false
-    final notifier = ref.read(preferencesManagerProvider.notifier);
-    await notifier.setOnboardingCompleted(true);
-    await notifier.setFirstLaunch(false);
-
     // Release button animation
     _buttonController.reverse();
 
-    // Navigate to auth screen
+    // Navigate to accent color screen
     if (mounted) {
-      context.go(AppRouter.auth);
+      context.go(AppRouter.accentColor);
     }
   }
 
@@ -218,38 +200,6 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ..._features.map((feature) => _buildFeatureCard(feature)),
-                              const SizedBox(height: 24),
-
-                              // Accent Color Section
-                              Text(
-                                AppLocalizations.of(context)!.yourAccentColor,
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.primaryText,
-                                ),
-                              ),
-
-                              const SizedBox(height: 8),
-
-                              Text(
-                                AppLocalizations.of(context)!.chooseFavoriteColor,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: AppColors.secondaryText,
-                                  height: 1.4,
-                                ),
-                              ),
-
-                              const SizedBox(height: 16),
-
-                              // Color Selection
-                              Wrap(
-                                spacing: 12,
-                                runSpacing: 12,
-                                children: _accentColors.map((colorData) =>
-                                  _buildColorOption(colorData)
-                                ).toList(),
-                              ),
-
                               const SizedBox(height: 40),
                             ],
                           ),
@@ -278,7 +228,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                               ],
                             ),
                             child: ElevatedButton(
-                              onPressed: _isNavigating ? null : _navigateToAuth,
+                              onPressed: _isNavigating ? null : _navigateToAccentColor,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
                                 foregroundColor: Colors.white,
@@ -298,7 +248,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
                                     ),
                                   )
                                 : Text(
-                                    AppLocalizations.of(context)!.letsGo,
+                                    AppLocalizations.of(context)!.continueLabel,
                                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
@@ -375,64 +325,5 @@ class _InfoScreenState extends ConsumerState<InfoScreen>
       ),
     );
   }
-
-  Widget _buildColorOption(Map<String, dynamic> colorData) {
-    final isSelected = _selectedColor == colorData['name'];
-    final color = colorData['color'] as Color;
-
-    // Calculate responsive box size to fit 5 colors in one line with better constraints
-    final screenWidth = MediaQuery.of(context).size.width;
-    final availableWidth = screenWidth - 32; // Subtract padding (16px on each side)
-    final spacingWidth = 4 * 12; // 4 gaps between 5 boxes × 12px spacing
-    final calculatedSize = (availableWidth - spacingWidth) / 5;
-    final boxSize = calculatedSize.clamp(48.0, 72.0); // Better min/max constraints
-
-    return GestureDetector(
-      onTap: () => _selectColor(colorData['name'] as String),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        width: boxSize,
-        height: boxSize,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(boxSize * 0.32), // Scale with box size
-          border: Border.all(
-            color: isSelected ? Colors.white : Colors.transparent,
-            width: isSelected ? 3 : 0,
-          ),
-          boxShadow: isSelected
-            ? [
-                BoxShadow(
-                  color: color.withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  spreadRadius: 2,
-                ),
-              ]
-            : null,
-        ),
-        child: Center(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            child: isSelected
-              ? Icon(
-                  Icons.check,
-                  key: const ValueKey('check'),
-                  color: Colors.white,
-                  size: boxSize * 0.32, // Scale with box size
-                )
-              : Container(
-                  key: const ValueKey('dot'),
-                  width: boxSize * 0.24, // Scale with box size
-                  height: boxSize * 0.24, // Scale with box size
-                  decoration: const BoxDecoration(
-                    color: Colors.white24,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-          ),
-        ),
-      ),
-    );
-  }
 }
+
