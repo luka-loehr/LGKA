@@ -1007,7 +1007,7 @@ class _DrawerSheet extends ConsumerWidget {
               
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                 decoration: BoxDecoration(
                   color: AppColors.appSurface,
                   borderRadius: BorderRadius.circular(16),
@@ -1015,9 +1015,9 @@ class _DrawerSheet extends ConsumerWidget {
                 child: Column(
                   children: [
                     _buildKrankmeldungOption(context, ref),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 4),
                     _buildDivider(),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 4),
                     _buildNeuigkeitenOption(context),
                   ],
                 ),
@@ -1030,93 +1030,115 @@ class _DrawerSheet extends ConsumerWidget {
   }
 
   Widget _buildKrankmeldungOption(BuildContext context, WidgetRef ref) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).pop();
-        HapticService.subtle();
-        
-        final preferencesManager = ref.read(preferencesManagerProvider);
-        
-        // Check if krankmeldung info has been shown before
-        if (preferencesManager.krankmeldungInfoShown) {
-          // Navigate directly to webview
-          context.push(AppRouter.webview, extra: {
-            'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
-            'title': AppLocalizations.of(context)!.krankmeldung,
-            'headers': {
-              'User-Agent': AppInfo.userAgent,
-            },
-            'fromKrankmeldungInfo': false,
-          });
-        } else {
-          // Navigate to the info screen first
-          context.push(AppRouter.krankmeldungInfo);
-        }
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        child: Row(
-          children: [
-            Icon(
-              Icons.medical_services_outlined,
-              color: AppColors.secondaryText,
-              size: 18,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                AppLocalizations.of(context)!.krankmeldung,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.secondaryText,
-                  fontWeight: FontWeight.w500,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).pop();
+          HapticService.subtle();
+          
+          final preferencesManager = ref.read(preferencesManagerProvider);
+          
+          // Check if krankmeldung info has been shown before
+          if (preferencesManager.krankmeldungInfoShown) {
+            // Navigate directly to webview
+            context.push(AppRouter.webview, extra: {
+              'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
+              'title': AppLocalizations.of(context)!.krankmeldung,
+              'headers': {
+                'User-Agent': AppInfo.userAgent,
+              },
+              'fromKrankmeldungInfo': false,
+            });
+          } else {
+            // Navigate to the info screen first
+            context.push(AppRouter.krankmeldungInfo);
+          }
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.medical_services_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
                 ),
               ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: AppColors.secondaryText.withValues(alpha: 0.6),
-              size: 16,
-            ),
-          ],
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  AppLocalizations.of(context)!.krankmeldung,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.appOnSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: AppColors.secondaryText.withValues(alpha: 0.5),
+                size: 14,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildNeuigkeitenOption(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).pop();
-        HapticService.subtle();
-        context.push(AppRouter.news);
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        child: Row(
-          children: [
-            Icon(
-              Icons.newspaper_outlined,
-              color: AppColors.secondaryText,
-              size: 18,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                AppLocalizations.of(context)!.news,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.secondaryText,
-                  fontWeight: FontWeight.w500,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).pop();
+          HapticService.subtle();
+          context.push(AppRouter.news);
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.newspaper_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
                 ),
               ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: AppColors.secondaryText.withValues(alpha: 0.6),
-              size: 16,
-            ),
-          ],
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  AppLocalizations.of(context)!.news,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.appOnSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: AppColors.secondaryText.withValues(alpha: 0.5),
+                size: 14,
+              ),
+            ],
+          ),
         ),
       ),
     );
