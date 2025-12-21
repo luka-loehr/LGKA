@@ -11,6 +11,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:lgka_flutter/navigation/app_router.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:lgka_flutter/providers/schedule_provider.dart';
+import 'package:lgka_flutter/providers/news_provider.dart';
 import 'data/preferences_manager.dart';
 import 'package:lgka_flutter/l10n/app_localizations.dart';
 import 'utils/app_logger.dart';
@@ -149,6 +150,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
       _preloadPdfs(),
       _preloadWeatherData(),
       _preloadSchedules(),
+      _preloadNews(),
     ]);
     AppLogger.success('Background preload complete');
     await _refreshExpiredCaches();
@@ -183,6 +185,17 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
       AppLogger.success('Schedules preloaded');
     } catch (e) {
       AppLogger.error('Failed to preload schedules', error: e);
+    }
+  }
+
+  Future<void> _preloadNews() async {
+    try {
+      AppLogger.init('Preloading news');
+      final newsNotifier = ref.read(newsProvider.notifier);
+      await newsNotifier.loadNews();
+      AppLogger.success('News preloaded');
+    } catch (e) {
+      AppLogger.error('Failed to preload news', error: e);
     }
   }
 
