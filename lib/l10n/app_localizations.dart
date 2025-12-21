@@ -578,7 +578,7 @@ abstract class AppLocalizations {
   /// No description provided for @infoHeader.
   ///
   /// In en, this message translates to:
-  /// **'What the App offers'**
+  /// **'All Features at a Glance'**
   String get infoHeader;
 
   /// No description provided for @featureSubstitutionTitle.
