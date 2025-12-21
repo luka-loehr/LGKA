@@ -1298,8 +1298,6 @@ class _SettingsSheet extends ConsumerWidget {
   Widget _buildLegalLinks(BuildContext context) {
     return Column(
       children: [
-        _buildNewsLink(context),
-        const SizedBox(height: 12),
         _buildBugReportLink(context),
         const SizedBox(height: 12),
         _buildLegalLink(
@@ -1316,43 +1314,6 @@ class _SettingsSheet extends ConsumerWidget {
           'https://luka-loehr.github.io/LGKA/impressum.html'
         ),
       ],
-    );
-  }
-
-  Widget _buildNewsLink(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        HapticService.subtle();
-        context.push(AppRouter.news);
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        child: Row(
-          children: [
-            Icon(
-              Icons.newspaper_outlined,
-              color: AppColors.secondaryText,
-              size: 18,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                AppLocalizations.of(context)!.news,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.secondaryText,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: AppColors.secondaryText.withValues(alpha: 0.6),
-              size: 16,
-            ),
-          ],
-        ),
-      ),
     );
   }
 
