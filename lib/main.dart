@@ -12,6 +12,8 @@ import 'package:lgka_flutter/navigation/app_router.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:lgka_flutter/providers/schedule_provider.dart';
 import 'package:lgka_flutter/providers/news_provider.dart';
+import 'package:lgka_flutter/providers/fireworks_provider.dart';
+import 'package:lgka_flutter/widgets/fireworks_overlay.dart';
 import 'data/preferences_manager.dart';
 import 'package:lgka_flutter/l10n/app_localizations.dart';
 import 'utils/app_logger.dart';
@@ -242,8 +244,10 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       builder: (context, child) {
-        // Wrap the entire app with proper edge-to-edge inset handling
-        return EdgeToEdgeWrapper(child: child ?? const SizedBox.shrink());
+        // Wrap the entire app with proper edge-to-edge inset handling and fireworks overlay
+        return FireworksOverlay(
+          child: EdgeToEdgeWrapper(child: child ?? const SizedBox.shrink()),
+        );
       },
     );
   }
