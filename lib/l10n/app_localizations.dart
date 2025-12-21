@@ -838,6 +838,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'.'**
   String get privacyConsentSuffix;
+
+  /// No description provided for @news.
+  ///
+  /// In en, this message translates to:
+  /// **'News'**
+  String get news;
+
+  /// No description provided for @more.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get more;
+
+  /// No description provided for @learnMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn more'**
+  String get learnMore;
+
+  /// No description provided for @noNewsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No news available'**
+  String get noNewsAvailable;
+
+  /// No description provided for @noNewsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No news found'**
+  String get noNewsFound;
+
+  /// No description provided for @errorLoadingNews.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading news'**
+  String get errorLoadingNews;
+
+  /// No description provided for @unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknown;
+
+  /// No description provided for @colorBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get colorBlue;
+
+  /// No description provided for @colorMint.
+  ///
+  /// In en, this message translates to:
+  /// **'Mint'**
+  String get colorMint;
+
+  /// No description provided for @colorLavender.
+  ///
+  /// In en, this message translates to:
+  /// **'Lavender'**
+  String get colorLavender;
+
+  /// No description provided for @colorRose.
+  ///
+  /// In en, this message translates to:
+  /// **'Rose'**
+  String get colorRose;
+
+  /// No description provided for @colorPeach.
+  ///
+  /// In en, this message translates to:
+  /// **'Peach'**
+  String get colorPeach;
+
+  /// No description provided for @csvFileTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV file too large or corrupted'**
+  String get csvFileTooLarge;
+
+  /// No description provided for @errorLoadingWeather.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading weather data'**
+  String get errorLoadingWeather;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

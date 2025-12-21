@@ -163,5 +163,19 @@
   },
   "privacyConsentPrefix": "Ich habe die ",
   "privacyPolicy": "Datenschutzerklärung",
-  "privacyConsentSuffix": " gelesen."
+  "privacyConsentSuffix": " gelesen.",
+  "news": "Neuigkeiten",
+  "more": "Weiteres",
+  "learnMore": "Mehr erfahren",
+  "noNewsAvailable": "Keine Neuigkeiten verfügbar",
+  "noNewsFound": "Keine Neuigkeiten gefunden",
+  "errorLoadingNews": "Fehler beim Laden der Neuigkeiten",
+  "unknown": "Unbekannt",
+  "colorBlue": "Blau",
+  "colorMint": "Mint",
+  "colorLavender": "Lavendel",
+  "colorRose": "Rose",
+  "colorPeach": "Pfirsich",
+  "csvFileTooLarge": "CSV-Datei zu groß oder beschädigt",
+  "errorLoadingWeather": "Fehler beim Laden der Wetterdaten"
 }

@@ -7,6 +7,7 @@ import '../theme/app_theme.dart';
 import '../providers/news_provider.dart';
 import '../providers/haptic_service.dart';
 import '../services/news_service.dart';
+import '../l10n/app_localizations.dart';
 
 class NewsScreen extends ConsumerStatefulWidget {
   const NewsScreen({super.key});
@@ -40,7 +41,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
         backgroundColor: backgroundColor,
         surfaceTintColor: Colors.transparent,
         title: Text(
-          'Neuigkeiten',
+          AppLocalizations.of(context)!.news,
           style: TextStyle(
             color: primaryTextColor,
             fontWeight: FontWeight.bold,
@@ -68,7 +69,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      newsState.error ?? 'Fehler beim Laden',
+                      AppLocalizations.of(context)!.errorLoadingNews,
                       style: TextStyle(
                         color: primaryTextColor,
                         fontSize: 16,
@@ -82,7 +83,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
                         ref.read(newsProvider.notifier).refreshNews();
                       },
                       icon: const Icon(Icons.refresh),
-                      label: const Text('Erneut versuchen'),
+                      label: Text(AppLocalizations.of(context)!.tryAgain),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: accentColor,
                         foregroundColor: Colors.white,
@@ -97,9 +98,9 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
               ),
             )
           else if (newsState.events.isEmpty)
-            const SliverFillRemaining(
+            SliverFillRemaining(
               child: Center(
-                child: Text('Keine Neuigkeiten verfügbar'),
+                child: Text(AppLocalizations.of(context)!.noNewsAvailable),
               ),
             )
           else
@@ -202,7 +203,9 @@ class _NewsCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  event.createdDate,
+                  event.createdDate == 'Unknown'
+                      ? AppLocalizations.of(context)!.unknown
+                      : event.createdDate,
                   style: TextStyle(
                     color: secondaryTextColor,
                     fontSize: 12,
@@ -237,7 +240,9 @@ class _NewsCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
-                              event.author,
+                              event.author == 'Unknown' 
+                                  ? AppLocalizations.of(context)!.unknown
+                                  : event.author,
                               style: TextStyle(
                                 color: secondaryTextColor.withValues(alpha: 0.6),
                                 fontSize: 12,
@@ -253,7 +258,7 @@ class _NewsCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Mehr erfahren',
+                          AppLocalizations.of(context)!.learnMore,
                           style: TextStyle(
                             color: accentColor,
                             fontSize: 13,

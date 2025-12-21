@@ -92,9 +92,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: AppColors.appBackground,
       elevation: 0,
       leading: IconButton(
-        onPressed: _onKrankmeldungPressed,
+        onPressed: _showDrawer,
         icon: const Icon(
-          Icons.medical_services_outlined,
+          Icons.menu,
           color: AppColors.secondaryText,
         ),
       ),
@@ -182,7 +182,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _pageController.jumpToPage(index);
       setState(() => _currentPage = index);
 
-      final tabNames = ['Substitution Plan', 'Weather', 'Schedule'];
+      final tabNames = [
+        AppLocalizations.of(context)!.substitutionPlan,
+        AppLocalizations.of(context)!.weather,
+        AppLocalizations.of(context)!.schedule,
+      ];
       AppLogger.navigation('Switched to ${tabNames[index]} tab');
     }
   }
@@ -222,6 +226,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => _SettingsSheet(),
+    );
+  }
+
+  void _showDrawer() {
+    HapticService.subtle();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E1E),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => _DrawerSheet(),
     );
   }
 
@@ -493,17 +510,17 @@ class _StundenplanPageState extends ConsumerState<_StundenplanPage>
     return Column(
       children: [
         _ScheduleOptionButton(
-          label: 'Klassenstufe 5-7',
+          label: AppLocalizations.of(context)!.classes5to7,
           onTap: () => _openSchedule('klassenstufe_5_7'),
         ),
         const SizedBox(height: 16),
         _ScheduleOptionButton(
-          label: 'Klassenstufe 8-10',
+          label: AppLocalizations.of(context)!.classes8to10,
           onTap: () => _openSchedule('klassenstufe_8_10'),
         ),
         const SizedBox(height: 16),
         _ScheduleOptionButton(
-          label: 'Oberstufe',
+          label: AppLocalizations.of(context)!.upperSchool,
           onTap: () => _openSchedule('oberstufe'),
         ),
       ],
@@ -959,6 +976,173 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
   }
 }
 
+/// Drawer bottom sheet
+class _DrawerSheet extends ConsumerWidget {
+  const _DrawerSheet();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Wrap(
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            16, 
+            16, 
+            16, 
+            _getBottomPadding(context),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.more,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: AppColors.appOnSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.appSurface,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: [
+                    _buildKrankmeldungOption(context, ref),
+                    const SizedBox(height: 12),
+                    _buildDivider(),
+                    const SizedBox(height: 12),
+                    _buildNeuigkeitenOption(context),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildKrankmeldungOption(BuildContext context, WidgetRef ref) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).pop();
+        HapticService.subtle();
+        
+        final preferencesManager = ref.read(preferencesManagerProvider);
+        
+        // Check if krankmeldung info has been shown before
+        if (preferencesManager.krankmeldungInfoShown) {
+          // Navigate directly to webview
+          context.push(AppRouter.webview, extra: {
+            'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
+            'title': AppLocalizations.of(context)!.krankmeldung,
+            'headers': {
+              'User-Agent': AppInfo.userAgent,
+            },
+            'fromKrankmeldungInfo': false,
+          });
+        } else {
+          // Navigate to the info screen first
+          context.push(AppRouter.krankmeldungInfo);
+        }
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Row(
+          children: [
+            Icon(
+              Icons.medical_services_outlined,
+              color: AppColors.secondaryText,
+              size: 18,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context)!.krankmeldung,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.secondaryText,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: AppColors.secondaryText.withValues(alpha: 0.6),
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNeuigkeitenOption(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).pop();
+        HapticService.subtle();
+        context.push(AppRouter.news);
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Row(
+          children: [
+            Icon(
+              Icons.newspaper_outlined,
+              color: AppColors.secondaryText,
+              size: 18,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context)!.news,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.secondaryText,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: AppColors.secondaryText.withValues(alpha: 0.6),
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Container(
+      height: 1,
+      color: Colors.white.withValues(alpha: 0.1),
+    );
+  }
+
+  double _getBottomPadding(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final gestureInsets = mediaQuery.systemGestureInsets.bottom;
+
+    if (gestureInsets >= 45) {
+      return 54.0; // Button navigation
+    } else if (gestureInsets <= 25) {
+      return 8.0; // Gesture navigation
+    } else {
+      return mediaQuery.viewPadding.bottom > 50 ? 54.0 : 8.0;
+    }
+  }
+}
+
 /// Settings bottom sheet
 class _SettingsSheet extends ConsumerWidget {
   const _SettingsSheet();
@@ -1132,7 +1316,7 @@ class _SettingsSheet extends ConsumerWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Neuigkeiten',
+                AppLocalizations.of(context)!.news,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.secondaryText,
                   fontWeight: FontWeight.w500,
