@@ -391,4 +391,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyConsentSuffix => '.';
+
+  @override
+  String get news => 'News';
+
+  @override
+  String get more => 'More';
+
+  @override
+  String get learnMore => 'Learn more';
+
+  @override
+  String get noNewsAvailable => 'No news available';
+
+  @override
+  String get noNewsFound => 'No news found';
+
+  @override
+  String get errorLoadingNews => 'Error loading news';
+
+  @override
+  String get unknown => 'Unknown';
+
+  @override
+  String get colorBlue => 'Blue';
+
+  @override
+  String get colorMint => 'Mint';
+
+  @override
+  String get colorLavender => 'Lavender';
+
+  @override
+  String get colorRose => 'Rose';
+
+  @override
+  String get colorPeach => 'Peach';
+
+  @override
+  String get csvFileTooLarge => 'CSV file too large or corrupted';
+
+  @override
+  String get errorLoadingWeather => 'Error loading weather data';
 }
