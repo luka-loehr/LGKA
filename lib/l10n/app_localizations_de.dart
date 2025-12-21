@@ -249,7 +249,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get subjectSubstitution => 'LGKA+ Vertretungsplan';
 
   @override
-  String get infoHeader => 'Was kannst du mit der App machen?';
+  String get infoHeader => 'Was bietet die App dir?';
 
   @override
   String get featureSubstitutionTitle => 'Vertretungsplan';
