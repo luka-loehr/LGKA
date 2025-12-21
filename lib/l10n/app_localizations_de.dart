@@ -391,4 +391,46 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacyConsentSuffix => ' gelesen.';
+
+  @override
+  String get news => 'Neuigkeiten';
+
+  @override
+  String get more => 'Weiteres';
+
+  @override
+  String get learnMore => 'Mehr erfahren';
+
+  @override
+  String get noNewsAvailable => 'Keine Neuigkeiten verfügbar';
+
+  @override
+  String get noNewsFound => 'Keine Neuigkeiten gefunden';
+
+  @override
+  String get errorLoadingNews => 'Fehler beim Laden der Neuigkeiten';
+
+  @override
+  String get unknown => 'Unbekannt';
+
+  @override
+  String get colorBlue => 'Blau';
+
+  @override
+  String get colorMint => 'Mint';
+
+  @override
+  String get colorLavender => 'Lavendel';
+
+  @override
+  String get colorRose => 'Rose';
+
+  @override
+  String get colorPeach => 'Pfirsich';
+
+  @override
+  String get csvFileTooLarge => 'CSV-Datei zu groß oder beschädigt';
+
+  @override
+  String get errorLoadingWeather => 'Fehler beim Laden der Wetterdaten';
 }

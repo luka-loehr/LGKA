@@ -164,5 +164,19 @@
   },
   "privacyConsentPrefix": "I have read the ",
   "privacyPolicy": "privacy policy",
-  "privacyConsentSuffix": "."
+  "privacyConsentSuffix": ".",
+  "news": "News",
+  "more": "More",
+  "learnMore": "Learn more",
+  "noNewsAvailable": "No news available",
+  "noNewsFound": "No news found",
+  "errorLoadingNews": "Error loading news",
+  "unknown": "Unknown",
+  "colorBlue": "Blue",
+  "colorMint": "Mint",
+  "colorLavender": "Lavender",
+  "colorRose": "Rose",
+  "colorPeach": "Peach",
+  "csvFileTooLarge": "CSV file too large or corrupted",
+  "errorLoadingWeather": "Error loading weather data"
 }
