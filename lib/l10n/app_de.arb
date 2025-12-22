@@ -76,6 +76,7 @@
   "chartsAvailableAt": "Diagramme sind ab 0:30 Uhr verfügbar.",
   "checkingAvailability": "Prüfe Verfügbarkeit...",
   "loadingSchedules": "Lade Stundenpläne...",
+  "loadingNews": "Lade Neuigkeiten...",
   "noSchedulesAvailable": "Keine Stundenpläne verfügbar",
   "tryAgainLater": "Versuche es später erneut",
   "loadingSchedule": "Lade Stundenplan...",
