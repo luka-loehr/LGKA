@@ -27,7 +27,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
   void initState() {
     super.initState();
     _listAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1800),
       vsync: this,
     );
 
