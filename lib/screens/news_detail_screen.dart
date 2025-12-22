@@ -45,32 +45,6 @@ class NewsDetailScreen extends ConsumerWidget {
     context.push(AppRouter.newsDetail, extra: article);
   }
 
-  Future<void> _popToNewsScreen(BuildContext context) async {
-    final router = GoRouter.of(context);
-    
-    // Keep popping until we reach the news screen
-    while (context.mounted) {
-      // Check current location
-      final location = router.routerDelegate.currentConfiguration.uri.path;
-      
-      // If we're already at news or home, we're done
-      if (location == AppRouter.news || location == AppRouter.home) {
-        break;
-      }
-      
-      // If we can't pop anymore, navigate to news screen
-      if (!context.canPop()) {
-        context.go(AppRouter.news);
-        break;
-      }
-      
-      // Pop one screen with animation
-      context.pop();
-      
-      // Wait a bit for the animation to complete before checking again
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -96,7 +70,7 @@ class NewsDetailScreen extends ConsumerWidget {
           onPressed: () async {
             await HapticService.light();
             if (context.mounted) {
-              await _popToNewsScreen(context);
+              context.go(AppRouter.news);
             }
           },
         ),
