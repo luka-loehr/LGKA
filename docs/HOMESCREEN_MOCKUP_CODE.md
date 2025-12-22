@@ -433,3 +433,4 @@ class _HomeCardState extends State<_HomeCard>
 - **Better Discoverability**: All features visible immediately
 - **Cleaner UX**: Less cognitive load, clearer hierarchy
 
+
