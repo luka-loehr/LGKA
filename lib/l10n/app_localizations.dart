@@ -911,6 +911,12 @@ abstract class AppLocalizations {
   /// **'Unknown'**
   String get unknown;
 
+  /// No description provided for @openInBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Browser'**
+  String get openInBrowser;
+
   /// No description provided for @colorBlue.
   ///
   /// In en, this message translates to:

@@ -429,6 +429,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unknown => 'Unknown';
 
   @override
+  String get openInBrowser => 'Open in Browser';
+
+  @override
   String get colorBlue => 'Blue';
 
   @override
