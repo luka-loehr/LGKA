@@ -91,8 +91,9 @@ class AppLogger {
   }
 
   /// Network request logs
-  static void network(String message) {
-    _log('[Network]', message);
+  static void network(String message, {String? module}) {
+    final prefix = module != null ? '[Network][$module]' : '[Network]';
+    _log(prefix, message);
   }
 
   /// Data processing logs
