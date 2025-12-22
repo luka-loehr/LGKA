@@ -294,12 +294,16 @@ class NewsDetailScreen extends ConsumerWidget {
                                           color: accentColor.withValues(alpha: 0.8),
                                         ),
                                         const SizedBox(width: 6),
-                                        Text(
-                                          article.author == 'Unknown'
-                                              ? AppLocalizations.of(context)!.unknown
-                                              : article.author,
-                                          style: theme.textTheme.bodySmall?.copyWith(
-                                            color: secondaryTextColor.withValues(alpha: 0.8),
+                                        Flexible(
+                                          child: Text(
+                                            article.author == 'Unknown'
+                                                ? AppLocalizations.of(context)!.unknown
+                                                : article.author,
+                                            style: theme.textTheme.bodySmall?.copyWith(
+                                              color: secondaryTextColor.withValues(alpha: 0.8),
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                       ],
@@ -314,12 +318,16 @@ class NewsDetailScreen extends ConsumerWidget {
                                           color: accentColor.withValues(alpha: 0.8),
                                         ),
                                         const SizedBox(width: 6),
-                                        Text(
-                                          article.createdDate == 'Unknown'
-                                              ? AppLocalizations.of(context)!.unknown
-                                              : article.createdDate,
-                                          style: theme.textTheme.bodySmall?.copyWith(
-                                            color: secondaryTextColor.withValues(alpha: 0.8),
+                                        Flexible(
+                                          child: Text(
+                                            article.createdDate == 'Unknown'
+                                                ? AppLocalizations.of(context)!.unknown
+                                                : article.createdDate,
+                                            style: theme.textTheme.bodySmall?.copyWith(
+                                              color: secondaryTextColor.withValues(alpha: 0.8),
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                       ],
