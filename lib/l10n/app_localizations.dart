@@ -917,6 +917,12 @@ abstract class AppLocalizations {
   /// **'Open in Browser'**
   String get openInBrowser;
 
+  /// No description provided for @continueReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Reading:'**
+  String get continueReading;
+
   /// No description provided for @colorBlue.
   ///
   /// In en, this message translates to:

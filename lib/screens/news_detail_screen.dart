@@ -1,13 +1,17 @@
 // Copyright Luka Löhr 2025
 
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import '../providers/haptic_service.dart';
 import '../services/news_service.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/color_provider.dart';
+import '../providers/news_provider.dart';
+import '../navigation/app_router.dart';
 
 class NewsDetailScreen extends ConsumerWidget {
   final NewsEvent event;
@@ -25,6 +29,22 @@ class NewsDetailScreen extends ConsumerWidget {
     }
   }
 
+  List<NewsEvent> _getRecommendedArticles(List<NewsEvent> allEvents) {
+    // Filter out current event
+    final otherEvents = allEvents.where((e) => e.url != event.url).toList();
+    
+    if (otherEvents.isEmpty) return [];
+    
+    // Shuffle and take up to 3
+    final shuffled = List<NewsEvent>.from(otherEvents)..shuffle(Random());
+    return shuffled.take(3).toList();
+  }
+
+  void _navigateToArticle(BuildContext context, NewsEvent article) async {
+    await HapticService.light();
+    context.push(AppRouter.newsDetail, extra: article);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final backgroundColor = AppColors.appBackground;
@@ -32,6 +52,8 @@ class NewsDetailScreen extends ConsumerWidget {
     final primaryTextColor = AppColors.primaryText;
     final secondaryTextColor = AppColors.secondaryText;
     final accentColor = ref.watch(currentColorProvider);
+    final newsState = ref.watch(newsProvider);
+    final recommendedArticles = _getRecommendedArticles(newsState.events);
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -59,6 +81,15 @@ class NewsDetailScreen extends ConsumerWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.open_in_browser,
+              color: accentColor,
+            ),
+            onPressed: _openInBrowser,
+          ),
+        ],
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -188,28 +219,104 @@ class NewsDetailScreen extends ConsumerWidget {
                       ),
                     ),
                   
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                   
-                  // Open in Browser button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _openInBrowser,
-                      icon: const Icon(Icons.open_in_browser, size: 20),
-                      label: Text(AppLocalizations.of(context)!.openInBrowser),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: accentColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
+                  // Recommended articles section
+                  if (recommendedArticles.isNotEmpty) ...[
+                    Text(
+                      AppLocalizations.of(context)!.continueReading,
+                      style: TextStyle(
+                        color: primaryTextColor,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                  
-                  const SizedBox(height: 32),
+                    const SizedBox(height: 16),
+                    ...recommendedArticles.map((article) => Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: surfaceColor,
+                        borderRadius: BorderRadius.circular(12.0),
+                        border: Border.all(
+                          color: accentColor.withValues(alpha: 0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12.0),
+                          onTap: () => _navigateToArticle(context, article),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  article.title,
+                                  style: TextStyle(
+                                    color: primaryTextColor,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                if (article.description.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    article.description,
+                                    style: TextStyle(
+                                      color: secondaryTextColor,
+                                      fontSize: 14,
+                                      height: 1.4,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.calendar_today_outlined,
+                                      size: 14,
+                                      color: accentColor.withValues(alpha: 0.8),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      article.createdDate == 'Unknown'
+                                          ? AppLocalizations.of(context)!.unknown
+                                          : article.createdDate,
+                                      style: TextStyle(
+                                        color: secondaryTextColor.withValues(alpha: 0.8),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Icon(
+                                      Icons.visibility_outlined,
+                                      size: 14,
+                                      color: accentColor.withValues(alpha: 0.8),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '${article.views}',
+                                      style: TextStyle(
+                                        color: secondaryTextColor.withValues(alpha: 0.8),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    )),
+                    const SizedBox(height: 32),
+                  ],
                 ]),
               ),
             ),

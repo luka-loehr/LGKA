@@ -432,6 +432,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openInBrowser => 'Open in Browser';
 
   @override
+  String get continueReading => 'Continue Reading:';
+
+  @override
   String get colorBlue => 'Blue';
 
   @override
