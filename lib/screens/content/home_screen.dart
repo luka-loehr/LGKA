@@ -4,21 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../theme/app_theme.dart';
-import '../providers/app_providers.dart';
-import '../providers/color_provider.dart';
-import '../providers/schedule_provider.dart';
-import '../data/pdf_repository.dart';
-import '../data/preferences_manager.dart';
-import '../providers/haptic_service.dart';
-import '../navigation/app_router.dart';
-import '../services/retry_service.dart';
-import '../utils/app_logger.dart';
-import '../utils/app_info.dart';
-import '../widgets/app_footer.dart';
+import '../../theme/app_theme.dart';
+import '../../providers/app_providers.dart';
+import '../../providers/color_provider.dart';
+import '../../providers/schedule_provider.dart';
+import '../../data/pdf_repository.dart';
+import '../../data/preferences_manager.dart';
+import '../../providers/haptic_service.dart';
+import '../../navigation/app_router.dart';
+import '../../services/retry_service.dart';
+import '../../utils/app_logger.dart';
+import '../../utils/app_info.dart';
+import '../../widgets/app_footer.dart';
 import 'weather_page.dart';
 import 'schedule_page.dart';
-import '../l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Main home screen with substitution plan and weather tabs
 class HomeScreen extends ConsumerStatefulWidget {

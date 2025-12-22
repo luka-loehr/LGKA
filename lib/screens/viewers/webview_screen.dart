@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../theme/app_theme.dart';
-import '../providers/haptic_service.dart';
-import '../l10n/app_localizations.dart';
-import '../utils/app_info.dart';
-import '../utils/app_logger.dart';
+import '../../theme/app_theme.dart';
+import '../../providers/haptic_service.dart';
+import '../../l10n/app_localizations.dart';
+import '../../utils/app_info.dart';
+import '../../utils/app_logger.dart';
 
 class InAppWebViewScreen extends StatefulWidget {
   final String url;

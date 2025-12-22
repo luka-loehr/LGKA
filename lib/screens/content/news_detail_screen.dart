@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../theme/app_theme.dart';
-import '../providers/haptic_service.dart';
-import '../services/news_service.dart';
-import '../l10n/app_localizations.dart';
-import '../providers/color_provider.dart';
-import '../providers/news_provider.dart';
-import '../navigation/app_router.dart';
+import '../../theme/app_theme.dart';
+import '../../providers/haptic_service.dart';
+import '../../services/news_service.dart';
+import '../../l10n/app_localizations.dart';
+import '../../providers/color_provider.dart';
+import '../../providers/news_provider.dart';
+import '../../navigation/app_router.dart';
 
 class NewsDetailScreen extends ConsumerWidget {
   final NewsEvent event;

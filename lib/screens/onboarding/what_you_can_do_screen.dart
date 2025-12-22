@@ -3,11 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../theme/app_theme.dart';
-import '../providers/color_provider.dart';
-import '../navigation/app_router.dart';
-import '../providers/haptic_service.dart';
-import '../l10n/app_localizations.dart';
+import '../../theme/app_theme.dart';
+import '../../providers/color_provider.dart';
+import '../../navigation/app_router.dart';
+import '../../providers/haptic_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class WhatYouCanDoScreen extends ConsumerStatefulWidget {
   const WhatYouCanDoScreen({super.key});
