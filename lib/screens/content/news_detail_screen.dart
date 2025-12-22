@@ -59,6 +59,7 @@ class NewsDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: backgroundColor,
+      extendBody: true,
       appBar: AppBar(
         backgroundColor: backgroundColor,
         surfaceTintColor: Colors.transparent,
@@ -91,12 +92,11 @@ class NewsDetailScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-              sliver: SliverList(
+      body: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+            sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   // Article block - title, metadata, and content in one container
                   Container(
@@ -228,7 +228,7 @@ class NewsDetailScreen extends ConsumerWidget {
                             height: 32,
                           ),
                           Text(
-                            AppLocalizations.of(context)!.continueReading,
+                            AppLocalizations.of(context)!.weitereNeuigkeiten,
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -338,8 +338,10 @@ class NewsDetailScreen extends ConsumerWidget {
                 ]),
               ),
             ),
-          ],
-        ),
+          SliverToBoxAdapter(
+            child: SizedBox(height: 32 + MediaQuery.of(context).padding.bottom),
+          ),
+        ],
       ),
     );
   }
