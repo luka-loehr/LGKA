@@ -77,7 +77,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.newspaper_off_outlined,
+                      Icons.newspaper_rounded,
                       size: 64,
                       color: secondaryTextColor.withValues(alpha: 0.5),
                     ),
