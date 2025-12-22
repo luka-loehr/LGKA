@@ -2,13 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
 import '../providers/news_provider.dart';
 import '../providers/haptic_service.dart';
 import '../providers/color_provider.dart';
 import '../services/news_service.dart';
 import '../l10n/app_localizations.dart';
+import '../navigation/app_router.dart';
 
 class NewsScreen extends ConsumerStatefulWidget {
   const NewsScreen({super.key});
@@ -220,13 +221,10 @@ class _NewsCard extends StatelessWidget {
     required this.accentColor,
   });
 
-  Future<void> _launchUrl() async {
-    // Provide haptic feedback when launching the URL
+  void _navigateToDetail(BuildContext context) async {
+    // Provide haptic feedback when navigating
     await HapticService.light();
-    final uri = Uri.parse(event.url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      debugPrint('Could not launch $uri');
-    }
+    context.push(AppRouter.newsDetail, extra: event);
   }
 
   @override
@@ -248,7 +246,7 @@ class _NewsCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16.0),
-          onTap: _launchUrl,
+          onTap: () => _navigateToDetail(context),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
