@@ -150,9 +150,15 @@ class AppRouter {
         ),
         GoRoute(
           path: newsDetail,
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final event = state.extra as NewsEvent;
-            return NewsDetailScreen(event: event);
+            return CustomTransitionPage(
+              child: NewsDetailScreen(event: event),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return child; // No animation - instant transition
+              },
+              transitionDuration: Duration.zero,
+            );
           },
         ),
       ],
