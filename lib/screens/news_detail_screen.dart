@@ -73,11 +73,18 @@ class NewsDetailScreen extends ConsumerWidget {
             }
           },
         ),
+        title: Text(
+          AppLocalizations.of(context)!.news,
+          style: TextStyle(
+            color: primaryTextColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(
-              Icons.open_in_browser,
-              color: accentColor,
+              Icons.share,
+              color: primaryTextColor,
             ),
             onPressed: _openInBrowser,
           ),
@@ -90,17 +97,6 @@ class NewsDetailScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  // Header title
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 24.0),
-                    child: Text(
-                      AppLocalizations.of(context)!.news,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  
                   // Article block - title, metadata, and content in one container
                   Container(
                     padding: const EdgeInsets.all(24.0),
