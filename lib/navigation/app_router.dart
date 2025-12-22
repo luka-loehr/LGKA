@@ -155,9 +155,18 @@ class AppRouter {
             return CustomTransitionPage(
               child: NewsDetailScreen(event: event),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return child; // No animation - instant transition
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeInOut,
+                  )),
+                  child: child,
+                );
               },
-              transitionDuration: Duration.zero,
+              transitionDuration: const Duration(milliseconds: 300),
             );
           },
         ),
