@@ -17,14 +17,28 @@ class NewsScreen extends ConsumerStatefulWidget {
   ConsumerState<NewsScreen> createState() => _NewsScreenState();
 }
 
-class _NewsScreenState extends ConsumerState<NewsScreen> {
+class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStateMixin {
+  late AnimationController _listAnimationController;
+  bool _hasAnimatedList = false;
+
   @override
   void initState() {
     super.initState();
+    _listAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
     // Load news when screen is first opened
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(newsProvider.notifier).loadNews();
     });
+  }
+
+  @override
+  void dispose() {
+    _listAnimationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -35,6 +49,16 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
     final primaryTextColor = AppColors.primaryText;
     final secondaryTextColor = AppColors.secondaryText;
     final accentColor = ref.watch(currentColorProvider);
+
+    // Trigger list animation once when events become available
+    if (newsState.events.isNotEmpty && !_hasAnimatedList) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!_hasAnimatedList && mounted) {
+          _hasAnimatedList = true;
+          _listAnimationController.forward(from: 0);
+        }
+      });
+    }
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -137,12 +161,35 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     final event = newsState.events[index];
-                    return _NewsCard(
-                      event: event,
-                      surfaceColor: surfaceColor,
-                      primaryTextColor: primaryTextColor,
-                      secondaryTextColor: secondaryTextColor,
-                      accentColor: accentColor,
+                    // Create a per-item animation that fades and slightly slides
+                    // cards in from top to bottom.
+                    final itemCount = newsState.events.length.clamp(1, 50);
+                    final startInterval = (index / itemCount) * 0.6;
+                    final endInterval = startInterval + 0.4;
+                    final animation = CurvedAnimation(
+                      parent: _listAnimationController,
+                      curve: Interval(
+                        startInterval.clamp(0.0, 1.0),
+                        endInterval.clamp(0.0, 1.0),
+                        curve: Curves.easeOutCubic,
+                      ),
+                    );
+
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 0.04),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: _NewsCard(
+                          event: event,
+                          surfaceColor: surfaceColor,
+                          primaryTextColor: primaryTextColor,
+                          secondaryTextColor: secondaryTextColor,
+                          accentColor: accentColor,
+                        ),
+                      ),
                     );
                   },
                   childCount: newsState.events.length,
