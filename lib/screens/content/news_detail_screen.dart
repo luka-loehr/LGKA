@@ -213,7 +213,7 @@ class NewsDetailScreen extends ConsumerWidget {
                     ),
                   ),
                   
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 24),
                   
                   // Recommended articles section - separated
                   if (recommendedArticles.isNotEmpty) ...[
@@ -225,7 +225,7 @@ class NewsDetailScreen extends ConsumerWidget {
                           Divider(
                             color: accentColor.withValues(alpha: 0.2),
                             thickness: 1,
-                            height: 32,
+                            height: 16,
                           ),
                           Text(
                             AppLocalizations.of(context)!.weitereNeuigkeiten,
