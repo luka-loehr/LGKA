@@ -467,6 +467,12 @@ abstract class AppLocalizations {
   /// **'Loading schedules...'**
   String get loadingSchedules;
 
+  /// No description provided for @loadingNews.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading news...'**
+  String get loadingNews;
+
   /// No description provided for @noSchedulesAvailable.
   ///
   /// In en, this message translates to:
