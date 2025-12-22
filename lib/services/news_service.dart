@@ -5,6 +5,7 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:timezone/timezone.dart' as tz;
 import '../utils/app_logger.dart';
 import '../utils/app_info.dart';
+import '../utils/retry_util.dart';
 
 /// Represents a news event from the Lessing Gymnasium website
 class NewsEvent {
@@ -47,24 +48,25 @@ class NewsService {
   Future<List<NewsEvent>> fetchNewsEvents() async {
     AppLogger.network('Fetching news events');
     
-    try {
-      final response = await http.get(
-        Uri.parse(newsUrl),
-        headers: {'User-Agent': AppInfo.userAgent},
-      ).timeout(const Duration(seconds: 15));
+    return RetryUtil.retry<List<NewsEvent>>(
+      operation: () async {
+        final response = await http.get(
+          Uri.parse(newsUrl),
+          headers: {'User-Agent': AppInfo.userAgent},
+        ).timeout(const Duration(seconds: 15));
 
-      if (response.statusCode != 200) {
-        throw Exception('Failed to load news: ${response.statusCode}');
-      }
+        if (response.statusCode != 200) {
+          throw Exception('Failed to load news: ${response.statusCode}');
+        }
 
-      final document = html_parser.parse(response.body);
+        final document = html_parser.parse(response.body);
 
-      // Find all blog-item divs (news articles)
-      final blogItems = document.querySelectorAll('.blog-item');
+        // Find all blog-item divs (news articles)
+        final blogItems = document.querySelectorAll('.blog-item');
 
-      // First, extract metadata from all articles
-      final List<Map<String, dynamic>> metadataList = [];
-      for (var item in blogItems) {
+        // First, extract metadata from all articles
+        final List<Map<String, dynamic>> metadataList = [];
+        for (var item in blogItems) {
         try {
           // Extract title
           final titleElement = item.querySelector('h2 a');
@@ -157,98 +159,109 @@ class NewsService {
         }
       }
 
-      // Fetch full content for all articles concurrently
-      AppLogger.network('Fetching full content for ${metadataList.length} articles', module: 'NewsService');
-      final contentFutures = metadataList.map((metadata) async {
-        final fullContent = await _fetchFullArticleContent(metadata['url'] as String);
-        return {
-          ...metadata,
-          'content': fullContent,
-        };
-      }).toList();
+        // Fetch full content for all articles concurrently
+        AppLogger.network('Fetching full content for ${metadataList.length} articles', module: 'NewsService');
+        final contentFutures = metadataList.map((metadata) async {
+          final fullContent = await _fetchFullArticleContent(metadata['url'] as String);
+          return {
+            ...metadata,
+            'content': fullContent,
+          };
+        }).toList();
 
-      // Wait for all requests to complete
-      final results = await Future.wait(contentFutures);
+        // Wait for all requests to complete
+        final results = await Future.wait(contentFutures);
 
-      // Build final event list
-      final List<NewsEvent> events = [];
-      for (var result in results) {
-        try {
-          final event = NewsEvent(
-            title: result['title'] as String,
-            author: result['author'] as String,
-            description: result['description'] as String,
-            content: result['content'] as String?,
-            createdDate: result['createdDate'] as String,
-            parsedDate: result['parsedDate'] as DateTime?,
-            views: result['views'] as int,
-            url: result['url'] as String,
-          );
-          events.add(event);
-        } catch (e) {
-          AppLogger.warning('Error creating news event: $e', module: 'NewsService');
-          continue;
+        // Build final event list
+        final List<NewsEvent> events = [];
+        for (var result in results) {
+          try {
+            final event = NewsEvent(
+              title: result['title'] as String,
+              author: result['author'] as String,
+              description: result['description'] as String,
+              content: result['content'] as String?,
+              createdDate: result['createdDate'] as String,
+              parsedDate: result['parsedDate'] as DateTime?,
+              views: result['views'] as int,
+              url: result['url'] as String,
+            );
+            events.add(event);
+          } catch (e) {
+            AppLogger.warning('Error creating news event: $e', module: 'NewsService');
+            continue;
+          }
         }
-      }
 
-      // Sort events by date (newest first)
-      events.sort((a, b) {
-        // If both have parsed dates, compare them
-        if (a.parsedDate != null && b.parsedDate != null) {
-          return b.parsedDate!.compareTo(a.parsedDate!);
-        }
-        // If only one has a parsed date, prioritize it
-        if (a.parsedDate != null) return -1;
-        if (b.parsedDate != null) return 1;
-        // If neither has a parsed date, maintain original order
-        return 0;
-      });
+        // Sort events by date (newest first)
+        events.sort((a, b) {
+          // If both have parsed dates, compare them
+          if (a.parsedDate != null && b.parsedDate != null) {
+            return b.parsedDate!.compareTo(a.parsedDate!);
+          }
+          // If only one has a parsed date, prioritize it
+          if (a.parsedDate != null) return -1;
+          if (b.parsedDate != null) return 1;
+          // If neither has a parsed date, maintain original order
+          return 0;
+        });
 
-      AppLogger.success('Fetched ${events.length} news events with full content', module: 'NewsService');
-      return events;
-    } catch (e) {
+        AppLogger.success('Fetched ${events.length} news events with full content', module: 'NewsService');
+        return events;
+      },
+      maxRetries: 2,
+      operationName: 'NewsService',
+      shouldRetry: RetryUtil.isRetryableError,
+    ).catchError((e) {
       AppLogger.error('Failed to fetch news events', module: 'NewsService', error: e);
-      rethrow;
-    }
+      throw e;
+    });
   }
 
   /// Fetches the full content from an individual news article page
   Future<String?> _fetchFullArticleContent(String articleUrl) async {
     try {
-      final response = await http.get(
-        Uri.parse(articleUrl),
-        headers: {'User-Agent': AppInfo.userAgent},
-      ).timeout(const Duration(seconds: 15));
+      return await RetryUtil.retry<String?>(
+        operation: () async {
+          final response = await http.get(
+            Uri.parse(articleUrl),
+            headers: {'User-Agent': AppInfo.userAgent},
+          ).timeout(const Duration(seconds: 15));
 
-      if (response.statusCode != 200) {
-        AppLogger.warning('Failed to load article: ${response.statusCode}', module: 'NewsService');
-        return null;
-      }
+          if (response.statusCode != 200) {
+            AppLogger.warning('Failed to load article: ${response.statusCode}', module: 'NewsService');
+            return null;
+          }
 
-      final document = html_parser.parse(response.body);
-      
-      // Look for the article body content in .com-content-article__body
-      final articleBody = document.querySelector('.com-content-article__body');
-      if (articleBody == null) {
-        AppLogger.warning('Could not find .com-content-article__body element', module: 'NewsService');
-        return null;
-      }
+          final document = html_parser.parse(response.body);
+          
+          // Look for the article body content in .com-content-article__body
+          final articleBody = document.querySelector('.com-content-article__body');
+          if (articleBody == null) {
+            AppLogger.warning('Could not find .com-content-article__body element', module: 'NewsService');
+            return null;
+          }
 
-      // Extract all paragraphs from the article body
-      final paragraphs = articleBody.querySelectorAll('p');
-      
-      if (paragraphs.isEmpty) {
-        // Fallback: get all text from the article body
-        return articleBody.text.trim();
-      }
+          // Extract all paragraphs from the article body
+          final paragraphs = articleBody.querySelectorAll('p');
+          
+          if (paragraphs.isEmpty) {
+            // Fallback: get all text from the article body
+            return articleBody.text.trim();
+          }
 
-      // Combine all paragraph text, filtering out empty ones
-      final fullText = paragraphs
-          .map((p) => p.text.trim())
-          .where((text) => text.isNotEmpty)
-          .join('\n\n');
+          // Combine all paragraph text, filtering out empty ones
+          final fullText = paragraphs
+              .map((p) => p.text.trim())
+              .where((text) => text.isNotEmpty)
+              .join('\n\n');
 
-      return fullText;
+          return fullText;
+        },
+        maxRetries: 2,
+        operationName: 'NewsService',
+        shouldRetry: RetryUtil.isRetryableError,
+      );
     } catch (e) {
       AppLogger.warning('Error extracting full article content from $articleUrl: $e', module: 'NewsService');
       return null;
