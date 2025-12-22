@@ -7,6 +7,41 @@ import '../utils/app_logger.dart';
 import '../utils/app_info.dart';
 import '../utils/retry_util.dart';
 
+/// Represents a link found in news content
+class NewsLink {
+  final String text;
+  final String url;
+
+  NewsLink({
+    required this.text,
+    required this.url,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'text': text,
+        'url': url,
+      };
+}
+
+/// Represents an image found in news content
+class NewsImage {
+  final String url;
+  final String? thumbnailUrl;
+  final String? alt;
+
+  NewsImage({
+    required this.url,
+    this.thumbnailUrl,
+    this.alt,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'url': url,
+        if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
+        if (alt != null) 'alt': alt,
+      };
+}
+
 /// Represents a news event from the Lessing Gymnasium website
 class NewsEvent {
   final String title;
@@ -17,6 +52,8 @@ class NewsEvent {
   final DateTime? parsedDate;
   final int views;
   final String url;
+  final List<NewsLink> links;
+  final List<NewsImage> images;
 
   NewsEvent({
     required this.title,
@@ -27,6 +64,8 @@ class NewsEvent {
     this.parsedDate,
     required this.views,
     required this.url,
+    this.links = const [],
+    this.images = const [],
   });
 
   Map<String, dynamic> toJson() => {
@@ -37,6 +76,8 @@ class NewsEvent {
         'created_date': createdDate,
         'views': views,
         'url': url,
+        'links': links.map((l) => l.toJson()).toList(),
+        'images': images.map((i) => i.toJson()).toList(),
       };
 }
 
@@ -162,10 +203,12 @@ class NewsService {
         // Fetch full content for all articles concurrently
         AppLogger.network('Fetching full content for ${metadataList.length} articles', module: 'NewsService');
         final contentFutures = metadataList.map((metadata) async {
-          final fullContent = await _fetchFullArticleContent(metadata['url'] as String);
+          final contentData = await _fetchFullArticleContent(metadata['url'] as String);
           return {
             ...metadata,
-            'content': fullContent,
+            'content': contentData['content'],
+            'links': contentData['links'],
+            'images': contentData['images'],
           };
         }).toList();
 
@@ -185,6 +228,8 @@ class NewsService {
               parsedDate: result['parsedDate'] as DateTime?,
               views: result['views'] as int,
               url: result['url'] as String,
+              links: (result['links'] as List<NewsLink>?) ?? [],
+              images: (result['images'] as List<NewsImage>?) ?? [],
             );
             events.add(event);
           } catch (e) {
@@ -218,10 +263,10 @@ class NewsService {
     });
   }
 
-  /// Fetches the full content from an individual news article page
-  Future<String?> _fetchFullArticleContent(String articleUrl) async {
+  /// Fetches the full content, links, and images from an individual news article page
+  Future<Map<String, dynamic>> _fetchFullArticleContent(String articleUrl) async {
     try {
-      return await RetryUtil.retry<String?>(
+      return await RetryUtil.retry<Map<String, dynamic>>(
         operation: () async {
           final response = await http.get(
             Uri.parse(articleUrl),
@@ -230,7 +275,7 @@ class NewsService {
 
           if (response.statusCode != 200) {
             AppLogger.warning('Failed to load article: ${response.statusCode}', module: 'NewsService');
-            return null;
+            return {'content': null, 'links': <NewsLink>[], 'images': <NewsImage>[]};
           }
 
           final document = html_parser.parse(response.body);
@@ -239,24 +284,108 @@ class NewsService {
           final articleBody = document.querySelector('.com-content-article__body');
           if (articleBody == null) {
             AppLogger.warning('Could not find .com-content-article__body element', module: 'NewsService');
-            return null;
+            return {'content': null, 'links': <NewsLink>[], 'images': <NewsImage>[]};
           }
 
-          // Extract all paragraphs from the article body
+          // Extract links from <a> tags within paragraphs
+          final List<NewsLink> links = [];
+          final linkElements = articleBody.querySelectorAll('a');
+          for (var linkElement in linkElements) {
+            final href = linkElement.attributes['href'];
+            final text = linkElement.text.trim();
+            if (href != null && href.isNotEmpty && text.isNotEmpty) {
+              // Convert relative URLs to absolute URLs
+              final fullUrl = href.startsWith('http')
+                  ? href
+                  : href.startsWith('/')
+                      ? 'https://lessing-gymnasium-karlsruhe.de$href'
+                      : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
+              links.add(NewsLink(text: text, url: fullUrl));
+            }
+          }
+
+          // Extract images from gallery plugin (sigFreeContainer) and regular img tags
+          final List<NewsImage> images = [];
+          
+          // Check for gallery plugin images (Simple Image Gallery)
+          final galleryContainers = articleBody.querySelectorAll('.sigFreeContainer');
+          for (var gallery in galleryContainers) {
+            final galleryLinks = gallery.querySelectorAll('a.sigFreeLink');
+            for (var link in galleryLinks) {
+              final imageUrl = link.attributes['href'];
+              final thumbnailUrl = link.attributes['data-thumb'];
+              final imgElement = link.querySelector('img');
+              final alt = imgElement?.attributes['alt'] ?? imgElement?.attributes['title'];
+              
+              if (imageUrl != null && imageUrl.isNotEmpty) {
+                final fullImageUrl = imageUrl.startsWith('http')
+                    ? imageUrl
+                    : imageUrl.startsWith('/')
+                        ? 'https://lessing-gymnasium-karlsruhe.de$imageUrl'
+                        : 'https://lessing-gymnasium-karlsruhe.de/cm3/$imageUrl';
+                
+                String? fullThumbnailUrl;
+                if (thumbnailUrl != null && thumbnailUrl.isNotEmpty) {
+                  fullThumbnailUrl = thumbnailUrl.startsWith('http')
+                      ? thumbnailUrl
+                      : thumbnailUrl.startsWith('/')
+                          ? 'https://lessing-gymnasium-karlsruhe.de$thumbnailUrl'
+                          : 'https://lessing-gymnasium-karlsruhe.de/cm3/$thumbnailUrl';
+                }
+                
+                images.add(NewsImage(
+                  url: fullImageUrl,
+                  thumbnailUrl: fullThumbnailUrl,
+                  alt: alt,
+                ));
+              }
+            }
+          }
+          
+          // Also check for regular img tags that might not be in galleries
+          final imgElements = articleBody.querySelectorAll('img');
+          for (var img in imgElements) {
+            // Skip images that are already in galleries (they have sigFreeImg class)
+            if (img.classes.contains('sigFreeImg')) continue;
+            
+            final src = img.attributes['src'];
+            if (src != null && src.isNotEmpty) {
+              final fullImageUrl = src.startsWith('http')
+                  ? src
+                  : src.startsWith('/')
+                      ? 'https://lessing-gymnasium-karlsruhe.de$src'
+                      : 'https://lessing-gymnasium-karlsruhe.de/cm3/$src';
+              
+              // Check if this image is already in our list (avoid duplicates)
+              if (!images.any((i) => i.url == fullImageUrl)) {
+                images.add(NewsImage(
+                  url: fullImageUrl,
+                  alt: img.attributes['alt'],
+                ));
+              }
+            }
+          }
+
+          // Extract text content from paragraphs (preserving structure for link replacement)
           final paragraphs = articleBody.querySelectorAll('p');
           
+          String? fullText;
           if (paragraphs.isEmpty) {
             // Fallback: get all text from the article body
-            return articleBody.text.trim();
+            fullText = articleBody.text.trim();
+          } else {
+            // Combine all paragraph text, filtering out empty ones
+            fullText = paragraphs
+                .map((p) => p.text.trim())
+                .where((text) => text.isNotEmpty)
+                .join('\n\n');
           }
 
-          // Combine all paragraph text, filtering out empty ones
-          final fullText = paragraphs
-              .map((p) => p.text.trim())
-              .where((text) => text.isNotEmpty)
-              .join('\n\n');
-
-          return fullText;
+          return {
+            'content': fullText,
+            'links': links,
+            'images': images,
+          };
         },
         maxRetries: 2,
         operationName: 'NewsService',
@@ -264,7 +393,7 @@ class NewsService {
       );
     } catch (e) {
       AppLogger.warning('Error extracting full article content from $articleUrl: $e', module: 'NewsService');
-      return null;
+      return {'content': null, 'links': <NewsLink>[], 'images': <NewsImage>[]};
     }
   }
 
