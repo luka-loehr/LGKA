@@ -103,10 +103,6 @@ class NewsDetailScreen extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: surfaceColor,
                       borderRadius: BorderRadius.circular(20.0),
-                      border: Border.all(
-                        color: accentColor.withValues(alpha: 0.15),
-                        width: 1,
-                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,10 +241,6 @@ class NewsDetailScreen extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: surfaceColor,
                         borderRadius: BorderRadius.circular(16.0),
-                        border: Border.all(
-                          color: accentColor.withValues(alpha: 0.15),
-                          width: 1,
-                        ),
                       ),
                       child: Material(
                         color: Colors.transparent,
