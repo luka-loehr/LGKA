@@ -429,6 +429,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get unknown => 'Unbekannt';
 
   @override
+  String get openInBrowser => 'Im Browser öffnen';
+
+  @override
   String get colorBlue => 'Blau';
 
   @override

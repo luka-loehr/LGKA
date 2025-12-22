@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import '../providers/haptic_service.dart';
 import '../services/news_service.dart';
@@ -15,6 +16,14 @@ class NewsDetailScreen extends ConsumerWidget {
     super.key,
     required this.event,
   });
+
+  Future<void> _openInBrowser() async {
+    await HapticService.light();
+    final uri = Uri.parse(event.url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      debugPrint('Could not launch $uri');
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -41,13 +50,6 @@ class NewsDetailScreen extends ConsumerWidget {
             }
           },
         ),
-        title: Text(
-          AppLocalizations.of(context)!.news,
-          style: TextStyle(
-            color: primaryTextColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -56,24 +58,28 @@ class NewsDetailScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(20.0),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  // Title
+                  // News Title (main title)
                   Text(
                     event.title,
                     style: TextStyle(
                       color: primaryTextColor,
-                      fontSize: 24,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                       height: 1.3,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   
-                  // Metadata section
+                  // Metadata section with accent colors
                   Container(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(20.0),
                     decoration: BoxDecoration(
                       color: surfaceColor,
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(16.0),
+                      border: Border.all(
+                        color: accentColor.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,23 +89,25 @@ class NewsDetailScreen extends ConsumerWidget {
                           children: [
                             Icon(
                               Icons.person_outline,
-                              size: 16,
-                              color: secondaryTextColor.withValues(alpha: 0.8),
+                              size: 18,
+                              color: accentColor,
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              event.author == 'Unknown'
-                                  ? AppLocalizations.of(context)!.unknown
-                                  : event.author,
-                              style: TextStyle(
-                                color: secondaryTextColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                event.author == 'Unknown'
+                                    ? AppLocalizations.of(context)!.unknown
+                                    : event.author,
+                                style: TextStyle(
+                                  color: primaryTextColor,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 16),
                         
                         // Date and Views
                         Row(
@@ -107,35 +115,35 @@ class NewsDetailScreen extends ConsumerWidget {
                             // Date
                             Icon(
                               Icons.calendar_today_outlined,
-                              size: 16,
-                              color: secondaryTextColor.withValues(alpha: 0.8),
+                              size: 18,
+                              color: accentColor,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 10),
                             Text(
                               event.createdDate == 'Unknown'
                                   ? AppLocalizations.of(context)!.unknown
                                   : event.createdDate,
                               style: TextStyle(
-                                color: secondaryTextColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                                color: primaryTextColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                            const SizedBox(width: 20),
+                            const SizedBox(width: 24),
                             
                             // Views
                             Icon(
                               Icons.visibility_outlined,
-                              size: 16,
-                              color: secondaryTextColor.withValues(alpha: 0.8),
+                              size: 18,
+                              color: accentColor,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 10),
                             Text(
                               '${event.views}',
                               style: TextStyle(
-                                color: secondaryTextColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                                color: primaryTextColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
@@ -152,7 +160,7 @@ class NewsDetailScreen extends ConsumerWidget {
                       style: TextStyle(
                         color: primaryTextColor,
                         fontSize: 16,
-                        height: 1.6,
+                        height: 1.7,
                       ),
                     )
                   else
@@ -182,6 +190,27 @@ class NewsDetailScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Open in Browser button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _openInBrowser,
+                      icon: const Icon(Icons.open_in_browser, size: 20),
+                      label: Text(AppLocalizations.of(context)!.openInBrowser),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: accentColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
                   
                   const SizedBox(height: 32),
                 ]),
