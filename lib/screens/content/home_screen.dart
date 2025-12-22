@@ -1307,6 +1307,8 @@ class _SettingsSheet extends ConsumerWidget {
       children: [
         _buildBugReportLink(context),
         const SizedBox(height: 12),
+        _buildSupportLink(context),
+        const SizedBox(height: 12),
         _buildLegalLink(
           context,
           Icons.privacy_tip_outlined, 
@@ -1353,6 +1355,43 @@ class _SettingsSheet extends ConsumerWidget {
             ),
             Icon(
               Icons.arrow_forward_ios,
+              color: AppColors.secondaryText.withValues(alpha: 0.6),
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSupportLink(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        HapticService.subtle();
+        _launchURL('https://buymeacoffee.com/lukaloehr');
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Row(
+          children: [
+            Icon(
+              Icons.favorite_outline,
+              color: AppColors.secondaryText,
+              size: 18,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context)!.supportProject,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.secondaryText,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.open_in_new,
               color: AppColors.secondaryText.withValues(alpha: 0.6),
               size: 16,
             ),
