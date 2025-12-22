@@ -148,6 +148,8 @@ class _NewsCard extends StatelessWidget {
   });
 
   Future<void> _launchUrl() async {
+    // Provide haptic feedback when launching the URL
+    await HapticService.light();
     final uri = Uri.parse(event.url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       debugPrint('Could not launch $uri');
