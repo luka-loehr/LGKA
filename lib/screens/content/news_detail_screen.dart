@@ -2,6 +2,7 @@
 
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -12,6 +13,19 @@ import '../../l10n/app_localizations.dart';
 import '../../providers/color_provider.dart';
 import '../../providers/news_provider.dart';
 import '../../navigation/app_router.dart';
+
+/// Helper class to track link matches in content
+class _LinkMatch {
+  final int start;
+  final int end;
+  final NewsLink link;
+
+  _LinkMatch({
+    required this.start,
+    required this.end,
+    required this.link,
+  });
+}
 
 class NewsDetailScreen extends ConsumerWidget {
   final NewsEvent event;
@@ -27,6 +41,128 @@ class NewsDetailScreen extends ConsumerWidget {
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       debugPrint('Could not launch $uri');
     }
+  }
+
+  Future<void> _openLink(String url) async {
+    await HapticService.light();
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      debugPrint('Could not launch $uri');
+    }
+  }
+
+  /// Builds a RichText widget with clickable links from the content
+  Widget _buildContentWithLinks(String content, List<NewsLink> links, BuildContext context, ThemeData theme, Color accentColor) {
+    if (links.isEmpty) {
+      // No links, return simple text
+      return Text(
+        content,
+        style: theme.textTheme.bodyLarge?.copyWith(
+          height: 1.8,
+          letterSpacing: 0.2,
+        ),
+      );
+    }
+
+    // Create a map of link text to URL for quick lookup
+    final linkMap = <String, String>{};
+    for (var link in links) {
+      linkMap[link.text] = link.url;
+    }
+
+    // Split content by link texts and build TextSpans
+    final List<TextSpan> spans = [];
+    
+    // Sort links by text length (longest first) to avoid partial matches
+    final sortedLinks = List<NewsLink>.from(links)..sort((a, b) => b.text.length.compareTo(a.text.length));
+    
+    final List<_LinkMatch> matches = [];
+    
+    // Find all link occurrences in the content
+    for (var link in sortedLinks) {
+      int index = content.indexOf(link.text);
+      while (index != -1) {
+        matches.add(_LinkMatch(
+          start: index,
+          end: index + link.text.length,
+          link: link,
+        ));
+        index = content.indexOf(link.text, index + 1);
+      }
+    }
+    
+    // Sort matches by start position
+    matches.sort((a, b) => a.start.compareTo(b.start));
+    
+    // Remove overlapping matches (keep first occurrence)
+    final List<_LinkMatch> nonOverlappingMatches = [];
+    for (var match in matches) {
+      bool overlaps = false;
+      for (var existing in nonOverlappingMatches) {
+        if (match.start < existing.end && match.end > existing.start) {
+          overlaps = true;
+          break;
+        }
+      }
+      if (!overlaps) {
+        nonOverlappingMatches.add(match);
+      }
+    }
+    
+    // Build TextSpans
+    int currentIndex = 0;
+    for (var match in nonOverlappingMatches) {
+      // Add text before the link
+      if (match.start > currentIndex) {
+        spans.add(TextSpan(
+          text: content.substring(currentIndex, match.start),
+          style: theme.textTheme.bodyLarge?.copyWith(
+            height: 1.8,
+            letterSpacing: 0.2,
+          ),
+        ));
+      }
+      
+      // Add the clickable link
+      spans.add(TextSpan(
+        text: match.link.text,
+        style: theme.textTheme.bodyLarge?.copyWith(
+          height: 1.8,
+          letterSpacing: 0.2,
+          color: accentColor,
+        ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () => _openLink(match.link.url),
+      ));
+      
+      currentIndex = match.end;
+    }
+    
+    // Add remaining text after the last link
+    if (currentIndex < content.length) {
+      spans.add(TextSpan(
+        text: content.substring(currentIndex),
+        style: theme.textTheme.bodyLarge?.copyWith(
+          height: 1.8,
+          letterSpacing: 0.2,
+        ),
+      ));
+    }
+    
+    // If no matches were found, return simple text
+    if (spans.isEmpty) {
+      return Text(
+        content,
+        style: theme.textTheme.bodyLarge?.copyWith(
+          height: 1.8,
+          letterSpacing: 0.2,
+        ),
+      );
+    }
+    
+    return RichText(
+      text: TextSpan(children: spans),
+    );
   }
 
   List<NewsEvent> _getRecommendedArticles(List<NewsEvent> allEvents) {
@@ -176,15 +312,91 @@ class NewsDetailScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 32),
                         
-                        // Full content
-                        if (event.content != null && event.content!.isNotEmpty)
-                          Text(
+                        // Full content with clickable links
+                        if (event.content != null && event.content!.isNotEmpty) ...[
+                          _buildContentWithLinks(
                             event.content!,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              height: 1.8,
-                              letterSpacing: 0.2,
-                            ),
-                          )
+                            event.links,
+                            context,
+                            theme,
+                            accentColor,
+                          ),
+                          
+                          // Display images if available
+                          if (event.images.isNotEmpty) ...[
+                            const SizedBox(height: 24),
+                            ...event.images.map((image) => Padding(
+                              padding: const EdgeInsets.only(bottom: 16.0),
+                              child: GestureDetector(
+                                onTap: () => _openLink(image.url),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                  child: Stack(
+                                    children: [
+                                      Image.network(
+                                        image.thumbnailUrl ?? image.url,
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
+                                        loadingBuilder: (context, child, loadingProgress) {
+                                          if (loadingProgress == null) return child;
+                                          return Container(
+                                            height: 200,
+                                            decoration: BoxDecoration(
+                                              color: backgroundColor,
+                                              borderRadius: BorderRadius.circular(12.0),
+                                            ),
+                                            child: Center(
+                                              child: CircularProgressIndicator(
+                                                value: loadingProgress.expectedTotalBytes != null
+                                                    ? loadingProgress.cumulativeBytesLoaded /
+                                                        loadingProgress.expectedTotalBytes!
+                                                    : null,
+                                                color: accentColor,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            height: 200,
+                                            decoration: BoxDecoration(
+                                              color: backgroundColor,
+                                              borderRadius: BorderRadius.circular(12.0),
+                                            ),
+                                            child: Center(
+                                              child: Icon(
+                                                Icons.broken_image_outlined,
+                                                color: secondaryTextColor.withValues(alpha: 0.5),
+                                                size: 48,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      // Overlay icon to indicate image is clickable
+                                      Positioned(
+                                        top: 8,
+                                        right: 8,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(6.0),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black.withValues(alpha: 0.5),
+                                            borderRadius: BorderRadius.circular(8.0),
+                                          ),
+                                          child: Icon(
+                                            Icons.open_in_new,
+                                            color: Colors.white,
+                                            size: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )),
+                          ],
+                        ]
                         else
                           Container(
                             padding: const EdgeInsets.all(20.0),
