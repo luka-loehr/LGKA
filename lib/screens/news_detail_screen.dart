@@ -50,6 +50,15 @@ class NewsDetailScreen extends ConsumerWidget {
             }
           },
         ),
+        title: Text(
+          event.title,
+          style: TextStyle(
+            color: primaryTextColor,
+            fontWeight: FontWeight.bold,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -58,18 +67,6 @@ class NewsDetailScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(20.0),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  // News Title (main title)
-                  Text(
-                    event.title,
-                    style: TextStyle(
-                      color: primaryTextColor,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      height: 1.3,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  
                   // Metadata section with accent colors
                   Container(
                     padding: const EdgeInsets.all(20.0),
