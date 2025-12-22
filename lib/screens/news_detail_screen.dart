@@ -115,62 +115,63 @@ class NewsDetailScreen extends ConsumerWidget {
                         const SizedBox(height: 24),
                         
                         // Metadata
-                        Row(
+                        Wrap(
+                          spacing: 24,
+                          runSpacing: 16,
                           children: [
                             // Author
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.person_outline,
-                                    size: 18,
-                                    color: accentColor,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      event.author == 'Unknown'
-                                          ? AppLocalizations.of(context)!.unknown
-                                          : event.author,
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.person_outline,
+                                  size: 18,
+                                  color: accentColor,
+                                ),
+                                const SizedBox(width: 10),
+                                Flexible(
+                                  child: Text(
+                                    event.author == 'Unknown'
+                                        ? AppLocalizations.of(context)!.unknown
+                                        : event.author,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.w500,
                                     ),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.visible,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 20),
                             
                             // Date
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.calendar_today_outlined,
-                                    size: 18,
-                                    color: accentColor,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      event.createdDate == 'Unknown'
-                                          ? AppLocalizations.of(context)!.unknown
-                                          : event.createdDate,
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.calendar_today_outlined,
+                                  size: 18,
+                                  color: accentColor,
+                                ),
+                                const SizedBox(width: 10),
+                                Flexible(
+                                  child: Text(
+                                    event.createdDate == 'Unknown'
+                                        ? AppLocalizations.of(context)!.unknown
+                                        : event.createdDate,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.w500,
                                     ),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.visible,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 20),
                             
                             // Views
                             Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   Icons.visibility_outlined,
