@@ -41,6 +41,19 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
       appBar: AppBar(
         backgroundColor: backgroundColor,
         surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: primaryTextColor,
+          ),
+          onPressed: () async {
+            // Provide haptic feedback when navigating back
+            await HapticService.light();
+            if (context.mounted) {
+              Navigator.of(context).pop();
+            }
+          },
+        ),
         title: Text(
           AppLocalizations.of(context)!.news,
           style: TextStyle(
