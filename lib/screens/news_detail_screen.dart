@@ -175,25 +175,6 @@ class NewsDetailScreen extends ConsumerWidget {
                                 ),
                               ],
                             ),
-                            
-                            // Views
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.visibility_outlined,
-                                  size: 18,
-                                  color: accentColor,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  '${event.views}',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
                           ],
                         ),
                         const SizedBox(height: 32),
@@ -311,19 +292,6 @@ class NewsDetailScreen extends ConsumerWidget {
                                       article.createdDate == 'Unknown'
                                           ? AppLocalizations.of(context)!.unknown
                                           : article.createdDate,
-                                      style: theme.textTheme.bodySmall?.copyWith(
-                                        color: secondaryTextColor.withValues(alpha: 0.8),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Icon(
-                                      Icons.visibility_outlined,
-                                      size: 14,
-                                      color: accentColor.withValues(alpha: 0.8),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '${article.views}',
                                       style: theme.textTheme.bodySmall?.copyWith(
                                         color: secondaryTextColor.withValues(alpha: 0.8),
                                       ),
