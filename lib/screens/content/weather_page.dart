@@ -4,15 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
-import '../services/weather_service.dart';
-import '../theme/app_theme.dart';
-import '../providers/app_providers.dart';
+import '../../services/weather_service.dart';
+import '../../theme/app_theme.dart';
+import '../../providers/app_providers.dart';
 
-import '../providers/haptic_service.dart';
-import '../l10n/app_localizations.dart';
-import '../utils/app_logger.dart';
+import '../../providers/haptic_service.dart';
+import '../../l10n/app_localizations.dart';
+import '../../utils/app_logger.dart';
 
-import '../widgets/app_footer.dart';
+import '../../widgets/app_footer.dart';
 import 'package:intl/intl.dart';
 
 
