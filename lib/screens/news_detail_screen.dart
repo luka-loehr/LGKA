@@ -87,156 +87,170 @@ class NewsDetailScreen extends ConsumerWidget {
         child: CustomScrollView(
           slivers: [
             SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  // Title
-                  Text(
-                    event.title,
-                    style: theme.textTheme.headlineLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      height: 1.3,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // Metadata card
+                  // Article block - title, metadata, and content in one container
                   Container(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(24.0),
                     decoration: BoxDecoration(
                       color: surfaceColor,
-                      borderRadius: BorderRadius.circular(16.0),
+                      borderRadius: BorderRadius.circular(20.0),
                       border: Border.all(
                         color: accentColor.withValues(alpha: 0.15),
                         width: 1,
                       ),
                     ),
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Author
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.person_outline,
-                                size: 18,
-                                color: accentColor,
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  event.author == 'Unknown'
-                                      ? AppLocalizations.of(context)!.unknown
-                                      : event.author,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
+                        // Title
+                        Text(
+                          event.title,
+                          style: theme.textTheme.headlineLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            height: 1.3,
                           ),
                         ),
-                        const SizedBox(width: 20),
+                        const SizedBox(height: 24),
                         
-                        // Date
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today_outlined,
-                                size: 18,
-                                color: accentColor,
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  event.createdDate == 'Unknown'
-                                      ? AppLocalizations.of(context)!.unknown
-                                      : event.createdDate,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-                        
-                        // Views
+                        // Metadata
                         Row(
                           children: [
-                            Icon(
-                              Icons.visibility_outlined,
-                              size: 18,
-                              color: accentColor,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              '${event.views}',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
+                            // Author
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.person_outline,
+                                    size: 18,
+                                    color: accentColor,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      event.author == 'Unknown'
+                                          ? AppLocalizations.of(context)!.unknown
+                                          : event.author,
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
+                            ),
+                            const SizedBox(width: 20),
+                            
+                            // Date
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today_outlined,
+                                    size: 18,
+                                    color: accentColor,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      event.createdDate == 'Unknown'
+                                          ? AppLocalizations.of(context)!.unknown
+                                          : event.createdDate,
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            
+                            // Views
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.visibility_outlined,
+                                  size: 18,
+                                  color: accentColor,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  '${event.views}',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
+                        const SizedBox(height: 32),
+                        
+                        // Full content
+                        if (event.content != null && event.content!.isNotEmpty)
+                          Text(
+                            event.content!,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              height: 1.8,
+                              letterSpacing: 0.2,
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.all(20.0),
+                            decoration: BoxDecoration(
+                              color: backgroundColor,
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  color: secondaryTextColor.withValues(alpha: 0.6),
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    AppLocalizations.of(context)!.noNewsFound,
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  
-                  // Full content
-                  if (event.content != null && event.content!.isNotEmpty)
-                    Text(
-                      event.content!,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        height: 1.8,
-                        letterSpacing: 0.2,
-                      ),
-                    )
-                  else
-                    Container(
-                      padding: const EdgeInsets.all(20.0),
-                      decoration: BoxDecoration(
-                        color: surfaceColor,
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            color: secondaryTextColor.withValues(alpha: 0.6),
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              AppLocalizations.of(context)!.noNewsFound,
-                              style: theme.textTheme.bodyMedium,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   
                   const SizedBox(height: 48),
                   
-                  // Recommended articles section
+                  // Recommended articles section - separated
                   if (recommendedArticles.isNotEmpty) ...[
-                    Divider(
-                      color: accentColor.withValues(alpha: 0.2),
-                      thickness: 1,
-                      height: 32,
-                    ),
-                    Text(
-                      AppLocalizations.of(context)!.continueReading,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Divider(
+                            color: accentColor.withValues(alpha: 0.2),
+                            thickness: 1,
+                            height: 32,
+                          ),
+                          Text(
+                            AppLocalizations.of(context)!.continueReading,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 20),
                     ...recommendedArticles.map((article) => Container(
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
