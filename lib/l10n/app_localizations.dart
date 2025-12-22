@@ -923,6 +923,12 @@ abstract class AppLocalizations {
   /// **'Continue Reading:'**
   String get continueReading;
 
+  /// No description provided for @weitereNeuigkeiten.
+  ///
+  /// In en, this message translates to:
+  /// **'More News'**
+  String get weitereNeuigkeiten;
+
   /// No description provided for @colorBlue.
   ///
   /// In en, this message translates to:
@@ -964,6 +970,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error loading weather data'**
   String get errorLoadingWeather;
+
+  /// No description provided for @supportProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Support Project'**
+  String get supportProject;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

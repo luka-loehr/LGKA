@@ -179,11 +179,13 @@
   "unknown": "Unknown",
   "openInBrowser": "Open in Browser",
   "continueReading": "Continue Reading:",
+  "weitereNeuigkeiten": "More News",
   "colorBlue": "Blue",
   "colorMint": "Mint",
   "colorLavender": "Lavender",
   "colorRose": "Rose",
   "colorPeach": "Peach",
   "csvFileTooLarge": "CSV file too large or corrupted",
-  "errorLoadingWeather": "Error loading weather data"
+  "errorLoadingWeather": "Error loading weather data",
+  "supportProject": "Support Project"
 }
