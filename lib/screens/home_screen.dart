@@ -1252,7 +1252,9 @@ class _SettingsSheet extends ConsumerWidget {
                 ref.read(colorProvider.notifier).setColor(colorPalette.name);
                 HapticService.subtle();
               },
-              child: Container(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
@@ -1272,13 +1274,18 @@ class _SettingsSheet extends ConsumerWidget {
                         ]
                       : null,
                 ),
-                child: isSelected
-                    ? Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 24,
-                      )
-                    : null,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  opacity: isSelected ? 1.0 : 0.0,
+                  child: isSelected
+                      ? Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 24,
+                        )
+                      : null,
+                ),
               ),
             );
           }).toList(),
