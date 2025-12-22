@@ -3,6 +3,7 @@ import 'package:csv/csv.dart';
 import 'dart:convert';
 import '../utils/app_logger.dart';
 import '../utils/app_info.dart';
+import '../utils/retry_util.dart';
 
 class WeatherData {
   final DateTime time;
@@ -98,112 +99,124 @@ class WeatherService {
   Future<List<WeatherData>> fetchWeatherData() async {
     AppLogger.network('Fetching weather data');
     
-    try {
-      // HTTP request with timeout
-      final response = await http.get(
-        Uri.parse(csvUrl),
-        headers: {'User-Agent': AppInfo.userAgent},
-      ).timeout(const Duration(seconds: 10));
-      
-      if (response.statusCode != 200) {
-        throw Exception('Failed to load weather data: ${response.statusCode}');
-      }
-
-      // Decode and validate size
-      final csvString = utf8.decode(response.bodyBytes, allowMalformed: true);
-      if (csvString.length > maxCsvSizeBytes) {
-        throw Exception('CSV data too large (${(csvString.length / 1024 / 1024).toStringAsFixed(1)}MB). Maximum allowed: ${(maxCsvSizeBytes / 1024 / 1024).toStringAsFixed(1)}MB');
-      }
-
-      // Parse CSV
-      final csvData = const CsvToListConverter(
-        eol: '\n',
-        fieldDelimiter: ';',
-      ).convert(csvString);
-      
-      if (csvData.isEmpty) {
-        throw Exception('CSV data is empty');
-      }
-
-      // Limit to last 24 hours (1440 minutes) to prevent memory issues
-      const int maxDataPoints = 1440;
-      final int startIndex = csvData.length > maxDataPoints + 1 ? csvData.length - maxDataPoints : 1;
-
-      // Parse data rows
-      final List<WeatherData> allWeatherData = [];
-      for (int i = startIndex; i < csvData.length; i++) {
-        final row = csvData[i];
-        if (row.length < 7) continue;
+    return RetryUtil.retry<List<WeatherData>>(
+      operation: () async {
+        // HTTP request with timeout
+        final response = await http.get(
+          Uri.parse(csvUrl),
+          headers: {'User-Agent': AppInfo.userAgent},
+        ).timeout(const Duration(seconds: 10));
         
-        try {
-          final dataIndex = i - startIndex;
-          final now = DateTime.now();
-          final time = DateTime(now.year, now.month, now.day, 0, 0)
-              .add(Duration(minutes: dataIndex));
-          
-          allWeatherData.add(WeatherData(
-            time: time,
-            windSpeed: _parseDouble(row[0]),
-            windDirection: row[1]?.toString() ?? '',
-            temperature: _parseDouble(row[2]),
-            humidity: _parseDouble(row[3]),
-            precipitation: _parseDouble(row[4]),
-            pressure: _parseDouble(row[5]),
-            radiation: _parseDouble(row[6]),
-          ));
-        } catch (e) {
-          // Skip invalid rows
+        if (response.statusCode != 200) {
+          throw Exception('Failed to load weather data: ${response.statusCode}');
         }
-      }
-      
-      if (allWeatherData.isNotEmpty) {
-        AppLogger.success('Loaded ${allWeatherData.length} points (${allWeatherData.first.temperature}°C → ${allWeatherData.last.temperature}°C)', module: 'WeatherService');
-      } else {
-        throw Exception('No valid weather data found');
-      }
-      
-      return allWeatherData;
-    } catch (e) {
+
+        // Decode and validate size
+        final csvString = utf8.decode(response.bodyBytes, allowMalformed: true);
+        if (csvString.length > maxCsvSizeBytes) {
+          throw Exception('CSV data too large (${(csvString.length / 1024 / 1024).toStringAsFixed(1)}MB). Maximum allowed: ${(maxCsvSizeBytes / 1024 / 1024).toStringAsFixed(1)}MB');
+        }
+
+        // Parse CSV
+        final csvData = const CsvToListConverter(
+          eol: '\n',
+          fieldDelimiter: ';',
+        ).convert(csvString);
+        
+        if (csvData.isEmpty) {
+          throw Exception('CSV data is empty');
+        }
+
+        // Limit to last 24 hours (1440 minutes) to prevent memory issues
+        const int maxDataPoints = 1440;
+        final int startIndex = csvData.length > maxDataPoints + 1 ? csvData.length - maxDataPoints : 1;
+
+        // Parse data rows
+        final List<WeatherData> allWeatherData = [];
+        for (int i = startIndex; i < csvData.length; i++) {
+          final row = csvData[i];
+          if (row.length < 7) continue;
+          
+          try {
+            final dataIndex = i - startIndex;
+            final now = DateTime.now();
+            final time = DateTime(now.year, now.month, now.day, 0, 0)
+                .add(Duration(minutes: dataIndex));
+            
+            allWeatherData.add(WeatherData(
+              time: time,
+              windSpeed: _parseDouble(row[0]),
+              windDirection: row[1]?.toString() ?? '',
+              temperature: _parseDouble(row[2]),
+              humidity: _parseDouble(row[3]),
+              precipitation: _parseDouble(row[4]),
+              pressure: _parseDouble(row[5]),
+              radiation: _parseDouble(row[6]),
+            ));
+          } catch (e) {
+            // Skip invalid rows
+          }
+        }
+        
+        if (allWeatherData.isNotEmpty) {
+          AppLogger.success('Loaded ${allWeatherData.length} points (${allWeatherData.first.temperature}°C → ${allWeatherData.last.temperature}°C)', module: 'WeatherService');
+        } else {
+          throw Exception('No valid weather data found');
+        }
+        
+        return allWeatherData;
+      },
+      maxRetries: 2,
+      operationName: 'WeatherService',
+      shouldRetry: RetryUtil.isRetryableError,
+    ).catchError((e) {
       AppLogger.error('Weather fetch failed', module: 'WeatherService', error: e);
-      rethrow;
-    }
+      throw e;
+    });
   }
 
   /// Get the latest weather data point for real-time display
   Future<WeatherData?> getLatestWeatherData() async {
     try {
-      final response = await http.get(
-        Uri.parse(csvUrl),
-        headers: {'User-Agent': AppInfo.userAgent},
-      ).timeout(const Duration(seconds: 10));
-      
-      if (response.statusCode != 200) return null;
+      return await RetryUtil.retry<WeatherData?>(
+        operation: () async {
+          final response = await http.get(
+            Uri.parse(csvUrl),
+            headers: {'User-Agent': AppInfo.userAgent},
+          ).timeout(const Duration(seconds: 10));
+          
+          if (response.statusCode != 200) return null;
 
-      final csvString = utf8.decode(response.bodyBytes, allowMalformed: true);
-      final csvData = const CsvToListConverter(
-        eol: '\n',
-        fieldDelimiter: ';',
-      ).convert(csvString);
-      
-      if (csvData.length < 2) return null;
-      
-      final lastRow = csvData.last;
-      if (lastRow.length < 7) return null;
-      
-      final minutesSinceMidnight = csvData.length - 2;
-      final now = DateTime.now();
-      final time = DateTime(now.year, now.month, now.day, 0, 0)
-          .add(Duration(minutes: minutesSinceMidnight));
-      
-      return WeatherData(
-        time: time,
-        windSpeed: _parseDouble(lastRow[0]),
-        windDirection: lastRow[1]?.toString() ?? '',
-        temperature: _parseDouble(lastRow[2]),
-        humidity: _parseDouble(lastRow[3]),
-        precipitation: _parseDouble(lastRow[4]),
-        pressure: _parseDouble(lastRow[5]),
-        radiation: _parseDouble(lastRow[6]),
+          final csvString = utf8.decode(response.bodyBytes, allowMalformed: true);
+          final csvData = const CsvToListConverter(
+            eol: '\n',
+            fieldDelimiter: ';',
+          ).convert(csvString);
+          
+          if (csvData.length < 2) return null;
+          
+          final lastRow = csvData.last;
+          if (lastRow.length < 7) return null;
+          
+          final minutesSinceMidnight = csvData.length - 2;
+          final now = DateTime.now();
+          final time = DateTime(now.year, now.month, now.day, 0, 0)
+              .add(Duration(minutes: minutesSinceMidnight));
+          
+          return WeatherData(
+            time: time,
+            windSpeed: _parseDouble(lastRow[0]),
+            windDirection: lastRow[1]?.toString() ?? '',
+            temperature: _parseDouble(lastRow[2]),
+            humidity: _parseDouble(lastRow[3]),
+            precipitation: _parseDouble(lastRow[4]),
+            pressure: _parseDouble(lastRow[5]),
+            radiation: _parseDouble(lastRow[6]),
+          );
+        },
+        maxRetries: 2,
+        operationName: 'WeatherService',
+        shouldRetry: RetryUtil.isRetryableError,
       );
     } catch (e) {
       AppLogger.error('Error getting latest weather data', module: 'WeatherService', error: e);
