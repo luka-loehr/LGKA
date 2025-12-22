@@ -11,6 +11,7 @@ class NewsEvent {
   final String title;
   final String author;
   final String description;
+  final String? content;
   final String createdDate;
   final DateTime? parsedDate;
   final int views;
@@ -20,6 +21,7 @@ class NewsEvent {
     required this.title,
     required this.author,
     required this.description,
+    this.content,
     required this.createdDate,
     this.parsedDate,
     required this.views,
@@ -30,6 +32,7 @@ class NewsEvent {
         'title': title,
         'author': author,
         'description': description,
+        if (content != null) 'content': content,
         'created_date': createdDate,
         'views': views,
         'url': url,
@@ -55,11 +58,12 @@ class NewsService {
       }
 
       final document = html_parser.parse(response.body);
-      final List<NewsEvent> events = [];
 
       // Find all blog-item divs (news articles)
       final blogItems = document.querySelectorAll('.blog-item');
 
+      // First, extract metadata from all articles
+      final List<Map<String, dynamic>> metadataList = [];
       for (var item in blogItems) {
         try {
           // Extract title
@@ -138,19 +142,51 @@ class NewsService {
             }
           }
 
-          final event = NewsEvent(
-            title: title,
-            author: author,
-            description: description,
-            createdDate: createdDate,
-            parsedDate: parsedDate,
-            views: views,
-            url: fullUrl,
-          );
+          metadataList.add({
+            'title': title,
+            'author': author,
+            'description': description,
+            'createdDate': createdDate,
+            'parsedDate': parsedDate,
+            'views': views,
+            'url': fullUrl,
+          });
+        } catch (e) {
+          AppLogger.warning('Error parsing news article metadata: $e', module: 'NewsService');
+          continue;
+        }
+      }
 
+      // Fetch full content for all articles concurrently
+      AppLogger.network('Fetching full content for ${metadataList.length} articles', module: 'NewsService');
+      final contentFutures = metadataList.map((metadata) async {
+        final fullContent = await _fetchFullArticleContent(metadata['url'] as String);
+        return {
+          ...metadata,
+          'content': fullContent,
+        };
+      }).toList();
+
+      // Wait for all requests to complete
+      final results = await Future.wait(contentFutures);
+
+      // Build final event list
+      final List<NewsEvent> events = [];
+      for (var result in results) {
+        try {
+          final event = NewsEvent(
+            title: result['title'] as String,
+            author: result['author'] as String,
+            description: result['description'] as String,
+            content: result['content'] as String?,
+            createdDate: result['createdDate'] as String,
+            parsedDate: result['parsedDate'] as DateTime?,
+            views: result['views'] as int,
+            url: result['url'] as String,
+          );
           events.add(event);
         } catch (e) {
-          AppLogger.warning('Error parsing news article: $e', module: 'NewsService');
+          AppLogger.warning('Error creating news event: $e', module: 'NewsService');
           continue;
         }
       }
@@ -168,11 +204,54 @@ class NewsService {
         return 0;
       });
 
-      AppLogger.success('Fetched ${events.length} news events', module: 'NewsService');
+      AppLogger.success('Fetched ${events.length} news events with full content', module: 'NewsService');
       return events;
     } catch (e) {
       AppLogger.error('Failed to fetch news events', module: 'NewsService', error: e);
       rethrow;
+    }
+  }
+
+  /// Fetches the full content from an individual news article page
+  Future<String?> _fetchFullArticleContent(String articleUrl) async {
+    try {
+      final response = await http.get(
+        Uri.parse(articleUrl),
+        headers: {'User-Agent': AppInfo.userAgent},
+      ).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode != 200) {
+        AppLogger.warning('Failed to load article: ${response.statusCode}', module: 'NewsService');
+        return null;
+      }
+
+      final document = html_parser.parse(response.body);
+      
+      // Look for the article body content in .com-content-article__body
+      final articleBody = document.querySelector('.com-content-article__body');
+      if (articleBody == null) {
+        AppLogger.warning('Could not find .com-content-article__body element', module: 'NewsService');
+        return null;
+      }
+
+      // Extract all paragraphs from the article body
+      final paragraphs = articleBody.querySelectorAll('p');
+      
+      if (paragraphs.isEmpty) {
+        // Fallback: get all text from the article body
+        return articleBody.text.trim();
+      }
+
+      // Combine all paragraph text, filtering out empty ones
+      final fullText = paragraphs
+          .map((p) => p.text.trim())
+          .where((text) => text.isNotEmpty)
+          .join('\n\n');
+
+      return fullText;
+    } catch (e) {
+      AppLogger.warning('Error extracting full article content from $articleUrl: $e', module: 'NewsService');
+      return null;
     }
   }
 
