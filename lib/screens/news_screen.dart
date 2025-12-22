@@ -77,7 +77,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.error_outline,
+                      Icons.newspaper_off_outlined,
                       size: 64,
                       color: secondaryTextColor.withValues(alpha: 0.5),
                     ),
@@ -96,7 +96,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
                         HapticService.light();
                         ref.read(newsProvider.notifier).refreshNews();
                       },
-                      icon: const Icon(Icons.refresh),
+                      icon: const Icon(Icons.refresh_outlined),
                       label: Text(AppLocalizations.of(context)!.tryAgain),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: accentColor,
