@@ -1253,7 +1253,7 @@ class _SettingsSheet extends ConsumerWidget {
                 HapticService.subtle();
               },
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 60),
+                duration: const Duration(milliseconds: 100),
                 curve: Curves.easeInOut,
                 width: 48,
                 height: 48,
@@ -1275,7 +1275,7 @@ class _SettingsSheet extends ConsumerWidget {
                       : null,
                 ),
                 child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 60),
+                  duration: const Duration(milliseconds: 100),
                   curve: Curves.easeInOut,
                   opacity: isSelected ? 1.0 : 0.0,
                   child: isSelected
