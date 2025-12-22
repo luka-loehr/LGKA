@@ -14,6 +14,8 @@ import '../screens/webview_screen.dart';
 import '../screens/krankmeldung_info_screen.dart';
 import '../screens/bug_report_screen.dart';
 import '../screens/news_screen.dart';
+import '../screens/news_detail_screen.dart';
+import '../services/news_service.dart';
 
 class AppRouter {
   // Route names
@@ -29,6 +31,7 @@ class AppRouter {
   static const String krankmeldungInfo = '/krankmeldung-info';
   static const String bugReport = '/bug-report';
   static const String news = '/news';
+  static const String newsDetail = '/news-detail';
 
   static GoRouter createRouter({required String initialLocation}) {
     return GoRouter(
@@ -129,6 +132,28 @@ class AppRouter {
           pageBuilder: (context, state) {
             return CustomTransitionPage(
               child: const NewsScreen(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeInOut,
+                  )),
+                  child: child,
+                );
+              },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+        GoRoute(
+          path: newsDetail,
+          pageBuilder: (context, state) {
+            final event = state.extra as NewsEvent;
+            return CustomTransitionPage(
+              child: NewsDetailScreen(event: event),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return SlideTransition(
                   position: Tween<Offset>(
