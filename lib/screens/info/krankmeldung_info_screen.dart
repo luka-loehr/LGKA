@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../theme/app_theme.dart';
-import '../providers/haptic_service.dart';
-import '../navigation/app_router.dart';
-import '../l10n/app_localizations.dart';
-import '../providers/app_providers.dart';
-import '../utils/app_info.dart';
+import '../../theme/app_theme.dart';
+import '../../providers/haptic_service.dart';
+import '../../navigation/app_router.dart';
+import '../../l10n/app_localizations.dart';
+import '../../providers/app_providers.dart';
+import '../../utils/app_info.dart';
 
 class KrankmeldungInfoScreen extends ConsumerWidget {
   const KrankmeldungInfoScreen({super.key});
