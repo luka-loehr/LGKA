@@ -92,232 +92,241 @@ class NewsDetailScreen extends ConsumerWidget {
         ],
       ),
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.all(20.0),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  // Metadata section with accent colors
-                  Container(
-                    padding: const EdgeInsets.all(20.0),
-                    decoration: BoxDecoration(
-                      color: surfaceColor,
-                      borderRadius: BorderRadius.circular(16.0),
-                      border: Border.all(
-                        color: accentColor.withValues(alpha: 0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Author
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.person_outline,
-                              size: 18,
-                              color: accentColor,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                event.author == 'Unknown'
-                                    ? AppLocalizations.of(context)!.unknown
-                                    : event.author,
-                                style: TextStyle(
-                                  color: primaryTextColor,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        
-                        // Date and Views
-                        Row(
-                          children: [
-                            // Date
-                            Icon(
-                              Icons.calendar_today_outlined,
-                              size: 18,
-                              color: accentColor,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              event.createdDate == 'Unknown'
-                                  ? AppLocalizations.of(context)!.unknown
-                                  : event.createdDate,
-                              style: TextStyle(
-                                color: primaryTextColor,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(width: 24),
-                            
-                            // Views
-                            Icon(
-                              Icons.visibility_outlined,
-                              size: 18,
-                              color: accentColor,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              '${event.views}',
-                              style: TextStyle(
-                                color: primaryTextColor,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+        child: Column(
+          children: [
+            // Fixed metadata section at the top
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+              decoration: BoxDecoration(
+                color: surfaceColor,
+                border: Border(
+                  bottom: BorderSide(
+                    color: accentColor.withValues(alpha: 0.2),
+                    width: 1,
                   ),
-                  const SizedBox(height: 24),
-                  
-                  // Full content
-                  if (event.content != null && event.content!.isNotEmpty)
-                    Text(
-                      event.content!,
-                      style: TextStyle(
-                        color: primaryTextColor,
-                        fontSize: 16,
-                        height: 1.7,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Author
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.person_outline,
+                        size: 18,
+                        color: accentColor,
                       ),
-                    )
-                  else
-                    Container(
-                      padding: const EdgeInsets.all(20.0),
-                      decoration: BoxDecoration(
-                        color: surfaceColor,
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            color: secondaryTextColor.withValues(alpha: 0.6),
-                            size: 20,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          event.author == 'Unknown'
+                              ? AppLocalizations.of(context)!.unknown
+                              : event.author,
+                          style: TextStyle(
+                            color: primaryTextColor,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              AppLocalizations.of(context)!.noNewsFound,
-                              style: TextStyle(
-                                color: secondaryTextColor,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  
-                  const SizedBox(height: 32),
-                  
-                  // Recommended articles section
-                  if (recommendedArticles.isNotEmpty) ...[
-                    Text(
-                      AppLocalizations.of(context)!.continueReading,
-                      style: TextStyle(
-                        color: primaryTextColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    ...recommendedArticles.map((article) => Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: surfaceColor,
-                        borderRadius: BorderRadius.circular(12.0),
-                        border: Border.all(
-                          color: accentColor.withValues(alpha: 0.2),
-                          width: 1,
                         ),
                       ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12.0),
-                          onTap: () => _navigateToArticle(context, article),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // Date and Views
+                  Row(
+                    children: [
+                      // Date
+                      Icon(
+                        Icons.calendar_today_outlined,
+                        size: 18,
+                        color: accentColor,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        event.createdDate == 'Unknown'
+                            ? AppLocalizations.of(context)!.unknown
+                            : event.createdDate,
+                        style: TextStyle(
+                          color: primaryTextColor,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      
+                      // Views
+                      Icon(
+                        Icons.visibility_outlined,
+                        size: 18,
+                        color: accentColor,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        '${event.views}',
+                        style: TextStyle(
+                          color: primaryTextColor,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            
+            // Scrollable content
+            Expanded(
+              child: CustomScrollView(
+                slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.all(20.0),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                  
+                        // Full content
+                        if (event.content != null && event.content!.isNotEmpty)
+                          Text(
+                            event.content!,
+                            style: TextStyle(
+                              color: primaryTextColor,
+                              fontSize: 16,
+                              height: 1.7,
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.all(20.0),
+                            decoration: BoxDecoration(
+                              color: surfaceColor,
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            child: Row(
                               children: [
-                                Text(
-                                  article.title,
-                                  style: TextStyle(
-                                    color: primaryTextColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
+                                Icon(
+                                  Icons.info_outline,
+                                  color: secondaryTextColor.withValues(alpha: 0.6),
+                                  size: 20,
                                 ),
-                                if (article.description.isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    article.description,
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    AppLocalizations.of(context)!.noNewsFound,
                                     style: TextStyle(
                                       color: secondaryTextColor,
                                       fontSize: 14,
-                                      height: 1.4,
                                     ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ],
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.calendar_today_outlined,
-                                      size: 14,
-                                      color: accentColor.withValues(alpha: 0.8),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      article.createdDate == 'Unknown'
-                                          ? AppLocalizations.of(context)!.unknown
-                                          : article.createdDate,
-                                      style: TextStyle(
-                                        color: secondaryTextColor.withValues(alpha: 0.8),
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Icon(
-                                      Icons.visibility_outlined,
-                                      size: 14,
-                                      color: accentColor.withValues(alpha: 0.8),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '${article.views}',
-                                      style: TextStyle(
-                                        color: secondaryTextColor.withValues(alpha: 0.8),
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ),
-                    )),
-                    const SizedBox(height: 32),
-                  ],
-                ]),
+                        
+                        const SizedBox(height: 32),
+                        
+                        // Recommended articles section
+                        if (recommendedArticles.isNotEmpty) ...[
+                          Text(
+                            AppLocalizations.of(context)!.continueReading,
+                            style: TextStyle(
+                              color: primaryTextColor,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          ...recommendedArticles.map((article) => Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: surfaceColor,
+                              borderRadius: BorderRadius.circular(12.0),
+                              border: Border.all(
+                                color: accentColor.withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(12.0),
+                                onTap: () => _navigateToArticle(context, article),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        article.title,
+                                        style: TextStyle(
+                                          color: primaryTextColor,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      if (article.description.isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          article.description,
+                                          style: TextStyle(
+                                            color: secondaryTextColor,
+                                            fontSize: 14,
+                                            height: 1.4,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.calendar_today_outlined,
+                                            size: 14,
+                                            color: accentColor.withValues(alpha: 0.8),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            article.createdDate == 'Unknown'
+                                                ? AppLocalizations.of(context)!.unknown
+                                                : article.createdDate,
+                                            style: TextStyle(
+                                              color: secondaryTextColor.withValues(alpha: 0.8),
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 16),
+                                          Icon(
+                                            Icons.visibility_outlined,
+                                            size: 14,
+                                            color: accentColor.withValues(alpha: 0.8),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            '${article.views}',
+                                            style: TextStyle(
+                                              color: secondaryTextColor.withValues(alpha: 0.8),
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )),
+                          const SizedBox(height: 32),
+                        ],
+                      ]),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
