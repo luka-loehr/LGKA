@@ -33,6 +33,12 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
     // Load news when screen is first opened
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(newsProvider.notifier).loadNews();
+      // If events are already loaded (returning to screen), skip animation
+      final newsState = ref.read(newsProvider);
+      if (newsState.events.isNotEmpty) {
+        _hasAnimatedList = true;
+        _listAnimationController.value = 1.0;
+      }
     });
   }
 
@@ -52,11 +58,19 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
     final accentColor = ref.watch(currentColorProvider);
 
     // Trigger list animation once when events become available
+    // Only animate if we haven't animated before and events just became available
     if (newsState.events.isNotEmpty && !_hasAnimatedList) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!_hasAnimatedList && mounted) {
           _hasAnimatedList = true;
           _listAnimationController.forward(from: 0);
+        }
+      });
+    } else if (newsState.events.isNotEmpty && _hasAnimatedList && _listAnimationController.value < 1.0) {
+      // If returning to screen and animation was already played, ensure it's at end state
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _listAnimationController.value < 1.0) {
+          _listAnimationController.value = 1.0;
         }
       });
     }
