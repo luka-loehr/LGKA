@@ -65,6 +65,7 @@
   "chartsAvailableAt": "Charts are available from 0:30 AM.",
   "checkingAvailability": "Checking availability...",
   "loadingSchedules": "Loading schedules...",
+  "loadingNews": "Loading news...",
   "noSchedulesAvailable": "No schedules available",
   "tryAgainLater": "Please try again later",
   "loadingSchedule": "Loading schedule...",
