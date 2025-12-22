@@ -75,7 +75,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
             // Provide haptic feedback when navigating back
             await HapticService.light();
             if (context.mounted) {
-              Navigator.of(context).pop();
+              context.go(AppRouter.home);
             }
           },
         ),
