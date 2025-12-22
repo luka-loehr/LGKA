@@ -435,6 +435,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get continueReading => 'Continue Reading:';
 
   @override
+  String get weitereNeuigkeiten => 'More News';
+
+  @override
   String get colorBlue => 'Blue';
 
   @override
@@ -454,4 +457,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorLoadingWeather => 'Error loading weather data';
+
+  @override
+  String get supportProject => 'Support Project';
 }
