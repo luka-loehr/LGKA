@@ -324,24 +324,6 @@ class NewsDetailScreen extends ConsumerWidget {
                                         ),
                                       ],
                                     ),
-                                    // Views
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.visibility_outlined,
-                                          size: 14,
-                                          color: accentColor.withValues(alpha: 0.8),
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Text(
-                                          '${article.views}',
-                                          style: theme.textTheme.bodySmall?.copyWith(
-                                            color: secondaryTextColor.withValues(alpha: 0.8),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
                                   ],
                                 ),
                               ],
