@@ -87,6 +87,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
 
     return Scaffold(
       backgroundColor: backgroundColor,
+      extendBody: true,
       appBar: AppBar(
         backgroundColor: backgroundColor,
         surfaceTintColor: Colors.transparent,
@@ -221,8 +222,8 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
                 ),
               ),
             ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 32),
+          SliverToBoxAdapter(
+            child: SizedBox(height: 32 + MediaQuery.of(context).padding.bottom),
           ),
         ],
       ),
