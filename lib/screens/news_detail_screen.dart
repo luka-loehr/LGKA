@@ -280,21 +280,67 @@ class NewsDetailScreen extends ConsumerWidget {
                                   ),
                                 ],
                                 const SizedBox(height: 12),
-                                Row(
+                                Wrap(
+                                  spacing: 16,
+                                  runSpacing: 8,
                                   children: [
-                                    Icon(
-                                      Icons.calendar_today_outlined,
-                                      size: 14,
-                                      color: accentColor.withValues(alpha: 0.8),
+                                    // Author
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.person_outline,
+                                          size: 14,
+                                          color: accentColor.withValues(alpha: 0.8),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          article.author == 'Unknown'
+                                              ? AppLocalizations.of(context)!.unknown
+                                              : article.author,
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            color: secondaryTextColor.withValues(alpha: 0.8),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      article.createdDate == 'Unknown'
-                                          ? AppLocalizations.of(context)!.unknown
-                                          : article.createdDate,
-                                      style: theme.textTheme.bodySmall?.copyWith(
-                                        color: secondaryTextColor.withValues(alpha: 0.8),
-                                      ),
+                                    // Date
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.calendar_today_outlined,
+                                          size: 14,
+                                          color: accentColor.withValues(alpha: 0.8),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          article.createdDate == 'Unknown'
+                                              ? AppLocalizations.of(context)!.unknown
+                                              : article.createdDate,
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            color: secondaryTextColor.withValues(alpha: 0.8),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // Views
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.visibility_outlined,
+                                          size: 14,
+                                          color: accentColor.withValues(alpha: 0.8),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          '${article.views}',
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            color: secondaryTextColor.withValues(alpha: 0.8),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
