@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import '../utils/app_logger.dart';
 import '../utils/app_info.dart';
 import '../config/app_credentials.dart';
+import '../utils/retry_util.dart';
 
 /// Represents a schedule PDF with metadata
 class ScheduleItem {
@@ -114,26 +115,33 @@ class ScheduleService {
 
   /// Scrape the schedule page to extract PDF links
   Future<List<ScheduleItem>> _scrapeSchedules() async {
-    final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
-    
-          final response = await http.get(
-        Uri.parse(_schedulePageUrl),
-        headers: {
-          'Authorization': 'Basic $credentials',
-          'User-Agent': AppInfo.userAgent,
-        },
-      ).timeout(_timeout);
+    return RetryUtil.retry<List<ScheduleItem>>(
+      operation: () async {
+        final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
+        
+        final response = await http.get(
+          Uri.parse(_schedulePageUrl),
+          headers: {
+            'Authorization': 'Basic $credentials',
+            'User-Agent': AppInfo.userAgent,
+          },
+        ).timeout(_timeout);
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to fetch schedule page: HTTP ${response.statusCode}');
-    }
+        if (response.statusCode != 200) {
+          throw Exception('Failed to fetch schedule page: HTTP ${response.statusCode}');
+        }
 
-    // Check if response body is empty or too short to be valid HTML
-    if (response.body.isEmpty || response.body.length < 100) {
-      throw Exception('Server returned empty or invalid response');
-    }
+        // Check if response body is empty or too short to be valid HTML
+        if (response.body.isEmpty || response.body.length < 100) {
+          throw Exception('Server returned empty or invalid response');
+        }
 
-    return await compute(_parseScheduleHtml, response.body);
+        return await compute(_parseScheduleHtml, response.body);
+      },
+      maxRetries: 2,
+      operationName: 'ScheduleService',
+      shouldRetry: RetryUtil.isRetryableError,
+    );
   }
 
   /// Check if a schedule PDF is available (HEAD request for faster checking)
@@ -162,18 +170,26 @@ class ScheduleService {
         return false;
       }
       
-      final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
+      final isAvailable = await RetryUtil.retry<bool>(
+        operation: () async {
+          final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
 
-      final response = await http.head(
-        uri,
-        headers: {
-          'Authorization': 'Basic $credentials',
-          'User-Agent': AppInfo.userAgent,
+          final response = await http.head(
+            uri,
+            headers: {
+              'Authorization': 'Basic $credentials',
+              'User-Agent': AppInfo.userAgent,
+            },
+          ).timeout(_availabilityCheckTimeout);
+
+          return response.statusCode == 200;
         },
-      ).timeout(_availabilityCheckTimeout);
+        maxRetries: 2,
+        operationName: 'ScheduleService',
+        shouldRetry: RetryUtil.isRetryableError,
+      );
 
       // Cache the result
-      final isAvailable = response.statusCode == 200;
       _availabilityCache[cacheKey] = isAvailable;
       _lastAvailabilityCheck = DateTime.now();
 
@@ -200,64 +216,71 @@ class ScheduleService {
         throw Exception('Invalid URL format');
       }
       
-      final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
+      return RetryUtil.retry<File?>(
+        operation: () async {
+          final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
 
-      AppLogger.debug('Making HTTP request for PDF', module: 'ScheduleService');
-      final response = await http.get(
-        uri,
-        headers: {
-          'Authorization': 'Basic $credentials',
-          'User-Agent': AppInfo.userAgent,
+          AppLogger.debug('Making HTTP request for PDF', module: 'ScheduleService');
+          final response = await http.get(
+            uri,
+            headers: {
+              'Authorization': 'Basic $credentials',
+              'User-Agent': AppInfo.userAgent,
+            },
+          ).timeout(_timeout);
+
+          if (response.statusCode == 404) {
+            AppLogger.warning('PDF not available (404): ${schedule.title}', module: 'ScheduleService');
+            return null;
+          }
+
+          if (response.statusCode != 200) {
+            throw Exception('Failed to download PDF: HTTP ${response.statusCode}');
+          }
+
+          final cacheDir = await getTemporaryDirectory();
+          final sanitizedGradeLevel = schedule.gradeLevel.replaceAll('/', '_');
+          final sanitizedHalbjahr = schedule.halbjahr.replaceAll('.', '_');
+          final filename = '${sanitizedGradeLevel}_$sanitizedHalbjahr.pdf';
+          final file = File('${cacheDir.path}/$filename');
+
+          AppLogger.debug('Saving PDF: ${response.bodyBytes.length} bytes', module: 'ScheduleService');
+          await file.writeAsBytes(response.bodyBytes);
+          AppLogger.success('PDF downloaded successfully: ${schedule.title} (${(response.bodyBytes.length / 1024).toStringAsFixed(1)}KB)', module: 'ScheduleService');
+          
+          // Validate PDF content
+          if (response.bodyBytes.length < 1000) {
+            AppLogger.warning('PDF too small, deleting', module: 'ScheduleService');
+            await file.delete();
+            return null;
+          }
+          
+          final responseText = String.fromCharCodes(response.bodyBytes.take(100));
+          if (responseText.contains('<html') || responseText.contains('<!DOCTYPE') || responseText.contains('error')) {
+            AppLogger.warning('Server returned HTML instead of PDF', module: 'ScheduleService');
+            await file.delete();
+            return null;
+          }
+          
+          try {
+            final pdfBytes = await file.readAsBytes();
+            if (pdfBytes.isNotEmpty && !_isValidPdfContent(pdfBytes)) {
+              AppLogger.warning('Invalid PDF content', module: 'ScheduleService');
+              await file.delete();
+              return null;
+            }
+          } catch (e) {
+            AppLogger.error('Error validating PDF', module: 'ScheduleService', error: e);
+            await file.delete();
+            return null;
+          }
+          
+          return file;
         },
-      ).timeout(_timeout);
-
-      if (response.statusCode == 404) {
-        AppLogger.warning('PDF not available (404): ${schedule.title}', module: 'ScheduleService');
-        return null;
-      }
-
-      if (response.statusCode != 200) {
-        throw Exception('Failed to download PDF: HTTP ${response.statusCode}');
-      }
-
-      final cacheDir = await getTemporaryDirectory();
-      final sanitizedGradeLevel = schedule.gradeLevel.replaceAll('/', '_');
-      final sanitizedHalbjahr = schedule.halbjahr.replaceAll('.', '_');
-      final filename = '${sanitizedGradeLevel}_$sanitizedHalbjahr.pdf';
-      final file = File('${cacheDir.path}/$filename');
-
-      AppLogger.debug('Saving PDF: ${response.bodyBytes.length} bytes', module: 'ScheduleService');
-      await file.writeAsBytes(response.bodyBytes);
-      AppLogger.success('PDF downloaded successfully: ${schedule.title} (${(response.bodyBytes.length / 1024).toStringAsFixed(1)}KB)', module: 'ScheduleService');
-      
-      // Validate PDF content
-      if (response.bodyBytes.length < 1000) {
-        AppLogger.warning('PDF too small, deleting', module: 'ScheduleService');
-        await file.delete();
-        return null;
-      }
-      
-      final responseText = String.fromCharCodes(response.bodyBytes.take(100));
-      if (responseText.contains('<html') || responseText.contains('<!DOCTYPE') || responseText.contains('error')) {
-        AppLogger.warning('Server returned HTML instead of PDF', module: 'ScheduleService');
-        await file.delete();
-        return null;
-      }
-      
-      try {
-        final pdfBytes = await file.readAsBytes();
-        if (pdfBytes.isNotEmpty && !_isValidPdfContent(pdfBytes)) {
-          AppLogger.warning('Invalid PDF content', module: 'ScheduleService');
-          await file.delete();
-          return null;
-        }
-      } catch (e) {
-        AppLogger.error('Error validating PDF', module: 'ScheduleService', error: e);
-        await file.delete();
-        return null;
-      }
-      
-      return file;
+        maxRetries: 2,
+        operationName: 'ScheduleService',
+        shouldRetry: RetryUtil.isRetryableError,
+      );
     } catch (e) {
       AppLogger.error('Failed to download schedule', module: 'ScheduleService', error: e);
       rethrow;
