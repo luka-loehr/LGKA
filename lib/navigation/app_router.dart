@@ -2,19 +2,19 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../screens/welcome_screen.dart';
-import '../screens/what_you_can_do_screen.dart';
-import '../screens/accent_color_screen.dart';
-import '../screens/auth_screen.dart';
-import '../screens/home_screen.dart';
-import '../screens/pdf_viewer_screen.dart';
-import '../screens/schedule_page.dart';
-import '../screens/legal_screen.dart';
-import '../screens/webview_screen.dart';
-import '../screens/krankmeldung_info_screen.dart';
-import '../screens/bug_report_screen.dart';
-import '../screens/news_screen.dart';
-import '../screens/news_detail_screen.dart';
+import '../screens/onboarding/welcome_screen.dart';
+import '../screens/onboarding/what_you_can_do_screen.dart';
+import '../screens/onboarding/accent_color_screen.dart';
+import '../screens/onboarding/auth_screen.dart';
+import '../screens/content/home_screen.dart';
+import '../screens/viewers/pdf_viewer_screen.dart';
+import '../screens/content/schedule_page.dart';
+import '../screens/info/legal_screen.dart';
+import '../screens/viewers/webview_screen.dart';
+import '../screens/info/krankmeldung_info_screen.dart';
+import '../screens/settings/bug_report_screen.dart';
+import '../screens/content/news_screen.dart';
+import '../screens/content/news_detail_screen.dart';
 import '../services/news_service.dart';
 
 class AppRouter {
