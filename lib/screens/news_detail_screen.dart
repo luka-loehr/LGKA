@@ -68,7 +68,7 @@ class NewsDetailScreen extends ConsumerWidget {
           onPressed: () async {
             await HapticService.light();
             if (context.mounted) {
-              Navigator.of(context).pop();
+              context.go(AppRouter.news);
             }
           },
         ),
