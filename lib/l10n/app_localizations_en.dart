@@ -195,6 +195,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingSchedules => 'Loading schedules...';
 
   @override
+  String get loadingNews => 'Loading news...';
+
+  @override
   String get noSchedulesAvailable => 'No schedules available';
 
   @override

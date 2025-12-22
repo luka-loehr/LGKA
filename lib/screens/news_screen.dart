@@ -65,9 +65,22 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
       body: CustomScrollView(
         slivers: [
           if (newsState.isLoading && newsState.events.isEmpty)
-            const SliverFillRemaining(
+            SliverFillRemaining(
               child: Center(
-                child: CircularProgressIndicator(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(
+                      AppLocalizations.of(context)!.loadingNews,
+                      style: TextStyle(
+                        color: secondaryTextColor,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
           else if (newsState.hasError && newsState.events.isEmpty)

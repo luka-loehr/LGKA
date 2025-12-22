@@ -195,6 +195,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get loadingSchedules => 'Lade Stundenpläne...';
 
   @override
+  String get loadingNews => 'Lade Neuigkeiten...';
+
+  @override
   String get noSchedulesAvailable => 'Keine Stundenpläne verfügbar';
 
   @override
