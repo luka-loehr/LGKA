@@ -183,11 +183,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     if (scheduleState.isLoading) {
       _didShowInitialSpinner = true;
     }
-    
-    // Detect transition from loading to error
-    if (_wasSchedulesLoading && !scheduleState.isLoading && scheduleState.hasError) {
-      HapticService.intense();
-    }
     _wasSchedulesLoading = scheduleState.isLoading;
 
     return Scaffold(

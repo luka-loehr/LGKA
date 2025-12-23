@@ -146,20 +146,12 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
             });
           },
           onReceivedError: (controller, request, error) {
-            // Detect transition from loading to error
-            if (_wasLoading && _progress < 1.0) {
-              HapticService.intense();
-            }
             setState(() {
               _hasError = true;
               _wasLoading = false;
             });
           },
           onReceivedHttpError: (controller, request, error) {
-            // Detect transition from loading to error
-            if (_wasLoading && _progress < 1.0) {
-              HapticService.intense();
-            }
             setState(() {
               _hasError = true;
               _wasLoading = false;
