@@ -10,6 +10,7 @@ import '../../theme/app_theme.dart';
 import '../../services/news_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/color_provider.dart';
+import '../../providers/haptic_service.dart';
 import '../../providers/news_provider.dart';
 import '../../navigation/app_router.dart';
 
@@ -129,7 +130,10 @@ class NewsDetailScreen extends ConsumerWidget {
           color: accentColor,
         ),
         recognizer: TapGestureRecognizer()
-          ..onTap = () => _openLink(match.link.url),
+          ..onTap = () {
+            HapticService.light();
+            _openLink(match.link.url);
+          },
       ));
       
       currentIndex = match.end;
@@ -201,6 +205,7 @@ class NewsDetailScreen extends ConsumerWidget {
             color: primaryTextColor,
           ),
           onPressed: () {
+            HapticService.light();
             if (context.mounted) {
               context.pop();
             }
@@ -219,7 +224,10 @@ class NewsDetailScreen extends ConsumerWidget {
               Icons.share,
               color: primaryTextColor,
             ),
-            onPressed: _openInBrowser,
+            onPressed: () {
+              HapticService.light();
+              _openInBrowser();
+            },
           ),
         ],
       ),
@@ -323,7 +331,10 @@ class NewsDetailScreen extends ConsumerWidget {
                             ...event.images.map((image) => Padding(
                               padding: const EdgeInsets.only(bottom: 16.0),
                               child: GestureDetector(
-                                onTap: () => _openLink(image.url),
+                                onTap: () {
+                                  HapticService.light();
+                                  _openLink(image.url);
+                                },
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(12.0),
                                   child: Stack(

@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/haptic_service.dart';
 import '../../utils/app_info.dart';
 import '../../utils/app_logger.dart';
 import '../../config/app_credentials.dart';
@@ -77,6 +78,7 @@ class _BugReportScreenState extends State<BugReportScreen> {
         leading: IconButton(
           icon: const Icon(Icons.close, color: AppColors.secondaryText),
           onPressed: () {
+            HapticService.light();
             Navigator.of(context).maybePop();
           },
         ),

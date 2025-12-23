@@ -7,6 +7,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import '../../services/weather_service.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/app_providers.dart';
+import '../../providers/haptic_service.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../utils/app_logger.dart';
@@ -449,6 +450,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                           Expanded(
                                             child: GestureDetector(
                                               onTap: () {
+                                                HapticService.light();
                                                 setState(() {
                                                   _selectedChart = ChartType.temperature;
                                                   _isChartRendered = false; // Force chart re-render
@@ -520,6 +522,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                           Expanded(
                                             child: GestureDetector(
                                               onTap: () {
+                                                HapticService.light();
                                                 setState(() {
                                                   _selectedChart = ChartType.humidity;
                                                   _isChartRendered = false; // Force chart re-render
@@ -598,6 +601,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       Expanded(
                                         child: GestureDetector(
                                           onTap: () {
+                                            HapticService.light();
                                             setState(() {
                                               _selectedChart = ChartType.windSpeed;
                                               _isChartRendered = false; // Force chart re-render
@@ -663,6 +667,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                       Expanded(
                                         child: GestureDetector(
                                           onTap: () {
+                                            HapticService.light();
                                             setState(() {
                                               _selectedChart = ChartType.radiation;
                                               _isChartRendered = false; // Force chart re-render
