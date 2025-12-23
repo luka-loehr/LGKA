@@ -10,7 +10,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../utils/app_info.dart';
 import '../config/app_credentials.dart';
-import '../providers/haptic_service.dart';
 
 /// Represents the state of a single PDF (today or tomorrow)
 class PdfState {
@@ -146,11 +145,6 @@ class PdfRepository {
         file: file,
       ));
 
-      // Provide haptic feedback when PDF is loaded (not for silent updates)
-      if (!silent) {
-        // Use light haptic feedback for successful PDF loading
-        await HapticService.pdfLoading();
-      }
 
       return true;
     } catch (e) {

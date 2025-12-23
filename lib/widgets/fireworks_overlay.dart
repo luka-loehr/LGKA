@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fireworks/flutter_fireworks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/fireworks_provider.dart';
-import '../providers/haptic_service.dart';
 
 class FireworksOverlay extends ConsumerStatefulWidget {
   final Widget child;
@@ -18,7 +17,6 @@ class FireworksOverlay extends ConsumerStatefulWidget {
 
 class _FireworksOverlayState extends ConsumerState<FireworksOverlay> {
   Timer? _fireworksTimer;
-  Timer? _particleHapticTimer;
   FireworksController? _controller;
   bool _wasShowing = false;
   final Random _random = Random();
@@ -39,7 +37,6 @@ class _FireworksOverlayState extends ConsumerState<FireworksOverlay> {
   @override
   void dispose() {
     _fireworksTimer?.cancel();
-    _particleHapticTimer?.cancel();
     _controller?.dispose();
     super.dispose();
   }
@@ -53,27 +50,9 @@ class _FireworksOverlayState extends ConsumerState<FireworksOverlay> {
   }
 
   void _launchSingleRocket() {
-    for (int i = 0; i < 3; i++) {
-      Future.delayed(Duration(milliseconds: i * 50), () => HapticService.subtle());
-    }
     _controller?.fireSingleRocket(color: _colors[_random.nextInt(_colors.length)]);
-    Future.delayed(const Duration(milliseconds: 1000), _startParticleHaptics);
   }
 
-  void _startParticleHaptics() {
-    _particleHapticTimer?.cancel();
-    final endTime = DateTime.now().millisecondsSinceEpoch + 1000;
-    void scheduleNext() {
-      if (DateTime.now().millisecondsSinceEpoch >= endTime) return;
-      _particleHapticTimer = Timer(Duration(milliseconds: 50 + _random.nextInt(150)), () {
-        if (mounted && DateTime.now().millisecondsSinceEpoch < endTime) {
-          HapticService.light();
-          scheduleNext();
-        }
-      });
-    }
-    scheduleNext();
-  }
 
   @override
   Widget build(BuildContext context) {

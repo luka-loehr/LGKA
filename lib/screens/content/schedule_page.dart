@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../providers/schedule_provider.dart';
-import '../../providers/haptic_service.dart';
 import '../../theme/app_theme.dart';
 import '../../services/schedule_service.dart';
 // import '../../services/retry_service.dart';
@@ -36,7 +35,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   static const Duration _availabilityCheckInterval = Duration(minutes: 15);
   bool _wasSchedulesLoading = true;
   bool _didShowInitialSpinner = false; // true once initial loading spinner was shown
-  bool _didVibrateOnInitialLoad = false; // ensure single haptic on first successful load
 
   @override
   void initState() {
@@ -258,11 +256,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
         _hasShownButtons = true;
         _fadeController.forward();
         AppLogger.schedule('Schedule buttons shown: ${_availableFirstHalbjahr.length + _availableSecondHalbjahr.length} available');
-        // Vibrate only once per app launch after the initial spinner has been shown
-        if (_didShowInitialSpinner && !_didVibrateOnInitialLoad) {
-          _didVibrateOnInitialLoad = true;
-          HapticService.light();
-        }
       }
     });
 
@@ -308,7 +301,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () async {
-                await HapticService.light();
                 await ref.read(scheduleProvider.notifier).refreshSchedules();
                 await _checkScheduleAvailability();
               },
@@ -509,8 +501,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   }
 
   void _openSchedule(ScheduleItem schedule) async {
-    HapticService.subtle();
-    
     // Check if PDF is already downloaded (from preloading)
     final cachedFile = await _getCachedScheduleFile(schedule);
     if (cachedFile != null && await cachedFile.exists()) {

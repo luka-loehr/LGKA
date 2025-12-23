@@ -8,7 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
 
 import '../../navigation/app_router.dart';
-import '../../providers/haptic_service.dart';
 import '../../l10n/app_localizations.dart';
 
 class WelcomeScreen extends ConsumerStatefulWidget {
@@ -52,8 +51,6 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     // Button press animation
     await _buttonController.forward();
     
-    // Premium haptic feedback
-    await HapticService.light();
     
     // Do not mark first launch here; onboarding completes on AccentColorScreen
     
@@ -219,7 +216,6 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () async {
-                  HapticService.subtle();
                   try {
                     final uri = Uri.parse(privacyPolicyUrl);
                     await launchUrl(uri, mode: LaunchMode.externalApplication);
