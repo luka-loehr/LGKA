@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../providers/app_providers.dart';
 import '../../providers/color_provider.dart';
 import '../../navigation/app_router.dart';
-import '../../providers/haptic_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../config/app_credentials.dart';
 
@@ -192,8 +191,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       // Start success animation with smooth fade
       _successColorController.forward();
       
-      // Success with premium haptic feedback
-      await HapticService.success();
       
       if (!mounted) return;
       
@@ -224,8 +221,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       await notifier.setOnboardingCompleted(true);
       await notifier.setFirstLaunch(false);
       
-      // Additional success haptic just before navigation
-      await HapticService.light();
       
       // Small delay to let the haptic feedback register
       await Future.delayed(const Duration(milliseconds: 50));
@@ -250,8 +245,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       // Start error animation immediately on press
       _buttonColorController.forward(from: 0);
       
-      // Premium error feedback - single, clean haptic pulse
-      await HapticService.error();
       
       // Hold the red color briefly
       Future.delayed(const Duration(milliseconds: 600), () {
