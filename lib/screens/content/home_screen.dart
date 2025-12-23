@@ -312,7 +312,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
       return _ErrorView(
         onRetry: () {
           HapticService.light();
-          ref.read(retryServiceProvider).retryAllDataSources();
+          ref.read(pdfRepositoryProvider.notifier).retryAll();
         },
       );
     }
@@ -351,7 +351,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
           label: AppLocalizations.of(context)!.today,
           onTap: () => _openPdf(pdfRepoState, ref, true),
           onRetry: () {
-            ref.read(retryServiceProvider).retryAllDataSources();
+            ref.read(pdfRepositoryProvider.notifier).retryPdf(true);
           },
         ),
         const SizedBox(height: 16),
@@ -360,7 +360,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
           label: AppLocalizations.of(context)!.tomorrow,
           onTap: () => _openPdf(pdfRepoState, ref, false),
           onRetry: () {
-            ref.read(retryServiceProvider).retryAllDataSources();
+            ref.read(pdfRepositoryProvider.notifier).retryPdf(false);
           },
         ),
       ],
@@ -953,10 +953,11 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
   }
 
   void _handleTap() {
-    HapticService.medium();
     if (widget.pdfState.error != null) {
+      HapticService.light();
       widget.onRetry();
     } else {
+      HapticService.medium();
       widget.onTap();
     }
   }
