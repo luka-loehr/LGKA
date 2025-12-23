@@ -87,7 +87,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: AppColors.appBackground,
       elevation: 0,
       leading: IconButton(
-        onPressed: _showDrawer,
+        onPressed: () {
+          HapticService.light();
+          _showDrawer();
+        },
         icon: const Icon(
           Icons.menu,
           color: AppColors.secondaryText,
