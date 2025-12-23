@@ -95,6 +95,11 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
           isLoading: false,
           error: 'Serververbindung fehlgeschlagen',
         );
+        
+        // Trigger medium haptic feedback on initial load failure
+        if (!forceRefresh) {
+          HapticService.medium();
+        }
         return;
       }
 
@@ -110,10 +115,8 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
         error: 'Serververbindung fehlgeschlagen',
       );
       
-      // Trigger medium haptic feedback on retry failure
-      if (forceRefresh) {
-        HapticService.medium();
-      }
+      // Trigger medium haptic feedback on failure (both initial load and retry)
+      HapticService.medium();
     }
   }
 
