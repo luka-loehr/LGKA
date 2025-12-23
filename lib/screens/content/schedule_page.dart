@@ -183,6 +183,11 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     if (scheduleState.isLoading) {
       _didShowInitialSpinner = true;
     }
+    
+    // Detect transition from loading to error
+    if (_wasSchedulesLoading && !scheduleState.isLoading && scheduleState.hasError) {
+      HapticService.intense();
+    }
     _wasSchedulesLoading = scheduleState.isLoading;
 
     return Scaffold(
@@ -302,6 +307,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () async {
+                HapticService.light();
                 await ref.read(scheduleProvider.notifier).refreshSchedules();
                 await _checkScheduleAvailability();
               },

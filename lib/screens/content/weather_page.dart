@@ -54,6 +54,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   bool _isChartRendered = false;
   bool _isInitialRenderComplete = false;
   bool _forceShowErrorUntilSuccess = false; // Keep error UI visible during retries until data arrives
+  bool _wasLoading = true;
 
   late AnimationController _errorAnimationController;
   late Animation<double> _errorAnimation;
@@ -235,6 +236,12 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     // Keep showing the error placeholder while retrying until data loads
     final shouldShowAnyError = _forceShowErrorUntilSuccess || shouldShowWeatherError || shouldShowStaleDataError || shouldShowRepairError;
     
+    // Detect transition from loading to error
+    if (_wasLoading && !weatherState.isLoading && shouldShowAnyError && !shouldShowRepairError) {
+      HapticService.intense();
+    }
+    _wasLoading = weatherState.isLoading && weatherState.chartData.isEmpty;
+    
     if (shouldShowAnyError) {
       if (_errorAnimationController.status == AnimationStatus.dismissed) {
         _errorAnimationController.forward();
@@ -330,7 +337,10 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                         if (!shouldShowRepairError) ...[
                           const SizedBox(height: 24),
                           ElevatedButton.icon(
-                            onPressed: _refreshData,
+                            onPressed: () {
+                              HapticService.light();
+                              _refreshData();
+                            },
                             icon: const Icon(Icons.refresh),
                             label: Text(AppLocalizations.of(context)!.tryAgain),
                             style: ElevatedButton.styleFrom(

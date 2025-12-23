@@ -28,6 +28,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
   InAppWebViewController? _controller;
   double _progress = 0;
   bool _hasError = false;
+  bool _wasLoading = true;
 
   
   // Check if this is the absence reporting (krankmeldung) webview
@@ -137,19 +138,31 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
             _controller = controller;
           },
           onProgressChanged: (controller, progress) {
-            setState(() => _progress = progress / 100);
-            
+            setState(() {
+              _progress = progress / 100;
+              if (_progress < 1.0) {
+                _wasLoading = true;
+              }
+            });
           },
           onReceivedError: (controller, request, error) {
+            // Detect transition from loading to error
+            if (_wasLoading && _progress < 1.0) {
+              HapticService.intense();
+            }
             setState(() {
               _hasError = true;
-
+              _wasLoading = false;
             });
           },
           onReceivedHttpError: (controller, request, error) {
+            // Detect transition from loading to error
+            if (_wasLoading && _progress < 1.0) {
+              HapticService.intense();
+            }
             setState(() {
               _hasError = true;
-
+              _wasLoading = false;
             });
           },
           onReceivedHttpAuthRequest: (controller, challenge) async {
@@ -219,6 +232,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                       const SizedBox(height: 24),
                       ElevatedButton.icon(
                         onPressed: () async {
+                          HapticService.light();
                           _retryLoad();
                         },
                         icon: const Icon(Icons.refresh),
