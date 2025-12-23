@@ -268,7 +268,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
   late Animation<double> _fadeAnimation;
   bool _hasShownButtons = false;
   bool _wasLoading = true;
-  bool _hasShownErrorHaptic = false;
+  bool _wasError = false;
 
   @override
   void initState() {
@@ -305,19 +305,13 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     final isLoading = pdfRepo.isLoading || !pdfRepo.isInitialized;
     final isError = pdfRepo.hasAnyError && !pdfRepo.hasAnyData;
     
-    // Trigger haptic when transitioning from loading to error (only once)
-    if (_wasLoading && !isLoading && isError && !_hasShownErrorHaptic) {
-      _hasShownErrorHaptic = true;
-      // Schedule haptic immediately, but only once
+    // Trigger haptic only when transitioning from non-error to error state
+    if (!_wasError && isError && !isLoading) {
       HapticService.medium();
     }
     
-    // Reset flag when loading starts again (for retry) or when error clears
-    if (isLoading || !isError) {
-      _hasShownErrorHaptic = false;
-    }
-    
     _wasLoading = isLoading;
+    _wasError = isError;
     
     if (!pdfRepo.isInitialized || pdfRepo.isLoading) {
       return _LoadingView();
