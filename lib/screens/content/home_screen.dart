@@ -196,7 +196,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       controller: _pageController,
       onPageChanged: (index) {
         if (_currentPage != index) {
-          HapticService.medium();
+          HapticService.light();
         }
         setState(() => _currentPage = index);
       },
