@@ -269,6 +269,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
   bool _hasShownButtons = false;
   bool _wasLoading = true;
   bool _wasError = false;
+  bool _hapticScheduled = false;
 
   @override
   void initState() {
@@ -305,9 +306,20 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     final isLoading = pdfRepo.isLoading || !pdfRepo.isInitialized;
     final isError = pdfRepo.hasAnyError && !pdfRepo.hasAnyData;
     
-    // Trigger haptic only when transitioning from non-error to error state
-    if (!_wasError && isError && !isLoading) {
-      HapticService.medium();
+    // Trigger haptic only when transitioning from loading+non-error to non-loading+error
+    // Use a flag to ensure it only fires once even if build is called multiple times rapidly
+    if (_wasLoading && !isLoading && !_wasError && isError && !_hapticScheduled) {
+      _hapticScheduled = true;
+      Future.microtask(() {
+        if (mounted) {
+          HapticService.medium();
+        }
+      });
+    }
+    
+    // Reset flag when loading starts again or error clears
+    if (isLoading || !isError) {
+      _hapticScheduled = false;
     }
     
     _wasLoading = isLoading;
