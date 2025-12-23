@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/schedule_service.dart';
 import '../utils/app_logger.dart';
+import '../providers/haptic_service.dart';
 import 'app_providers.dart';
 
 /// State class for schedule data
@@ -108,6 +109,11 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
         isLoading: false,
         error: 'Serververbindung fehlgeschlagen',
       );
+      
+      // Trigger medium haptic feedback on retry failure
+      if (forceRefresh) {
+        HapticService.medium();
+      }
     }
   }
 
