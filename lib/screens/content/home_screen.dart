@@ -303,17 +303,17 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
   Widget build(BuildContext context) {
     final pdfRepo = ref.watch(pdfRepositoryProvider);
     final isLoading = pdfRepo.isLoading || !pdfRepo.isInitialized;
+    final isError = pdfRepo.hasAnyError && !pdfRepo.hasAnyData;
     
     // Trigger haptic when transitioning from loading to error (only once)
-    if (_wasLoading && !isLoading && pdfRepo.hasAnyError && !pdfRepo.hasAnyData && !_hasShownErrorHaptic) {
+    if (_wasLoading && !isLoading && isError && !_hasShownErrorHaptic) {
       _hasShownErrorHaptic = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        HapticService.medium();
-      });
+      // Schedule haptic immediately, but only once
+      HapticService.medium();
     }
     
-    // Reset flag when loading starts again (for retry)
-    if (isLoading) {
+    // Reset flag when loading starts again (for retry) or when error clears
+    if (isLoading || !isError) {
       _hasShownErrorHaptic = false;
     }
     
