@@ -95,15 +95,13 @@ class PdfRepository {
 
   /// Initialize the repository by loading both PDFs
   Future<void> initialize() async {
+    // Already initialized - don't reload (even if we have errors)
     if (_isInitialized) {
-      if (_isCacheValid && hasAnyData) {
-        return;
-      }
-
+      // Refresh in background if cache is stale and we have data
       if (hasAnyData && !_isCacheValid) {
         unawaited(refreshInBackground());
-        return;
       }
+      return;
     }
 
     await _loadBothPdfs();
