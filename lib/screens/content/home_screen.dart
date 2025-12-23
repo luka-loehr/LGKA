@@ -267,6 +267,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   bool _hasShownButtons = false;
+  bool _wasLoading = true;
 
   @override
   void initState() {
@@ -301,6 +302,12 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
   Widget build(BuildContext context) {
     final pdfRepo = ref.watch(pdfRepositoryProvider);
     
+    // Detect transition from loading to error
+    if (_wasLoading && !pdfRepo.isLoading && pdfRepo.hasAnyError && !pdfRepo.hasAnyData) {
+      HapticService.intense();
+    }
+    _wasLoading = pdfRepo.isLoading || !pdfRepo.isInitialized;
+    
     if (!pdfRepo.isInitialized || pdfRepo.isLoading) {
       return _LoadingView();
     }
@@ -308,6 +315,7 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     if (pdfRepo.hasAnyError && !pdfRepo.hasAnyData) {
       return _ErrorView(
         onRetry: () {
+          HapticService.light();
           ref.read(retryServiceProvider).retryAllDataSources();
         },
       );
@@ -725,6 +733,7 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () {
+              HapticService.light();
               onRetry();
             },
             icon: const Icon(Icons.refresh),
