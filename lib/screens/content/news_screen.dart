@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/news_provider.dart';
 import '../../providers/color_provider.dart';
+import '../../providers/haptic_service.dart';
 import '../../services/news_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../navigation/app_router.dart';
@@ -91,6 +92,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
             color: primaryTextColor,
           ),
           onPressed: () {
+            HapticService.light();
             if (context.mounted) {
               context.go(AppRouter.home);
             }
@@ -238,6 +240,7 @@ class _NewsCard extends StatelessWidget {
   });
 
   void _navigateToDetail(BuildContext context) {
+    HapticService.medium();
     context.push(AppRouter.newsDetail, extra: event);
   }
 
