@@ -264,6 +264,7 @@ class PdfRepositoryState {
 /// Notifier for PDF repository
 class PdfRepositoryNotifier extends Notifier<PdfRepositoryState> {
   final PdfRepository _repository = PdfRepository();
+  bool _hasTriggeredInitialErrorHaptic = false;
 
   @override
   PdfRepositoryState build() {
@@ -281,13 +282,18 @@ class PdfRepositoryNotifier extends Notifier<PdfRepositoryState> {
   }
 
   Future<void> initialize() async {
+    final previousState = state;
     await _repository.initialize();
     _refreshState();
     
-    // Check if initialization failed and trigger haptic feedback
+    // Check if initialization failed and trigger haptic feedback only once
     final currentState = state;
-    if (currentState.hasAnyError && !currentState.hasAnyData) {
-      HapticService.medium();
+    if (currentState.hasAnyError && !currentState.hasAnyData && !_hasTriggeredInitialErrorHaptic) {
+      // Only trigger if we transitioned from no error to error (first time error appears)
+      if (!previousState.hasAnyError) {
+        _hasTriggeredInitialErrorHaptic = true;
+        HapticService.medium();
+      }
     }
   }
 
@@ -316,6 +322,9 @@ class PdfRepositoryNotifier extends Notifier<PdfRepositoryState> {
     // Set loading state immediately so UI shows loading indicator
     _repository.setLoadingState(true);
     _refreshState();
+    
+    // Reset the flag when retrying so we can trigger haptic again if it fails
+    _hasTriggeredInitialErrorHaptic = false;
     
     // Then perform the actual retry
     await _repository.retryAll();
