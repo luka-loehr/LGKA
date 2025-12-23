@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../providers/schedule_provider.dart';
+import '../../providers/haptic_service.dart';
 import '../../theme/app_theme.dart';
 import '../../services/schedule_service.dart';
 // import '../../services/retry_service.dart';
@@ -383,7 +384,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
 
   Widget _buildScheduleCard(ScheduleItem schedule) {
     return GestureDetector(
-      onTap: () => _openSchedule(schedule),
+      onTap: () {
+        HapticService.medium();
+        _openSchedule(schedule);
+      },
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
