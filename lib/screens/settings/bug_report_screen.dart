@@ -23,6 +23,7 @@ class _BugReportScreenState extends State<BugReportScreen> {
   double _progress = 0;
   bool _hasError = false;
   String? _errorText;
+  bool _wasLoading = true;
 
   @override
   void dispose() {
@@ -116,23 +117,37 @@ class _BugReportScreenState extends State<BugReportScreen> {
                 _controller = controller;
               },
               onProgressChanged: (controller, progress) {
-                setState(() => _progress = progress / 100);
-                
+                setState(() {
+                  _progress = progress / 100;
+                  if (_progress < 1.0) {
+                    _wasLoading = true;
+                  }
+                });
               },
               onLoadStop: (controller, url) async {
                 // Cache is already disabled via incognito mode and cacheEnabled: false
                 // No need to manually clear cache
               },
               onReceivedError: (controller, request, error) {
+                // Detect transition from loading to error
+                if (_wasLoading && _progress < 1.0) {
+                  HapticService.intense();
+                }
                 setState(() {
                   _hasError = true;
                   _errorText = error.description;
+                  _wasLoading = false;
                 });
               },
               onReceivedHttpError: (controller, request, error) {
+                // Detect transition from loading to error
+                if (_wasLoading && _progress < 1.0) {
+                  HapticService.intense();
+                }
                 setState(() {
                   _hasError = true;
                   _errorText = 'HTTP ${error.statusCode}';
+                  _wasLoading = false;
                 });
               },
             ),
@@ -190,6 +205,7 @@ class _BugReportScreenState extends State<BugReportScreen> {
                       const SizedBox(height: 24),
                       ElevatedButton.icon(
                         onPressed: () async {
+                          HapticService.light();
                           _retryLoad();
                         },
                         icon: const Icon(Icons.refresh),
