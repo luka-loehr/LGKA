@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../utils/app_info.dart';
+import '../utils/retry_util.dart';
 import '../config/app_credentials.dart';
 
 /// Represents the state of a single PDF (today or tomorrow)
@@ -170,27 +171,34 @@ class PdfRepository {
       throw Exception('Invalid URL format: $url');
     }
     
-    final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
-    
-    final response = await http.get(
-      uri,
-      headers: {
-        'Authorization': 'Basic $credentials',
-        'User-Agent': AppInfo.userAgent,
+    return RetryUtil.retry<File>(
+      operation: () async {
+        final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
+        
+        final response = await http.get(
+          uri!,
+          headers: {
+            'Authorization': 'Basic $credentials',
+            'User-Agent': AppInfo.userAgent,
+          },
+        ).timeout(_timeout);
+
+        if (response.statusCode != 200) {
+          throw Exception('HTTP ${response.statusCode}');
+        }
+
+        // Save to temporary directory
+        final cacheDir = await getTemporaryDirectory();
+        final filename = url.contains('heute') ? 'today.pdf' : 'tomorrow.pdf';
+        final file = File('${cacheDir.path}/$filename');
+        
+        await file.writeAsBytes(response.bodyBytes);
+        return file;
       },
-    ).timeout(_timeout);
-
-    if (response.statusCode != 200) {
-      throw Exception('HTTP ${response.statusCode}');
-    }
-
-    // Save to temporary directory
-    final cacheDir = await getTemporaryDirectory();
-    final filename = url.contains('heute') ? 'today.pdf' : 'tomorrow.pdf';
-    final file = File('${cacheDir.path}/$filename');
-    
-    await file.writeAsBytes(response.bodyBytes);
-    return file;
+      maxRetries: 2,
+      operationName: 'PdfRepository',
+      shouldRetry: RetryUtil.isRetryableError,
+    );
   }
 
   /// Extract metadata from PDF file
