@@ -301,8 +301,16 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
   @override
   Widget build(BuildContext context) {
     final pdfRepo = ref.watch(pdfRepositoryProvider);
+    final isLoading = pdfRepo.isLoading || !pdfRepo.isInitialized;
     
-    _wasLoading = pdfRepo.isLoading || !pdfRepo.isInitialized;
+    // Trigger haptic when transitioning from loading to error
+    if (_wasLoading && !isLoading && pdfRepo.hasAnyError && !pdfRepo.hasAnyData) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        HapticService.medium();
+      });
+    }
+    
+    _wasLoading = isLoading;
     
     if (!pdfRepo.isInitialized || pdfRepo.isLoading) {
       return _LoadingView();
