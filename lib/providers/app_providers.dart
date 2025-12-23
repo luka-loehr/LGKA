@@ -283,6 +283,12 @@ class PdfRepositoryNotifier extends Notifier<PdfRepositoryState> {
   Future<void> initialize() async {
     await _repository.initialize();
     _refreshState();
+    
+    // Check if initialization failed and trigger haptic feedback
+    final currentState = state;
+    if (currentState.hasAnyError && !currentState.hasAnyData) {
+      HapticService.medium();
+    }
   }
 
   Future<void> retryPdf(bool isToday) async {
@@ -480,6 +486,9 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
         // Keep existing data if available, don't clear it on error
         chartData: state.chartData.isNotEmpty ? state.chartData : const [],
       );
+      
+      // Trigger medium haptic feedback on initial load failure
+      HapticService.medium();
     }
   }
 
