@@ -334,7 +334,7 @@ class NewsDetailScreen extends ConsumerWidget {
                                   child: Stack(
                                     children: [
                                       Image.network(
-                                        image.thumbnailUrl ?? image.url,
+                                        image.url,
                                         fit: BoxFit.cover,
                                         width: double.infinity,
                                         loadingBuilder: (context, child, loadingProgress) {
