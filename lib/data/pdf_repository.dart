@@ -213,6 +213,21 @@ class PdfRepository {
     await _loadPdf(url, isToday);
   }
 
+  /// Set loading state for both PDFs (used by notifier to show loading immediately)
+  void setLoadingState(bool isLoading) {
+    _todayState = _todayState.copyWith(isLoading: isLoading, error: null);
+    _tomorrowState = _tomorrowState.copyWith(isLoading: isLoading, error: null);
+  }
+
+  /// Set loading state for a specific PDF (used by notifier to show loading immediately)
+  void setLoadingStateForPdf(bool isToday, bool isLoading) {
+    if (isToday) {
+      _todayState = _todayState.copyWith(isLoading: isLoading, error: null);
+    } else {
+      _tomorrowState = _tomorrowState.copyWith(isLoading: isLoading, error: null);
+    }
+  }
+
   /// Retry loading both PDFs
   Future<void> retryAll() async {
     await _loadBothPdfs();

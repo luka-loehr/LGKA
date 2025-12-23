@@ -285,11 +285,25 @@ class PdfRepositoryNotifier extends Notifier<PdfRepositoryState> {
   }
 
   Future<void> retryPdf(bool isToday) async {
+    // Set loading state immediately so UI shows loading indicator
+    if (isToday) {
+      _repository.setLoadingStateForPdf(true, true);
+    } else {
+      _repository.setLoadingStateForPdf(false, true);
+    }
+    _refreshState();
+    
+    // Then perform the actual retry
     await _repository.retryPdf(isToday);
     _refreshState();
   }
 
   Future<void> retryAll() async {
+    // Set loading state immediately so UI shows loading indicator
+    _repository.setLoadingState(true);
+    _refreshState();
+    
+    // Then perform the actual retry
     await _repository.retryAll();
     _refreshState();
   }
