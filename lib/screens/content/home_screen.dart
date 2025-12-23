@@ -311,7 +311,6 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     if (pdfRepo.hasAnyError && !pdfRepo.hasAnyData) {
       return _ErrorView(
         onRetry: () {
-          HapticService.light();
           ref.read(pdfRepositoryProvider.notifier).retryAll();
         },
       );
