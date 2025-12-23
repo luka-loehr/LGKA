@@ -1038,6 +1038,12 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   bool _isWeatherStationRepair() {
     final weatherState = ref.read(weatherDataProvider);
     
+    // Don't show repair error if there's a network/connection error
+    // Network errors should be shown instead of repair messages
+    if (weatherState.error != null) {
+      return false;
+    }
+    
     try {
       final berlin = tz.getLocation('Europe/Berlin');
       final now = tz.TZDateTime.now(berlin);
@@ -1045,6 +1051,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
       
       // After 1 AM, if we have less than 50 data points, show repair error
       // This indicates the weather station should have collected enough data by now
+      // Only show this if there's no error (meaning fetch succeeded but data is insufficient)
       if (isAfter1AM && weatherState.fullDataCount < 50) {
         return true;
       }
