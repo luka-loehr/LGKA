@@ -1216,10 +1216,6 @@ class _SettingsSheet extends ConsumerWidget {
                     const SizedBox(height: 20),
                     _buildDivider(),
                     const SizedBox(height: 20),
-                    _buildHapticTestSection(context),
-                    const SizedBox(height: 20),
-                    _buildDivider(),
-                    const SizedBox(height: 20),
                     _buildLegalLinks(context),
                   ],
                 ),
@@ -1302,83 +1298,6 @@ class _SettingsSheet extends ConsumerWidget {
           }).toList(),
         ),
       ],
-    );
-  }
-
-  Widget _buildHapticTestSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Haptic Feedback Test',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.primaryText,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Test haptic feedback levels',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.secondaryText,
-              ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _buildHapticTestButton(
-                context,
-                'Light',
-                () => HapticService.light(),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildHapticTestButton(
-                context,
-                'Medium',
-                () => HapticService.medium(),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildHapticTestButton(
-                context,
-                'Intense',
-                () => HapticService.intense(),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHapticTestButton(BuildContext context, String label, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        decoration: BoxDecoration(
-          color: AppColors.appSurface.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: AppColors.secondaryText.withValues(alpha: 0.2),
-            width: 1,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.primaryText,
-                  fontWeight: FontWeight.w500,
-                ),
-          ),
-        ),
-      ),
     );
   }
 
