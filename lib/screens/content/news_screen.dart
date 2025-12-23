@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/news_provider.dart';
-import '../../providers/haptic_service.dart';
 import '../../providers/color_provider.dart';
 import '../../services/news_service.dart';
 import '../../l10n/app_localizations.dart';
@@ -58,13 +57,8 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
     final secondaryTextColor = AppColors.secondaryText;
     final accentColor = ref.watch(currentColorProvider);
 
-    // Trigger haptic feedback when news finishes loading and data becomes available
+    // Track news loading state
     final becameAvailable = _wasNewsLoading && !newsState.isLoading && newsState.events.isNotEmpty;
-    if (becameAvailable) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await HapticService.light();
-      });
-    }
     _wasNewsLoading = newsState.isLoading;
 
     // Trigger list animation once when events become available
@@ -96,9 +90,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
             Icons.arrow_back_ios,
             color: primaryTextColor,
           ),
-          onPressed: () async {
-            // Provide haptic feedback when navigating back
-            await HapticService.light();
+          onPressed: () {
             if (context.mounted) {
               context.go(AppRouter.home);
             }
@@ -156,7 +148,6 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
                       onPressed: () {
-                        HapticService.light();
                         ref.read(newsProvider.notifier).refreshNews();
                       },
                       icon: const Icon(Icons.refresh_outlined),
@@ -246,9 +237,7 @@ class _NewsCard extends StatelessWidget {
     required this.accentColor,
   });
 
-  void _navigateToDetail(BuildContext context) async {
-    // Provide haptic feedback when navigating
-    await HapticService.light();
+  void _navigateToDetail(BuildContext context) {
     context.push(AppRouter.newsDetail, extra: event);
   }
 

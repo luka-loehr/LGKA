@@ -8,7 +8,6 @@ import '../../services/weather_service.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/app_providers.dart';
 
-import '../../providers/haptic_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/app_logger.dart';
 
@@ -159,7 +158,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
 
   void _onChartAnimationComplete() {
-    HapticService.light();
     AppLogger.chart('Chart animation completed for ${_getChartTitle().toLowerCase()}');
   }
 
@@ -172,7 +170,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   }
 
   void _refreshData() async {
-    await HapticService.light();
     AppLogger.chart('Manual refresh requested');
     // Ensure error UI stays visible while retrying, until data successfully loads
     if (mounted) {
@@ -254,8 +251,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
           _forceShowErrorUntilSuccess = false;
         });
       }
-      // Light haptic to signal data loaded successfully
-      HapticService.light();
       AppLogger.chart('Weather data loaded successfully');
     }
 
@@ -458,7 +453,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                                   _selectedChart = ChartType.temperature;
                                                   _isChartRendered = false; // Force chart re-render
                                                 });
-                                                HapticService.subtle();
                                                 // Re-render chart after a short delay
                                                 Future.delayed(const Duration(milliseconds: 50), () {
                                                   if (mounted) {
@@ -530,7 +524,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                                   _selectedChart = ChartType.humidity;
                                                   _isChartRendered = false; // Force chart re-render
                                                 });
-                                                HapticService.subtle();
                                                 // Re-render chart after a short delay
                                                 Future.delayed(const Duration(milliseconds: 50), () {
                                                   if (mounted) {
@@ -609,7 +602,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                               _selectedChart = ChartType.windSpeed;
                                               _isChartRendered = false; // Force chart re-render
                                             });
-                                            HapticService.subtle();
                                             // Re-render chart after a short delay
                                             Future.delayed(const Duration(milliseconds: 50), () {
                                               if (mounted) {
@@ -675,7 +667,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
                                               _selectedChart = ChartType.radiation;
                                               _isChartRendered = false; // Force chart re-render
                                             });
-                                            HapticService.subtle();
                                             // Re-render chart after a short delay
                                             Future.delayed(const Duration(milliseconds: 50), () {
                                               if (mounted) {

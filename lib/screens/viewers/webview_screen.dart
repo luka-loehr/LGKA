@@ -6,7 +6,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme/app_theme.dart';
-import '../../providers/haptic_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/app_info.dart';
 import '../../utils/app_logger.dart';
@@ -27,7 +26,6 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
 
   InAppWebViewController? _controller;
   double _progress = 0;
-  bool _hasTriggeredLoadedHaptic = false;
   bool _hasError = false;
 
   
@@ -37,11 +35,8 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
   Future<void> _retryLoad() async {
     setState(() {
       _hasError = false;
-
       _progress = 0;
-      _hasTriggeredLoadedHaptic = false;
     });
-    await HapticService.light();
     if (_controller != null) {
       try {
         await _controller!.reload();
@@ -75,7 +70,6 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
         leading: IconButton(
           icon: const Icon(Icons.close, color: AppColors.secondaryText),
           onPressed: () {
-            HapticService.subtle();
             if (widget.fromKrankmeldungInfo) {
               // If we came from Krankmeldung info screen, go back to home
               Navigator.of(context).popUntil((route) => route.isFirst);
@@ -143,17 +137,6 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
           onProgressChanged: (controller, progress) {
             setState(() => _progress = progress / 100);
             
-            // Trigger haptic feedback when page is fully loaded
-            if (progress == 100 && !_hasTriggeredLoadedHaptic) {
-              _hasTriggeredLoadedHaptic = true;
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Future.delayed(const Duration(milliseconds: 500), () {
-                  if (mounted) {
-                    HapticService.pdfLoading();
-                  }
-                });
-              });
-            }
           },
           onReceivedError: (controller, request, error) {
             setState(() {
@@ -234,7 +217,6 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                       const SizedBox(height: 24),
                       ElevatedButton.icon(
                         onPressed: () async {
-                          await HapticService.light();
                           _retryLoad();
                         },
                         icon: const Icon(Icons.refresh),

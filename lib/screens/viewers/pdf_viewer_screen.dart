@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
-import 'package:lgka_flutter/providers/haptic_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:pdfx/pdfx.dart' as pdfx;
@@ -49,7 +48,6 @@ class PDFViewerScreen extends StatefulWidget {
 class _PDFViewerScreenState extends State<PDFViewerScreen>
     with TickerProviderStateMixin {
   late final pdfx.PdfController _pdfController;
-  bool _hasTriggeredLoadedHaptic = false;
   final GlobalKey _shareButtonKey = GlobalKey(); // Key for share button position
   
   // Search functionality
@@ -217,8 +215,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       // Animate button to red
       _buttonColorController.forward();
       
-      // Haptic feedback
-      await HapticService.error();
       
       // Reset button color after delay
       Future.delayed(const Duration(milliseconds: 600), () {
@@ -240,8 +236,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     // Start success animation with smooth fade
     _successColorController.forward();
     
-    // Success with haptic feedback
-    await HapticService.success();
     
     if (!mounted) return;
     
@@ -539,7 +533,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       AppLogger.search('Search completed: ${results.length} results for "$query"');
 
       if (results.isNotEmpty) {
-        HapticService.subtle();
 
         // Automatically navigate to the first result
         if (results.isNotEmpty) {
@@ -604,11 +597,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       } catch (e) {
         AppLogger.debug('Error saving search result: $e', module: 'PDFViewer');
       }
-      
-      // Provide haptic feedback
-      HapticService.subtle();
-      
-
     } catch (e) {
       if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -700,9 +688,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);
     if (l10n == null) return;
-    
-    // Subtle haptic feedback when share button is pressed
-    await HapticService.subtle();
     
     // Check mounted again after async operation
     if (!mounted) return;
@@ -822,7 +807,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
           icon: const Icon(Icons.arrow_back),
           color: AppColors.primaryText,
           onPressed: () {
-            HapticService.subtle(); // Add haptic feedback
+ // Add haptic feedback
             Navigator.of(context).pop();
           },
         ),
@@ -963,13 +948,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         }
       });
 
-      // Trigger haptic feedback when PDF is loaded
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted && !_hasTriggeredLoadedHaptic) {
-          _hasTriggeredLoadedHaptic = true;
-          HapticService.pdfLoading();
-        }
-      });
     }
 
     return PhotoViewGalleryPageOptions(
@@ -1000,7 +978,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
           icon: const Icon(Icons.arrow_back),
           color: AppColors.primaryText,
           onPressed: () {
-            HapticService.subtle();
             Navigator.of(context).pop();
           },
         ),

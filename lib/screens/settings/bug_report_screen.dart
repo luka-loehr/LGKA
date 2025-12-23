@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../../theme/app_theme.dart';
-import '../../providers/haptic_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/app_info.dart';
 import '../../utils/app_logger.dart';
@@ -21,7 +20,6 @@ class _BugReportScreenState extends State<BugReportScreen> {
   final GlobalKey webViewKey = GlobalKey();
   InAppWebViewController? _controller;
   double _progress = 0;
-  bool _hasTriggeredLoadedHaptic = false;
   bool _hasError = false;
   String? _errorText;
 
@@ -47,9 +45,7 @@ class _BugReportScreenState extends State<BugReportScreen> {
       _hasError = false;
       _errorText = null;
       _progress = 0;
-      _hasTriggeredLoadedHaptic = false;
     });
-    await HapticService.light();
     if (_controller != null) {
       try {
         await _controller!.reload();
@@ -81,7 +77,6 @@ class _BugReportScreenState extends State<BugReportScreen> {
         leading: IconButton(
           icon: const Icon(Icons.close, color: AppColors.secondaryText),
           onPressed: () {
-            HapticService.subtle();
             Navigator.of(context).maybePop();
           },
         ),
@@ -121,17 +116,6 @@ class _BugReportScreenState extends State<BugReportScreen> {
               onProgressChanged: (controller, progress) {
                 setState(() => _progress = progress / 100);
                 
-                // Trigger haptic feedback when page is fully loaded
-                if (progress == 100 && !_hasTriggeredLoadedHaptic) {
-                  _hasTriggeredLoadedHaptic = true;
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    Future.delayed(const Duration(milliseconds: 500), () {
-                      if (mounted) {
-                        HapticService.light();
-                      }
-                    });
-                  });
-                }
               },
               onLoadStop: (controller, url) async {
                 // Cache is already disabled via incognito mode and cacheEnabled: false
@@ -204,7 +188,6 @@ class _BugReportScreenState extends State<BugReportScreen> {
                       const SizedBox(height: 24),
                       ElevatedButton.icon(
                         onPressed: () async {
-                          await HapticService.light();
                           _retryLoad();
                         },
                         icon: const Icon(Icons.refresh),
