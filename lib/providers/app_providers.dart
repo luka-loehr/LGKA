@@ -13,6 +13,7 @@ import '../services/schedule_service.dart';
 import '../services/news_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_logger.dart';
+import '../providers/haptic_service.dart';
 
 /// State class for preferences manager
 class PreferencesManagerState {
@@ -296,6 +297,13 @@ class PdfRepositoryNotifier extends Notifier<PdfRepositoryState> {
     // Then perform the actual retry
     await _repository.retryPdf(isToday);
     _refreshState();
+    
+    // Check if retry failed and trigger haptic feedback
+    final currentState = state;
+    final pdfState = isToday ? currentState.todayState : currentState.tomorrowState;
+    if (pdfState.error != null) {
+      HapticService.medium();
+    }
   }
 
   Future<void> retryAll() async {
@@ -306,6 +314,12 @@ class PdfRepositoryNotifier extends Notifier<PdfRepositoryState> {
     // Then perform the actual retry
     await _repository.retryAll();
     _refreshState();
+    
+    // Check if retry failed and trigger haptic feedback
+    final currentState = state;
+    if (currentState.hasAnyError) {
+      HapticService.medium();
+    }
   }
 
   Future<void> refresh() async {
@@ -503,6 +517,9 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
         // Keep existing data if available, don't clear it on error
         chartData: state.chartData.isNotEmpty ? state.chartData : const [],
       );
+      
+      // Trigger medium haptic feedback on retry failure
+      HapticService.medium();
     }
   }
 
