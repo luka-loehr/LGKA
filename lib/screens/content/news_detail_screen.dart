@@ -465,7 +465,10 @@ class NewsDetailScreen extends ConsumerWidget {
                         color: Colors.transparent,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16.0),
-                          onTap: () => _navigateToArticle(context, article),
+                          onTap: () {
+                            HapticService.medium();
+                            _navigateToArticle(context, article);
+                          },
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: Column(
