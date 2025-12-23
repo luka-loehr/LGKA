@@ -129,10 +129,6 @@ class _BugReportScreenState extends State<BugReportScreen> {
                 // No need to manually clear cache
               },
               onReceivedError: (controller, request, error) {
-                // Detect transition from loading to error
-                if (_wasLoading && _progress < 1.0) {
-                  HapticService.intense();
-                }
                 setState(() {
                   _hasError = true;
                   _errorText = error.description;
@@ -140,10 +136,6 @@ class _BugReportScreenState extends State<BugReportScreen> {
                 });
               },
               onReceivedHttpError: (controller, request, error) {
-                // Detect transition from loading to error
-                if (_wasLoading && _progress < 1.0) {
-                  HapticService.intense();
-                }
                 setState(() {
                   _hasError = true;
                   _errorText = 'HTTP ${error.statusCode}';

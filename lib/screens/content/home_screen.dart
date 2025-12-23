@@ -302,10 +302,6 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
   Widget build(BuildContext context) {
     final pdfRepo = ref.watch(pdfRepositoryProvider);
     
-    // Detect transition from loading to error
-    if (_wasLoading && !pdfRepo.isLoading && pdfRepo.hasAnyError && !pdfRepo.hasAnyData) {
-      HapticService.intense();
-    }
     _wasLoading = pdfRepo.isLoading || !pdfRepo.isInitialized;
     
     if (!pdfRepo.isInitialized || pdfRepo.isLoading) {
@@ -1437,7 +1433,7 @@ class _SettingsSheet extends ConsumerWidget {
   Widget _buildSupportLink(BuildContext context) {
     return InkWell(
       onTap: () {
-        HapticService.light();
+        HapticService.intense();
         _launchURL('https://buymeacoffee.com/lukaloehr');
       },
       borderRadius: BorderRadius.circular(8),

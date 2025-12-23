@@ -60,11 +60,6 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
 
     // Track news loading state
     final becameAvailable = _wasNewsLoading && !newsState.isLoading && newsState.events.isNotEmpty;
-    
-    // Detect transition from loading to error
-    if (_wasNewsLoading && !newsState.isLoading && newsState.hasError && newsState.events.isEmpty) {
-      HapticService.intense();
-    }
     _wasNewsLoading = newsState.isLoading;
 
     // Trigger list animation once when events become available

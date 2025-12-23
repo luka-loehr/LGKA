@@ -236,10 +236,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     // Keep showing the error placeholder while retrying until data loads
     final shouldShowAnyError = _forceShowErrorUntilSuccess || shouldShowWeatherError || shouldShowStaleDataError || shouldShowRepairError;
     
-    // Detect transition from loading to error
-    if (_wasLoading && !weatherState.isLoading && shouldShowAnyError && !shouldShowRepairError) {
-      HapticService.intense();
-    }
     _wasLoading = weatherState.isLoading && weatherState.chartData.isEmpty;
     
     if (shouldShowAnyError) {
