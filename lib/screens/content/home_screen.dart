@@ -10,6 +10,7 @@ import '../../providers/color_provider.dart';
 import '../../providers/schedule_provider.dart';
 import '../../data/pdf_repository.dart';
 import '../../data/preferences_manager.dart';
+import '../../providers/haptic_service.dart';
 import '../../navigation/app_router.dart';
 import '../../services/retry_service.dart';
 import '../../utils/app_logger.dart';
@@ -1173,6 +1174,10 @@ class _SettingsSheet extends ConsumerWidget {
                 child: Column(
                   children: [
                     _buildAccentColorSetting(context, ref),
+                    const SizedBox(height: 20),
+                    _buildDivider(),
+                    const SizedBox(height: 20),
+                    _buildHapticTestSection(context),
                     const SizedBox(height: 20),
                     _buildDivider(),
                     const SizedBox(height: 20),
