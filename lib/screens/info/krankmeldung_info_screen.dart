@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../theme/app_theme.dart';
-import '../../providers/haptic_service.dart';
 import '../../navigation/app_router.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/app_providers.dart';
@@ -22,7 +21,6 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
         elevation: 0,
         leading: IconButton(
           onPressed: () {
-            HapticService.subtle();
             context.pop();
           },
           icon: const Icon(
@@ -86,7 +84,6 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    HapticService.subtle();
                     _openKrankmeldung(context, ref);
                   },
                   style: ElevatedButton.styleFrom(

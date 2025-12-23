@@ -10,7 +10,6 @@ import '../../providers/color_provider.dart';
 import '../../providers/schedule_provider.dart';
 import '../../data/pdf_repository.dart';
 import '../../data/preferences_manager.dart';
-import '../../providers/haptic_service.dart';
 import '../../navigation/app_router.dart';
 import '../../services/retry_service.dart';
 import '../../utils/app_logger.dart';
@@ -71,13 +70,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final pdfRepo = ref.watch(pdfRepositoryProvider);
 
-    // Trigger light haptic when PDFs finish loading and data is available
+    // Track PDF loading state
     final becameAvailable = _pdfLoadingPreviously && !pdfRepo.isLoading && pdfRepo.hasAnyData;
-    if (becameAvailable) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await HapticService.light();
-      });
-    }
     _pdfLoadingPreviously = pdfRepo.isLoading;
 
     return Scaffold(
@@ -178,7 +172,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _switchToPage(int index) {
     if (_currentPage != index) {
-      HapticService.subtle();
       _pageController.jumpToPage(index);
       setState(() => _currentPage = index);
 
@@ -196,17 +189,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       controller: _pageController,
       onPageChanged: (index) {
         setState(() => _currentPage = index);
-        // Add haptic on page switch, but avoid double haptic if Schedule page will vibrate after its spinner
-        bool shouldVibrate = true;
-        if (index == 2) {
-          final scheduleState = ref.read(scheduleProvider);
-          if (scheduleState.isLoading) {
-            shouldVibrate = false;
-          }
-        }
-        if (shouldVibrate) {
-          HapticService.subtle();
-        }
       },
       children: [
         const _SubstitutionPlanPage(),
@@ -217,7 +199,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showSettings() {
-    HapticService.subtle();
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1E1E1E),
@@ -230,7 +211,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showDrawer() {
-    HapticService.subtle();
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1E1E1E),
@@ -243,8 +223,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _onKrankmeldungPressed() {
-    HapticService.subtle();
-    
     final preferencesManager = ref.read(preferencesManagerProvider);
     
     // Check if krankmeldung info has been shown before
@@ -320,7 +298,6 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     if (pdfRepo.hasAnyError && !pdfRepo.hasAnyData) {
       return _ErrorView(
         onRetry: () {
-          HapticService.light();
           ref.read(retryServiceProvider).retryAllDataSources();
         },
       );
@@ -360,7 +337,6 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
           label: AppLocalizations.of(context)!.today,
           onTap: () => _openPdf(pdfRepoState, ref, true),
           onRetry: () {
-            HapticService.light();
             ref.read(retryServiceProvider).retryAllDataSources();
           },
         ),
@@ -370,7 +346,6 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
           label: AppLocalizations.of(context)!.tomorrow,
           onTap: () => _openPdf(pdfRepoState, ref, false),
           onRetry: () {
-            HapticService.light();
             ref.read(retryServiceProvider).retryAllDataSources();
           },
         ),
@@ -529,7 +504,6 @@ class _StundenplanPageState extends ConsumerState<_StundenplanPage>
 
   void _openSchedule(String scheduleType) {
     // Navigate to schedule page - implementation handled in SchedulePage
-    HapticService.subtle();
   }
 
   Widget _buildFooter(BuildContext context) {
@@ -675,7 +649,6 @@ class _ScheduleOptionButtonState extends ConsumerState<_ScheduleOptionButton>
   }
 
   void _handleTap() {
-    HapticService.subtle();
     widget.onTap();
   }
 }
@@ -740,8 +713,7 @@ class _ErrorView extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () async {
-              await HapticService.light();
+            onPressed: () {
               onRetry();
             },
             icon: const Icon(Icons.refresh),
@@ -965,9 +937,6 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
   }
 
   void _handleTap() {
-    // Add haptic feedback when button is tapped
-    HapticService.subtle();
-    
     if (widget.pdfState.error != null) {
       widget.onRetry();
     } else {
@@ -1035,7 +1004,6 @@ class _DrawerSheet extends ConsumerWidget {
       child: InkWell(
         onTap: () {
           Navigator.of(context).pop();
-          HapticService.subtle();
           
           final preferencesManager = ref.read(preferencesManagerProvider);
           
@@ -1101,7 +1069,6 @@ class _DrawerSheet extends ConsumerWidget {
       child: InkWell(
         onTap: () {
           Navigator.of(context).pop();
-          HapticService.subtle();
           context.push(AppRouter.news);
         },
         borderRadius: BorderRadius.circular(12),
@@ -1250,7 +1217,6 @@ class _SettingsSheet extends ConsumerWidget {
             return GestureDetector(
               onTap: () {
                 ref.read(colorProvider.notifier).setColor(colorPalette.name);
-                HapticService.subtle();
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 60),
@@ -1330,7 +1296,6 @@ class _SettingsSheet extends ConsumerWidget {
   Widget _buildBugReportLink(BuildContext context) {
     return InkWell(
       onTap: () {
-        HapticService.subtle();
         context.push(AppRouter.bugReport);
       },
       borderRadius: BorderRadius.circular(8),
@@ -1367,7 +1332,6 @@ class _SettingsSheet extends ConsumerWidget {
   Widget _buildSupportLink(BuildContext context) {
     return InkWell(
       onTap: () {
-        HapticService.subtle();
         _launchURL('https://buymeacoffee.com/lukaloehr');
       },
       borderRadius: BorderRadius.circular(8),
@@ -1404,7 +1368,6 @@ class _SettingsSheet extends ConsumerWidget {
   Widget _buildLegalLink(BuildContext context, IconData icon, String text, String url) {
     return InkWell(
       onTap: () {
-        HapticService.subtle();
         _launchURL(url);
       },
       borderRadius: BorderRadius.circular(8),

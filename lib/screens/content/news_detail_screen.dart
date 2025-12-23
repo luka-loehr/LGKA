@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
-import '../../providers/haptic_service.dart';
 import '../../services/news_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/color_provider.dart';
@@ -36,7 +35,6 @@ class NewsDetailScreen extends ConsumerWidget {
   });
 
   Future<void> _openInBrowser() async {
-    await HapticService.light();
     final uri = Uri.parse(event.url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       debugPrint('Could not launch $uri');
@@ -44,7 +42,6 @@ class NewsDetailScreen extends ConsumerWidget {
   }
 
   Future<void> _openLink(String url) async {
-    await HapticService.light();
     final uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       debugPrint('Could not launch $uri');
@@ -176,8 +173,7 @@ class NewsDetailScreen extends ConsumerWidget {
     return shuffled.take(3).toList();
   }
 
-  void _navigateToArticle(BuildContext context, NewsEvent article) async {
-    await HapticService.light();
+  void _navigateToArticle(BuildContext context, NewsEvent article) {
     context.push(AppRouter.newsDetail, extra: article);
   }
 
@@ -204,8 +200,7 @@ class NewsDetailScreen extends ConsumerWidget {
             Icons.arrow_back_ios,
             color: primaryTextColor,
           ),
-          onPressed: () async {
-            await HapticService.light();
+          onPressed: () {
             if (context.mounted) {
               context.pop();
             }

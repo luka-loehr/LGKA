@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/color_provider.dart';
 import '../../navigation/app_router.dart';
-import '../../providers/haptic_service.dart';
 import '../../l10n/app_localizations.dart';
 
 class WhatYouCanDoScreen extends ConsumerStatefulWidget {
@@ -150,8 +149,6 @@ class _WhatYouCanDoScreenState extends ConsumerState<WhatYouCanDoScreen>
     // Button press animation
     await _buttonController.forward();
 
-    // Premium haptic feedback
-    await HapticService.light();
 
     // Small delay for the animation to feel natural
     await Future.delayed(const Duration(milliseconds: 50));

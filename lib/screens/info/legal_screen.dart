@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
-import '../../providers/haptic_service.dart';
 
 class LegalScreen extends ConsumerWidget {
   const LegalScreen({super.key});
@@ -83,7 +82,6 @@ class LegalScreen extends ConsumerWidget {
   Widget _buildLinkRow(BuildContext context, IconData icon, String text, String url) {
     return InkWell(
       onTap: () {
-        HapticService.subtle();
         _launchURL(url);
       },
       borderRadius: BorderRadius.circular(8),
