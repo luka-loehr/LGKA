@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/haptic_service.dart';
 import '../../utils/app_info.dart';
 import '../../utils/app_logger.dart';
 
@@ -70,6 +71,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
         leading: IconButton(
           icon: const Icon(Icons.close, color: AppColors.secondaryText),
           onPressed: () {
+            HapticService.light();
             if (widget.fromKrankmeldungInfo) {
               // If we came from Krankmeldung info screen, go back to home
               Navigator.of(context).popUntil((route) => route.isFirst);

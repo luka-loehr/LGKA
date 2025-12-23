@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
+import 'package:lgka_flutter/providers/haptic_service.dart';
 import 'package:pdfx/pdfx.dart' as pdfx;
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -807,7 +808,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
           icon: const Icon(Icons.arrow_back),
           color: AppColors.primaryText,
           onPressed: () {
- // Add haptic feedback
+            HapticService.light();
             Navigator.of(context).pop();
           },
         ),
@@ -847,7 +848,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
           ],
           IconButton(
             key: _shareButtonKey, // Add key for position calculation
-            onPressed: _sharePdf,
+            onPressed: () {
+              HapticService.light();
+              _sharePdf();
+            },
             icon: const Icon(
               Icons.share_outlined,
               color: AppColors.secondaryText,

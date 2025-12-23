@@ -97,7 +97,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       centerTitle: true,
       actions: [
         IconButton(
-          onPressed: _showSettings,
+          onPressed: () {
+            HapticService.light();
+            _showSettings();
+          },
           icon: const Icon(
             Icons.settings_outlined,
             color: AppColors.secondaryText,
@@ -650,6 +653,7 @@ class _ScheduleOptionButtonState extends ConsumerState<_ScheduleOptionButton>
   }
 
   void _handleTap() {
+    HapticService.medium();
     widget.onTap();
   }
 }
@@ -938,6 +942,7 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
   }
 
   void _handleTap() {
+    HapticService.medium();
     if (widget.pdfState.error != null) {
       widget.onRetry();
     } else {
@@ -1004,6 +1009,7 @@ class _DrawerSheet extends ConsumerWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
+          HapticService.light();
           Navigator.of(context).pop();
           
           final preferencesManager = ref.read(preferencesManagerProvider);
@@ -1069,6 +1075,7 @@ class _DrawerSheet extends ConsumerWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
+          HapticService.light();
           Navigator.of(context).pop();
           context.push(AppRouter.news);
         },
@@ -1221,6 +1228,7 @@ class _SettingsSheet extends ConsumerWidget {
             final isSelected = currentColorName == colorPalette.name;
             return GestureDetector(
               onTap: () {
+                HapticService.light();
                 ref.read(colorProvider.notifier).setColor(colorPalette.name);
               },
               child: AnimatedContainer(
@@ -1377,6 +1385,7 @@ class _SettingsSheet extends ConsumerWidget {
   Widget _buildBugReportLink(BuildContext context) {
     return InkWell(
       onTap: () {
+        HapticService.light();
         context.push(AppRouter.bugReport);
       },
       borderRadius: BorderRadius.circular(8),
@@ -1413,6 +1422,7 @@ class _SettingsSheet extends ConsumerWidget {
   Widget _buildSupportLink(BuildContext context) {
     return InkWell(
       onTap: () {
+        HapticService.light();
         _launchURL('https://buymeacoffee.com/lukaloehr');
       },
       borderRadius: BorderRadius.circular(8),
@@ -1449,6 +1459,7 @@ class _SettingsSheet extends ConsumerWidget {
   Widget _buildLegalLink(BuildContext context, IconData icon, String text, String url) {
     return InkWell(
       onTap: () {
+        HapticService.light();
         _launchURL(url);
       },
       borderRadius: BorderRadius.circular(8),
