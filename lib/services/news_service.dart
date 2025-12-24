@@ -1,5 +1,6 @@
 // Copyright Luka Löhr 2025
 
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
 import 'package:timezone/timezone.dart' as tz;
