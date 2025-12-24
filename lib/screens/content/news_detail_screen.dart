@@ -317,17 +317,38 @@ class NewsDetailScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                // Link icon
+                // Favicon or link icon
                 Container(
                   padding: const EdgeInsets.all(10.0),
                   decoration: BoxDecoration(
                     color: accentColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  child: Icon(
-                    Icons.link,
-                    color: accentColor,
-                    size: 24,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(6.0),
+                    child: Image.network(
+                      _getFaviconUrl(link.url),
+                      width: 24,
+                      height: 24,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Fallback to link icon if favicon fails to load
+                        return Icon(
+                          Icons.link,
+                          color: accentColor,
+                          size: 24,
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        // Show link icon while loading favicon
+                        return Icon(
+                          Icons.link,
+                          color: accentColor,
+                          size: 24,
+                        );
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -377,6 +398,17 @@ class NewsDetailScreen extends ConsumerWidget {
       return uri.host.replaceFirst('www.', '');
     } catch (e) {
       return url.length > 50 ? '${url.substring(0, 50)}...' : url;
+    }
+  }
+
+  /// Get favicon URL for a domain using Google's favicon service
+  String _getFaviconUrl(String url) {
+    try {
+      final uri = Uri.parse(url);
+      final domain = uri.host.replaceFirst('www.', '');
+      return 'https://www.google.com/s2/favicons?domain=$domain&sz=64';
+    } catch (e) {
+      return '';
     }
   }
 
