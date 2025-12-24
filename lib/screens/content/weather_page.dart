@@ -7,7 +7,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import '../../services/weather_service.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/app_providers.dart';
-import '../../providers/haptic_service.dart';
+import '../../services/haptic_service.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../utils/app_logger.dart';

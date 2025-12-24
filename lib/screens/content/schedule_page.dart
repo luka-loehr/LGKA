@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../providers/schedule_provider.dart';
-import '../../providers/haptic_service.dart';
+import '../../services/haptic_service.dart';
 import '../../theme/app_theme.dart';
 import '../../services/schedule_service.dart';
 // import '../../services/retry_service.dart';

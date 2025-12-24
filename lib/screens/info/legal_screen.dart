@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
-import '../../providers/haptic_service.dart';
+import '../../services/haptic_service.dart';
 
 class LegalScreen extends ConsumerWidget {
   const LegalScreen({super.key});
