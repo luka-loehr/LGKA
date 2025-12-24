@@ -411,7 +411,6 @@ class NewsDetailScreen extends ConsumerWidget {
     
     // Rebuild spans with links inserted
     final List<TextSpan> result = [];
-    int currentPos = 0;
     
     // Process all segments and matches together
     int segmentIndex = 0;
@@ -502,7 +501,6 @@ class NewsDetailScreen extends ConsumerWidget {
       }
     }
   }
-  }
   
   /// Creates a TextSpan from a portion of a segment, preserving formatting
   TextSpan _createTextSpanFromSegment(TextSpan originalSpan, String segmentText, int start, int end) {
@@ -536,10 +534,7 @@ class NewsDetailScreen extends ConsumerWidget {
       };
     
     // Preserve original formatting but add accent color and recognizer
-    TextStyle? linkStyle = originalSpan.style?.copyWith(color: accentColor);
-    if (linkStyle == null) {
-      linkStyle = TextStyle(color: accentColor);
-    }
+    final linkStyle = originalSpan.style?.copyWith(color: accentColor) ?? TextStyle(color: accentColor);
     
     return TextSpan(
       text: linkText,
