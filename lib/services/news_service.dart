@@ -627,33 +627,10 @@ class NewsService {
             }
           }
           
-          // Remove HTML comments (like JoomlaWorks plugin comments)
-          final commentNodes = articleBodyClone.querySelectorAll('*');
-          for (var node in commentNodes) {
-            // Remove comment nodes
-            final commentElements = node.nodes.where((n) {
-              try {
-                return (n as dynamic).nodeType == 8; // Comment node type
-              } catch (_) {
-                return false;
-              }
-            }).toList();
-            for (var comment in commentElements) {
-              try {
-                (comment as dynamic).remove();
-              } catch (_) {
-                // Ignore removal errors
-              }
-            }
-          }
-          
-          // Also remove comment text from innerHTML by regex
+          // Remove HTML comments from innerHTML
           String cleanHtml(String html) {
-            // Remove HTML comments
+            // Remove all HTML comments (<!-- ... -->)
             html = html.replaceAll(RegExp(r'<!--.*?-->', dotAll: true), '');
-            // Remove JoomlaWorks plugin text if it appears as text
-            html = html.replaceAll(RegExp(r'JoomlaWorks\s+"Simple Image Gallery"\s+Plugin.*?starts here', caseSensitive: false, dotAll: true), '');
-            html = html.replaceAll(RegExp(r'JoomlaWorks\s+"Simple Image Gallery"\s+Plugin.*?ends here', caseSensitive: false, dotAll: true), '');
             return html.trim();
           }
           
@@ -669,7 +646,7 @@ class NewsService {
             // Combine all paragraph HTML, filtering out empty ones and cleaning comments
             final paragraphHtmls = paragraphs
                 .map((p) => cleanHtml(p.innerHtml))
-                .where((html) => html.isNotEmpty && !html.toLowerCase().contains('joomlaworks'));
+                .where((html) => html.isNotEmpty);
             
             // Join paragraphs with double line breaks
             htmlContent = paragraphHtmls.join('\n\n');
