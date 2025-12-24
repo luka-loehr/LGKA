@@ -105,13 +105,16 @@ class ScheduleService {
     if (_isRefreshing) return;
 
     _isRefreshing = true;
+    AppLogger.info('Starting background refresh: Schedules', module: 'ScheduleService');
     try {
       final schedules = await _scrapeSchedules();
       _cachedSchedules = schedules;
       _lastFetchTime = DateTime.now();
       _cacheService.updateCacheTimestamp(CacheKey.schedules, _lastFetchTime);
-    } catch (_) {
-      // Ignore background refresh errors
+      AppLogger.success('Background refresh complete: Schedules', module: 'ScheduleService');
+    } catch (e) {
+      AppLogger.warning('Background refresh failed: Schedules', module: 'ScheduleService', error: e);
+      // Ignore background refresh errors - don't show to user
     } finally {
       _isRefreshing = false;
     }

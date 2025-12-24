@@ -401,6 +401,7 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
 
   /// Update data in background (silent refresh)
   Future<void> updateDataInBackground() async {
+    AppLogger.info('Background refresh: Weather data', module: 'WeatherProvider');
     try {
       final chartDataFuture = _weatherService.fetchWeatherData();
       final latestDataFuture = _weatherService.getLatestWeatherData();
@@ -419,9 +420,11 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
           fullDataCount: fullData.length,
         );
         _cacheService.updateCacheTimestamp(CacheKey.weather, updateTime);
+        AppLogger.success('Background refresh complete: Weather data', module: 'WeatherProvider');
       }
     } catch (e) {
-      // Silent failure for background updates
+      AppLogger.warning('Background refresh failed: Weather data', module: 'WeatherProvider', error: e);
+      // Silent failure for background updates - don't show to user
     }
   }
 }

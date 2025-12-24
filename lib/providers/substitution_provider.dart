@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/substitution_service.dart';
 import '../services/haptic_service.dart';
 import '../services/cache_service.dart';
+import '../utils/app_logger.dart';
 import 'app_providers.dart';
 
 /// State class for substitution data
@@ -123,10 +124,12 @@ class SubstitutionNotifier extends Notifier<SubstitutionProviderState> {
     _refreshState();
   }
 
-  /// Refresh in background
+  /// Refresh in background (silent - no UI updates, only logs)
   Future<void> refreshInBackground() async {
+    AppLogger.info('Background refresh: Substitution plans', module: 'SubstitutionProvider');
     await _substitutionService.refreshInBackground();
     _refreshState();
+    AppLogger.success('Background refresh complete: Substitution plans', module: 'SubstitutionProvider');
   }
 
   /// Get the file for a specific PDF if available
