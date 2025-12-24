@@ -177,90 +177,120 @@ class NewsDetailScreen extends ConsumerWidget {
     List<TextSpan> processNode(dynamic node, TextStyle? parentStyle) {
       final List<TextSpan> nodeSpans = [];
       
-      if (node is html_parser.Element) {
-        final tagName = node.localName?.toLowerCase();
-        TextStyle? currentStyle = parentStyle ?? baseStyle;
-        
-        // Apply formatting based on tag
-        switch (tagName) {
-          case 'strong':
-          case 'b':
-            currentStyle = currentStyle?.copyWith(fontWeight: FontWeight.bold);
-            break;
-          case 'em':
-          case 'i':
-            currentStyle = currentStyle?.copyWith(fontStyle: FontStyle.italic);
-            break;
-          case 'u':
-            currentStyle = currentStyle?.copyWith(decoration: TextDecoration.underline);
-            break;
-          case 'a':
-            // Handle links
-            final href = node.attributes['href'];
-            final linkText = node.text.trim();
-            if (href != null && linkText.isNotEmpty) {
-              // Convert relative URLs to absolute
-              final fullUrl = href.startsWith('http')
-                  ? href
-                  : href.startsWith('/')
-                      ? 'https://lessing-gymnasium-karlsruhe.de$href'
-                      : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
-              
-              // Process child nodes for formatting within the link
-              final List<TextSpan> linkSpans = [];
-              for (var child in node.nodes) {
-                linkSpans.addAll(processNode(child, currentStyle?.copyWith(color: accentColor)));
-              }
-              
-              if (linkSpans.isEmpty) {
-                linkSpans.add(TextSpan(
-                  text: linkText,
+      // Check if node is an element (has localName property)
+      try {
+        final localName = (node as dynamic).localName;
+        if (localName != null) {
+          // It's an element
+          final tagName = (localName as String?)?.toLowerCase();
+          TextStyle? currentStyle = parentStyle ?? baseStyle;
+          
+          // Apply formatting based on tag
+          switch (tagName) {
+            case 'strong':
+            case 'b':
+              currentStyle = currentStyle?.copyWith(fontWeight: FontWeight.bold);
+              break;
+            case 'em':
+            case 'i':
+              currentStyle = currentStyle?.copyWith(fontStyle: FontStyle.italic);
+              break;
+            case 'u':
+              currentStyle = currentStyle?.copyWith(decoration: TextDecoration.underline);
+              break;
+            case 'a':
+              // Handle links
+              final attributes = (node as dynamic).attributes as Map<String, String>?;
+              final href = attributes?['href'];
+              final linkText = ((node as dynamic).text as String?)?.trim() ?? '';
+              if (href != null && linkText.isNotEmpty) {
+                // Convert relative URLs to absolute
+                final fullUrl = href.startsWith('http')
+                    ? href
+                    : href.startsWith('/')
+                        ? 'https://lessing-gymnasium-karlsruhe.de$href'
+                        : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
+                
+                // Process child nodes for formatting within the link
+                final List<TextSpan> linkSpans = [];
+                final nodes = (node as dynamic).nodes as List<dynamic>?;
+                if (nodes != null) {
+                  for (var child in nodes) {
+                    linkSpans.addAll(processNode(child, currentStyle?.copyWith(color: accentColor)));
+                  }
+                }
+                
+                if (linkSpans.isEmpty) {
+                  linkSpans.add(TextSpan(
+                    text: linkText,
+                    style: currentStyle?.copyWith(color: accentColor),
+                  ));
+                }
+                
+                nodeSpans.add(TextSpan(
+                  children: linkSpans,
                   style: currentStyle?.copyWith(color: accentColor),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      HapticService.light();
+                      _openLink(fullUrl);
+                    },
                 ));
+                return nodeSpans; // Return early, don't process children again
               }
-              
-              nodeSpans.add(TextSpan(
-                children: linkSpans,
-                style: currentStyle?.copyWith(color: accentColor),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    HapticService.light();
-                    _openLink(fullUrl);
-                  },
-              ));
-              return nodeSpans; // Return early, don't process children again
-            }
-            break;
-          case 'p':
-            // Process paragraph content
-            final List<TextSpan> paragraphSpans = [];
-            for (var child in node.nodes) {
-              paragraphSpans.addAll(processNode(child, currentStyle));
-            }
-            if (paragraphSpans.isNotEmpty) {
-              nodeSpans.addAll(paragraphSpans);
-              // Add line break after paragraph if not last
-              if (node.nextElementSibling != null) {
-                nodeSpans.add(TextSpan(text: '\n\n', style: currentStyle));
+              break;
+            case 'p':
+              // Process paragraph content
+              final List<TextSpan> paragraphSpans = [];
+              final nodes = (node as dynamic).nodes as List<dynamic>?;
+              if (nodes != null) {
+                for (var child in nodes) {
+                  paragraphSpans.addAll(processNode(child, currentStyle));
+                }
               }
+              if (paragraphSpans.isNotEmpty) {
+                nodeSpans.addAll(paragraphSpans);
+                // Add line break after paragraph if not last
+                final nextSibling = (node as dynamic).nextElementSibling;
+                if (nextSibling != null) {
+                  nodeSpans.add(TextSpan(text: '\n\n', style: currentStyle));
+                }
+              }
+              return nodeSpans;
+            case 'br':
+              nodeSpans.add(TextSpan(text: '\n', style: currentStyle));
+              return nodeSpans;
+          }
+          
+          // Process child nodes for other elements
+          final nodes = (node as dynamic).nodes as List<dynamic>?;
+          if (nodes != null) {
+            for (var child in nodes) {
+              nodeSpans.addAll(processNode(child, currentStyle));
             }
-            return nodeSpans;
-          case 'br':
-            nodeSpans.add(TextSpan(text: '\n', style: currentStyle));
-            return nodeSpans;
+          }
+        } else {
+          // It's a text node - check for text property
+          final text = (node as dynamic).text as String?;
+          if (text != null && (text.trim().isNotEmpty || text.contains('\n'))) {
+            nodeSpans.add(TextSpan(
+              text: text,
+              style: parentStyle ?? baseStyle,
+            ));
+          }
         }
-        
-        // Process child nodes for other elements
-        for (var child in node.nodes) {
-          nodeSpans.addAll(processNode(child, currentStyle));
-        }
-      } else if (node is html_parser.Text) {
-        final text = node.text;
-        if (text.trim().isNotEmpty || text.contains('\n')) {
-          nodeSpans.add(TextSpan(
-            text: text,
-            style: parentStyle ?? baseStyle,
-          ));
+      } catch (e) {
+        // Fallback: try to get text directly
+        try {
+          final text = (node as dynamic).text as String?;
+          if (text != null && text.trim().isNotEmpty) {
+            nodeSpans.add(TextSpan(
+              text: text,
+              style: parentStyle ?? baseStyle,
+            ));
+          }
+        } catch (_) {
+          // Ignore errors for unsupported node types
         }
       }
       
