@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:html/parser.dart' as html_parser;
 import '../../theme/app_theme.dart';
 import '../../services/news_service.dart';
 import '../../l10n/app_localizations.dart';
@@ -157,6 +158,139 @@ class NewsDetailScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Converts HTML content to TextSpans with formatting preserved
+  List<TextSpan> _parseHtmlToTextSpans(String html, ThemeData theme, Color accentColor, List<NewsLink> links) {
+    final List<TextSpan> spans = [];
+    
+    // Parse the HTML
+    final document = html_parser.parse(html);
+    
+    // Base text style
+    final baseStyle = theme.textTheme.bodyLarge?.copyWith(
+      height: 1.8,
+      letterSpacing: 0.2,
+    );
+    
+    // Recursive function to convert HTML nodes to TextSpans
+    List<TextSpan> processNode(dynamic node, TextStyle? parentStyle) {
+      final List<TextSpan> nodeSpans = [];
+      
+      if (node is html_parser.Element) {
+        final tagName = node.localName?.toLowerCase();
+        TextStyle? currentStyle = parentStyle ?? baseStyle;
+        
+        // Apply formatting based on tag
+        switch (tagName) {
+          case 'strong':
+          case 'b':
+            currentStyle = currentStyle?.copyWith(fontWeight: FontWeight.bold);
+            break;
+          case 'em':
+          case 'i':
+            currentStyle = currentStyle?.copyWith(fontStyle: FontStyle.italic);
+            break;
+          case 'u':
+            currentStyle = currentStyle?.copyWith(decoration: TextDecoration.underline);
+            break;
+          case 'a':
+            // Handle links
+            final href = node.attributes['href'];
+            final linkText = node.text.trim();
+            if (href != null && linkText.isNotEmpty) {
+              // Convert relative URLs to absolute
+              final fullUrl = href.startsWith('http')
+                  ? href
+                  : href.startsWith('/')
+                      ? 'https://lessing-gymnasium-karlsruhe.de$href'
+                      : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
+              
+              // Process child nodes for formatting within the link
+              final List<TextSpan> linkSpans = [];
+              for (var child in node.nodes) {
+                linkSpans.addAll(processNode(child, currentStyle?.copyWith(color: accentColor)));
+              }
+              
+              if (linkSpans.isEmpty) {
+                linkSpans.add(TextSpan(
+                  text: linkText,
+                  style: currentStyle?.copyWith(color: accentColor),
+                ));
+              }
+              
+              nodeSpans.add(TextSpan(
+                children: linkSpans,
+                style: currentStyle?.copyWith(color: accentColor),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    HapticService.light();
+                    _openLink(fullUrl);
+                  },
+              ));
+              return nodeSpans; // Return early, don't process children again
+            }
+            break;
+          case 'p':
+            // Process paragraph content
+            final List<TextSpan> paragraphSpans = [];
+            for (var child in node.nodes) {
+              paragraphSpans.addAll(processNode(child, currentStyle));
+            }
+            if (paragraphSpans.isNotEmpty) {
+              nodeSpans.addAll(paragraphSpans);
+              // Add line break after paragraph if not last
+              if (node.nextElementSibling != null) {
+                nodeSpans.add(TextSpan(text: '\n\n', style: currentStyle));
+              }
+            }
+            return nodeSpans;
+          case 'br':
+            nodeSpans.add(TextSpan(text: '\n', style: currentStyle));
+            return nodeSpans;
+        }
+        
+        // Process child nodes for other elements
+        for (var child in node.nodes) {
+          nodeSpans.addAll(processNode(child, currentStyle));
+        }
+      } else if (node is html_parser.Text) {
+        final text = node.text;
+        if (text.trim().isNotEmpty || text.contains('\n')) {
+          nodeSpans.add(TextSpan(
+            text: text,
+            style: parentStyle ?? baseStyle,
+          ));
+        }
+      }
+      
+      return nodeSpans;
+    }
+    
+    // Process all nodes in the document body
+    if (document.body != null) {
+      for (var node in document.body!.nodes) {
+        spans.addAll(processNode(node, null));
+      }
+    }
+    
+    return spans;
+  }
+
+  /// Builds a RichText widget with formatted HTML content and clickable links
+  Widget _buildContentFromHtml(String? htmlContent, String? plainContent, List<NewsLink> links, BuildContext context, ThemeData theme, Color accentColor) {
+    // Use HTML content if available, otherwise fall back to plain text
+    if (htmlContent != null && htmlContent.isNotEmpty) {
+      final spans = _parseHtmlToTextSpans(htmlContent, theme, accentColor, links);
+      if (spans.isNotEmpty) {
+        return RichText(
+          text: TextSpan(children: spans),
+        );
+      }
+    }
+    
+    // Fallback to plain text with links
+    return _buildContentWithLinks(plainContent ?? '', links, context, theme, accentColor);
   }
 
   /// Builds a RichText widget with clickable embedded links from the content
@@ -563,10 +697,12 @@ class NewsDetailScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 32),
                         
-                        // Full content with embedded links
-                        if (event.content != null && event.content!.isNotEmpty) ...[
-                          _buildContentWithLinks(
-                            event.content!,
+                        // Full content with embedded links and formatting
+                        if ((event.htmlContent != null && event.htmlContent!.isNotEmpty) || 
+                            (event.content != null && event.content!.isNotEmpty)) ...[
+                          _buildContentFromHtml(
+                            event.htmlContent,
+                            event.content,
                             event.links,
                             context,
                             theme,
