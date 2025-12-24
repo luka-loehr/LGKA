@@ -277,40 +277,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     return activeColor.withValues(alpha: 0.5); // 50% opacity when fields are empty
   }
 
-  Future<void> _selectColor(String colorName) async {
-    setState(() {
-      // Trigger rebuild to update colors
-    });
-
-    // Haptic feedback for color selection
-    HapticService.light();
-
-    // Save color preference using color provider
-    await ref.read(colorProvider.notifier).setColor(colorName);
-    
-    // Update animations with new color
-    final newColor = ref.read(currentColorProvider);
-    _buttonColorAnimation = ColorTween(
-      begin: newColor,
-      end: _errorRedColor,
-    ).animate(CurvedAnimation(
-      parent: _buttonColorController,
-      curve: Curves.easeInOut,
-    ));
-
-    _successColorAnimation = ColorTween(
-      begin: newColor,
-      end: _successGreenColor,
-    ).animate(CurvedAnimation(
-      parent: _successColorController,
-      curve: Curves.easeInOut,
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
-    final choosableColors = ref.watch(choosableColorsProvider);
-    final currentColorName = ref.watch(colorProvider);
     final activeColor = ref.watch(currentColorProvider);
     
     return Scaffold(
@@ -354,78 +322,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                           height: 1.4,
                         ),
                         textAlign: TextAlign.center,
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // Accent Color Selection
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)!.accentColor,
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: AppColors.primaryText,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            AppLocalizations.of(context)!.chooseAccentColor,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.secondaryText,
-                                ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 16),
-                          Wrap(
-                            spacing: 12,
-                            runSpacing: 8,
-                            alignment: WrapAlignment.center,
-                            children: choosableColors.map((colorPalette) {
-                              final isSelected = currentColorName == colorPalette.name;
-                              return GestureDetector(
-                                onTap: () => _selectColor(colorPalette.name),
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  curve: Curves.easeInOut,
-                                  width: 48,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    color: colorPalette.color,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: isSelected ? Colors.white : Colors.transparent,
-                                      width: isSelected ? 3 : 0,
-                                    ),
-                                    boxShadow: isSelected
-                                        ? [
-                                            BoxShadow(
-                                              color: colorPalette.color.withValues(alpha: 0.5),
-                                              blurRadius: 8,
-                                              spreadRadius: 2,
-                                            ),
-                                          ]
-                                        : null,
-                                  ),
-                                  child: AnimatedOpacity(
-                                    duration: const Duration(milliseconds: 200),
-                                    curve: Curves.easeInOut,
-                                    opacity: isSelected ? 1.0 : 0.0,
-                                    child: isSelected
-                                        ? Icon(
-                                            Icons.check,
-                                            color: Colors.white,
-                                            size: 24,
-                                          )
-                                        : null,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
                       ),
 
                       const SizedBox(height: 32),
