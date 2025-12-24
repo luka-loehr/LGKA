@@ -117,7 +117,7 @@ class NewsNotifier extends Notifier<NewsState> {
         AppLogger.success('Background refresh complete: News', module: 'NewsProvider');
       }
     } catch (e) {
-      AppLogger.warning('Background refresh failed: News', module: 'NewsProvider', error: e);
+      AppLogger.error('Background refresh failed: News', module: 'NewsProvider', error: e);
       // Ignore background refresh errors - don't show to user
     }
   }
