@@ -76,7 +76,8 @@ class NewsEvent {
   final DateTime? parsedDate;
   final int views;
   final String url;
-  final List<NewsLink> links;
+  final List<NewsLink> links; // Embedded links in text
+  final List<NewsLink> standaloneLinks; // Standalone links (full URLs) for buttons
   final List<NewsImage> images;
   final List<NewsDownload> downloads;
 
@@ -90,6 +91,7 @@ class NewsEvent {
     required this.views,
     required this.url,
     this.links = const [],
+    this.standaloneLinks = const [],
     this.images = const [],
     this.downloads = const [],
   });
@@ -103,6 +105,7 @@ class NewsEvent {
         'views': views,
         'url': url,
         'links': links.map((l) => l.toJson()).toList(),
+        'standalone_links': standaloneLinks.map((l) => l.toJson()).toList(),
         'images': images.map((i) => i.toJson()).toList(),
         'downloads': downloads.map((d) => d.toJson()).toList(),
       };
@@ -262,6 +265,7 @@ class NewsService {
             ...metadata,
             'content': contentData['content'],
             'links': contentData['links'],
+            'standaloneLinks': contentData['standaloneLinks'],
             'images': contentData['images'],
             'downloads': contentData['downloads'],
           };
@@ -284,6 +288,7 @@ class NewsService {
               views: result['views'] as int,
               url: result['url'] as String,
               links: (result['links'] as List<NewsLink>?) ?? [],
+              standaloneLinks: (result['standaloneLinks'] as List<NewsLink>?) ?? [],
               images: (result['images'] as List<NewsImage>?) ?? [],
               downloads: (result['downloads'] as List<NewsDownload>?) ?? [],
             );
@@ -361,7 +366,7 @@ class NewsService {
 
           if (response.statusCode != 200) {
             AppLogger.warning('Failed to load article: ${response.statusCode}', module: 'NewsService');
-            return {'content': null, 'links': <NewsLink>[], 'images': <NewsImage>[], 'downloads': <NewsDownload>[]};
+            return {'content': null, 'links': <NewsLink>[], 'standaloneLinks': <NewsLink>[], 'images': <NewsImage>[], 'downloads': <NewsDownload>[]};
           }
 
           final document = html_parser.parse(response.body);
@@ -370,7 +375,7 @@ class NewsService {
           final articleBody = document.querySelector('.com-content-article__body');
           if (articleBody == null) {
             AppLogger.warning('Could not find .com-content-article__body element', module: 'NewsService');
-            return {'content': null, 'links': <NewsLink>[], 'images': <NewsImage>[], 'downloads': <NewsDownload>[]};
+            return {'content': null, 'links': <NewsLink>[], 'standaloneLinks': <NewsLink>[], 'images': <NewsImage>[], 'downloads': <NewsDownload>[]};
           }
 
           // Extract download links first (doclink-insert class)
@@ -448,7 +453,10 @@ class NewsService {
           }
 
           // Extract regular links from <a> tags (excluding download links)
-          final List<NewsLink> links = [];
+          // Separate embedded links (in text) from standalone links (full URLs in own paragraph)
+          final List<NewsLink> embeddedLinks = [];
+          final List<NewsLink> standaloneLinks = [];
+          
           final linkElements = articleBody.querySelectorAll('a');
           for (var linkElement in linkElements) {
             // Skip download links
@@ -456,14 +464,33 @@ class NewsService {
             
             final href = linkElement.attributes['href'];
             final text = linkElement.text.trim();
-            if (href != null && href.isNotEmpty && text.isNotEmpty) {
-              // Convert relative URLs to absolute URLs
-              final fullUrl = href.startsWith('http')
-                  ? href
-                  : href.startsWith('/')
-                      ? 'https://lessing-gymnasium-karlsruhe.de$href'
-                      : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
-              links.add(NewsLink(text: text, url: fullUrl));
+            if (href == null || href.isEmpty || text.isEmpty) continue;
+            
+            // Convert relative URLs to absolute URLs
+            final fullUrl = href.startsWith('http')
+                ? href
+                : href.startsWith('/')
+                    ? 'https://lessing-gymnasium-karlsruhe.de$href'
+                    : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
+            
+            // Check if this is a standalone link (link text equals URL, or link is the only content in paragraph)
+            final parent = linkElement.parent;
+            bool isStandalone = false;
+            
+            if (parent != null && (parent.localName == 'p' || parent.localName == 'div')) {
+              final parentText = parent.text.trim();
+              // Standalone if: link text equals URL, or parent text is mostly just the link
+              isStandalone = text == fullUrl || 
+                            text == href ||
+                            (text.startsWith('http') && parentText == text) ||
+                            (text.startsWith('http') && parentText.length <= text.length + 5);
+            }
+            
+            final link = NewsLink(text: text, url: fullUrl);
+            if (isStandalone) {
+              standaloneLinks.add(link);
+            } else {
+              embeddedLinks.add(link);
             }
           }
 
@@ -530,7 +557,8 @@ class NewsService {
           }
 
           // Extract text content from paragraphs (preserving structure for link replacement)
-          // First, clone the article body and remove download links and regular links to avoid duplicates
+          // First, clone the article body and remove download links and standalone links to avoid duplicates
+          // Keep embedded links in the text for RichText display
           final articleBodyClone = articleBody.clone(true);
           
           // Remove download links
@@ -540,11 +568,37 @@ class NewsService {
             downloadLink.remove();
           }
           
-          // Remove regular links (they'll be displayed as separate buttons)
-          final regularLinksInClone = articleBodyClone.querySelectorAll('a:not(.doclink-insert)');
-          for (var link in regularLinksInClone) {
-            // Remove the link element entirely - links are displayed separately as buttons
-            link.remove();
+          // Remove standalone links (they'll be displayed as separate buttons)
+          // Keep embedded links in the text
+          final allLinksInClone = articleBodyClone.querySelectorAll('a:not(.doclink-insert)');
+          for (var link in allLinksInClone) {
+            final href = link.attributes['href'];
+            final text = link.text.trim();
+            if (href == null || href.isEmpty || text.isEmpty) continue;
+            
+            final fullUrl = href.startsWith('http')
+                ? href
+                : href.startsWith('/')
+                    ? 'https://lessing-gymnasium-karlsruhe.de$href'
+                    : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
+            
+            // Check if this is a standalone link
+            final parent = link.parent;
+            bool isStandalone = false;
+            
+            if (parent != null && (parent.localName == 'p' || parent.localName == 'div')) {
+              final parentText = parent.text.trim();
+              // Standalone if: link text equals URL, or parent text is mostly just the link
+              isStandalone = text == fullUrl || 
+                            text == href ||
+                            (text.startsWith('http') && parentText == text) ||
+                            (text.startsWith('http') && parentText.length <= text.length + 5);
+            }
+            
+            // Only remove standalone links, keep embedded links
+            if (isStandalone) {
+              link.remove();
+            }
           }
           
           final paragraphs = articleBodyClone.querySelectorAll('p');
@@ -563,7 +617,8 @@ class NewsService {
 
           return {
             'content': fullText,
-            'links': links,
+            'links': embeddedLinks, // Only embedded links for RichText
+            'standaloneLinks': standaloneLinks, // Standalone links for buttons
             'images': images,
             'downloads': downloads,
           };
@@ -574,7 +629,7 @@ class NewsService {
       );
     } catch (e) {
       AppLogger.warning('Error extracting full article content from $articleUrl: $e', module: 'NewsService');
-      return {'content': null, 'links': <NewsLink>[], 'images': <NewsImage>[], 'downloads': <NewsDownload>[]};
+      return {'content': null, 'links': <NewsLink>[], 'standaloneLinks': <NewsLink>[], 'images': <NewsImage>[], 'downloads': <NewsDownload>[]};
     }
   }
 
