@@ -540,9 +540,9 @@ class NewsDetailScreen extends ConsumerWidget {
                           ),
                           
                           // Display standalone link buttons if available
-                          if (event.standaloneLinks.isNotEmpty) ...[
+                          if (event.standaloneLinksOrEmpty.isNotEmpty) ...[
                             const SizedBox(height: 24),
-                            ...event.standaloneLinks.map((link) => _buildLinkButton(
+                            ...event.standaloneLinksOrEmpty.map((link) => _buildLinkButton(
                               link,
                               context,
                               theme,
