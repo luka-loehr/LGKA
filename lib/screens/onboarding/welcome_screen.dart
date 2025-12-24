@@ -99,7 +99,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                       width: logoSize,
                       height: logoSize,
                       child: Image.asset(
-                        'assets/images/welcome/welcome-logo.png',
+                        'assets/images/welcome/welcome-logo.webp',
                         width: logoSize,
                         height: logoSize,
                         fit: BoxFit.contain,
