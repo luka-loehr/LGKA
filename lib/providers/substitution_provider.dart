@@ -29,7 +29,7 @@ class SubstitutionProviderState {
 
   bool get isCacheValid {
     if (lastFetchTime == null) return false;
-    const cacheValidity = Duration(minutes: 5);
+    const cacheValidity = Duration(minutes: 2);
     return DateTime.now().difference(lastFetchTime!) < cacheValidity;
   }
 
