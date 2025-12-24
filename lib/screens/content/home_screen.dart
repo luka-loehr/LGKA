@@ -974,7 +974,7 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
 
   void _handleTap() {
     if (widget.pdfState.error != null) {
-      HapticService.light();
+      HapticService.medium();
       widget.onRetry();
     } else {
       HapticService.medium();
