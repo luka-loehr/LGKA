@@ -28,17 +28,40 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  int _lastHapticPage = 0;
 
   @override
   void initState() {
     super.initState();
     _initializeData();
+    _setupPageListener();
   }
 
   @override
   void dispose() {
+    _pageController.removeListener(_onPageScroll);
     _pageController.dispose();
     super.dispose();
+  }
+
+  /// Setup listener to track page position changes for haptic feedback
+  void _setupPageListener() {
+    _pageController.addListener(_onPageScroll);
+  }
+
+  /// Handle page scroll events and trigger haptic when category visually switches
+  void _onPageScroll() {
+    if (!_pageController.hasClients) return;
+    
+    final currentPosition = _pageController.page ?? 0.0;
+    // Round to nearest integer to determine which category is visually displayed
+    final visualPage = currentPosition.round();
+    
+    // Trigger haptic feedback every time the visual category changes
+    if (visualPage != _lastHapticPage && visualPage >= 0 && visualPage <= 2) {
+      HapticService.medium();
+      _lastHapticPage = visualPage;
+    }
   }
 
   /// Initialize substitution provider and preload weather data
@@ -185,11 +208,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return PageView(
       controller: _pageController,
       onPageChanged: (index) {
-        // Trigger haptic feedback every time the category switches
-        if (_currentPage != index) {
-          HapticService.medium();
-        }
         setState(() => _currentPage = index);
+        // Update haptic tracking when page fully changes
+        _lastHapticPage = index;
       },
       children: [
         const SubstitutionScreen(),
