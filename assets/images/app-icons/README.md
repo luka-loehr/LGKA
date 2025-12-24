@@ -3,7 +3,7 @@
 This directory contains the application icons for the LGKA Flutter app.
 
 ## Files:
-- `app-logo.png` (115KB) - Main application icon
+- `app-icon.webp` (16KB) - Main application icon (used for app icon and welcome screen)
 
 ## Tools for editing:
 - [GIMP](https://gimp.org) - Free image editor
