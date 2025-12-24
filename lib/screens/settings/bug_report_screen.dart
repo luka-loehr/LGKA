@@ -22,8 +22,6 @@ class _BugReportScreenState extends State<BugReportScreen> {
   InAppWebViewController? _controller;
   double _progress = 0;
   bool _hasError = false;
-  String? _errorText;
-  bool _wasLoading = true;
 
   @override
   void dispose() {
@@ -45,7 +43,6 @@ class _BugReportScreenState extends State<BugReportScreen> {
   Future<void> _retryLoad() async {
     setState(() {
       _hasError = false;
-      _errorText = null;
       _progress = 0;
     });
     if (_controller != null) {
@@ -119,9 +116,6 @@ class _BugReportScreenState extends State<BugReportScreen> {
               onProgressChanged: (controller, progress) {
                 setState(() {
                   _progress = progress / 100;
-                  if (_progress < 1.0) {
-                    _wasLoading = true;
-                  }
                 });
               },
               onLoadStop: (controller, url) async {
@@ -131,15 +125,11 @@ class _BugReportScreenState extends State<BugReportScreen> {
               onReceivedError: (controller, request, error) {
                 setState(() {
                   _hasError = true;
-                  _errorText = error.description;
-                  _wasLoading = false;
                 });
               },
               onReceivedHttpError: (controller, request, error) {
                 setState(() {
                   _hasError = true;
-                  _errorText = 'HTTP ${error.statusCode}';
-                  _wasLoading = false;
                 });
               },
             ),

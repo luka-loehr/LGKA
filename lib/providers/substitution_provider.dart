@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/substitution_service.dart';
-import '../utils/app_logger.dart';
 import '../services/haptic_service.dart';
 import 'app_providers.dart';
 
