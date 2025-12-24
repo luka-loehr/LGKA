@@ -7,7 +7,7 @@ import '../../theme/app_theme.dart';
 import '../../providers/color_provider.dart';
 import '../../navigation/app_router.dart';
 import '../../l10n/app_localizations.dart';
-import '../../providers/haptic_service.dart';
+import '../../services/haptic_service.dart';
 
 class WhatYouCanDoScreen extends ConsumerStatefulWidget {
   const WhatYouCanDoScreen({super.key});

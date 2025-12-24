@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
-import '../../providers/haptic_service.dart';
+import '../../services/haptic_service.dart';
 import '../../utils/app_info.dart';
 import '../../utils/app_logger.dart';
 

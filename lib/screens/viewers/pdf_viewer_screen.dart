@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
-import 'package:lgka_flutter/providers/haptic_service.dart';
+import 'package:lgka_flutter/services/haptic_service.dart';
 import 'package:pdfx/pdfx.dart' as pdfx;
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
