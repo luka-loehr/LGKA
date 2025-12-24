@@ -80,6 +80,7 @@ class NewsEvent {
   final List<NewsLink>? standaloneLinks; // Standalone links (full URLs) for buttons (nullable for backward compatibility)
   final List<NewsImage> images;
   final List<NewsDownload> downloads;
+  final List<String> tags; // Tags/categories for the news item
 
   NewsEvent({
     required this.title,
@@ -94,6 +95,7 @@ class NewsEvent {
     this.standaloneLinks,
     this.images = const [],
     this.downloads = const [],
+    this.tags = const [],
   });
   
   /// Get standalone links, returning empty list if null (for backward compatibility)
@@ -111,6 +113,7 @@ class NewsEvent {
         'standalone_links': (standaloneLinks ?? []).map((l) => l.toJson()).toList(),
         'images': images.map((i) => i.toJson()).toList(),
         'downloads': downloads.map((d) => d.toJson()).toList(),
+        'tags': tags,
       };
 }
 
@@ -245,6 +248,19 @@ class NewsService {
             }
           }
 
+          // Extract tags
+          final List<String> tags = [];
+          final tagsContainer = item.querySelector('ul.tags.list-inline');
+          if (tagsContainer != null) {
+            final tagLinks = tagsContainer.querySelectorAll('a');
+            for (var tagLink in tagLinks) {
+              final tagText = tagLink.text.trim();
+              if (tagText.isNotEmpty) {
+                tags.add(tagText);
+              }
+            }
+          }
+
           metadataList.add({
             'title': title,
             'author': author,
@@ -253,6 +269,7 @@ class NewsService {
             'parsedDate': parsedDate,
             'views': views,
             'url': fullUrl,
+            'tags': tags,
           });
         } catch (e) {
           AppLogger.warning('Error parsing news article metadata: $e', module: 'NewsService');
@@ -294,6 +311,7 @@ class NewsService {
               standaloneLinks: (result['standaloneLinks'] as List<NewsLink>?),
               images: (result['images'] as List<NewsImage>?) ?? [],
               downloads: (result['downloads'] as List<NewsDownload>?) ?? [],
+              tags: (result['tags'] as List<String>?) ?? [],
             );
             events.add(event);
           } catch (e) {
