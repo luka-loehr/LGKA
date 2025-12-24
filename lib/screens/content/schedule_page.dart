@@ -54,14 +54,28 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       curve: Curves.easeOutCubic,
     ));
     
-    // Load schedules when page initializes
+    // Only load schedules if not already loaded (avoid reloading on every screen visit)
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      AppLogger.schedule('Schedule page initialized');
-      await ref.read(scheduleProvider.notifier).loadSchedules();
-      AppLogger.debug('Schedule loading complete', module: 'SchedulePage');
+      final scheduleState = ref.read(scheduleProvider);
+      if (!scheduleState.hasSchedules) {
+        AppLogger.schedule('Schedule page initialized - loading schedules');
+        await ref.read(scheduleProvider.notifier).loadSchedules();
+        AppLogger.debug('Schedule loading complete', module: 'SchedulePage');
+      }
+      
       // Check availability only if it hasn't been checked recently
       if (_shouldCheckAvailability()) {
         await _checkScheduleAvailability();
+      } else {
+        // If we have cached availability results, restore them from the schedule state
+        final allSchedules = [
+          ...scheduleState.firstHalbjahrSchedules,
+          ...scheduleState.secondHalbjahrSchedules,
+        ];
+        if (allSchedules.isNotEmpty && (_availableFirstHalbjahr.isEmpty && _availableSecondHalbjahr.isEmpty)) {
+          // Restore availability from cache by checking which schedules have cached PDFs
+          await _restoreAvailabilityFromCache(allSchedules);
+        }
       }
     });
   }
@@ -153,6 +167,27 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     }
   }
   
+  /// Restore availability from cache by checking which schedules have cached PDFs
+  Future<void> _restoreAvailabilityFromCache(List<ScheduleItem> allSchedules) async {
+    for (final schedule in allSchedules) {
+      final cachedFile = await _getCachedScheduleFile(schedule);
+      if (cachedFile != null && await cachedFile.exists()) {
+        if (schedule.halbjahr == '1. Halbjahr') {
+          if (!_availableFirstHalbjahr.contains(schedule)) {
+            _availableFirstHalbjahr.add(schedule);
+          }
+        } else if (schedule.halbjahr == '2. Halbjahr') {
+          if (!_availableSecondHalbjahr.contains(schedule)) {
+            _availableSecondHalbjahr.add(schedule);
+          }
+        }
+      }
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   /// Preload PDFs for available schedules in the background
   void _preloadSchedulePDFs() {
     final allAvailableSchedules = [
@@ -164,13 +199,20 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     
     // Preload all available schedules in the background
     for (final schedule in allAvailableSchedules) {
-      // Download schedule PDF in background (downloadSchedule handles caching)
-      // This will download if not cached, or return cached file if it exists
+      // Check if PDF is already cached before downloading
       unawaited(
-        ref.read(scheduleProvider.notifier).downloadSchedule(schedule).catchError((e) {
-          // Silently handle errors - preloading shouldn't show errors to user
-          AppLogger.debug('Failed to preload schedule PDF: ${schedule.title}', module: 'SchedulePage');
-          return null; // Return null to satisfy Future<File?> return type
+        _getCachedScheduleFile(schedule).then((cachedFile) async {
+          if (cachedFile != null && await cachedFile.exists()) {
+            AppLogger.debug('Schedule PDF already cached: ${schedule.title}', module: 'SchedulePage');
+            return;
+          }
+          // Download schedule PDF in background only if not cached
+          try {
+            await ref.read(scheduleProvider.notifier).downloadSchedule(schedule);
+          } catch (e) {
+            // Silently handle errors - preloading shouldn't show errors to user
+            AppLogger.debug('Failed to preload schedule PDF: ${schedule.title}', module: 'SchedulePage');
+          }
         })
       );
     }
