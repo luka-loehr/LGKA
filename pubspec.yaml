@@ -33,10 +33,6 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  
   # Navigation
   go_router: ^17.0.1
   
@@ -113,10 +109,10 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # Assets configuration - using existing PNG files until WebP conversion is complete
+  # Assets configuration - using WebP format for better compression
   assets:
-    - assets/images/app-icons/app-logo.png
-    - assets/images/welcome/welcome-logo.png
+    - assets/images/app-icons/app-logo.webp
+    - assets/images/welcome/welcome-logo.webp
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -148,9 +144,9 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/app-icons/app-logo.png"
+  image_path: "assets/images/app-icons/app-logo.webp"
   adaptive_icon_background: "#00000000"
-  adaptive_icon_foreground: "assets/images/app-icons/app-logo.png"
+  adaptive_icon_foreground: "assets/images/app-icons/app-logo.webp"
   # Force generation of legacy icons for better compatibility
   min_sdk_android: 21
 
