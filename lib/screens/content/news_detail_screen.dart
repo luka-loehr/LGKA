@@ -308,6 +308,31 @@ class NewsDetailScreen extends ConsumerWidget {
       }
     }
     
+    // Trim trailing whitespace/newlines from the last span to reduce spacing
+    if (spans.isNotEmpty) {
+      final lastSpan = spans.last;
+      if (lastSpan.text != null && lastSpan.text!.trim().isEmpty) {
+        // Remove trailing whitespace-only span
+        spans.removeLast();
+      } else if (lastSpan.text != null && lastSpan.text!.endsWith('\n\n')) {
+        // Trim trailing double newlines
+        spans[spans.length - 1] = TextSpan(
+          text: lastSpan.text!.replaceAll(RegExp(r'\n+$'), ''),
+          style: lastSpan.style,
+          recognizer: lastSpan.recognizer,
+          children: lastSpan.children,
+        );
+      } else if (lastSpan.text != null && lastSpan.text!.endsWith('\n')) {
+        // Trim trailing single newline
+        spans[spans.length - 1] = TextSpan(
+          text: lastSpan.text!.replaceAll(RegExp(r'\n+$'), ''),
+          style: lastSpan.style,
+          recognizer: lastSpan.recognizer,
+          children: lastSpan.children,
+        );
+      }
+    }
+    
     return spans;
   }
 
@@ -745,7 +770,7 @@ class NewsDetailScreen extends ConsumerWidget {
                           
                           // Display standalone link buttons if available
                           if (event.standaloneLinksOrEmpty.isNotEmpty) ...[
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 12),
                             ...event.standaloneLinksOrEmpty.map((link) => _buildLinkButton(
                               link,
                               context,
@@ -757,7 +782,7 @@ class NewsDetailScreen extends ConsumerWidget {
                           
                           // Display download buttons if available
                           if (event.downloads.isNotEmpty) ...[
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 12),
                             ...event.downloads.map((download) => _buildDownloadButton(
                               download,
                               context,
