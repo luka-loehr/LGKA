@@ -49,6 +49,116 @@ class NewsDetailScreen extends ConsumerWidget {
     }
   }
 
+  /// Get icon for file type
+  IconData _getFileTypeIcon(String fileType) {
+    switch (fileType.toLowerCase()) {
+      case 'audio':
+      case 'sound':
+        return Icons.headphones;
+      case 'video':
+      case 'movie':
+        return Icons.videocam;
+      case 'image':
+      case 'picture':
+      case 'photo':
+        return Icons.image;
+      case 'pdf':
+      case 'document':
+        return Icons.picture_as_pdf;
+      case 'archive':
+      case 'zip':
+      case 'rar':
+        return Icons.archive;
+      case 'text':
+        return Icons.text_snippet;
+      case 'spreadsheet':
+      case 'excel':
+        return Icons.table_chart;
+      case 'presentation':
+      case 'powerpoint':
+        return Icons.slideshow;
+      default:
+        return Icons.download;
+    }
+  }
+
+  /// Build download button widget
+  Widget _buildDownloadButton(NewsDownload download, BuildContext context, ThemeData theme, Color accentColor, Color surfaceColor) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12.0),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(
+          color: accentColor.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12.0),
+          onTap: () {
+            HapticService.medium();
+            _openLink(download.url);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                // File type icon
+                Container(
+                  padding: const EdgeInsets.all(10.0),
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Icon(
+                    _getFileTypeIcon(download.fileType),
+                    color: accentColor,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // File info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        download.title,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (download.size != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          download.size!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.secondaryText.withValues(alpha: 0.7),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                // Download icon
+                Icon(
+                  Icons.download_outlined,
+                  color: accentColor,
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   /// Builds a RichText widget with clickable links from the content
   Widget _buildContentWithLinks(String content, List<NewsLink> links, BuildContext context, ThemeData theme, Color accentColor) {
     if (links.isEmpty) {
@@ -324,6 +434,18 @@ class NewsDetailScreen extends ConsumerWidget {
                             theme,
                             accentColor,
                           ),
+                          
+                          // Display download buttons if available
+                          if (event.downloads.isNotEmpty) ...[
+                            const SizedBox(height: 24),
+                            ...event.downloads.map((download) => _buildDownloadButton(
+                              download,
+                              context,
+                              theme,
+                              accentColor,
+                              surfaceColor,
+                            )),
+                          ],
                           
                           // Display images if available
                           if (event.images.isNotEmpty) ...[
