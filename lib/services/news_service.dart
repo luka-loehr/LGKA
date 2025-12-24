@@ -7,6 +7,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../utils/app_logger.dart';
 import '../utils/app_info.dart';
 import '../utils/retry_util.dart';
+import 'cache_service.dart';
 
 /// Represents a link found in news content
 class NewsLink {
@@ -85,7 +86,8 @@ class NewsEvent {
 /// Service for fetching news from the Lessing Gymnasium website
 class NewsService {
   static const String newsUrl = 'https://lessing-gymnasium-karlsruhe.de/cm3/index.php/neues';
-  static const Duration _cacheValidity = Duration(minutes: 5);
+  
+  final _cacheService = CacheService();
 
   List<NewsEvent>? _cachedEvents;
   DateTime? _lastFetchTime;
@@ -98,7 +100,7 @@ class NewsService {
     if (_cachedEvents == null || _lastFetchTime == null) {
       return false;
     }
-    return DateTime.now().difference(_lastFetchTime!) < _cacheValidity;
+    return _cacheService.isCacheValid(CacheKey.news, lastFetchTime: _lastFetchTime);
   }
 
   /// Extracts all news events from the Lessing Gymnasium news page
@@ -283,6 +285,7 @@ class NewsService {
         // Cache the results
         _cachedEvents = events;
         _lastFetchTime = DateTime.now();
+        _cacheService.updateCacheTimestamp(CacheKey.news, _lastFetchTime);
         
         return events;
       },
@@ -306,6 +309,7 @@ class NewsService {
       final events = await fetchNewsEvents(forceRefresh: true);
       _cachedEvents = events;
       _lastFetchTime = DateTime.now();
+      _cacheService.updateCacheTimestamp(CacheKey.news, _lastFetchTime);
     } catch (e) {
       // Ignore background refresh errors
       AppLogger.debug('Background news refresh failed', module: 'NewsService');
