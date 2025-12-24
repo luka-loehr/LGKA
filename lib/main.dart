@@ -127,8 +127,8 @@ class LGKAApp extends ConsumerStatefulWidget {
 class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
   late final _router = AppRouter.createRouter(initialLocation: widget.initialRoute);
   final _cacheService = CacheService();
-  // Use the shortest cache validity (substitutions: 2 minutes) for refresh timer
-  static const Duration _cacheRefreshInterval = Duration(minutes: 2);
+  // Refresh timer runs every minute to proactively refresh expired caches
+  static const Duration _cacheRefreshInterval = Duration(minutes: 1);
   Timer? _cacheRefreshTimer;
 
   @override
