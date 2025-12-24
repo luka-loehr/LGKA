@@ -1,5 +1,3 @@
-# GitHub Release Notes Template
-
 iOS: https://apps.apple.com/app/lgka/id6747010920  
 Android: https://play.google.com/store/apps/details?id=com.lgka
 
