@@ -48,14 +48,35 @@ class NewsNotifier extends Notifier<NewsState> {
   @override
   NewsState build() => const NewsState();
 
-  /// Load news events from the web
+  /// Load news events from the web or cache
   Future<void> loadNews({bool forceRefresh = false}) async {
     if (state.isLoading && !forceRefresh) return;
+
+    // Check cache first if not forcing refresh
+    final cachedEvents = _newsService.cachedEvents;
+    final lastFetchTime = _newsService.lastFetchTime;
+
+    if (!forceRefresh && cachedEvents != null) {
+      state = state.copyWith(
+        events: cachedEvents,
+        isLoading: false,
+        clearError: true,
+        lastUpdated: lastFetchTime ?? state.lastUpdated,
+      );
+
+      if (_newsService.hasValidCache) {
+        return;
+      }
+
+      // Cache is stale, refresh in background
+      unawaited(_refreshNewsSilently());
+      return;
+    }
 
     state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      final events = await _newsService.fetchNewsEvents();
+      final events = await _newsService.fetchNewsEvents(forceRefresh: forceRefresh);
 
       if (events.isEmpty) {
         state = state.copyWith(
@@ -69,7 +90,7 @@ class NewsNotifier extends Notifier<NewsState> {
         events: events,
         isLoading: false,
         clearError: true,
-        lastUpdated: DateTime.now(),
+        lastUpdated: _newsService.lastFetchTime ?? DateTime.now(),
       );
     } catch (e) {
       AppLogger.error('Failed to load news', module: 'NewsProvider', error: e);
@@ -78,6 +99,27 @@ class NewsNotifier extends Notifier<NewsState> {
         error: 'Fehler beim Laden der Neuigkeiten',
       );
     }
+  }
+
+  Future<void> _refreshNewsSilently() async {
+    try {
+      await _newsService.fetchNewsEvents(forceRefresh: true);
+      final updatedEvents = _newsService.cachedEvents;
+      if (updatedEvents != null) {
+        state = state.copyWith(
+          events: updatedEvents,
+          isLoading: false,
+          clearError: true,
+          lastUpdated: _newsService.lastFetchTime ?? state.lastUpdated,
+        );
+      }
+    } catch (e) {
+      // Ignore background refresh errors
+    }
+  }
+
+  Future<void> refreshInBackground() async {
+    await _refreshNewsSilently();
   }
 
   /// Refresh news (force reload)

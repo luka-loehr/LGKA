@@ -225,6 +225,11 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
         DateTime.now().difference(weatherLastUpdate) >= _cacheValidity) {
       unawaited(ref.read(weatherDataProvider.notifier).updateDataInBackground());
     }
+
+    final newsService = ref.read(newsServiceProvider);
+    if (!newsService.hasValidCache && newsService.cachedEvents != null) {
+      unawaited(ref.read(newsProvider.notifier).refreshInBackground());
+    }
   }
 
   @override
