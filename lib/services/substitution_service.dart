@@ -304,7 +304,7 @@ class SubstitutionService {
       await _loadBothPdfs(silent: true);
       AppLogger.success('Background refresh complete: Substitution plans', module: 'SubstitutionService');
     } catch (e) {
-      AppLogger.warning('Background refresh failed: Substitution plans', module: 'SubstitutionService', error: e);
+      AppLogger.error('Background refresh failed: Substitution plans', module: 'SubstitutionService', error: e);
     } finally {
       _isRefreshing = false;
     }

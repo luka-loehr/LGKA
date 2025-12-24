@@ -423,7 +423,7 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
         AppLogger.success('Background refresh complete: Weather data', module: 'WeatherProvider');
       }
     } catch (e) {
-      AppLogger.warning('Background refresh failed: Weather data', module: 'WeatherProvider', error: e);
+      AppLogger.error('Background refresh failed: Weather data', module: 'WeatherProvider', error: e);
       // Silent failure for background updates - don't show to user
     }
   }

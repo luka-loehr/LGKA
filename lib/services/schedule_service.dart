@@ -113,7 +113,7 @@ class ScheduleService {
       _cacheService.updateCacheTimestamp(CacheKey.schedules, _lastFetchTime);
       AppLogger.success('Background refresh complete: Schedules', module: 'ScheduleService');
     } catch (e) {
-      AppLogger.warning('Background refresh failed: Schedules', module: 'ScheduleService', error: e);
+      AppLogger.error('Background refresh failed: Schedules', module: 'ScheduleService', error: e);
       // Ignore background refresh errors - don't show to user
     } finally {
       _isRefreshing = false;
