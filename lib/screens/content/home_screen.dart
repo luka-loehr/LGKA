@@ -28,6 +28,9 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  double _lastScrollPosition = 0.0;
+  DateTime? _lastHapticTime;
+  static const Duration _hapticDebounce = Duration(milliseconds: 50);
 
   @override
   void initState() {
@@ -182,19 +185,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildBody() {
-    return PageView(
-      controller: _pageController,
-      onPageChanged: (index) {
-        if (_currentPage != index) {
-          HapticService.medium();
+    return NotificationListener<ScrollUpdateNotification>(
+      onNotification: (notification) {
+        // Get current scroll position from PageController
+        if (_pageController.hasClients) {
+          final currentPosition = _pageController.page ?? 0.0;
+          final scrollDelta = (currentPosition - _lastScrollPosition).abs();
+          
+          // Trigger haptic feedback when scroll position changes significantly
+          // Use a threshold to avoid too frequent haptics, but still provide continuous feedback
+          if (scrollDelta > 0.01) {
+            final now = DateTime.now();
+            if (_lastHapticTime == null || 
+                now.difference(_lastHapticTime!) >= _hapticDebounce) {
+              HapticService.medium();
+              _lastHapticTime = now;
+            }
+            _lastScrollPosition = currentPosition;
+          }
         }
-        setState(() => _currentPage = index);
+        return false; // Allow notification to continue propagating
       },
-      children: [
-        const SubstitutionScreen(),
-        const WeatherPage(),
-        const SchedulePage(),
-      ],
+      child: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() => _currentPage = index);
+          // Reset scroll position tracking when page changes
+          _lastScrollPosition = index.toDouble();
+        },
+        children: [
+          const SubstitutionScreen(),
+          const WeatherPage(),
+          const SchedulePage(),
+        ],
+      ),
     );
   }
 
