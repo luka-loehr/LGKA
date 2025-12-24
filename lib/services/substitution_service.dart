@@ -299,8 +299,12 @@ class SubstitutionService {
     if (_isRefreshing) return;
 
     _isRefreshing = true;
+    AppLogger.info('Starting background refresh: Substitution plans', module: 'SubstitutionService');
     try {
       await _loadBothPdfs(silent: true);
+      AppLogger.success('Background refresh complete: Substitution plans', module: 'SubstitutionService');
+    } catch (e) {
+      AppLogger.warning('Background refresh failed: Substitution plans', module: 'SubstitutionService', error: e);
     } finally {
       _isRefreshing = false;
     }
