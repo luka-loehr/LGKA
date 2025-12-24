@@ -199,7 +199,7 @@ class NewsDetailScreen extends ConsumerWidget {
               currentStyle = currentStyle?.copyWith(decoration: TextDecoration.underline);
               break;
             case 'a':
-              // Handle links
+              // Handle links - ensure link text is always visible and clickable
               final attributes = (node as dynamic).attributes as Map<String, String>?;
               final href = attributes?['href'];
               final linkText = ((node as dynamic).text as String?)?.trim() ?? '';
@@ -227,33 +227,31 @@ class NewsDetailScreen extends ConsumerWidget {
                     _openLink(fullUrl);
                   };
                 
-                // If we have child spans, use them (they already have the accent color from processNode)
+                // Use child spans if they have content, otherwise use linkText
+                // This ensures the link is always visible
                 if (linkSpans.isNotEmpty) {
-                  // Helper function to check if a TextSpan has visible content
-                  bool hasVisibleText(TextSpan span) {
+                  // Check if linkSpans actually contains visible text (including nested children)
+                  bool hasText(TextSpan span) {
                     if (span.text != null && span.text!.trim().isNotEmpty) return true;
-                    if (span.children != null && span.children!.isNotEmpty) {
+                    if (span.children != null) {
                       return span.children!.any((child) {
-                        if (child is TextSpan) {
-                          return hasVisibleText(child);
-                        }
+                        if (child is TextSpan) return hasText(child);
                         return false;
                       });
                     }
                     return false;
                   }
                   
-                  // Check if linkSpans actually has visible content
-                  bool hasVisibleContent = linkSpans.any((span) => hasVisibleText(span));
+                  bool hasVisibleText = linkSpans.any((span) => hasText(span));
                   
-                  if (hasVisibleContent) {
-                    // Create link span with children - don't set style on parent when using children
+                  if (hasVisibleText) {
+                    // Use child spans with their formatting
                     nodeSpans.add(TextSpan(
                       children: linkSpans,
                       recognizer: recognizer,
                     ));
                   } else if (linkText.isNotEmpty) {
-                    // Child spans exist but have no visible content, use linkText instead
+                    // Child spans exist but no visible text, use linkText
                     nodeSpans.add(TextSpan(
                       text: linkText,
                       style: currentStyle?.copyWith(color: accentColor),
