@@ -26,22 +26,30 @@ Initiate when user says: "prepare release", "release", "create release", "new re
    - Fetch tags if needed: `git fetch --tags`
    - The previous tag is typically the one before the current version (e.g., if releasing 2.4.0, previous is 2.3.0)
 
-2. Compare the two release tags to get actual changes:
+2. **CRITICAL**: Read the previous release notes to avoid duplicating content:
+   - Get previous release notes: `gh release view [previous_tag] --json body --jq .body` or check if a RELEASE_NOTES file exists for that version
+   - **DO NOT** include features/changes that were already mentioned in the previous release notes
+   - Only include what's NEW in this release compared to the previous one
+
+3. Compare the two release tags to get actual changes:
    - Get commit log: `git log --pretty=format:"%h - %s" [previous_tag]..[current_tag]`
    - Get file statistics: `git diff --stat [previous_tag]..[current_tag]`
    - **Note**: Tag formats may differ (e.g., `2.3.0` vs `v2.4.0`), so use the exact tag names from `git tag --list`
 
-3. Analyze the commits to identify:
+4. Analyze the commits to identify:
    - New features introduced
    - User-visible changes
    - Bug fixes
    - Performance improvements
    - UI/UX improvements
+   - **IMPORTANT**: Cross-reference with previous release notes to ensure no duplication
 
 ### Task 3: Create GitHub Release
 
 1. Create release notes following the template at `agents/templates/release_notes_template.md`
    - **CRITICAL**: When creating release notes files (e.g., `RELEASE_NOTES_v2.4.0.md`), DO NOT include the template header "# GitHub Release Notes Template" or any other template metadata. The release notes file should start directly with the actual content (e.g., iOS/Android links, Highlights section, etc.). Template headers are for reference only and must be removed before using the file.
+   - **CRITICAL**: Before finalizing release notes, compare with the previous release notes to ensure you're not repeating features/changes that were already mentioned. Only include what's NEW in this release.
+   - Review each section and remove any items that were already covered in the previous release
 2. Create GitHub release via CLI:
    - Title format: `LGKA+ vx.x.x`
    - Attach release notes

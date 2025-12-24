@@ -28,10 +28,6 @@ This release introduces a comprehensive news feature, intelligent haptic feedbac
 - Added New Year fireworks feature with haptic feedback
 
 ### Schedule & Timetables
-- Added automatic PDF preloading when schedule page loads
-- Improved schedule search UX and orientation handling
-- Added class validation and button animations to class input modal
-- Fixed auto-navigation after class input
 - Enhanced error handling with automatic retry logic (up to 2 retries)
 - Reduced cache validity from 5 minutes to 2 minutes for fresher live data
 
@@ -46,7 +42,6 @@ This release introduces a comprehensive news feature, intelligent haptic feedbac
 - Improved error handling with timezone-based data collection window
 - Added automatic retry logic (up to 2 retries)
 - Enhanced weather chart availability checks
-- Added safeguards to prevent app freezing on large or corrupted CSV files
 - Improved chart rendering and x-axis interval calculation
 
 ### UI & Design
@@ -56,14 +51,11 @@ This release introduces a comprehensive news feature, intelligent haptic feedbac
 - Enhanced drawer menu styling with icon backgrounds and better spacing
 - Added slide animations for news detail screen navigation
 - Improved spacing and visual balance across screens
-- Updated launch screens to show app logo on both platforms
 - Added website favicons to standalone link buttons
 
 ### PDF Viewer
 - Improved PDF loading and error handling
 - Added retry logic using RetryUtil for consistent behavior
-- Enhanced class input modal with validation and animations
-- Fixed auto-navigation timing issues
 
 ### Onboarding
 - Added comprehensive onboarding flow with welcome, info, accent color, and auth screens
@@ -78,17 +70,14 @@ This release introduces a comprehensive news feature, intelligent haptic feedbac
 - Fixed localization for legal screen and schedule option labels
 
 ### Under the Hood
-- Migrated to Riverpod 3.0 with new Notifier API
 - Created centralized CacheService for managing all cache validity across services
 - Extracted HapticService from providers to services folder
 - Organized screens directory into categorized subdirectories (content, info, onboarding, settings, viewers)
 - Added RetryUtil for automatic retry logic on network errors
-- Updated major dependencies: flutter_riverpod 3.0.3, syncfusion_flutter_charts 32.1.19, syncfusion_flutter_pdf 32.1.19, go_router 17.0.1
+- Updated major dependencies: syncfusion_flutter_charts 32.1.19, syncfusion_flutter_pdf 32.1.19
 - Converted assets to WebP format for better compression
 - Removed unused dependencies and cleaned up codebase
 - Improved logging system to professional format without emojis
-- Enhanced error handling with global error catcher and custom ErrorWidget
-- Updated iOS project configuration and Android Gradle plugin version
 - Added comprehensive localization support for new features
 
 ## Version Info
