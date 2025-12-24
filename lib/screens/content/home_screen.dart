@@ -28,17 +28,49 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  int _lastHapticPage = 0;
 
   @override
   void initState() {
     super.initState();
     _initializeData();
+    _setupPageListener();
   }
 
   @override
   void dispose() {
+    _pageController.removeListener(_onPagePositionChanged);
     _pageController.dispose();
     super.dispose();
+  }
+
+  /// Setup listener to track page position changes for haptic feedback
+  void _setupPageListener() {
+    _pageController.addListener(_onPagePositionChanged);
+  }
+
+  /// Handle page position changes and trigger haptic when category visually switches
+  void _onPagePositionChanged() {
+    if (!_pageController.hasClients) return;
+    
+    final currentPosition = _pageController.page ?? 0.0;
+    // Determine which category is visually displayed based on position
+    // Category switches at 0.5, 1.5, etc.
+    int visualPage;
+    if (currentPosition < 0.5) {
+      visualPage = 0;
+    } else if (currentPosition < 1.5) {
+      visualPage = 1;
+    } else {
+      visualPage = 2;
+    }
+    
+    // Trigger haptic feedback every time the visual category changes
+    // This works even during animations, not just when pages snap
+    if (visualPage != _lastHapticPage) {
+      HapticService.medium();
+      _lastHapticPage = visualPage;
+    }
   }
 
   /// Initialize substitution provider and preload weather data
@@ -185,12 +217,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return PageView(
       controller: _pageController,
       onPageChanged: (index) {
-        // Trigger haptic feedback every time the page changes
-        // This fires whenever the category in the top navbar switches
-        if (_currentPage != index) {
-          HapticService.medium();
-        }
         setState(() => _currentPage = index);
+        // Update haptic tracking when page fully changes
+        _lastHapticPage = index;
       },
       children: [
         const SubstitutionScreen(),
