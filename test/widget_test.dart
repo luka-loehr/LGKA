@@ -5,15 +5,14 @@ import 'package:lgka_flutter/main.dart';
 import 'package:lgka_flutter/data/preferences_manager.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:lgka_flutter/navigation/app_router.dart';
-import 'package:lgka_flutter/data/pdf_repository.dart';
 import 'package:lgka_flutter/services/weather_service.dart';
 import 'package:lgka_flutter/services/schedule_service.dart';
+import 'package:lgka_flutter/services/substitution_service.dart';
+import 'package:lgka_flutter/providers/substitution_provider.dart';
 import 'package:lgka_flutter/screens/welcome_screen.dart';
 
 // Mocks
-class MockPdfRepository extends PdfRepository {
-  MockPdfRepository(Ref ref) : super(ref);
-  
+class MockSubstitutionService extends SubstitutionService {
   @override
   Future<void> initialize() async {
     // Do nothing
@@ -62,7 +61,7 @@ void main() {
         overrides: [
           preferencesManagerProvider.overrideWith((ref) => preferencesManager),
           // Override services to prevent network calls
-          pdfRepositoryProvider.overrideWith((ref) => MockPdfRepository(ref)),
+          substitutionServiceProvider.overrideWith((ref) => MockSubstitutionService()),
           weatherServiceProvider.overrideWith((ref) => MockWeatherService()),
           scheduleServiceProvider.overrideWith((ref) => MockScheduleService()),
         ],
