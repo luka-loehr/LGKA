@@ -10,6 +10,8 @@ import '../../services/haptic_service.dart';
 import '../../services/news_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../navigation/app_router.dart';
+import '../../services/loading_spinner_tracker_service.dart';
+import '../../utils/app_logger.dart';
 
 class NewsScreen extends ConsumerStatefulWidget {
   const NewsScreen({super.key});
@@ -21,6 +23,9 @@ class NewsScreen extends ConsumerStatefulWidget {
 class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStateMixin {
   late AnimationController _listAnimationController;
   bool _hasAnimatedList = false;
+
+  // Loading spinner tracker for haptic feedback
+  final _spinnerTracker = LoadingSpinnerTracker();
 
   @override
   void initState() {
@@ -56,6 +61,23 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
     final primaryTextColor = AppColors.primaryText;
     final secondaryTextColor = AppColors.secondaryText;
     final accentColor = ref.watch(currentColorProvider);
+
+    // Track spinner visibility and trigger haptic feedback when spinner disappears
+    final isSpinnerVisible = newsState.isLoading && newsState.events.isEmpty;
+    final hasData = newsState.events.isNotEmpty;
+    final hasError = newsState.hasError && newsState.events.isEmpty;
+
+    final hapticTriggered = _spinnerTracker.trackState(
+      isSpinnerVisible: isSpinnerVisible,
+      hasData: hasData,
+      hasError: hasError,
+      mounted: mounted,
+    );
+
+    // Log successful load when haptic is triggered
+    if (hapticTriggered) {
+      AppLogger.success('News data load complete: ${newsState.events.length} events', module: 'NewsScreen');
+    }
 
     // Trigger list animation once when events become available
     // Only animate if we haven't animated before and events just became available
