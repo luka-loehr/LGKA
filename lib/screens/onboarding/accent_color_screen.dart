@@ -8,6 +8,7 @@ import '../../providers/app_providers.dart';
 import '../../providers/color_provider.dart';
 import '../../navigation/app_router.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/haptic_service.dart';
 
 class AccentColorScreen extends ConsumerStatefulWidget {
   const AccentColorScreen({super.key});
@@ -91,6 +92,8 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
       _selectedColor = colorName;
     });
 
+    // Haptic feedback for color selection
+    HapticService.light();
 
     // Save color preference using color provider
     await ref.read(colorProvider.notifier).setColor(colorName);
@@ -103,10 +106,11 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
       _isNavigating = true;
     });
 
+    // Haptic feedback
+    HapticService.medium();
+
     // Button press animation
     await _buttonController.forward();
-
-    // Premium haptic feedback
 
     // Small delay for the animation to feel natural
     await Future.delayed(const Duration(milliseconds: 50));

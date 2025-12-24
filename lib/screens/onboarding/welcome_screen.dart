@@ -9,6 +9,7 @@ import '../../theme/app_theme.dart';
 
 import '../../navigation/app_router.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/haptic_service.dart';
 
 class WelcomeScreen extends ConsumerStatefulWidget {
   const WelcomeScreen({super.key});
@@ -47,6 +48,9 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     setState(() {
       _isNavigating = true;
     });
+
+    // Haptic feedback
+    HapticService.medium();
 
     // Button press animation
     await _buttonController.forward();
