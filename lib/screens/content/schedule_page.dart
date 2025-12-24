@@ -32,10 +32,12 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   List<ScheduleItem> _availableFirstHalbjahr = [];
   List<ScheduleItem> _availableSecondHalbjahr = [];
   bool _isCheckingAvailability = false;
+  bool _wasCheckingAvailability = false;
   DateTime? _lastAvailabilityCheck;
   static const Duration _availabilityCheckInterval = Duration(minutes: 15);
   bool _wasSchedulesLoading = true;
   bool _didShowInitialSpinner = false; // true once initial loading spinner was shown
+  bool _hapticScheduled = false;
 
   @override
   void initState() {
@@ -183,7 +185,29 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     if (scheduleState.isLoading) {
       _didShowInitialSpinner = true;
     }
+    
+    final wasShowingSpinner = _wasSchedulesLoading || _wasCheckingAvailability;
+    final isShowingSpinner = scheduleState.isLoading || _isCheckingAvailability;
+    final hasData = scheduleState.hasSchedules && !scheduleState.hasError;
+    
+    // Trigger haptic when transitioning from showing spinner to showing schedule list
+    // Use a flag to ensure it only fires once even if build is called multiple times rapidly
+    if (wasShowingSpinner && !isShowingSpinner && hasData && !_hapticScheduled) {
+      _hapticScheduled = true;
+      Future.microtask(() {
+        if (mounted) {
+          HapticService.medium();
+        }
+      });
+    }
+    
+    // Reset flag when loading starts again or error occurs
+    if (isShowingSpinner || scheduleState.hasError) {
+      _hapticScheduled = false;
+    }
+    
     _wasSchedulesLoading = scheduleState.isLoading;
+    _wasCheckingAvailability = _isCheckingAvailability;
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
