@@ -72,6 +72,7 @@ class NewsEvent {
   final String author;
   final String description;
   final String? content;
+  final String? htmlContent; // HTML content with formatting preserved
   final String createdDate;
   final DateTime? parsedDate;
   final int views;
@@ -87,6 +88,7 @@ class NewsEvent {
     required this.author,
     required this.description,
     this.content,
+    this.htmlContent,
     required this.createdDate,
     this.parsedDate,
     required this.views,
@@ -106,6 +108,7 @@ class NewsEvent {
         'author': author,
         'description': description,
         if (content != null) 'content': content,
+        if (htmlContent != null) 'html_content': htmlContent,
         'created_date': createdDate,
         'views': views,
         'url': url,
@@ -284,6 +287,7 @@ class NewsService {
           return {
             ...metadata,
             'content': contentData['content'],
+            'htmlContent': contentData['htmlContent'],
             'links': contentData['links'],
             'standaloneLinks': contentData['standaloneLinks'],
             'images': contentData['images'],
@@ -303,6 +307,7 @@ class NewsService {
               author: result['author'] as String,
               description: result['description'] as String,
               content: result['content'] as String?,
+              htmlContent: result['htmlContent'] as String?,
               createdDate: result['createdDate'] as String,
               parsedDate: result['parsedDate'] as DateTime?,
               views: result['views'] as int,
@@ -622,14 +627,29 @@ class NewsService {
             }
           }
           
+          // Extract HTML content preserving formatting
+          // Get the inner HTML of the cloned article body
+          String? htmlContent;
           final paragraphs = articleBodyClone.querySelectorAll('p');
           
+          if (paragraphs.isEmpty) {
+            // Fallback: get all HTML from the article body
+            htmlContent = articleBodyClone.innerHtml.trim();
+          } else {
+            // Combine all paragraph HTML, filtering out empty ones
+            final paragraphHtmls = paragraphs
+                .map((p) => p.innerHtml.trim())
+                .where((html) => html.isNotEmpty);
+            
+            // Join paragraphs with double line breaks
+            htmlContent = paragraphHtmls.join('\n\n');
+          }
+          
+          // Also extract plain text for backward compatibility
           String? fullText;
           if (paragraphs.isEmpty) {
-            // Fallback: get all text from the article body
             fullText = articleBodyClone.text.trim();
           } else {
-            // Combine all paragraph text, filtering out empty ones
             fullText = paragraphs
                 .map((p) => p.text.trim())
                 .where((text) => text.isNotEmpty)
@@ -637,7 +657,8 @@ class NewsService {
           }
 
           return {
-            'content': fullText,
+            'content': fullText, // Plain text for backward compatibility
+            'htmlContent': htmlContent, // HTML content with formatting
             'links': embeddedLinks, // Only embedded links for RichText
             'standaloneLinks': standaloneLinks, // Standalone links for buttons
             'images': images,
