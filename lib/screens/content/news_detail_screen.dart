@@ -273,10 +273,16 @@ class NewsDetailScreen extends ConsumerWidget {
           // It's a text node - check for text property
           final text = (node as dynamic).text as String?;
           if (text != null && (text.trim().isNotEmpty || text.contains('\n'))) {
-            nodeSpans.add(TextSpan(
-              text: text,
-              style: parentStyle ?? baseStyle,
-            ));
+            // Filter out JoomlaWorks plugin text and HTML comment text
+            final trimmedText = text.trim();
+            if (!trimmedText.toLowerCase().contains('joomlaworks') &&
+                !trimmedText.startsWith('<!--') &&
+                !trimmedText.contains('Simple Image Gallery')) {
+              nodeSpans.add(TextSpan(
+                text: text,
+                style: parentStyle ?? baseStyle,
+              ));
+            }
           }
         }
       } catch (e) {
