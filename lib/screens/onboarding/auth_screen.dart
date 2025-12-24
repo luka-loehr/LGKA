@@ -23,26 +23,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     with TickerProviderStateMixin {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _usernameFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
   
   bool _isLoading = false;
   bool _showErrorFlash = false;
   bool _showSuccessFlash = false;
-  bool _shouldShowOffset = false;
   String _currentAccentColor = 'blue';
   bool _hasInitializedAnimations = false;
   
-  // Adaptive offset calculation based on screen height
-  double _getAdaptiveOffset(BuildContext context) {
-    // With textScaleFactor fixed to 1.0, a fixed offset works well
-    return -185.0;
-  }
-  
-  // Base offset for unfocused UI (to center it better)
-  static const double _baseOffset = -30.0;
-  
-  static const Duration _animationDuration = Duration(milliseconds: 250);
   static const Duration _buttonAnimationDuration = Duration(milliseconds: 300);
   
   // Colors
@@ -84,10 +72,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       vsync: this,
     );
     
-    // Set up focus listeners
-    _usernameFocusNode.addListener(_handleFocusChange);
-    _passwordFocusNode.addListener(_handleTextChange);
-    
     // Listen for text changes to update button state
     _usernameController.addListener(_handleTextChange);
     _passwordController.addListener(_handleTextChange);
@@ -113,27 +97,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     ));
   }
   
-  void _handleFocusChange() {
-    _updateOffsetState();
-  }
-  
   void _handleTextChange() {
     // Force rebuild to update button state
     setState(() {});
-  }
-  
-  void _updateOffsetState() {
-    final bool hasFocus = _usernameFocusNode.hasFocus || _passwordFocusNode.hasFocus;
-    final bool keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
-    
-    // Only show offset if field has focus AND keyboard is visible
-    final bool shouldOffset = hasFocus && keyboardVisible;
-    
-    if (shouldOffset != _shouldShowOffset) {
-      setState(() {
-        _shouldShowOffset = shouldOffset;
-      });
-    }
   }
 
   @override
@@ -162,16 +128,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       
       _hasInitializedAnimations = true;
     }
-    
-    // Ensure keyboard animation updates when keyboard visibility changes
-    _updateOffsetState();
   }
 
   @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
-    _usernameFocusNode.dispose();
     _passwordFocusNode.dispose();
     _buttonColorController.dispose();
     _successColorController.dispose();
@@ -299,11 +261,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Check if keyboard is visible to update offset state
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _updateOffsetState();
-    });
-    
     // Listen for accent color changes
     ref.listen(preferencesManagerProvider, (previous, next) {
       if (previous?.accentColor != next.accentColor) {
@@ -326,32 +283,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     
     return Scaffold(
       backgroundColor: Colors.black,
-      // This silences the overflow messages without changing behavior
-      resizeToAvoidBottomInset: false,
       body: GestureDetector(
         onTap: () {
           // Clear focus when tapping outside fields
           FocusScope.of(context).unfocus();
         },
         behavior: HitTestBehavior.translucent,
-        child: AnimatedContainer(
-          duration: _animationDuration,
-          curve: Curves.easeOutQuad,
-          transform: Matrix4.translationValues(
-            0, 
-            _shouldShowOffset ? _getAdaptiveOffset(context) : _baseOffset, 
-            0
-          ),
-          child: SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(height: topSpacing),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: topSpacing),
                       
                       // Title
                       Text(
@@ -399,7 +346,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 ),
                                 child: TextField(
                                   controller: _usernameController,
-                                  focusNode: _usernameFocusNode,
+                                  autofocus: true,
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
