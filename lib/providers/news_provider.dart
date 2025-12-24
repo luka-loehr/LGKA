@@ -103,6 +103,7 @@ class NewsNotifier extends Notifier<NewsState> {
   }
 
   Future<void> _refreshNewsSilently() async {
+    AppLogger.info('Background refresh: News', module: 'NewsProvider');
     try {
       await _newsService.fetchNewsEvents(forceRefresh: true);
       final updatedEvents = _newsService.cachedEvents;
@@ -113,9 +114,11 @@ class NewsNotifier extends Notifier<NewsState> {
           clearError: true,
           lastUpdated: _newsService.lastFetchTime ?? state.lastUpdated,
         );
+        AppLogger.success('Background refresh complete: News', module: 'NewsProvider');
       }
     } catch (e) {
-      // Ignore background refresh errors
+      AppLogger.warning('Background refresh failed: News', module: 'NewsProvider', error: e);
+      // Ignore background refresh errors - don't show to user
     }
   }
 

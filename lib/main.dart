@@ -230,13 +230,17 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
   }
 
   Future<void> _refreshExpiredCaches() async {
+    AppLogger.debug('Cache refresh timer: Checking expired caches', module: 'Main');
+    
     final substitutionState = ref.read(substitutionProvider);
     if (!substitutionState.isCacheValid && substitutionState.hasAnyData) {
+      AppLogger.debug('Cache refresh timer: Triggering background refresh for substitutions', module: 'Main');
       unawaited(ref.read(substitutionProvider.notifier).refreshInBackground());
     }
 
     final scheduleService = ref.read(scheduleServiceProvider);
     if (!scheduleService.hasValidCache && scheduleService.cachedSchedules != null) {
+      AppLogger.debug('Cache refresh timer: Triggering background refresh for schedules', module: 'Main');
       unawaited(ref.read(scheduleProvider.notifier).refreshInBackground());
     }
 
@@ -244,11 +248,13 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
     final weatherLastUpdate = weatherState.lastUpdateTime;
     if (weatherLastUpdate == null ||
         _cacheService.isCacheExpired(CacheKey.weather, lastFetchTime: weatherLastUpdate)) {
+      AppLogger.debug('Cache refresh timer: Triggering background refresh for weather', module: 'Main');
       unawaited(ref.read(weatherDataProvider.notifier).updateDataInBackground());
     }
 
     final newsService = ref.read(newsServiceProvider);
     if (!newsService.hasValidCache && newsService.cachedEvents != null) {
+      AppLogger.debug('Cache refresh timer: Triggering background refresh for news', module: 'Main');
       unawaited(ref.read(newsProvider.notifier).refreshInBackground());
     }
   }
