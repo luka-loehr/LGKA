@@ -86,7 +86,7 @@ class NewsDetailScreen extends ConsumerWidget {
   /// Build download button widget
   Widget _buildDownloadButton(NewsDownload download, BuildContext context, ThemeData theme, Color accentColor, Color surfaceColor) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12.0),
+      margin: EdgeInsets.zero,
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(12.0),
@@ -489,7 +489,7 @@ class NewsDetailScreen extends ConsumerWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12.0),
+      margin: EdgeInsets.zero,
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(12.0),
@@ -770,26 +770,46 @@ class NewsDetailScreen extends ConsumerWidget {
                           
                           // Display standalone link buttons if available
                           if (event.standaloneLinksOrEmpty.isNotEmpty) ...[
-                            const SizedBox(height: 12),
-                            ...event.standaloneLinksOrEmpty.map((link) => _buildLinkButton(
-                              link,
-                              context,
-                              theme,
-                              accentColor,
-                              surfaceColor,
-                            )),
+                            const SizedBox(height: 24),
+                            ...event.standaloneLinksOrEmpty.asMap().entries.map((entry) {
+                              final index = entry.key;
+                              final link = entry.value;
+                              return Column(
+                                children: [
+                                  _buildLinkButton(
+                                    link,
+                                    context,
+                                    theme,
+                                    accentColor,
+                                    surfaceColor,
+                                  ),
+                                  if (index < event.standaloneLinksOrEmpty.length - 1)
+                                    const SizedBox(height: 12),
+                                ],
+                              );
+                            }),
                           ],
                           
                           // Display download buttons if available
                           if (event.downloads.isNotEmpty) ...[
-                            const SizedBox(height: 12),
-                            ...event.downloads.map((download) => _buildDownloadButton(
-                              download,
-                              context,
-                              theme,
-                              accentColor,
-                              surfaceColor,
-                            )),
+                            const SizedBox(height: 24),
+                            ...event.downloads.asMap().entries.map((entry) {
+                              final index = entry.key;
+                              final download = entry.value;
+                              return Column(
+                                children: [
+                                  _buildDownloadButton(
+                                    download,
+                                    context,
+                                    theme,
+                                    accentColor,
+                                    surfaceColor,
+                                  ),
+                                  if (index < event.downloads.length - 1)
+                                    const SizedBox(height: 12),
+                                ],
+                              );
+                            }),
                           ],
                           
                           // Display images if available
