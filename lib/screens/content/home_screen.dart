@@ -311,6 +311,12 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     // Use a flag to ensure it only fires once even if build is called multiple times rapidly
     if (_wasLoading && !isLoading && !isError && hasData && !_hapticScheduled) {
       _hapticScheduled = true;
+      
+      // Log successful load
+      final availableCount = (pdfRepo.todayState.canDisplay ? 1 : 0) + 
+                            (pdfRepo.tomorrowState.canDisplay ? 1 : 0);
+      AppLogger.success('Substitution plan load complete: $availableCount available', module: 'SubstitutionPage');
+      
       Future.microtask(() {
         if (mounted) {
           HapticService.medium();
@@ -340,6 +346,13 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
 
     // Start animation when buttons should be visible
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Log when buttons are shown (before setting flag)
+      final availableCount = (pdfRepo.todayState.canDisplay ? 1 : 0) + 
+                            (pdfRepo.tomorrowState.canDisplay ? 1 : 0);
+      if (availableCount > 0 && !_hasShownButtons) {
+        AppLogger.schedule('Substitution buttons shown: $availableCount available');
+      }
+      
       _startButtonAnimation();
     });
 
