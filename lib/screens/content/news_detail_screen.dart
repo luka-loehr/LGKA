@@ -322,12 +322,12 @@ class NewsDetailScreen extends ConsumerWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8.0),
                     border: Border.all(
-                      color: accentColor,
-                      width: 2,
+                      color: accentColor.withValues(alpha: 0.2),
+                      width: 1,
                     ),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(6.0),
+                    borderRadius: BorderRadius.circular(7.0),
                     child: Image.network(
                       _getFaviconUrl(link.url),
                       width: 40,
