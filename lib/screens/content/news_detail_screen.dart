@@ -318,37 +318,30 @@ class NewsDetailScreen extends ConsumerWidget {
             child: Row(
               children: [
                 // Favicon or link icon
-                Container(
-                  padding: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: accentColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(6.0),
-                    child: Image.network(
-                      _getFaviconUrl(link.url),
-                      width: 24,
-                      height: 24,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        // Fallback to link icon if favicon fails to load
-                        return Icon(
-                          Icons.link,
-                          color: accentColor,
-                          size: 24,
-                        );
-                      },
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        // Show link icon while loading favicon
-                        return Icon(
-                          Icons.link,
-                          color: accentColor,
-                          size: 24,
-                        );
-                      },
-                    ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.network(
+                    _getFaviconUrl(link.url),
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback to link icon if favicon fails to load
+                      return Icon(
+                        Icons.link,
+                        color: accentColor,
+                        size: 40,
+                      );
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      // Show link icon while loading favicon
+                      return Icon(
+                        Icons.link,
+                        color: accentColor,
+                        size: 40,
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(width: 16),
