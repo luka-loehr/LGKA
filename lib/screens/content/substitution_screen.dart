@@ -26,6 +26,7 @@ class _SubstitutionScreenState extends ConsumerState<SubstitutionScreen>
   late Animation<double> _fadeAnimation;
   bool _hasShownButtons = false;
   bool _wasLoading = true;
+  bool _hadDataPreviously = false;
   bool _hapticScheduled = false;
 
   @override
@@ -65,8 +66,9 @@ class _SubstitutionScreenState extends ConsumerState<SubstitutionScreen>
     final hasData = substitutionState.hasAnyData;
     
     // Trigger haptic when transitioning from loading to success (when spinner disappears)
+    // Only trigger if we didn't have data previously (real load, not cache check)
     // Use a flag to ensure it only fires once even if build is called multiple times rapidly
-    if (_wasLoading && !isLoading && !isError && hasData && !_hapticScheduled) {
+    if (_wasLoading && !isLoading && !isError && hasData && !_hadDataPreviously && !_hapticScheduled) {
       _hapticScheduled = true;
       
       // Log successful load
@@ -86,7 +88,9 @@ class _SubstitutionScreenState extends ConsumerState<SubstitutionScreen>
       _hapticScheduled = false;
     }
     
+    // Track state for next build
     _wasLoading = isLoading;
+    _hadDataPreviously = hasData;
     
     if (!substitutionState.isInitialized || substitutionState.isLoading) {
       return _LoadingView();

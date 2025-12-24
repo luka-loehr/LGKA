@@ -36,6 +36,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   DateTime? _lastAvailabilityCheck;
   static const Duration _availabilityCheckInterval = Duration(minutes: 15);
   bool _wasSchedulesLoading = true;
+  bool _hadDataPreviously = false;
   bool _hapticScheduled = false;
 
   @override
@@ -226,8 +227,9 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     final hasData = scheduleState.hasSchedules && !scheduleState.hasError;
     
     // Trigger haptic when transitioning from showing spinner to showing schedule list
+    // Only trigger if we didn't have data previously (real load, not cache check)
     // Use a flag to ensure it only fires once even if build is called multiple times rapidly
-    if (wasShowingSpinner && !isShowingSpinner && hasData && !_hapticScheduled) {
+    if (wasShowingSpinner && !isShowingSpinner && hasData && !_hadDataPreviously && !_hapticScheduled) {
       _hapticScheduled = true;
       Future.microtask(() {
         if (mounted) {
@@ -241,8 +243,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       _hapticScheduled = false;
     }
     
+    // Track state for next build
     _wasSchedulesLoading = scheduleState.isLoading;
     _wasCheckingAvailability = _isCheckingAvailability;
+    _hadDataPreviously = hasData;
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
