@@ -28,7 +28,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  double _lastScrollPosition = 0.0;
 
   @override
   void initState() {
@@ -183,35 +182,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildBody() {
-    return NotificationListener<ScrollUpdateNotification>(
-      onNotification: (notification) {
-        // Get current scroll position from PageController
-        if (_pageController.hasClients) {
-          final currentPosition = _pageController.page ?? 0.0;
-          final scrollDelta = (currentPosition - _lastScrollPosition).abs();
-          
-          // Trigger haptic feedback when scroll position changes
-          // Provides continuous feedback for every movement during swipe
-          if (scrollDelta > 0.01) {
-            HapticService.medium();
-            _lastScrollPosition = currentPosition;
-          }
+    return PageView(
+      controller: _pageController,
+      onPageChanged: (index) {
+        // Trigger haptic feedback every time the category switches
+        if (_currentPage != index) {
+          HapticService.medium();
         }
-        return false; // Allow notification to continue propagating
+        setState(() => _currentPage = index);
       },
-      child: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() => _currentPage = index);
-          // Reset scroll position tracking when page changes
-          _lastScrollPosition = index.toDouble();
-        },
-        children: [
-          const SubstitutionScreen(),
-          const WeatherPage(),
-          const SchedulePage(),
-        ],
-      ),
+      children: [
+        const SubstitutionScreen(),
+        const WeatherPage(),
+        const SchedulePage(),
+      ],
     );
   }
 
