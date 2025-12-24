@@ -12,6 +12,7 @@ import 'package:lgka_flutter/navigation/app_router.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:lgka_flutter/providers/schedule_provider.dart';
 import 'package:lgka_flutter/providers/news_provider.dart';
+import 'package:lgka_flutter/providers/substitution_provider.dart';
 import 'package:lgka_flutter/providers/fireworks_provider.dart';
 import 'package:lgka_flutter/widgets/fireworks_overlay.dart';
 import 'data/preferences_manager.dart';
@@ -160,11 +161,11 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
 
   Future<void> _preloadPdfs() async {
     try {
-      AppLogger.init('Preloading PDF repository');
-      await ref.read(pdfRepositoryProvider.notifier).initialize();
-      AppLogger.success('PDF repository preloaded');
+      AppLogger.init('Preloading substitution plans');
+      await ref.read(substitutionProvider.notifier).initialize();
+      AppLogger.success('Substitution plans preloaded');
     } catch (e) {
-      AppLogger.error('Failed to preload PDFs', error: e);
+      AppLogger.error('Failed to preload substitution plans', error: e);
     }
   }
 
@@ -209,9 +210,9 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
   }
 
   Future<void> _refreshExpiredCaches() async {
-    final pdfRepository = ref.read(pdfRepositoryProvider);
-    if (!pdfRepository.isCacheValid && pdfRepository.hasAnyData) {
-      unawaited(ref.read(pdfRepositoryProvider.notifier).refreshInBackground());
+    final substitutionState = ref.read(substitutionProvider);
+    if (!substitutionState.isCacheValid && substitutionState.hasAnyData) {
+      unawaited(ref.read(substitutionProvider.notifier).refreshInBackground());
     }
 
     final scheduleService = ref.read(scheduleServiceProvider);

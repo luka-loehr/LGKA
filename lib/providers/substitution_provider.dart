@@ -28,6 +28,12 @@ class SubstitutionProviderState {
     this.hasAnyData = false,
   });
 
+  bool get isCacheValid {
+    if (lastFetchTime == null) return false;
+    const cacheValidity = Duration(minutes: 5);
+    return DateTime.now().difference(lastFetchTime!) < cacheValidity;
+  }
+
   SubstitutionProviderState copyWith({
     SubstitutionState? todayState,
     SubstitutionState? tomorrowState,
