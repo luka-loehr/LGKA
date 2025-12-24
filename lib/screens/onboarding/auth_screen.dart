@@ -1,7 +1,6 @@
 // Copyright Luka Löhr 2025
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/app_providers.dart';
@@ -204,7 +203,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       
       // Update authentication state
       await ref.read(preferencesManagerProvider.notifier).setAuthenticated(true);
-      ref.read(isAuthenticatedProvider.notifier).state = true;
       
       // Mark onboarding as completed only after successful authentication
       final notifier = ref.read(preferencesManagerProvider.notifier);

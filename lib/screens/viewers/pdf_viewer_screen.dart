@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
@@ -55,7 +54,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   List<SearchResult> _searchResults = [];
-  int _currentSearchIndex = -1;
   
   // Search bar state
   bool _isSearchBarVisible = false;
@@ -466,15 +464,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     if (query.trim().isEmpty) {
       setState(() {
         _searchResults.clear();
-        _currentSearchIndex = -1;
       });
       return;
     }
-
-    // Show loading state
-    setState(() {
-      _currentSearchIndex = -1;
-    });
 
     try {
       final bytes = await widget.pdfFile.readAsBytes();
@@ -528,7 +520,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
       setState(() {
         _searchResults = results;
-        _currentSearchIndex = results.isNotEmpty ? 0 : -1;
       });
 
       AppLogger.search('Search completed: ${results.length} results for "$query"');
@@ -610,23 +601,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     }
   }
 
-  void _nextSearchResult() {
-    if (_searchResults.isNotEmpty && _currentSearchIndex < _searchResults.length - 1) {
-      setState(() {
-        _currentSearchIndex++;
-      });
-      _navigateToSearchResult(_searchResults[_currentSearchIndex]);
-    }
-  }
-
-  void _previousSearchResult() {
-    if (_searchResults.isNotEmpty && _currentSearchIndex > 0) {
-      setState(() {
-        _currentSearchIndex--;
-      });
-      _navigateToSearchResult(_searchResults[_currentSearchIndex]);
-    }
-  }
 
   void _showSearchBar() {
     setState(() {
@@ -656,7 +630,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     setState(() {
       _isSearchBarVisible = false;
       _searchResults.clear();
-      _currentSearchIndex = -1;
     });
     _searchController.clear();
   }

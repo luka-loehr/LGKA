@@ -2,12 +2,10 @@
 
 import 'dart:async';
 
-import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import '../data/preferences_manager.dart';
 import '../services/weather_service.dart';
-import '../providers/schedule_provider.dart';
 import '../services/schedule_service.dart';
 import '../services/news_service.dart';
 import '../services/substitution_service.dart';

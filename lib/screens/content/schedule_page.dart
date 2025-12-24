@@ -36,7 +36,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   DateTime? _lastAvailabilityCheck;
   static const Duration _availabilityCheckInterval = Duration(minutes: 15);
   bool _wasSchedulesLoading = true;
-  bool _didShowInitialSpinner = false; // true once initial loading spinner was shown
   bool _hapticScheduled = false;
 
   @override
@@ -221,10 +220,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   @override
   Widget build(BuildContext context) {
     final scheduleState = ref.watch(scheduleProvider);
-    // Track if initial spinner ever appeared in this page lifetime
-    if (scheduleState.isLoading) {
-      _didShowInitialSpinner = true;
-    }
     
     final wasShowingSpinner = _wasSchedulesLoading || _wasCheckingAvailability;
     final isShowingSpinner = scheduleState.isLoading || _isCheckingAvailability;

@@ -28,7 +28,6 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
   InAppWebViewController? _controller;
   double _progress = 0;
   bool _hasError = false;
-  bool _wasLoading = true;
 
   
   // Check if this is the absence reporting (krankmeldung) webview
@@ -140,21 +139,16 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
           onProgressChanged: (controller, progress) {
             setState(() {
               _progress = progress / 100;
-              if (_progress < 1.0) {
-                _wasLoading = true;
-              }
             });
           },
           onReceivedError: (controller, request, error) {
             setState(() {
               _hasError = true;
-              _wasLoading = false;
             });
           },
           onReceivedHttpError: (controller, request, error) {
             setState(() {
               _hasError = true;
-              _wasLoading = false;
             });
           },
           onReceivedHttpAuthRequest: (controller, challenge) async {

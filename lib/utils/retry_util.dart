@@ -60,7 +60,7 @@ class RetryUtil {
 
     // If we get here, all retries failed
     if (lastError != null) {
-      Error.throwWithStackTrace(lastError!, lastStackTrace ?? StackTrace.current);
+      Error.throwWithStackTrace(lastError, lastStackTrace ?? StackTrace.current);
     }
     throw StateError('Retry failed but no error was captured');
   }

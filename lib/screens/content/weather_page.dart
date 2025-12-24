@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest_all.dart' as tz;
 import '../../services/weather_service.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/app_providers.dart';
@@ -54,7 +53,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
   bool _isChartRendered = false;
   bool _isInitialRenderComplete = false;
   bool _forceShowErrorUntilSuccess = false; // Keep error UI visible during retries until data arrives
-  bool _wasLoading = true;
 
   late AnimationController _errorAnimationController;
   late Animation<double> _errorAnimation;
@@ -235,8 +233,6 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     final shouldShowRepairError = _isWeatherStationRepair();
     // Keep showing the error placeholder while retrying until data loads
     final shouldShowAnyError = _forceShowErrorUntilSuccess || shouldShowWeatherError || shouldShowStaleDataError || shouldShowRepairError;
-    
-    _wasLoading = weatherState.isLoading && weatherState.chartData.isEmpty;
     
     if (shouldShowAnyError) {
       if (_errorAnimationController.status == AnimationStatus.dismissed) {

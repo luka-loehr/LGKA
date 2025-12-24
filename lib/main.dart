@@ -13,7 +13,6 @@ import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:lgka_flutter/providers/schedule_provider.dart';
 import 'package:lgka_flutter/providers/news_provider.dart';
 import 'package:lgka_flutter/providers/substitution_provider.dart';
-import 'package:lgka_flutter/providers/fireworks_provider.dart';
 import 'package:lgka_flutter/widgets/fireworks_overlay.dart';
 import 'data/preferences_manager.dart';
 import 'package:lgka_flutter/l10n/app_localizations.dart';

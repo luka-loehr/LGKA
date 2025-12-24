@@ -203,7 +203,7 @@ class SubstitutionService {
         final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
         
         final response = await http.get(
-          uri!,
+          uri,
           headers: {
             'Authorization': 'Basic $credentials',
             'User-Agent': AppInfo.userAgent,
@@ -424,7 +424,7 @@ Map<String, String> _extractPdfData(List<int> bytes) {
         // Find a 4-digit year near this match to avoid picking up unrelated numbers
         final start = (matchB.start - 200).clamp(0, text.length);
         final end = (matchB.end + 200).clamp(0, text.length);
-        final localContext = text.substring(start as int, end as int);
+        final localContext = text.substring(start, end);
         // Prefer real years only (19xx or 20xx). This avoids picking up '7613' from ZIP '76135'.
         final yearInContext = RegExp(r'\b(19|20)\d{2}\b').firstMatch(localContext)?.group(0);
 
@@ -447,7 +447,7 @@ Map<String, String> _extractPdfData(List<int> bytes) {
           // Try to find a complete date near the weekday mention
           final start = (weekdayOnly.start - 200).clamp(0, text.length);
           final end = (weekdayOnly.end + 200).clamp(0, text.length);
-          final localContext = text.substring(start as int, end as int);
+          final localContext = text.substring(start, end);
           final dateNearby = RegExp(r'(\d{1,2})\.(\d{1,2})\.((?:19|20)\d{2})').firstMatch(localContext);
           if (dateNearby != null) {
             final g1 = dateNearby.group(1);
