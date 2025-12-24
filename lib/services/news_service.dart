@@ -530,12 +530,21 @@ class NewsService {
           }
 
           // Extract text content from paragraphs (preserving structure for link replacement)
-          // First, clone the article body and remove download links to avoid duplicates
+          // First, clone the article body and remove download links and regular links to avoid duplicates
           final articleBodyClone = articleBody.clone(true);
+          
+          // Remove download links
           final downloadLinksInClone = articleBodyClone.querySelectorAll('a.doclink-insert');
           for (var downloadLink in downloadLinksInClone) {
             // Remove the download link but keep surrounding text
             downloadLink.remove();
+          }
+          
+          // Remove regular links (they'll be displayed as separate buttons)
+          final regularLinksInClone = articleBodyClone.querySelectorAll('a:not(.doclink-insert)');
+          for (var link in regularLinksInClone) {
+            // Remove the link element entirely - links are displayed separately as buttons
+            link.remove();
           }
           
           final paragraphs = articleBodyClone.querySelectorAll('p');
