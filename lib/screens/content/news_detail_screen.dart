@@ -220,41 +220,48 @@ class NewsDetailScreen extends ConsumerWidget {
                   }
                 }
                 
-                // Check if we have visible content from child nodes
-                bool hasVisibleContentFromChildren = linkSpans.any((span) => 
-                  (span.text != null && span.text!.trim().isNotEmpty) ||
-                  (span.children != null && span.children!.isNotEmpty)
-                );
+                // Create the tap recognizer for the link
+                final recognizer = TapGestureRecognizer()
+                  ..onTap = () {
+                    HapticService.light();
+                    _openLink(fullUrl);
+                  };
                 
-                // If no visible content from children, use linkText as fallback
-                if (!hasVisibleContentFromChildren && linkText.isNotEmpty) {
-                  linkSpans.add(TextSpan(
-                    text: linkText,
-                    style: currentStyle?.copyWith(color: accentColor),
-                  ));
-                }
-                
-                // Create link span if we have any content
+                // If we have child spans, use them (they already have the accent color from processNode)
                 if (linkSpans.isNotEmpty) {
-                  nodeSpans.add(TextSpan(
-                    children: linkSpans,
-                    style: currentStyle?.copyWith(color: accentColor),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        HapticService.light();
-                        _openLink(fullUrl);
-                      },
-                  ));
+                  // Check if linkSpans actually has visible content
+                  bool hasVisibleContent = linkSpans.any((span) {
+                    if (span.text != null && span.text!.trim().isNotEmpty) return true;
+                    if (span.children != null && span.children!.isNotEmpty) {
+                      // Recursively check children
+                      return span.children!.any((child) => 
+                        (child.text != null && child.text!.trim().isNotEmpty) ||
+                        (child.children != null && child.children!.isNotEmpty)
+                      );
+                    }
+                    return false;
+                  });
+                  
+                  if (hasVisibleContent) {
+                    // Create link span with children - don't set style on parent when using children
+                    nodeSpans.add(TextSpan(
+                      children: linkSpans,
+                      recognizer: recognizer,
+                    ));
+                  } else if (linkText.isNotEmpty) {
+                    // Child spans exist but have no visible content, use linkText instead
+                    nodeSpans.add(TextSpan(
+                      text: linkText,
+                      style: currentStyle?.copyWith(color: accentColor),
+                      recognizer: recognizer,
+                    ));
+                  }
                 } else if (linkText.isNotEmpty) {
-                  // Fallback: create a simple link span with just the text (if linkSpans is empty)
+                  // No child spans, use linkText directly
                   nodeSpans.add(TextSpan(
                     text: linkText,
                     style: currentStyle?.copyWith(color: accentColor),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        HapticService.light();
-                        _openLink(fullUrl);
-                      },
+                    recognizer: recognizer,
                   ));
                 }
                 return nodeSpans; // Return early, don't process children again
