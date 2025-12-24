@@ -14,6 +14,8 @@ This release introduces a comprehensive news feature, intelligent haptic feedbac
 - Integrated news into drawer menu with "Neuigkeiten" option
 - Added fade-in animations for news cards
 - Improved news error handling with automatic retry logic
+- Added support for download links with file type icons and sizes
+- Added styled link buttons for news articles with favicons
 
 ### Haptic Feedback System
 - Implemented intelligent haptic feedback system for loading states
@@ -23,6 +25,7 @@ This release introduces a comprehensive news feature, intelligent haptic feedbac
 - Added intense haptic feedback for errors and important actions
 - Improved haptic feedback during PageView swiping between main screens
 - Added haptic feedback to onboarding flow buttons
+- Added New Year fireworks feature with haptic feedback
 
 ### Schedule & Timetables
 - Added automatic PDF preloading when schedule page loads
@@ -54,6 +57,7 @@ This release introduces a comprehensive news feature, intelligent haptic feedbac
 - Added slide animations for news detail screen navigation
 - Improved spacing and visual balance across screens
 - Updated launch screens to show app logo on both platforms
+- Added website favicons to standalone link buttons
 
 ### PDF Viewer
 - Improved PDF loading and error handling
@@ -68,10 +72,10 @@ This release introduces a comprehensive news feature, intelligent haptic feedbac
 - Enhanced visual design and animations
 
 ### Other Features
-- Added New Year fireworks feature with haptic feedback
 - Added support project link to settings
 - Improved error messages and user feedback
 - Enhanced loading states and spinner tracking
+- Fixed localization for legal screen and schedule option labels
 
 ### Under the Hood
 - Migrated to Riverpod 3.0 with new Notifier API
