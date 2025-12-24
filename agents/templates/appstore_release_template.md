@@ -23,6 +23,7 @@ github.com/luka-loehr/LGKA/releases/tag/x.x.x
 - Maximum 4000 characters
 - No emojis or special formatting
 - Focus on user-visible changes and fixes
+- IMPORTANT: The provided examples below are the maximum length - never provide release notes longer than the examples
 
 Example 1 (v2.3.0):
 Klassensuche im Stundenplan-PDF funktioniert jetzt besser
