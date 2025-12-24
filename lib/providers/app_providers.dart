@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import '../data/preferences_manager.dart';
-import '../data/pdf_repository.dart';
 import '../services/weather_service.dart';
 import '../providers/schedule_provider.dart';
 import '../services/schedule_service.dart';
@@ -218,129 +217,6 @@ final themeProvider = Provider<ThemeData>((ref) {
   final preferencesManagerState = ref.watch(preferencesManagerProvider);
   return AppTheme.getDarkThemeWithAccent(preferencesManagerState.accentColor);
 });
-
-/// State class for PDF repository
-class PdfRepositoryState {
-  final PdfState todayState;
-  final PdfState tomorrowState;
-  final bool isInitialized;
-  final DateTime? lastFetchTime;
-  final bool isRefreshing;
-
-  const PdfRepositoryState({
-    this.todayState = const PdfState(),
-    this.tomorrowState = const PdfState(),
-    this.isInitialized = false,
-    this.lastFetchTime,
-    this.isRefreshing = false,
-  });
-
-  PdfRepositoryState copyWith({
-    PdfState? todayState,
-    PdfState? tomorrowState,
-    bool? isInitialized,
-    DateTime? lastFetchTime,
-    bool? isRefreshing,
-  }) {
-    return PdfRepositoryState(
-      todayState: todayState ?? this.todayState,
-      tomorrowState: tomorrowState ?? this.tomorrowState,
-      isInitialized: isInitialized ?? this.isInitialized,
-      lastFetchTime: lastFetchTime ?? this.lastFetchTime,
-      isRefreshing: isRefreshing ?? this.isRefreshing,
-    );
-  }
-
-  bool get hasAnyData => todayState.hasData || tomorrowState.hasData;
-  bool get hasAnyError => todayState.error != null || tomorrowState.error != null;
-  bool get isLoading => todayState.isLoading || tomorrowState.isLoading;
-  
-  bool get isCacheValid {
-    if (lastFetchTime == null) return false;
-    const cacheValidity = Duration(minutes: 5);
-    return DateTime.now().difference(lastFetchTime!) < cacheValidity;
-  }
-}
-
-/// Notifier for PDF repository
-class PdfRepositoryNotifier extends Notifier<PdfRepositoryState> {
-  final PdfRepository _repository = PdfRepository();
-
-  @override
-  PdfRepositoryState build() {
-    return const PdfRepositoryState();
-  }
-
-  void _refreshState() {
-    state = PdfRepositoryState(
-      todayState: _repository.todayState,
-      tomorrowState: _repository.tomorrowState,
-      isInitialized: _repository.isInitialized,
-      lastFetchTime: _repository.lastFetchTime,
-      isRefreshing: false, // We don't expose this from repository
-    );
-  }
-
-  Future<void> initialize() async {
-    await _repository.initialize();
-    _refreshState();
-  }
-
-  Future<void> retryPdf(bool isToday) async {
-    // Set loading state immediately so UI shows loading indicator
-    if (isToday) {
-      _repository.setLoadingStateForPdf(true, true);
-    } else {
-      _repository.setLoadingStateForPdf(false, true);
-    }
-    _refreshState();
-    
-    // Then perform the actual retry
-    await _repository.retryPdf(isToday);
-    _refreshState();
-    
-    // Check if retry failed and trigger haptic feedback
-    final currentState = state;
-    final pdfState = isToday ? currentState.todayState : currentState.tomorrowState;
-    if (pdfState.error != null) {
-      HapticService.medium();
-    }
-  }
-
-  Future<void> retryAll() async {
-    // Set loading state immediately so UI shows loading indicator
-    _repository.setLoadingState(true);
-    _refreshState();
-    
-    // Then perform the actual retry
-    await _repository.retryAll();
-    _refreshState();
-  }
-
-  Future<void> refresh() async {
-    await _repository.refresh();
-    _refreshState();
-  }
-
-  Future<void> refreshInBackground() async {
-    await _repository.refreshInBackground();
-    _refreshState();
-  }
-
-  File? getPdfFile(bool isToday) {
-    return _repository.getPdfFile(isToday);
-  }
-
-  bool canOpenPdf(bool isToday) {
-    return _repository.canOpenPdf(isToday);
-  }
-
-  // Expose repository for direct access (for compatibility)
-  PdfRepository get repository => _repository;
-}
-
-// PDF Repository Provider
-final pdfRepositoryProvider = NotifierProvider<PdfRepositoryNotifier, PdfRepositoryState>(PdfRepositoryNotifier.new);
 
 // App State Providers
 class IsFirstLaunchNotifier extends Notifier<bool> {
