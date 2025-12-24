@@ -8,6 +8,7 @@ import '../../providers/color_provider.dart';
 import '../../navigation/app_router.dart';
 import '../../l10n/app_localizations.dart';
 import '../../config/app_credentials.dart';
+import '../../providers/haptic_service.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   final VoidCallback? onLoginSuccess;
@@ -180,6 +181,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   void _validateLogin() async {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
+
+    // Haptic feedback for login button press
+    HapticService.medium();
 
     if (username == AppCredentials.username && password == AppCredentials.password) {
       // Show success flash immediately
