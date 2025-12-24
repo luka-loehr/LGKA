@@ -3,6 +3,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
 import '../providers/schedule_provider.dart';
+import '../providers/substitution_provider.dart';
 
 
 /// Centralized service for retrying all data sources
@@ -22,8 +23,8 @@ class RetryService {
     }
     
     try {
-      // Retry PDF substitution plans - fire and forget
-      await _ref.read(pdfRepositoryProvider.notifier).retryAll();
+      // Retry substitution plans - fire and forget
+      await _ref.read(substitutionProvider.notifier).retryAll();
     } catch (e) {
       // Silently ignore any errors - don't crash the retry service
     }
@@ -45,10 +46,10 @@ class RetryService {
     }
   }
 
-  /// Retry only PDF substitution plans
+  /// Retry only substitution plans
   Future<void> retryPdfData() async {
     try {
-      await _ref.read(pdfRepositoryProvider.notifier).retryAll();
+      await _ref.read(substitutionProvider.notifier).retryAll();
     } catch (e) {
       // Silently ignore any errors - don't crash the retry service
     }
