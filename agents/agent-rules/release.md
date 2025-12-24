@@ -52,8 +52,16 @@ Copy the archive to `~/Library/Developer/Xcode/Archives/$(date +%Y-%m-%d)/` so i
 
 ### Task 8: App Store Release Notes
 
-1. Create German-language release notes following `agents/templates/appstore_release_template.md`
-2. **Output the App Store release notes directly in chat** (not just as a file)
+1. **CRITICAL**: Get the actual GitHub release URL using the CLI:
+   - Run: `gh release view [version_tag] --json tagName --jq .tagName` to get the tag name
+   - Construct the release URL as: `github.com/luka-loehr/LGKA/releases/tag/[tagName]`
+   - **DO NOT** make up or guess the release URL - always get it from the CLI using the actual tag name
+   - Example: If tag is `v2.4.0`, URL is `github.com/luka-loehr/LGKA/releases/tag/v2.4.0`
+2. Create German-language release notes following `agents/templates/appstore_release_template.md`
+   - Use the examples in the template as guidance for quality and style
+   - Focus on user-visible changes that students will notice
+   - Keep it concise and student-friendly
+3. **Output the App Store release notes directly in chat** (not just as a file)
 
 ## File Locations
 
