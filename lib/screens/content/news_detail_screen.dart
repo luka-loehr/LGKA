@@ -169,7 +169,7 @@ class NewsDetailScreen extends ConsumerWidget {
     
     // Base text style
     final baseStyle = theme.textTheme.bodyLarge?.copyWith(
-      height: 1.8,
+      height: 1.5,
       letterSpacing: 0.2,
     );
     
@@ -250,10 +250,10 @@ class NewsDetailScreen extends ConsumerWidget {
               }
               if (paragraphSpans.isNotEmpty) {
                 nodeSpans.addAll(paragraphSpans);
-                // Add line break after paragraph if not last
+                // Add minimal line break after paragraph if not last
                 final nextSibling = (node as dynamic).nextElementSibling;
                 if (nextSibling != null) {
-                  nodeSpans.add(TextSpan(text: '\n\n', style: currentStyle));
+                  nodeSpans.add(TextSpan(text: '\n', style: currentStyle));
                 }
               }
               return nodeSpans;
@@ -308,28 +308,32 @@ class NewsDetailScreen extends ConsumerWidget {
       }
     }
     
-    // Trim trailing whitespace/newlines from the last span to reduce spacing
+    // Aggressively trim trailing whitespace/newlines from all spans to reduce spacing
     if (spans.isNotEmpty) {
-      final lastSpan = spans.last;
-      if (lastSpan.text != null && lastSpan.text!.trim().isEmpty) {
-        // Remove trailing whitespace-only span
-        spans.removeLast();
-      } else if (lastSpan.text != null && lastSpan.text!.endsWith('\n\n')) {
-        // Trim trailing double newlines
-        spans[spans.length - 1] = TextSpan(
-          text: lastSpan.text!.replaceAll(RegExp(r'\n+$'), ''),
-          style: lastSpan.style,
-          recognizer: lastSpan.recognizer,
-          children: lastSpan.children,
-        );
-      } else if (lastSpan.text != null && lastSpan.text!.endsWith('\n')) {
-        // Trim trailing single newline
-        spans[spans.length - 1] = TextSpan(
-          text: lastSpan.text!.replaceAll(RegExp(r'\n+$'), ''),
-          style: lastSpan.style,
-          recognizer: lastSpan.recognizer,
-          children: lastSpan.children,
-        );
+      // Remove trailing whitespace-only spans
+      while (spans.isNotEmpty) {
+        final lastSpan = spans.last;
+        if (lastSpan.text != null && lastSpan.text!.trim().isEmpty) {
+          spans.removeLast();
+        } else {
+          break;
+        }
+      }
+      
+      // Trim trailing newlines from the last non-empty span
+      if (spans.isNotEmpty) {
+        final lastSpan = spans.last;
+        if (lastSpan.text != null && lastSpan.text!.isNotEmpty) {
+          final trimmedText = lastSpan.text!.replaceAll(RegExp(r'\s+$'), '');
+          if (trimmedText != lastSpan.text) {
+            spans[spans.length - 1] = TextSpan(
+              text: trimmedText,
+              style: lastSpan.style,
+              recognizer: lastSpan.recognizer,
+              children: lastSpan.children,
+            );
+          }
+        }
       }
     }
     
@@ -359,7 +363,7 @@ class NewsDetailScreen extends ConsumerWidget {
       return Text(
         content,
         style: theme.textTheme.bodyLarge?.copyWith(
-          height: 1.8,
+          height: 1.5,
           letterSpacing: 0.2,
         ),
       );
@@ -418,7 +422,7 @@ class NewsDetailScreen extends ConsumerWidget {
         spans.add(TextSpan(
           text: content.substring(currentIndex, match.start),
           style: theme.textTheme.bodyLarge?.copyWith(
-            height: 1.8,
+            height: 1.5,
             letterSpacing: 0.2,
           ),
         ));
@@ -428,7 +432,7 @@ class NewsDetailScreen extends ConsumerWidget {
       spans.add(TextSpan(
         text: match.link.text,
         style: theme.textTheme.bodyLarge?.copyWith(
-          height: 1.8,
+          height: 1.5,
           letterSpacing: 0.2,
           color: accentColor,
         ),
@@ -447,7 +451,7 @@ class NewsDetailScreen extends ConsumerWidget {
       spans.add(TextSpan(
         text: content.substring(currentIndex),
         style: theme.textTheme.bodyLarge?.copyWith(
-          height: 1.8,
+          height: 1.5,
           letterSpacing: 0.2,
         ),
       ));
@@ -458,7 +462,7 @@ class NewsDetailScreen extends ConsumerWidget {
       return Text(
         content,
         style: theme.textTheme.bodyLarge?.copyWith(
-          height: 1.8,
+          height: 1.5,
           letterSpacing: 0.2,
         ),
       );
@@ -770,7 +774,7 @@ class NewsDetailScreen extends ConsumerWidget {
                           
                           // Display standalone link buttons if available
                           if (event.standaloneLinksOrEmpty.isNotEmpty) ...[
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 6),
                             ...event.standaloneLinksOrEmpty.map((link) => _buildLinkButton(
                               link,
                               context,
@@ -782,7 +786,7 @@ class NewsDetailScreen extends ConsumerWidget {
                           
                           // Display download buttons if available
                           if (event.downloads.isNotEmpty) ...[
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 6),
                             ...event.downloads.map((download) => _buildDownloadButton(
                               download,
                               context,
