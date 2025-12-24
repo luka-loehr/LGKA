@@ -11,6 +11,7 @@ import '../services/weather_service.dart';
 import '../providers/schedule_provider.dart';
 import '../services/schedule_service.dart';
 import '../services/news_service.dart';
+import '../services/substitution_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_logger.dart';
 import '../providers/haptic_service.dart';
@@ -553,4 +554,9 @@ final scheduleServiceProvider = Provider<ScheduleService>((ref) {
 // News Service Provider
 final newsServiceProvider = Provider<NewsService>((ref) {
   return NewsService();
+});
+
+// Substitution Service Provider
+final substitutionServiceProvider = Provider<SubstitutionService>((ref) {
+  return SubstitutionService();
 });

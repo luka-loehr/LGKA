@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
@@ -12,10 +11,9 @@ import '../utils/app_info.dart';
 import '../utils/retry_util.dart';
 import '../utils/app_logger.dart';
 import '../config/app_credentials.dart';
-import '../services/substitution_service.dart';
 
-/// Represents the state of a single PDF (today or tomorrow)
-class PdfState {
+/// Represents the state of a single substitution PDF (today or tomorrow)
+class SubstitutionState {
   final bool isLoading;
   final bool hasData;
   final String? error;
@@ -24,7 +22,7 @@ class PdfState {
   final String? lastUpdated;
   final File? file;
 
-  const PdfState({
+  const SubstitutionState({
     this.isLoading = false,
     this.hasData = false,
     this.error,
@@ -34,7 +32,7 @@ class PdfState {
     this.file,
   });
 
-  PdfState copyWith({
+  SubstitutionState copyWith({
     bool? isLoading,
     bool? hasData,
     String? error,
@@ -43,7 +41,7 @@ class PdfState {
     String? lastUpdated,
     File? file,
   }) {
-    return PdfState(
+    return SubstitutionState(
       isLoading: isLoading ?? this.isLoading,
       hasData: hasData ?? this.hasData,
       error: error,
@@ -65,85 +63,244 @@ class PdfState {
   }
 }
 
-/// Repository for managing PDF substitution plans
-/// This is a wrapper around SubstitutionService for backward compatibility
-class PdfRepository {
-  final SubstitutionService _substitutionService = SubstitutionService();
+/// Service for managing substitution plan PDFs
+class SubstitutionService {
+  static const String _todayUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_heute.pdf';
+  static const String _tomorrowUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_morgen.pdf';
+  static const Duration _timeout = Duration(seconds: 10);
+  static const Duration _cacheValidity = Duration(minutes: 5);
 
-  PdfRepository();
+  SubstitutionState _todayState = const SubstitutionState();
+  SubstitutionState _tomorrowState = const SubstitutionState();
+  bool _isInitialized = false;
+  DateTime? _lastFetchTime;
+  bool _isRefreshing = false;
 
-  // Getters - delegate to substitution service
-  PdfState get todayState => _convertSubstitutionState(_substitutionService.todayState);
-  PdfState get tomorrowState => _convertSubstitutionState(_substitutionService.tomorrowState);
-  bool get isInitialized => _substitutionService.isInitialized;
-  bool get hasAnyData => _substitutionService.hasAnyData;
-  bool get hasAnyError => _substitutionService.hasAnyError;
-  bool get isLoading => _substitutionService.isLoading;
-  DateTime? get lastFetchTime => _substitutionService.lastFetchTime;
-  bool get isCacheValid => _substitutionService.isCacheValid;
+  // Getters
+  SubstitutionState get todayState => _todayState;
+  SubstitutionState get tomorrowState => _tomorrowState;
+  bool get isInitialized => _isInitialized;
+  bool get hasAnyData => _todayState.hasData || _tomorrowState.hasData;
+  bool get hasAnyError => _todayState.error != null || _tomorrowState.error != null;
+  bool get isLoading => _todayState.isLoading || _tomorrowState.isLoading;
+  DateTime? get lastFetchTime => _lastFetchTime;
+  bool get isCacheValid => _isCacheValid;
 
-  /// Convert SubstitutionState to PdfState for backward compatibility
-  PdfState _convertSubstitutionState(SubstitutionState subState) {
-    return PdfState(
-      isLoading: subState.isLoading,
-      hasData: subState.hasData,
-      error: subState.error,
-      weekday: subState.weekday,
-      date: subState.date,
-      lastUpdated: subState.lastUpdated,
-      file: subState.file,
+  bool get _isCacheValid {
+    if (_lastFetchTime == null) return false;
+    return DateTime.now().difference(_lastFetchTime!) < _cacheValidity;
+  }
+
+  /// Initialize the service by loading both PDFs
+  Future<void> initialize() async {
+    // Already initialized - don't reload (even if we have errors)
+    if (_isInitialized) {
+      // Refresh in background if cache is stale and we have data
+      if (hasAnyData && !_isCacheValid) {
+        unawaited(refreshInBackground());
+      }
+      return;
+    }
+
+    await _loadBothPdfs();
+    _isInitialized = true;
+    _lastFetchTime = DateTime.now();
+    
+    final loadedCount = (todayState.canDisplay ? 1 : 0) + (tomorrowState.canDisplay ? 1 : 0);
+    AppLogger.debug('Substitution plan initialization complete: $loadedCount PDF(s) loaded', module: 'SubstitutionService');
+  }
+
+  /// Load both PDFs simultaneously
+  Future<void> _loadBothPdfs({bool silent = false}) async {
+    final results = await Future.wait<bool>([
+      _loadPdf(_todayUrl, true, silent: silent),
+      _loadPdf(_tomorrowUrl, false, silent: silent),
+    ]);
+
+    if (results.any((success) => success)) {
+      _lastFetchTime = DateTime.now();
+    }
+  }
+
+  /// Load a single PDF and update its state
+  Future<bool> _loadPdf(String url, bool isToday, {bool silent = false}) async {
+    final previousState = isToday ? _todayState : _tomorrowState;
+    final dayLabel = isToday ? 'today' : 'tomorrow';
+
+    // Check if PDF is already cached
+    final cacheDir = await getTemporaryDirectory();
+    final filename = isToday ? 'today.pdf' : 'tomorrow.pdf';
+    final cachedFile = File('${cacheDir.path}/$filename');
+    
+    if (await cachedFile.exists()) {
+      final fileSize = await cachedFile.length();
+      if (fileSize > 1000) {
+        AppLogger.debug('Cache hit: Substitution plan - $dayLabel', module: 'SubstitutionService');
+        try {
+          final metadata = await _extractMetadata(cachedFile);
+          _updatePdfState(isToday, SubstitutionState(
+            isLoading: false,
+            hasData: true,
+            weekday: metadata['weekday'],
+            date: metadata['date'],
+            lastUpdated: metadata['lastUpdated'],
+            file: cachedFile,
+          ));
+          return true;
+        } catch (e) {
+          // If metadata extraction fails, continue to download
+          AppLogger.debug('Failed to extract metadata from cached file, re-downloading', module: 'SubstitutionService');
+        }
+      }
+    }
+
+    // Set loading state
+    if (!silent) {
+      _updatePdfState(isToday, previousState.copyWith(isLoading: true, error: null));
+    }
+
+    try {
+      final file = await _downloadPdf(url);
+      final metadata = await _extractMetadata(file);
+
+      // Update state with success
+      _updatePdfState(isToday, SubstitutionState(
+        isLoading: false,
+        hasData: true,
+        weekday: metadata['weekday'],
+        date: metadata['date'],
+        lastUpdated: metadata['lastUpdated'],
+        file: file,
+      ));
+
+      AppLogger.debug('Substitution plan loaded: $dayLabel (${metadata['weekday']})', module: 'SubstitutionService');
+      return true;
+    } catch (e) {
+      if (!silent) {
+        // Update state with error
+        _updatePdfState(isToday, previousState.copyWith(
+          isLoading: false,
+          error: 'Serververbindung fehlgeschlagen',
+        ));
+      } else {
+        // Restore previous state when running silently
+        _updatePdfState(isToday, previousState);
+      }
+      return false;
+    }
+  }
+
+  /// Download PDF from URL with authentication
+  Future<File> _downloadPdf(String url) async {
+    // Validate URL before making request
+    final uri = Uri.tryParse(url);
+    if (uri == null || !uri.hasScheme || !uri.hasAuthority) {
+      throw Exception('Invalid URL format: $url');
+    }
+    
+    return RetryUtil.retry<File>(
+      operation: () async {
+        final credentials = base64Encode(utf8.encode('${AppCredentials.username}:${AppCredentials.password}'));
+        
+        final response = await http.get(
+          uri!,
+          headers: {
+            'Authorization': 'Basic $credentials',
+            'User-Agent': AppInfo.userAgent,
+          },
+        ).timeout(_timeout);
+
+        if (response.statusCode != 200) {
+          throw Exception('HTTP ${response.statusCode}');
+        }
+
+        // Save to temporary directory
+        final cacheDir = await getTemporaryDirectory();
+        final filename = url.contains('heute') ? 'today.pdf' : 'tomorrow.pdf';
+        final file = File('${cacheDir.path}/$filename');
+        
+        await file.writeAsBytes(response.bodyBytes);
+        return file;
+      },
+      maxRetries: 2,
+      operationName: 'SubstitutionService',
+      shouldRetry: RetryUtil.isRetryableError,
     );
   }
 
-  /// Initialize the repository by loading both PDFs
-  Future<void> initialize() async {
-    await _substitutionService.initialize();
+  /// Extract metadata from PDF file
+  Future<Map<String, String>> _extractMetadata(File file) async {
+    return await compute(_extractPdfData, await file.readAsBytes());
   }
 
-  // All methods delegate to substitution service
+  /// Update the state of a specific PDF
+  void _updatePdfState(bool isToday, SubstitutionState newState) {
+    if (isToday) {
+      _todayState = newState;
+    } else {
+      _tomorrowState = newState;
+    }
+  }
 
   /// Retry loading a specific PDF
   Future<void> retryPdf(bool isToday) async {
-    await _substitutionService.retryPdf(isToday);
+    final url = isToday ? _todayUrl : _tomorrowUrl;
+    await _loadPdf(url, isToday);
   }
 
-  /// Set loading state for both PDFs (used by notifier to show loading immediately)
+  /// Set loading state for both PDFs
   void setLoadingState(bool isLoading) {
-    _substitutionService.setLoadingState(isLoading);
+    _todayState = _todayState.copyWith(isLoading: isLoading, error: null);
+    _tomorrowState = _tomorrowState.copyWith(isLoading: isLoading, error: null);
   }
 
-  /// Set loading state for a specific PDF (used by notifier to show loading immediately)
+  /// Set loading state for a specific PDF
   void setLoadingStateForPdf(bool isToday, bool isLoading) {
-    _substitutionService.setLoadingStateForPdf(isToday, isLoading);
+    if (isToday) {
+      _todayState = _todayState.copyWith(isLoading: isLoading, error: null);
+    } else {
+      _tomorrowState = _tomorrowState.copyWith(isLoading: isLoading, error: null);
+    }
   }
 
   /// Retry loading both PDFs
   Future<void> retryAll() async {
-    await _substitutionService.retryAll();
+    await _loadBothPdfs();
   }
 
   /// Refresh all PDFs (force reload)
   Future<void> refresh() async {
-    await _substitutionService.refresh();
+    await _loadBothPdfs();
+    _isInitialized = true;
+    _lastFetchTime = DateTime.now();
   }
 
   /// Get the file for a specific PDF if available
   File? getPdfFile(bool isToday) {
-    return _substitutionService.getPdfFile(isToday);
+    final state = isToday ? _todayState : _tomorrowState;
+    return state.file;
   }
 
   /// Check if a PDF can be opened
   bool canOpenPdf(bool isToday) {
-    return _substitutionService.canOpenPdf(isToday);
+    final state = isToday ? _todayState : _tomorrowState;
+    return state.canDisplay;
   }
 
   /// Trigger a silent background refresh when cache is stale
   Future<void> refreshInBackground() async {
-    await _substitutionService.refreshInBackground();
+    if (_isRefreshing) return;
+
+    _isRefreshing = true;
+    try {
+      await _loadBothPdfs(silent: true);
+    } finally {
+      _isRefreshing = false;
+    }
   }
 }
 
-/// Extract PDF data in background isolate
+/// Extract PDF data in background isolate (same as PDF repository)
 Map<String, String> _extractPdfData(List<int> bytes) {
   try {
     final document = PdfDocument(inputBytes: bytes);
@@ -400,9 +557,4 @@ Map<String, String> _extractPdfData(List<int> bytes) {
       'lastUpdated': '',
     };
   }
-} 
-
-/// Debug helper to reuse the same parsing in tooling/tests
-Map<String, String> debugExtractPdfDataFromBytes(List<int> bytes) {
-  return _extractPdfData(bytes);
 }

@@ -58,9 +58,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final scheduleState = ref.read(scheduleProvider);
       if (!scheduleState.hasSchedules) {
-        AppLogger.schedule('Schedule page initialized - loading schedules');
         await ref.read(scheduleProvider.notifier).loadSchedules();
-        AppLogger.debug('Schedule loading complete', module: 'SchedulePage');
       }
       
       // Check availability only if it hasn't been checked recently
@@ -148,11 +146,11 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       
       // EXCLUSIVE LOGIC: If second half-year is available, clear first half-year
       if (_availableSecondHalbjahr.isNotEmpty) {
-        AppLogger.schedule('Second half-year available: ${results.length} schedules checked');
         _availableFirstHalbjahr.clear(); // Only show second half-year
       }
 
-      AppLogger.success('Schedule availability check complete: ${results.where((r) => r['isAvailable'] as bool).length} available', module: 'SchedulePage');
+      final availableCount = results.where((r) => r['isAvailable'] as bool).length;
+      AppLogger.success('Schedule availability check complete: $availableCount available', module: 'SchedulePage');
       setState(() {});
       
       // Preload PDFs for available schedules in the background
