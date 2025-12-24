@@ -9,7 +9,7 @@ import '../../providers/color_provider.dart';
 import '../../navigation/app_router.dart';
 import '../../l10n/app_localizations.dart';
 import '../../config/app_credentials.dart';
-import '../../providers/haptic_service.dart';
+import '../../services/haptic_service.dart';
 import '../../theme/app_theme.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
