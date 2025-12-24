@@ -130,12 +130,13 @@ class SubstitutionService {
     final previousState = isToday ? _todayState : _tomorrowState;
     final dayLabel = isToday ? 'today' : 'tomorrow';
 
-    // Check if PDF is already cached
+    // Check if PDF is already cached and cache is still valid
     final cacheDir = await getTemporaryDirectory();
     final filename = isToday ? 'today.pdf' : 'tomorrow.pdf';
     final cachedFile = File('${cacheDir.path}/$filename');
     
-    if (await cachedFile.exists()) {
+    // Only use cached file if cache is valid (app wasn't backgrounded since last fetch)
+    if (await cachedFile.exists() && _isCacheValid) {
       final fileSize = await cachedFile.length();
       if (fileSize > 1000) {
         AppLogger.debug('Cache hit: Substitution plan - $dayLabel', module: 'SubstitutionService');
@@ -155,6 +156,8 @@ class SubstitutionService {
           AppLogger.debug('Failed to extract metadata from cached file, re-downloading', module: 'SubstitutionService');
         }
       }
+    } else if (await cachedFile.exists() && !_isCacheValid) {
+      AppLogger.debug('Cache invalid (app was backgrounded) - will refetch: Substitution plan - $dayLabel', module: 'SubstitutionService');
     }
 
     // Set loading state
