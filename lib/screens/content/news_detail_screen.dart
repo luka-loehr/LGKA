@@ -229,18 +229,22 @@ class NewsDetailScreen extends ConsumerWidget {
                 
                 // If we have child spans, use them (they already have the accent color from processNode)
                 if (linkSpans.isNotEmpty) {
-                  // Check if linkSpans actually has visible content
-                  bool hasVisibleContent = linkSpans.any((span) {
+                  // Helper function to check if a TextSpan has visible content
+                  bool hasVisibleText(TextSpan span) {
                     if (span.text != null && span.text!.trim().isNotEmpty) return true;
                     if (span.children != null && span.children!.isNotEmpty) {
-                      // Recursively check children
-                      return span.children!.any((child) => 
-                        (child.text != null && child.text!.trim().isNotEmpty) ||
-                        (child.children != null && child.children!.isNotEmpty)
-                      );
+                      return span.children!.any((child) {
+                        if (child is TextSpan) {
+                          return hasVisibleText(child);
+                        }
+                        return false;
+                      });
                     }
                     return false;
-                  });
+                  }
+                  
+                  // Check if linkSpans actually has visible content
+                  bool hasVisibleContent = linkSpans.any((span) => hasVisibleText(span));
                   
                   if (hasVisibleContent) {
                     // Create link span with children - don't set style on parent when using children
