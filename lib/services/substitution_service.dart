@@ -11,6 +11,7 @@ import '../utils/app_info.dart';
 import '../utils/retry_util.dart';
 import '../utils/app_logger.dart';
 import '../config/app_credentials.dart';
+import 'cache_service.dart';
 
 /// Represents the state of a single substitution PDF (today or tomorrow)
 class SubstitutionState {
@@ -68,7 +69,8 @@ class SubstitutionService {
   static const String _todayUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_heute.pdf';
   static const String _tomorrowUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_morgen.pdf';
   static const Duration _timeout = Duration(seconds: 10);
-  static const Duration _cacheValidity = Duration(minutes: 2);
+  
+  final _cacheService = CacheService();
 
   SubstitutionState _todayState = const SubstitutionState();
   SubstitutionState _tomorrowState = const SubstitutionState();
@@ -87,8 +89,7 @@ class SubstitutionService {
   bool get isCacheValid => _isCacheValid;
 
   bool get _isCacheValid {
-    if (_lastFetchTime == null) return false;
-    return DateTime.now().difference(_lastFetchTime!) < _cacheValidity;
+    return _cacheService.isCacheValid(CacheKey.substitutions, lastFetchTime: _lastFetchTime);
   }
 
   /// Initialize the service by loading both PDFs
@@ -105,6 +106,7 @@ class SubstitutionService {
     await _loadBothPdfs();
     _isInitialized = true;
     _lastFetchTime = DateTime.now();
+    _cacheService.updateCacheTimestamp(CacheKey.substitutions, _lastFetchTime);
     
     final loadedCount = (todayState.canDisplay ? 1 : 0) + (tomorrowState.canDisplay ? 1 : 0);
     AppLogger.debug('Substitution plan initialization complete: $loadedCount PDF(s) loaded', module: 'SubstitutionService');
@@ -119,6 +121,7 @@ class SubstitutionService {
 
     if (results.any((success) => success)) {
       _lastFetchTime = DateTime.now();
+      _cacheService.updateCacheTimestamp(CacheKey.substitutions, _lastFetchTime);
     }
   }
 
@@ -273,6 +276,7 @@ class SubstitutionService {
     await _loadBothPdfs();
     _isInitialized = true;
     _lastFetchTime = DateTime.now();
+    _cacheService.updateCacheTimestamp(CacheKey.substitutions, _lastFetchTime);
   }
 
   /// Get the file for a specific PDF if available
