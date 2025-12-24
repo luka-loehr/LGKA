@@ -1,6 +1,7 @@
 // Copyright Luka Löhr 2025
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/app_providers.dart';
@@ -9,6 +10,7 @@ import '../../navigation/app_router.dart';
 import '../../l10n/app_localizations.dart';
 import '../../config/app_credentials.dart';
 import '../../providers/haptic_service.dart';
+import '../../theme/app_theme.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   final VoidCallback? onLoginSuccess;
@@ -23,44 +25,36 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     with TickerProviderStateMixin {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _usernameFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
   
   bool _isLoading = false;
   bool _showErrorFlash = false;
   bool _showSuccessFlash = false;
-  String _currentAccentColor = 'blue';
-  bool _hasInitializedAnimations = false;
+  bool _showUsernameError = false;
+  bool _showPasswordError = false;
+  
+  late AnimationController _buttonColorController;
+  late Animation<Color?> _buttonColorAnimation;
+  late AnimationController _successColorController;
+  late Animation<Color?> _successColorAnimation;
+  late AnimationController _buttonController;
+  late Animation<double> _buttonScale;
+  late AnimationController _contentController;
+  late Animation<double> _contentOpacity;
+  late Animation<Offset> _contentSlide;
   
   static const Duration _buttonAnimationDuration = Duration(milliseconds: 300);
   
   // Colors
   static const Color _errorRedColor = Colors.red;
   static const Color _successGreenColor = Colors.green;
-  
-  static const Duration _buttonColorTransitionDuration = Duration(milliseconds: 300);
-  
-  late AnimationController _buttonColorController;
-  late Animation<Color?> _buttonColorAnimation;
-  late AnimationController _successColorController;
-  late Animation<Color?> _successColorAnimation;
-
-  // Get accent color from color provider
-  Color get _activeColor => ref.watch(currentColorProvider);
-  
-  // Inactive color with transparency
-  Color get _inactiveColor => _activeColor.withValues(alpha: 0.5); // 50% opacity
 
   @override
   void initState() {
     super.initState();
     
-    // Get initial accent color
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final prefsState = ref.read(preferencesManagerProvider);
-      _currentAccentColor = prefsState.accentColor;
-    });
-    
-    // Setup button color animation with accent color
+    // Setup button color animation
     _buttonColorController = AnimationController(
       duration: _buttonAnimationDuration,
       vsync: this,
@@ -72,16 +66,55 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       vsync: this,
     );
     
+    // Button press animation
+    _buttonController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _buttonScale = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _buttonController, curve: Curves.easeInOut),
+    );
+
+    // Content animation
+    _contentController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _contentOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _contentController,
+        curve: const Interval(0.2, 1.0, curve: Curves.easeOut),
+      ),
+    );
+
+    _contentSlide = Tween<Offset>(
+      begin: const Offset(0.0, 0.1),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _contentController,
+        curve: const Interval(0.0, 0.8, curve: Curves.easeOut),
+      ),
+    );
+
+    // Start content animation
+    _contentController.forward();
+    
     // Listen for text changes to update button state
     _usernameController.addListener(_handleTextChange);
     _passwordController.addListener(_handleTextChange);
   }
 
-
-  // Update animations when accent color changes
-  void _updateAnimations() {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Setup color animations after dependencies are available
+    final activeColor = ref.read(currentColorProvider);
+    
     _buttonColorAnimation = ColorTween(
-      begin: _activeColor,
+      begin: activeColor,
       end: _errorRedColor,
     ).animate(CurvedAnimation(
       parent: _buttonColorController,
@@ -89,55 +122,37 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     ));
 
     _successColorAnimation = ColorTween(
-      begin: _activeColor,
+      begin: activeColor,
       end: _successGreenColor,
     ).animate(CurvedAnimation(
       parent: _successColorController,
       curve: Curves.easeInOut,
     ));
   }
-  
-  void _handleTextChange() {
-    // Force rebuild to update button state
-    setState(() {});
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    
-    // Setup color animations only once after dependencies are available
-    if (!_hasInitializedAnimations) {
-      final activeColor = ref.read(currentColorProvider);
-      
-      _buttonColorAnimation = ColorTween(
-        begin: activeColor, // Current accent color
-        end: _errorRedColor,
-      ).animate(CurvedAnimation(
-        parent: _buttonColorController,
-        curve: Curves.easeInOut,
-      ));
-
-      _successColorAnimation = ColorTween(
-        begin: activeColor, // Current accent color
-        end: _successGreenColor,
-      ).animate(CurvedAnimation(
-        parent: _successColorController,
-        curve: Curves.easeInOut,
-      ));
-      
-      _hasInitializedAnimations = true;
-    }
-  }
 
   @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
+    _usernameFocusNode.dispose();
     _passwordFocusNode.dispose();
     _buttonColorController.dispose();
     _successColorController.dispose();
+    _buttonController.dispose();
+    _contentController.dispose();
     super.dispose();
+  }
+
+  void _handleTextChange() {
+    // Clear error states when user types
+    if (_showUsernameError || _showPasswordError) {
+      setState(() {
+        _showUsernameError = false;
+        _showPasswordError = false;
+      });
+    }
+    // Force rebuild to update button state
+    setState(() {});
   }
 
   void _validateLogin() async {
@@ -152,11 +167,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       setState(() {
         _showSuccessFlash = true;
         _showErrorFlash = false;
+        _showUsernameError = false;
+        _showPasswordError = false;
       });
       
       // Start success animation with smooth fade
       _successColorController.forward();
-      
       
       if (!mounted) return;
       
@@ -195,7 +211,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       await notifier.setOnboardingCompleted(true);
       await notifier.setFirstLaunch(false);
       
-      
       // Small delay to let the haptic feedback register
       await Future.delayed(const Duration(milliseconds: 50));
       
@@ -214,16 +229,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       // Show error immediately
       setState(() {
         _showErrorFlash = true;
+        _showUsernameError = username != AppCredentials.username;
+        _showPasswordError = password != AppCredentials.password;
       });
       
       // Start error animation immediately on press
       _buttonColorController.forward(from: 0);
       
-      
       // Hold the red color briefly
       Future.delayed(const Duration(milliseconds: 600), () {
         if (mounted) {
-          // Smoothly animate back to blue
+          // Smoothly animate back to accent color
           _buttonColorController.reverse().then((_) {
             if (mounted) {
               setState(() {
@@ -252,265 +268,326 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       return _buttonColorAnimation.value ?? _errorRedColor;
     }
     
+    final activeColor = ref.read(currentColorProvider);
+    
     if (_canLogin) {
-      return _activeColor; // Active blue when fields have content
+      return activeColor; // Active accent color when fields have content
     }
     
-    return _inactiveColor; // Grayed-out blue when fields are empty
+    return activeColor.withValues(alpha: 0.5); // 50% opacity when fields are empty
+  }
+
+  Future<void> _selectColor(String colorName) async {
+    setState(() {
+      // Trigger rebuild to update colors
+    });
+
+    // Haptic feedback for color selection
+    HapticService.light();
+
+    // Save color preference using color provider
+    await ref.read(colorProvider.notifier).setColor(colorName);
+    
+    // Update animations with new color
+    final newColor = ref.read(currentColorProvider);
+    _buttonColorAnimation = ColorTween(
+      begin: newColor,
+      end: _errorRedColor,
+    ).animate(CurvedAnimation(
+      parent: _buttonColorController,
+      curve: Curves.easeInOut,
+    ));
+
+    _successColorAnimation = ColorTween(
+      begin: newColor,
+      end: _successGreenColor,
+    ).animate(CurvedAnimation(
+      parent: _successColorController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
-    // Listen for accent color changes
-    ref.listen(preferencesManagerProvider, (previous, next) {
-      if (previous?.accentColor != next.accentColor) {
-        _currentAccentColor = next.accentColor;
-        _updateAnimations();
-        setState(() {}); // Trigger rebuild to update colors
-      }
-    });
-    
-    // Get screen metrics for responsive design
-    final mediaQuery = MediaQuery.of(context);
-    final screenSize = mediaQuery.size;
-    final keyboardHeight = mediaQuery.viewInsets.bottom;
-    // Force text scale factor to 1.0 for consistent UI across all devices
-    const textScaleFactor = 1.0;
-    
-    // Calculate responsive sizes
-    final bool isSmallScreen = screenSize.height < 700;
-    final double topSpacing = isSmallScreen ? 60 : 100;
-    final double formWidth = screenSize.width * 0.85;
-    final double maxFormWidth = 400; // Max width for larger screens
-    
-    // Calculate minimum spacing above keyboard (20% of screen height)
-    final double minSpacingAboveKeyboard = screenSize.height * 0.2;
-    // Calculate bottom spacing - when keyboard is visible, ensure button stays at least 20% above it
-    final double bottomSpacing = keyboardHeight > 0 
-        ? minSpacingAboveKeyboard 
-        : (isSmallScreen ? 40.0 : 60.0);
+    final choosableColors = ref.watch(choosableColorsProvider);
+    final currentColorName = ref.watch(colorProvider);
+    final activeColor = ref.watch(currentColorProvider);
     
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.appBackground,
       resizeToAvoidBottomInset: true,
-      body: GestureDetector(
-        onTap: () {
-          // Clear focus when tapping outside fields
-          FocusScope.of(context).unfocus();
-        },
-        behavior: HitTestBehavior.translucent,
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: topSpacing),
-                  // Title
-                  Text(
-                    AppLocalizations.of(context)!.authTitle,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28 / textScaleFactor, // Adjust for text scale factor
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  
-                  const SizedBox(height: 12),
-                  
-                  // Subtitle
-                  Text(
-                    AppLocalizations.of(context)!.authSubtitle,
-                    style: TextStyle(
-                      color: const Color(0xB3FFFFFF), // 70% white
-                      fontSize: 14 / textScaleFactor, // Adjust for text scale factor
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  
-                  SizedBox(height: isSmallScreen ? 40 : 60),
-                  
-                  // Card with form fields
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: maxFormWidth,
-                    ),
-                    child: Container(
-                      width: formWidth,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E),
-                        borderRadius: BorderRadius.circular(16),
+      body: SafeArea(
+        child: AnimatedBuilder(
+          animation: Listenable.merge([
+            _contentController,
+            _buttonController,
+            _buttonColorAnimation,
+            _successColorAnimation,
+          ]),
+          builder: (context, child) {
+            return FadeTransition(
+              opacity: _contentOpacity,
+              child: SlideTransition(
+                position: _contentSlide,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      const Spacer(),
+                      
+                      // Header
+                      Text(
+                        AppLocalizations.of(context)!.authTitle,
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      child: Column(
+
+                      const SizedBox(height: 16),
+
+                      // Description
+                      Text(
+                        AppLocalizations.of(context)!.authSubtitle,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.secondaryText,
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      // Accent Color Selection
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                              // Username Field with rounded corners
-                              ClipRRect(
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(16), 
-                                  topRight: Radius.circular(16),
+                          Text(
+                            AppLocalizations.of(context)!.accentColor,
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: AppColors.primaryText,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                child: TextField(
-                                  controller: _usernameController,
-                                  autofocus: true,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                  decoration: InputDecoration(
-                                    hintText: AppLocalizations.of(context)!.username,
-                                    hintStyle: const TextStyle(
-                                      color: Color(0x80FFFFFF),
-                                      fontSize: 16,
-                                    ),
-                                    prefixIcon: const Icon(
-                                      Icons.person_outline,
-                                      color: Color(0xFF8E8E93),
-                                      size: 22,
-                                    ),
-                                    border: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 18,
-                                    ),
-                                    filled: true,
-                                    fillColor: const Color(0xFF1E1E1E),
-                                  ),
-                                  textInputAction: TextInputAction.next,
-                                  onSubmitted: (_) => _passwordFocusNode.requestFocus(),
-                                  onChanged: (_) => setState(() {}),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            AppLocalizations.of(context)!.chooseAccentColor,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.secondaryText,
                                 ),
-                              ),
-                              
-                              // Divider
-                              Container(
-                                height: 1,
-                                margin: const EdgeInsets.symmetric(horizontal: 16),
-                                color: Colors.white.withValues(alpha: 0.1),
-                              ),
-                              
-                              // Password Field with rounded corners
-                              ClipRRect(
-                                borderRadius: const BorderRadius.only(
-                                  bottomLeft: Radius.circular(16), 
-                                  bottomRight: Radius.circular(16),
-                                ),
-                                child: TextField(
-                                  controller: _passwordController,
-                                  focusNode: _passwordFocusNode,
-                                  obscureText: true,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 8,
+                            alignment: WrapAlignment.center,
+                            children: choosableColors.map((colorPalette) {
+                              final isSelected = currentColorName == colorPalette.name;
+                              return GestureDetector(
+                                onTap: () => _selectColor(colorPalette.name),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.easeInOut,
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: colorPalette.color,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected ? Colors.white : Colors.transparent,
+                                      width: isSelected ? 3 : 0,
+                                    ),
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                              color: colorPalette.color.withValues(alpha: 0.5),
+                                              blurRadius: 8,
+                                              spreadRadius: 2,
+                                            ),
+                                          ]
+                                        : null,
                                   ),
-                                  decoration: InputDecoration(
-                                    hintText: AppLocalizations.of(context)!.password,
-                                    hintStyle: const TextStyle(
-                                      color: Color(0x80FFFFFF),
-                                      fontSize: 16,
-                                    ),
-                                    prefixIcon: const Icon(
-                                      Icons.lock_outline,
-                                      color: Color(0xFF8E8E93),
-                                      size: 22,
-                                    ),
-                                    border: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 18,
-                                    ),
-                                    filled: true,
-                                    fillColor: const Color(0xFF1E1E1E),
+                                  child: AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.easeInOut,
+                                    opacity: isSelected ? 1.0 : 0.0,
+                                    child: isSelected
+                                        ? Icon(
+                                            Icons.check,
+                                            color: Colors.white,
+                                            size: 24,
+                                          )
+                                        : null,
                                   ),
-                                  textInputAction: TextInputAction.done,
-                                  onSubmitted: (_) {
-                                    if (_canLogin) _validateLogin();
-                                  },
-                                  onChanged: (_) => setState(() {}),
                                 ),
-                              ),
+                              );
+                            }).toList(),
+                          ),
                         ],
                       ),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 32),
-                  
-                  // Login Button with animated color
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: maxFormWidth,
-                    ),
-                    child: AnimatedBuilder(
-                      animation: Listenable.merge([_buttonColorAnimation, _successColorAnimation]),
-                      builder: (context, child) {
-                        return SizedBox(
-                          width: formWidth,
-                          height: 46,
-                          child: Stack(
-                            children: [
-                              // Animated background button
-                              Positioned.fill(
-                                child: AnimatedContainer(
-                                  duration: _buttonColorTransitionDuration,
-                                  curve: Curves.easeInOut,
-                                  decoration: BoxDecoration(
-                                    color: _currentButtonColor,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
+
+                      const SizedBox(height: 32),
+
+                      // Username Field
+                      TextField(
+                        controller: _usernameController,
+                        focusNode: _usernameFocusNode,
+                        autofocus: true,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: AppColors.primaryText,
+                            ),
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)!.username,
+                          prefixIcon: const Icon(
+                            Icons.person_outline,
+                            color: AppColors.secondaryText,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: _showUsernameError
+                                  ? Colors.red
+                                  : activeColor.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: _showUsernameError
+                                  ? Colors.red
+                                  : activeColor,
+                              width: 2,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: AppColors.appSurface,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        ),
+                        textInputAction: TextInputAction.next,
+                        onSubmitted: (_) => _passwordFocusNode.requestFocus(),
+                        onChanged: (_) => _handleTextChange(),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Password Field
+                      TextField(
+                        controller: _passwordController,
+                        focusNode: _passwordFocusNode,
+                        obscureText: true,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: AppColors.primaryText,
+                            ),
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)!.password,
+                          prefixIcon: const Icon(
+                            Icons.lock_outline,
+                            color: AppColors.secondaryText,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: _showPasswordError
+                                  ? Colors.red
+                                  : activeColor.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: _showPasswordError
+                                  ? Colors.red
+                                  : activeColor,
+                              width: 2,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: AppColors.appSurface,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        ),
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) {
+                          if (_canLogin) {
+                            _buttonController.forward().then((_) {
+                              _buttonController.reverse();
+                              _validateLogin();
+                            });
+                          }
+                        },
+                        onChanged: (_) => _handleTextChange(),
+                      ),
+
+                      const Spacer(),
+
+                      // Login Button
+                      ScaleTransition(
+                        scale: _buttonScale,
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeInOut,
+                            decoration: BoxDecoration(
+                              color: _currentButtonColor,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: _isLoading || _showErrorFlash || _showSuccessFlash ? null : [
+                                BoxShadow(
+                                  color: _currentButtonColor.withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  spreadRadius: 2,
+                                  offset: const Offset(0, 2),
                                 ),
-                              ),
-                              
-                              // Clickable transparent button with always-white text
-                              SizedBox(
-                                width: double.infinity,
-                                height: double.infinity,
-                                child: InkWell(
-                                  onTap: _canLogin && !_showErrorFlash && !_showSuccessFlash ? _validateLogin : null,
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: _canLogin && !_showErrorFlash && !_showSuccessFlash
+                                  ? () {
+                                      _buttonController.forward().then((_) {
+                                        _buttonController.reverse();
+                                        _validateLogin();
+                                      });
+                                    }
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  splashColor: Colors.transparent,
-                                  highlightColor: Colors.transparent,
-                                  child: Center(
-                                    child: _isLoading
-                                      ? const SizedBox(
-                                          width: 22,
-                                          height: 22,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.5,
-                                            strokeCap: StrokeCap.round,
-                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                          ),
-                                        )
-                                      : Text(
-                                          AppLocalizations.of(context)!.login,
-                                          style: TextStyle(
+                                ),
+                                elevation: 0,
+                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      ),
+                                    )
+                                  : Text(
+                                      AppLocalizations.of(context)!.login,
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                             fontWeight: FontWeight.w600,
                                             color: Colors.white,
-                                            fontSize: 15 / textScaleFactor,
                                           ),
-                                        ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                                    ),
+                            ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: bottomSpacing),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
   }
-} 
+}
