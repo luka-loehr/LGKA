@@ -88,6 +88,11 @@ class CacheService {
     return _lastFetchTimes[key];
   }
 
+  /// Get the timestamp when app was last backgrounded (null if never backgrounded)
+  DateTime? getLastBackgroundTime() {
+    return _lastBackgroundTime;
+  }
+
   /// Clear cache timestamp for a specific key
   void clearCache(CacheKey key) {
     _lastFetchTimes[key] = null;
