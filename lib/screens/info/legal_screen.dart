@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
 import '../../services/haptic_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class LegalScreen extends ConsumerWidget {
   const LegalScreen({super.key});
@@ -15,7 +16,7 @@ class LegalScreen extends ConsumerWidget {
       backgroundColor: AppColors.appBackground,
       appBar: AppBar(
         title: Text(
-          'Rechtliches',
+          AppLocalizations.of(context)!.legalLabel,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.primaryText,
@@ -51,14 +52,14 @@ class LegalScreen extends ConsumerWidget {
                   _buildLinkRow(
                     context,
                     Icons.shield_outlined, 
-                    'Datenschutzerklärung', 
+                    AppLocalizations.of(context)!.privacyLabel, 
                     'https://luka-loehr.github.io/LGKA/privacy.html'
                   ),
                   const SizedBox(height: 16),
                   _buildLinkRow(
                     context,
                     Icons.info_outline, 
-                    'Impressum', 
+                    AppLocalizations.of(context)!.legalLabel, 
                     'https://luka-loehr.github.io/LGKA/impressum.html'
                   ),
                 ],

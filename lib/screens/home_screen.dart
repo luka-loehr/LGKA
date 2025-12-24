@@ -182,7 +182,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _pageController.jumpToPage(index);
       setState(() => _currentPage = index);
 
-      final tabNames = ['Substitution Plan', 'Weather', 'Schedule'];
+      final l10n = AppLocalizations.of(context)!;
+      final tabNames = [l10n.substitutionPlan, l10n.weather, l10n.schedule];
       AppLogger.navigation('Switched to ${tabNames[index]} tab');
     }
   }
@@ -492,17 +493,17 @@ class _StundenplanPageState extends ConsumerState<_StundenplanPage>
     return Column(
       children: [
         _ScheduleOptionButton(
-          label: 'Klassenstufe 5-7',
+          label: AppLocalizations.of(context)!.classes5to7,
           onTap: () => _openSchedule('klassenstufe_5_7'),
         ),
         const SizedBox(height: 16),
         _ScheduleOptionButton(
-          label: 'Klassenstufe 8-10',
+          label: AppLocalizations.of(context)!.classes8to10,
           onTap: () => _openSchedule('klassenstufe_8_10'),
         ),
         const SizedBox(height: 16),
         _ScheduleOptionButton(
-          label: 'Oberstufe',
+          label: AppLocalizations.of(context)!.upperSchool,
           onTap: () => _openSchedule('oberstufe'),
         ),
       ],
