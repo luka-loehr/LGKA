@@ -157,7 +157,11 @@ class SubstitutionService {
         }
       }
     } else if (await cachedFile.exists() && !_isCacheValid) {
-      AppLogger.debug('Cache invalid (app was backgrounded) - will refetch: Substitution plan - $dayLabel', module: 'SubstitutionService');
+      // Check if cache is invalid due to backgrounding or time expiration
+      final cacheService = CacheService();
+      final wasBackgrounded = cacheService.getLastBackgroundTime() != null;
+      final reason = wasBackgrounded ? 'app was backgrounded' : 'cache expired (time-based)';
+      AppLogger.debug('Cache invalid ($reason) - will refetch: Substitution plan - $dayLabel', module: 'SubstitutionService');
     }
 
     // Set loading state
