@@ -84,9 +84,35 @@ class NewsEvent {
 /// Service for fetching news from the Lessing Gymnasium website
 class NewsService {
   static const String newsUrl = 'https://lessing-gymnasium-karlsruhe.de/cm3/index.php/neues';
+  static const Duration _cacheValidity = Duration(minutes: 5);
+
+  List<NewsEvent>? _cachedEvents;
+  DateTime? _lastFetchTime;
+
+  /// Get cached events if available and valid
+  List<NewsEvent>? get cachedEvents => _cachedEvents;
+  DateTime? get lastFetchTime => _lastFetchTime;
+  
+  bool get hasValidCache {
+    if (_cachedEvents == null || _lastFetchTime == null) {
+      return false;
+    }
+    return DateTime.now().difference(_lastFetchTime!) < _cacheValidity;
+  }
 
   /// Extracts all news events from the Lessing Gymnasium news page
-  Future<List<NewsEvent>> fetchNewsEvents() async {
+  Future<List<NewsEvent>> fetchNewsEvents({bool forceRefresh = false}) async {
+    // Return cached events if valid and not forcing refresh
+    if (!forceRefresh && hasValidCache && _cachedEvents != null) {
+      AppLogger.debug('Returning cached news events', module: 'NewsService');
+      return _cachedEvents!;
+    }
+    
+    // If cache exists but is stale, refresh in background and return stale cache
+    if (!forceRefresh && _cachedEvents != null) {
+      unawaited(_refreshCacheInBackground());
+      return _cachedEvents!;
+    }
     AppLogger.network('Fetching news events');
     
     return RetryUtil.retry<List<NewsEvent>>(
@@ -252,6 +278,11 @@ class NewsService {
         });
 
         AppLogger.success('Fetched ${events.length} news events with full content', module: 'NewsService');
+        
+        // Cache the results
+        _cachedEvents = events;
+        _lastFetchTime = DateTime.now();
+        
         return events;
       },
       maxRetries: 2,
@@ -259,8 +290,31 @@ class NewsService {
       shouldRetry: RetryUtil.isRetryableError,
     ).catchError((e) {
       AppLogger.error('Failed to fetch news events', module: 'NewsService', error: e);
+      // Return cached events if available, even if stale
+      if (_cachedEvents != null) {
+        AppLogger.debug('Returning stale cached news events due to error', module: 'NewsService');
+        return _cachedEvents!;
+      }
       throw e;
     });
+  }
+
+  /// Refresh cache in background
+  Future<void> _refreshCacheInBackground() async {
+    try {
+      final events = await fetchNewsEvents(forceRefresh: true);
+      _cachedEvents = events;
+      _lastFetchTime = DateTime.now();
+    } catch (e) {
+      // Ignore background refresh errors
+      AppLogger.debug('Background news refresh failed', module: 'NewsService');
+    }
+  }
+
+  /// Clear the cache
+  void clearCache() {
+    _cachedEvents = null;
+    _lastFetchTime = null;
   }
 
   /// Fetches the full content, links, and images from an individual news article page

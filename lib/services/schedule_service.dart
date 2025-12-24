@@ -207,6 +207,25 @@ class ScheduleService {
   /// Download a specific schedule PDF
   Future<File?> downloadSchedule(ScheduleItem schedule) async {
     try {
+      // Check if PDF is already cached
+      final cacheDir = await getTemporaryDirectory();
+      final sanitizedGradeLevel = schedule.gradeLevel.replaceAll('/', '_');
+      final sanitizedHalbjahr = schedule.halbjahr.replaceAll('.', '_');
+      final filename = '${sanitizedGradeLevel}_$sanitizedHalbjahr.pdf';
+      final cachedFile = File('${cacheDir.path}/$filename');
+      
+      if (await cachedFile.exists()) {
+        // Validate cached file size (must be > 1000 bytes)
+        final fileSize = await cachedFile.length();
+        if (fileSize > 1000) {
+          AppLogger.debug('Using cached schedule PDF: ${schedule.title}', module: 'ScheduleService');
+          return cachedFile;
+        } else {
+          // Invalid cached file, delete it
+          await cachedFile.delete();
+        }
+      }
+      
       AppLogger.schedule('Starting download: ${schedule.title} (${schedule.halbjahr}, ${schedule.gradeLevel})');
       
       // Validate URL before making request
@@ -238,11 +257,7 @@ class ScheduleService {
             throw Exception('Failed to download PDF: HTTP ${response.statusCode}');
           }
 
-          final cacheDir = await getTemporaryDirectory();
-          final sanitizedGradeLevel = schedule.gradeLevel.replaceAll('/', '_');
-          final sanitizedHalbjahr = schedule.halbjahr.replaceAll('.', '_');
-          final filename = '${sanitizedGradeLevel}_$sanitizedHalbjahr.pdf';
-          final file = File('${cacheDir.path}/$filename');
+          final file = cachedFile; // Use the cachedFile we already determined above
 
           AppLogger.debug('Saving PDF: ${response.bodyBytes.length} bytes', module: 'ScheduleService');
           await file.writeAsBytes(response.bodyBytes);
