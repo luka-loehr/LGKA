@@ -44,12 +44,20 @@ Initiate when user says: "prepare release", "release", "create release", "new re
    - UI/UX improvements
    - **IMPORTANT**: Cross-reference with previous release notes to ensure no duplication
 
+5. **CRITICAL**: When organizing changes into categories, ensure:
+   - Each item appears only once (no duplicates within the same category)
+   - Related items are grouped logically (e.g., all haptic feedback in one section, all error handling improvements together)
+   - Avoid repeating the same feature across multiple categories (e.g., if haptic feedback is mentioned in "Haptic Feedback System", don't repeat it in other feature sections)
+   - Consolidate similar improvements (e.g., if multiple services got retry logic, mention it once in "Under the Hood" rather than repeating in each service section)
+
 ### Task 3: Create GitHub Release
 
 1. Create release notes following the template at `agents/templates/release_notes_template.md`
    - **CRITICAL**: When creating release notes files (e.g., `RELEASE_NOTES_v2.4.0.md`), DO NOT include the template header "# GitHub Release Notes Template" or any other template metadata. The release notes file should start directly with the actual content (e.g., iOS/Android links, Highlights section, etc.). Template headers are for reference only and must be removed before using the file.
    - **CRITICAL**: Before finalizing release notes, compare with the previous release notes to ensure you're not repeating features/changes that were already mentioned. Only include what's NEW in this release.
    - Review each section and remove any items that were already covered in the previous release
+   - **CRITICAL**: Ensure no duplicate items within categories - each feature/change should appear only once
+   - Consolidate related improvements to avoid repetition (e.g., if retry logic was added to multiple services, mention it once in "Under the Hood" rather than repeating in each service section)
 2. Create GitHub release via CLI:
    - Title format: `LGKA+ vx.x.x`
    - Attach release notes
