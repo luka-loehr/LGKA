@@ -9,6 +9,7 @@ import '../services/weather_service.dart';
 import '../services/schedule_service.dart';
 import '../services/news_service.dart';
 import '../services/substitution_service.dart';
+import '../services/cache_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_logger.dart';
 import '../services/haptic_service.dart';
@@ -294,7 +295,7 @@ final weatherDataProvider = NotifierProvider<WeatherDataNotifier, WeatherDataSta
 });
 
 class WeatherDataNotifier extends Notifier<WeatherDataState> {
-  static const Duration _cacheValidity = Duration(minutes: 5);
+  final _cacheService = CacheService();
 
   WeatherService get _weatherService => ref.read(weatherServiceProvider);
 
@@ -304,8 +305,7 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
   /// Preload weather data from network
   Future<void> preloadWeatherData() async {
     if (state.chartData.isNotEmpty && state.lastUpdateTime != null) {
-      final isFresh = DateTime.now().difference(state.lastUpdateTime!) < _cacheValidity;
-      if (isFresh) {
+      if (_cacheService.isCacheValid(CacheKey.weather, lastFetchTime: state.lastUpdateTime)) {
         return;
       }
 
@@ -328,14 +328,16 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
       // Downsample for chart performance - shows full day from 0:00 to 23:59
       final downsampledData = _weatherService.downsampleForChart(fullData);
 
+      final updateTime = DateTime.now();
       state = state.copyWith(
         chartData: downsampledData,
         latestData: latestData ?? (fullData.isNotEmpty ? fullData.last : null),
         isLoading: false,
         isPreloaded: true,
-        lastUpdateTime: DateTime.now(),
+        lastUpdateTime: updateTime,
         fullDataCount: fullData.length,
       );
+      _cacheService.updateCacheTimestamp(CacheKey.weather, updateTime);
     } catch (e) {
       // Handle errors gracefully - don't freeze the app
       AppLogger.error('Failed to preload weather data', module: 'WeatherProvider', error: e);
@@ -368,14 +370,16 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
       final latestData = results[1] as WeatherData?;
       final downsampledData = _weatherService.downsampleForChart(fullData);
 
+      final updateTime = DateTime.now();
       state = state.copyWith(
         chartData: downsampledData,
         latestData: latestData ?? (fullData.isNotEmpty ? fullData.last : null),
         isLoading: false,
         isPreloaded: true,
-        lastUpdateTime: DateTime.now(),
+        lastUpdateTime: updateTime,
         fullDataCount: fullData.length,
       );
+      _cacheService.updateCacheTimestamp(CacheKey.weather, updateTime);
     } catch (e) {
       // Handle errors gracefully - don't freeze the app
       AppLogger.error('Failed to refresh weather data', module: 'WeatherProvider', error: e);
@@ -407,12 +411,14 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
 
       if (fullData.isNotEmpty) {
         final downsampledData = _weatherService.downsampleForChart(fullData);
+        final updateTime = DateTime.now();
         state = state.copyWith(
           chartData: downsampledData,
           latestData: latestData ?? fullData.last,
-          lastUpdateTime: DateTime.now(),
+          lastUpdateTime: updateTime,
           fullDataCount: fullData.length,
         );
+        _cacheService.updateCacheTimestamp(CacheKey.weather, updateTime);
       }
     } catch (e) {
       // Silent failure for background updates
