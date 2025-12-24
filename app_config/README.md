@@ -20,7 +20,7 @@ package_name: "com.lgka"
 # To update version, edit pubspec.yaml directly
 
 # App Icon Configuration
-app_icon_path: "assets/images/app-icons/app-logo.png"
+app_icon_path: "assets/images/app-icons/app-icon.webp"
 ```
 
 ### 2. Apply Configuration
@@ -75,7 +75,7 @@ That's it! The script will automatically update all platform-specific files and 
 3. The script will automatically generate all required icon sizes
 
 **Icon Requirements:**
-- Format: PNG
+- Format: WebP (preferred) or PNG
 - Recommended size: 1024x1024px or larger
 - Square aspect ratio
 - No transparency (will be removed on iOS)

@@ -12,7 +12,7 @@ package_name: "com.lgka"
 # To update version, edit the 'version:' field in pubspec.yaml
 
 # App Icon Configuration
-app_icon_path: "assets/images/app-icons/app-logo.png"
+app_icon_path: "assets/images/app-icons/app-icon.webp"
 
 # Android Specific
 android:
