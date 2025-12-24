@@ -10,6 +10,7 @@ import '../utils/app_logger.dart';
 import '../utils/app_info.dart';
 import '../config/app_credentials.dart';
 import '../utils/retry_util.dart';
+import 'cache_service.dart';
 
 /// Represents a schedule PDF with metadata
 class ScheduleItem {
@@ -41,14 +42,14 @@ class ScheduleService {
   static const Duration _timeout = Duration(seconds: 10);
   static const Duration _availabilityCheckTimeout = Duration(seconds: 10);
 
+  final _cacheService = CacheService();
+  
   List<ScheduleItem>? _cachedSchedules;
   DateTime? _lastFetchTime;
-  static const Duration _cacheValidity = Duration(minutes: 5);
 
   // Cache for availability checks
   final Map<String, bool> _availabilityCache = {};
   DateTime? _lastAvailabilityCheck;
-  static const Duration _availabilityCacheValidity = Duration(minutes: 15);
   bool _isRefreshing = false;
 
   List<ScheduleItem>? get cachedSchedules => _cachedSchedules;
@@ -57,7 +58,7 @@ class ScheduleService {
     if (_cachedSchedules == null || _lastFetchTime == null) {
       return false;
     }
-    return DateTime.now().difference(_lastFetchTime!) < _cacheValidity;
+    return _cacheService.isCacheValid(CacheKey.schedules, lastFetchTime: _lastFetchTime);
   }
 
   /// Get all available schedules, using cache if valid
@@ -75,6 +76,7 @@ class ScheduleService {
       final schedules = await _scrapeSchedules();
       _cachedSchedules = schedules;
       _lastFetchTime = DateTime.now();
+      _cacheService.updateCacheTimestamp(CacheKey.schedules, _lastFetchTime);
       return schedules;
     } catch (e) {
       if (_cachedSchedules != null) {
@@ -91,6 +93,7 @@ class ScheduleService {
     _scrapeSchedules().then((schedules) {
       _cachedSchedules = schedules;
       _lastFetchTime = DateTime.now();
+      _cacheService.updateCacheTimestamp(CacheKey.schedules, _lastFetchTime);
     }).catchError((_) {
       // Ignore background refresh errors
     }).whenComplete(() {
@@ -106,6 +109,7 @@ class ScheduleService {
       final schedules = await _scrapeSchedules();
       _cachedSchedules = schedules;
       _lastFetchTime = DateTime.now();
+      _cacheService.updateCacheTimestamp(CacheKey.schedules, _lastFetchTime);
     } catch (_) {
       // Ignore background refresh errors
     } finally {
@@ -151,8 +155,7 @@ class ScheduleService {
 
     // Check if cache is still valid
     if (_availabilityCache.containsKey(cacheKey) && _lastAvailabilityCheck != null) {
-      final timeSinceLastCheck = DateTime.now().difference(_lastAvailabilityCheck!);
-      if (timeSinceLastCheck < _availabilityCacheValidity) {
+      if (_cacheService.isCacheValid(CacheKey.scheduleAvailability, lastFetchTime: _lastAvailabilityCheck)) {
         AppLogger.debug('Cache hit: ${schedule.title}', module: 'ScheduleService');
         return _availabilityCache[cacheKey]!;
       }
@@ -167,6 +170,7 @@ class ScheduleService {
         AppLogger.warning('Invalid URL format: ${schedule.fullUrl}', module: 'ScheduleService');
         _availabilityCache[cacheKey] = false;
         _lastAvailabilityCheck = DateTime.now();
+        _cacheService.updateCacheTimestamp(CacheKey.scheduleAvailability, _lastAvailabilityCheck);
         return false;
       }
       
@@ -192,6 +196,7 @@ class ScheduleService {
       // Cache the result
       _availabilityCache[cacheKey] = isAvailable;
       _lastAvailabilityCheck = DateTime.now();
+      _cacheService.updateCacheTimestamp(CacheKey.scheduleAvailability, _lastAvailabilityCheck);
 
       AppLogger.debug('Availability check result: ${schedule.title} = ${isAvailable ? 'available' : 'not available'}', module: 'ScheduleService');
       return isAvailable;
@@ -199,6 +204,7 @@ class ScheduleService {
       // If there's any error (timeout, network issue, etc.), assume not available
       _availabilityCache[cacheKey] = false;
       _lastAvailabilityCheck = DateTime.now();
+      _cacheService.updateCacheTimestamp(CacheKey.scheduleAvailability, _lastAvailabilityCheck);
       AppLogger.debug('Availability check failed: ${schedule.title}', module: 'ScheduleService');
       return false;
     }

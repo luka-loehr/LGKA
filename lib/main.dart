@@ -13,6 +13,7 @@ import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:lgka_flutter/providers/schedule_provider.dart';
 import 'package:lgka_flutter/providers/news_provider.dart';
 import 'package:lgka_flutter/providers/substitution_provider.dart';
+import 'package:lgka_flutter/services/cache_service.dart';
 import 'package:lgka_flutter/widgets/fireworks_overlay.dart';
 import 'data/preferences_manager.dart';
 import 'package:lgka_flutter/l10n/app_localizations.dart';
@@ -125,7 +126,9 @@ class LGKAApp extends ConsumerStatefulWidget {
 
 class _LGKAAppState extends ConsumerState<LGKAApp> {
   late final _router = AppRouter.createRouter(initialLocation: widget.initialRoute);
-  static const Duration _cacheValidity = Duration(minutes: 5);
+  final _cacheService = CacheService();
+  // Use the shortest cache validity (substitutions: 2 minutes) for refresh timer
+  static const Duration _cacheRefreshInterval = Duration(minutes: 2);
   Timer? _cacheRefreshTimer;
 
   @override
@@ -203,7 +206,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
 
   void _startCacheRefreshTimer() {
     _cacheRefreshTimer?.cancel();
-    _cacheRefreshTimer = Timer.periodic(_cacheValidity, (_) {
+    _cacheRefreshTimer = Timer.periodic(_cacheRefreshInterval, (_) {
       unawaited(_refreshExpiredCaches());
     });
   }
@@ -222,7 +225,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
     final weatherState = ref.read(weatherDataProvider);
     final weatherLastUpdate = weatherState.lastUpdateTime;
     if (weatherLastUpdate == null ||
-        DateTime.now().difference(weatherLastUpdate) >= _cacheValidity) {
+        _cacheService.isCacheExpired(CacheKey.weather, lastFetchTime: weatherLastUpdate)) {
       unawaited(ref.read(weatherDataProvider.notifier).updateDataInBackground());
     }
 
