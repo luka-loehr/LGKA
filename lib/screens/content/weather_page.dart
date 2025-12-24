@@ -13,6 +13,7 @@ import '../../utils/app_logger.dart';
 
 import '../../widgets/app_footer.dart';
 import 'package:intl/intl.dart';
+import '../../services/loading_spinner_tracker_service.dart';
 
 
 // Helper function for robust navigation bar detection across all Android devices
@@ -56,15 +57,18 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
 
   late AnimationController _errorAnimationController;
   late Animation<double> _errorAnimation;
-  
+
   // Fade-in animation for weather components
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   bool _hasShownComponents = false;
-  
+
   // Chart animation completion detection
 
   Timer? _animationTimer;
+
+  // Loading spinner tracker for haptic feedback
+  final _spinnerTracker = LoadingSpinnerTracker();
   
   @override
   bool get wantKeepAlive => true;
@@ -233,6 +237,23 @@ class _WeatherPageState extends ConsumerState<WeatherPage> with AutomaticKeepAli
     final shouldShowRepairError = _isWeatherStationRepair();
     // Keep showing the error placeholder while retrying until data loads
     final shouldShowAnyError = _forceShowErrorUntilSuccess || shouldShowWeatherError || shouldShowStaleDataError || shouldShowRepairError;
+
+    // Track spinner visibility and trigger haptic feedback when spinner disappears
+    final isSpinnerVisible = weatherState.isLoading && weatherState.chartData.isEmpty;
+    final hasData = weatherState.chartData.isNotEmpty;
+    final hasError = shouldShowAnyError;
+
+    final hapticTriggered = _spinnerTracker.trackState(
+      isSpinnerVisible: isSpinnerVisible,
+      hasData: hasData,
+      hasError: hasError,
+      mounted: mounted,
+    );
+
+    // Log successful load when haptic is triggered
+    if (hapticTriggered) {
+      AppLogger.success('Weather data load complete: ${weatherState.chartData.length} data points', module: 'WeatherPage');
+    }
     
     if (shouldShowAnyError) {
       if (_errorAnimationController.status == AnimationStatus.dismissed) {
