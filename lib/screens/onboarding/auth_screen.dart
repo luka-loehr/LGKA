@@ -186,9 +186,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     HapticService.medium();
 
     if (username == AppCredentials.username && password == AppCredentials.password) {
-      // Haptic feedback for successful authentication
-      HapticService.medium();
-      
       // Show success flash immediately
       setState(() {
         _showSuccessFlash = true;
@@ -206,6 +203,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       
       // Hold the green color briefly, then start loading while staying green
       await Future.delayed(const Duration(milliseconds: 600));
+      
+      if (!mounted) return;
+      
+      // Haptic feedback for successful authentication (1 second after button press)
+      await Future.delayed(const Duration(milliseconds: 400));
+      if (mounted) {
+        HapticService.medium();
+      }
       
       if (!mounted) return;
       
