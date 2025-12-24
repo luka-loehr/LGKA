@@ -161,7 +161,7 @@ class NewsDetailScreen extends ConsumerWidget {
   }
 
   /// Converts HTML content to TextSpans with formatting preserved
-  List<TextSpan> _parseHtmlToTextSpans(String html, ThemeData theme, Color accentColor, List<NewsLink> links) {
+  List<TextSpan> _parseHtmlToTextSpans(String html, ThemeData theme, Color accentColor, List<NewsLink> links, {bool trimTrailingWhitespace = false}) {
     final List<TextSpan> spans = [];
     
     // Parse the HTML
@@ -309,27 +309,57 @@ class NewsDetailScreen extends ConsumerWidget {
     }
     
     // Trim trailing whitespace/newlines from the last span to reduce spacing
+    // If trimTrailingWhitespace is true (buttons follow), aggressively remove all trailing whitespace
     if (spans.isNotEmpty) {
-      final lastSpan = spans.last;
-      if (lastSpan.text != null && lastSpan.text!.trim().isEmpty) {
-        // Remove trailing whitespace-only span
-        spans.removeLast();
-      } else if (lastSpan.text != null && lastSpan.text!.endsWith('\n\n')) {
-        // Trim trailing double newlines
-        spans[spans.length - 1] = TextSpan(
-          text: lastSpan.text!.replaceAll(RegExp(r'\n+$'), ''),
-          style: lastSpan.style,
-          recognizer: lastSpan.recognizer,
-          children: lastSpan.children,
-        );
-      } else if (lastSpan.text != null && lastSpan.text!.endsWith('\n')) {
-        // Trim trailing single newline
-        spans[spans.length - 1] = TextSpan(
-          text: lastSpan.text!.replaceAll(RegExp(r'\n+$'), ''),
-          style: lastSpan.style,
-          recognizer: lastSpan.recognizer,
-          children: lastSpan.children,
-        );
+      if (trimTrailingWhitespace) {
+        // Aggressively remove all trailing whitespace/newlines when buttons follow
+        while (spans.isNotEmpty) {
+          final lastSpan = spans.last;
+          if (lastSpan.text != null && lastSpan.text!.trim().isEmpty) {
+            spans.removeLast();
+          } else {
+            break;
+          }
+        }
+        
+        // Trim trailing whitespace from the last non-empty span
+        if (spans.isNotEmpty) {
+          final lastSpan = spans.last;
+          if (lastSpan.text != null && lastSpan.text!.isNotEmpty) {
+            final trimmedText = lastSpan.text!.replaceAll(RegExp(r'\s+$'), '');
+            if (trimmedText != lastSpan.text) {
+              spans[spans.length - 1] = TextSpan(
+                text: trimmedText,
+                style: lastSpan.style,
+                recognizer: lastSpan.recognizer,
+                children: lastSpan.children,
+              );
+            }
+          }
+        }
+      } else {
+        // Normal trimming - preserve website spacing
+        final lastSpan = spans.last;
+        if (lastSpan.text != null && lastSpan.text!.trim().isEmpty) {
+          // Remove trailing whitespace-only span
+          spans.removeLast();
+        } else if (lastSpan.text != null && lastSpan.text!.endsWith('\n\n')) {
+          // Trim trailing double newlines
+          spans[spans.length - 1] = TextSpan(
+            text: lastSpan.text!.replaceAll(RegExp(r'\n+$'), ''),
+            style: lastSpan.style,
+            recognizer: lastSpan.recognizer,
+            children: lastSpan.children,
+          );
+        } else if (lastSpan.text != null && lastSpan.text!.endsWith('\n')) {
+          // Trim trailing single newline
+          spans[spans.length - 1] = TextSpan(
+            text: lastSpan.text!.replaceAll(RegExp(r'\n+$'), ''),
+            style: lastSpan.style,
+            recognizer: lastSpan.recognizer,
+            children: lastSpan.children,
+          );
+        }
       }
     }
     
@@ -337,10 +367,10 @@ class NewsDetailScreen extends ConsumerWidget {
   }
 
   /// Builds a RichText widget with formatted HTML content and clickable links
-  Widget _buildContentFromHtml(String? htmlContent, String? plainContent, List<NewsLink> links, BuildContext context, ThemeData theme, Color accentColor) {
+  Widget _buildContentFromHtml(String? htmlContent, String? plainContent, List<NewsLink> links, BuildContext context, ThemeData theme, Color accentColor, {bool trimTrailingWhitespace = false}) {
     // Use HTML content if available, otherwise fall back to plain text
     if (htmlContent != null && htmlContent.isNotEmpty) {
-      final spans = _parseHtmlToTextSpans(htmlContent, theme, accentColor, links);
+      final spans = _parseHtmlToTextSpans(htmlContent, theme, accentColor, links, trimTrailingWhitespace: trimTrailingWhitespace);
       if (spans.isNotEmpty) {
         return RichText(
           text: TextSpan(children: spans),
@@ -349,11 +379,16 @@ class NewsDetailScreen extends ConsumerWidget {
     }
     
     // Fallback to plain text with links
-    return _buildContentWithLinks(plainContent ?? '', links, context, theme, accentColor);
+    return _buildContentWithLinks(plainContent ?? '', links, context, theme, accentColor, trimTrailingWhitespace: trimTrailingWhitespace);
   }
 
   /// Builds a RichText widget with clickable embedded links from the content
-  Widget _buildContentWithLinks(String content, List<NewsLink> links, BuildContext context, ThemeData theme, Color accentColor) {
+  Widget _buildContentWithLinks(String content, List<NewsLink> links, BuildContext context, ThemeData theme, Color accentColor, {bool trimTrailingWhitespace = false}) {
+    // Trim trailing whitespace if buttons will follow
+    if (trimTrailingWhitespace) {
+      content = content.replaceAll(RegExp(r'\s+$'), '');
+    }
+    
     if (links.isEmpty) {
       // No links, return simple text
       return Text(
@@ -444,13 +479,38 @@ class NewsDetailScreen extends ConsumerWidget {
     
     // Add remaining text after the last link
     if (currentIndex < content.length) {
-      spans.add(TextSpan(
-        text: content.substring(currentIndex),
-        style: theme.textTheme.bodyLarge?.copyWith(
-          height: 1.8,
-          letterSpacing: 0.2,
-        ),
-      ));
+      var remainingText = content.substring(currentIndex);
+      // Trim trailing whitespace if buttons will follow
+      if (trimTrailingWhitespace) {
+        remainingText = remainingText.replaceAll(RegExp(r'\s+$'), '');
+      }
+      if (remainingText.isNotEmpty) {
+        spans.add(TextSpan(
+          text: remainingText,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            height: 1.8,
+            letterSpacing: 0.2,
+          ),
+        ));
+      }
+    }
+    
+    // Trim trailing whitespace from last span if buttons will follow
+    if (trimTrailingWhitespace && spans.isNotEmpty) {
+      final lastSpan = spans.last;
+      if (lastSpan.text != null && lastSpan.text!.isNotEmpty) {
+        final trimmedText = lastSpan.text!.replaceAll(RegExp(r'\s+$'), '');
+        if (trimmedText != lastSpan.text && trimmedText.isNotEmpty) {
+          spans[spans.length - 1] = TextSpan(
+            text: trimmedText,
+            style: lastSpan.style,
+            recognizer: lastSpan.recognizer,
+            children: lastSpan.children,
+          );
+        } else if (trimmedText.isEmpty) {
+          spans.removeLast();
+        }
+      }
     }
     
     // If no matches were found, return simple text
@@ -766,6 +826,7 @@ class NewsDetailScreen extends ConsumerWidget {
                             context,
                             theme,
                             accentColor,
+                            trimTrailingWhitespace: event.standaloneLinksOrEmpty.isNotEmpty || event.downloads.isNotEmpty,
                           ),
                           
                           // Display standalone link buttons if available
