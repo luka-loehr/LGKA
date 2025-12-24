@@ -28,48 +28,17 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  int _lastVisualPage = 0;
 
   @override
   void initState() {
     super.initState();
     _initializeData();
-    _setupPageListener();
   }
 
   @override
   void dispose() {
-    _pageController.removeListener(_onPageScroll);
     _pageController.dispose();
     super.dispose();
-  }
-
-  /// Setup listener to track page position changes for haptic feedback
-  void _setupPageListener() {
-    _pageController.addListener(_onPageScroll);
-  }
-
-  /// Handle page scroll events and trigger haptic when category visually switches
-  void _onPageScroll() {
-    if (!_pageController.hasClients) return;
-    
-    final currentPosition = _pageController.page ?? 0.0;
-    // Determine which category is visually displayed based on position
-    // Category switches at 0.5, 1.5, etc.
-    int visualPage;
-    if (currentPosition < 0.5) {
-      visualPage = 0;
-    } else if (currentPosition < 1.5) {
-      visualPage = 1;
-    } else {
-      visualPage = 2;
-    }
-    
-    // Trigger haptic feedback every time the visual category changes
-    if (visualPage != _lastVisualPage) {
-      HapticService.medium();
-      _lastVisualPage = visualPage;
-    }
   }
 
   /// Initialize substitution provider and preload weather data
@@ -216,9 +185,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return PageView(
       controller: _pageController,
       onPageChanged: (index) {
+        // Trigger haptic feedback every time the page changes
+        // This fires whenever the category in the top navbar switches
+        if (_currentPage != index) {
+          HapticService.medium();
+        }
         setState(() => _currentPage = index);
-        // Update visual page tracking when page fully changes
-        _lastVisualPage = index;
       },
       children: [
         const SubstitutionScreen(),
