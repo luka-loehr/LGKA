@@ -28,7 +28,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  int _lastHapticPage = 0;
+  int _lastVisualPage = 0;
 
   @override
   void initState() {
@@ -54,13 +54,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (!_pageController.hasClients) return;
     
     final currentPosition = _pageController.page ?? 0.0;
-    // Round to nearest integer to determine which category is visually displayed
-    final visualPage = currentPosition.round();
+    // Determine which category is visually displayed based on position
+    // Category switches at 0.5, 1.5, etc.
+    int visualPage;
+    if (currentPosition < 0.5) {
+      visualPage = 0;
+    } else if (currentPosition < 1.5) {
+      visualPage = 1;
+    } else {
+      visualPage = 2;
+    }
     
     // Trigger haptic feedback every time the visual category changes
-    if (visualPage != _lastHapticPage && visualPage >= 0 && visualPage <= 2) {
+    if (visualPage != _lastVisualPage) {
       HapticService.medium();
-      _lastHapticPage = visualPage;
+      _lastVisualPage = visualPage;
     }
   }
 
@@ -209,8 +217,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       controller: _pageController,
       onPageChanged: (index) {
         setState(() => _currentPage = index);
-        // Update haptic tracking when page fully changes
-        _lastHapticPage = index;
+        // Update visual page tracking when page fully changes
+        _lastVisualPage = index;
       },
       children: [
         const SubstitutionScreen(),
