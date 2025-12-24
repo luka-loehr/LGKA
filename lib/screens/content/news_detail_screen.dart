@@ -217,7 +217,6 @@ class NewsDetailScreen extends ConsumerWidget {
                 }
               }
               return nodeSpans; // Return early, don't process children again
-              break;
             case 'p':
               // Process paragraph content
               final List<TextSpan> paragraphSpans = [];
@@ -345,72 +344,6 @@ class NewsDetailScreen extends ConsumerWidget {
     return spans;
   }
 
-  /// Applies link matching to formatted TextSpans by finding link text and adding recognizers
-  List<TextSpan> _applyLinksToFormattedSpans(List<TextSpan> formattedSpans, List<NewsLink> links, Color accentColor) {
-    if (links.isEmpty) return formattedSpans;
-    
-    // Helper to extract plain text from a span
-    String extractText(TextSpan span) {
-      if (span.text != null) return span.text!;
-      if (span.children != null) {
-        return span.children!.map((child) {
-          if (child is TextSpan) return extractText(child);
-          return '';
-        }).join('');
-      }
-      return '';
-    }
-    
-    // Convert spans to a flat list with position info
-    final List<({TextSpan span, int start, int end})> spanPositions = [];
-    int currentPos = 0;
-    
-    for (var span in formattedSpans) {
-      String text = extractText(span);
-      if (text.isNotEmpty) {
-        spanPositions.add((span: span, start: currentPos, end: currentPos + text.length));
-        currentPos += text.length;
-      }
-    }
-    
-    String fullText = spanPositions.map((sp) => extractText(sp.span)).join('');
-    
-    // Find link matches
-    final sortedLinks = List<NewsLink>.from(links)..sort((a, b) => b.text.length.compareTo(a.text.length));
-    final List<_LinkMatch> matches = [];
-    
-    for (var link in sortedLinks) {
-      int index = fullText.indexOf(link.text);
-      while (index != -1) {
-        matches.add(_LinkMatch(start: index, end: index + link.text.length, link: link));
-        index = fullText.indexOf(link.text, index + 1);
-      }
-    }
-    
-    matches.sort((a, b) => a.start.compareTo(b.start));
-    
-    // Remove overlapping matches
-    final List<_LinkMatch> nonOverlappingMatches = [];
-    for (var match in matches) {
-      bool overlaps = false;
-      for (var existing in nonOverlappingMatches) {
-        if (match.start < existing.end && match.end > existing.start) {
-          overlaps = true;
-          break;
-        }
-      }
-      if (!overlaps) {
-        nonOverlappingMatches.add(match);
-      }
-    }
-    
-    if (nonOverlappingMatches.isEmpty) return formattedSpans;
-    
-    // Rebuild spans with links - this is complex, so for now use simpler fallback
-    // When links exist, prefer the proven plain text approach
-    return formattedSpans;
-  }
-
   /// Builds a RichText widget with formatted HTML content and clickable links
   Widget _buildContentFromHtml(String? htmlContent, String? plainContent, List<NewsLink> links, BuildContext context, ThemeData theme, Color accentColor, {bool trimTrailingWhitespace = false}) {
     // Strategy: 
@@ -461,13 +394,7 @@ class NewsDetailScreen extends ConsumerWidget {
       );
     }
 
-    // Create a map of link text to URL for quick lookup
-    final linkMap = <String, String>{};
-    for (var link in links) {
-      linkMap[link.text] = link.url;
-    }
-
-    // Split content by link texts and build TextSpans
+    // Build TextSpans with clickable links
     final List<TextSpan> spans = [];
     
     // Sort links by text length (longest first) to avoid partial matches
