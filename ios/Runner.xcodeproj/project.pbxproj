@@ -283,7 +283,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin";
+			shellScript = "if [ -z \"$FLUTTER_ROOT\" ]; then\n  if [ -f \"${SRCROOT}/../Flutter/Generated.xcconfig\" ]; then\n    export FLUTTER_ROOT=$(grep \"^FLUTTER_ROOT=\" \"${SRCROOT}/../Flutter/Generated.xcconfig\" | cut -d '=' -f2)\n  else\n    echo \"error: FLUTTER_ROOT not set and Generated.xcconfig not found. Run 'flutter pub get' first.\" >&2\n    exit 1\n  fi\nfi\n/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin";
 		};
 		8C95BB81521FBE2094452125 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -320,7 +320,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+			shellScript = "if [ -z \"$FLUTTER_ROOT\" ]; then\n  if [ -f \"${SRCROOT}/../Flutter/Generated.xcconfig\" ]; then\n    export FLUTTER_ROOT=$(grep \"^FLUTTER_ROOT=\" \"${SRCROOT}/../Flutter/Generated.xcconfig\" | cut -d '=' -f2)\n  else\n    echo \"error: FLUTTER_ROOT not set and Generated.xcconfig not found. Run 'flutter pub get' first.\" >&2\n    exit 1\n  fi\nfi\n/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
 		};
 		979A42D3D53C29A3DB79CD5D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
