@@ -271,7 +271,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     });
     
     // Get screen metrics for responsive design
-    final screenSize = MediaQuery.of(context).size;
+    final mediaQuery = MediaQuery.of(context);
+    final screenSize = mediaQuery.size;
+    final keyboardHeight = mediaQuery.viewInsets.bottom;
     // Force text scale factor to 1.0 for consistent UI across all devices
     const textScaleFactor = 1.0;
     
@@ -281,8 +283,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     final double formWidth = screenSize.width * 0.85;
     final double maxFormWidth = 400; // Max width for larger screens
     
+    // Calculate minimum spacing above keyboard (20% of screen height)
+    final double minSpacingAboveKeyboard = screenSize.height * 0.2;
+    // Calculate bottom padding to ensure button is always 20% above keyboard
+    // When keyboard is visible, ensure button stays at least 20% above it
+    final double bottomPadding = keyboardHeight > 0 
+        ? minSpacingAboveKeyboard 
+        : (isSmallScreen ? 40.0 : 60.0);
+    
     return Scaffold(
       backgroundColor: Colors.black,
+      resizeToAvoidBottomInset: true,
       body: GestureDetector(
         onTap: () {
           // Clear focus when tapping outside fields
@@ -290,43 +301,52 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         },
         behavior: HitTestBehavior.translucent,
         child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(height: topSpacing),
-                      
-                      // Title
-                      Text(
-                        AppLocalizations.of(context)!.authTitle,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28 / textScaleFactor, // Adjust for text scale factor
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: 24.0,
+                        right: 24.0,
+                        top: topSpacing,
+                        bottom: bottomPadding,
                       ),
-                      
-                      const SizedBox(height: 12),
-                      
-                      // Subtitle
-                      Text(
-                        AppLocalizations.of(context)!.authSubtitle,
-                        style: TextStyle(
-                          color: const Color(0xB3FFFFFF), // 70% white
-                          fontSize: 14 / textScaleFactor, // Adjust for text scale factor
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      
-                      SizedBox(height: isSmallScreen ? 40 : 60),
-                      
-                      // Card with form fields
-                      ConstrainedBox(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Title
+                          Text(
+                            AppLocalizations.of(context)!.authTitle,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 28 / textScaleFactor, // Adjust for text scale factor
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          
+                          const SizedBox(height: 12),
+                          
+                          // Subtitle
+                          Text(
+                            AppLocalizations.of(context)!.authSubtitle,
+                            style: TextStyle(
+                              color: const Color(0xB3FFFFFF), // 70% white
+                              fontSize: 14 / textScaleFactor, // Adjust for text scale factor
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          
+                          SizedBox(height: isSmallScreen ? 40 : 60),
+                          
+                          // Card with form fields
+                          ConstrainedBox(
                         constraints: BoxConstraints(
                           maxWidth: maxFormWidth,
                         ),
@@ -429,82 +449,83 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               ),
                             ],
                           ),
+                          ),
                         ),
-                      ),
-                      
-                      const SizedBox(height: 32),
-                      
-                      // Login Button with animated color
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: maxFormWidth,
-                        ),
-                        child: AnimatedBuilder(
-                          animation: Listenable.merge([_buttonColorAnimation, _successColorAnimation]),
-                          builder: (context, child) {
-                            return SizedBox(
-                              width: formWidth,
-                              height: 46,
-                              child: Stack(
-                                children: [
-                                  // Animated background button
-                                  Positioned.fill(
-                                    child: AnimatedContainer(
-                                      duration: _buttonColorTransitionDuration,
-                                      curve: Curves.easeInOut,
-                                      decoration: BoxDecoration(
-                                        color: _currentButtonColor,
-                                        borderRadius: BorderRadius.circular(12),
+                        
+                          const SizedBox(height: 32),
+                          
+                          // Login Button with animated color
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: maxFormWidth,
+                            ),
+                            child: AnimatedBuilder(
+                              animation: Listenable.merge([_buttonColorAnimation, _successColorAnimation]),
+                              builder: (context, child) {
+                                return SizedBox(
+                                  width: formWidth,
+                                  height: 46,
+                                  child: Stack(
+                                    children: [
+                                      // Animated background button
+                                      Positioned.fill(
+                                        child: AnimatedContainer(
+                                          duration: _buttonColorTransitionDuration,
+                                          curve: Curves.easeInOut,
+                                          decoration: BoxDecoration(
+                                            color: _currentButtonColor,
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  
-                                  // Clickable transparent button with always-white text
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    child: InkWell(
-                                      onTap: _canLogin && !_showErrorFlash && !_showSuccessFlash ? _validateLogin : null,
-                                      borderRadius: BorderRadius.circular(12),
-                                      splashColor: Colors.transparent,
-                                      highlightColor: Colors.transparent,
-                                      child: Center(
-                                        child: _isLoading
-                                          ? const SizedBox(
-                                              width: 22,
-                                              height: 22,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2.5,
-                                                strokeCap: StrokeCap.round,
-                                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                              ),
-                                            )
-                                          : Text(
-                                              AppLocalizations.of(context)!.login,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                color: Colors.white,
-                                                fontSize: 15 / textScaleFactor,
-                                              ),
-                                            ),
+                                      
+                                      // Clickable transparent button with always-white text
+                                      SizedBox(
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        child: InkWell(
+                                          onTap: _canLogin && !_showErrorFlash && !_showSuccessFlash ? _validateLogin : null,
+                                          borderRadius: BorderRadius.circular(12),
+                                          splashColor: Colors.transparent,
+                                          highlightColor: Colors.transparent,
+                                          child: Center(
+                                            child: _isLoading
+                                              ? const SizedBox(
+                                                  width: 22,
+                                                  height: 22,
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2.5,
+                                                    strokeCap: StrokeCap.round,
+                                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                                  ),
+                                                )
+                                              : Text(
+                                                  AppLocalizations.of(context)!.login,
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.white,
+                                                    fontSize: 15 / textScaleFactor,
+                                                  ),
+                                                ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                      
-                      SizedBox(height: isSmallScreen ? 40 : 60),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
-      );
+      ),
+    );
   }
 } 
