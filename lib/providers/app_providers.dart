@@ -14,7 +14,7 @@ import '../services/news_service.dart';
 import '../services/substitution_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_logger.dart';
-import '../providers/haptic_service.dart';
+import '../services/haptic_service.dart';
 
 /// State class for preferences manager
 class PreferencesManagerState {

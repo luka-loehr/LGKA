@@ -8,7 +8,7 @@ import '../../providers/app_providers.dart';
 import '../../providers/color_provider.dart';
 import '../../navigation/app_router.dart';
 import '../../l10n/app_localizations.dart';
-import '../../providers/haptic_service.dart';
+import '../../services/haptic_service.dart';
 
 class AccentColorScreen extends ConsumerStatefulWidget {
   const AccentColorScreen({super.key});

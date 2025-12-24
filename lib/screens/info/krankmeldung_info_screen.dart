@@ -7,7 +7,7 @@ import '../../theme/app_theme.dart';
 import '../../navigation/app_router.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/app_providers.dart';
-import '../../providers/haptic_service.dart';
+import '../../services/haptic_service.dart';
 import '../../utils/app_info.dart';
 
 class KrankmeldungInfoScreen extends ConsumerWidget {

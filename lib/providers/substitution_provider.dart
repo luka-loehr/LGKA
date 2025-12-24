@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/substitution_service.dart';
 import '../utils/app_logger.dart';
-import '../providers/haptic_service.dart';
+import '../services/haptic_service.dart';
 import 'app_providers.dart';
 
 /// State class for substitution data
