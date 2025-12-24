@@ -305,10 +305,11 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
     final pdfRepo = ref.watch(pdfRepositoryProvider);
     final isLoading = pdfRepo.isLoading || !pdfRepo.isInitialized;
     final isError = pdfRepo.hasAnyError && !pdfRepo.hasAnyData;
+    final hasData = pdfRepo.hasAnyData;
     
-    // Trigger haptic only when transitioning from loading+non-error to non-loading+error
+    // Trigger haptic when transitioning from loading to success (when spinner disappears)
     // Use a flag to ensure it only fires once even if build is called multiple times rapidly
-    if (_wasLoading && !isLoading && !_wasError && isError && !_hapticScheduled) {
+    if (_wasLoading && !isLoading && !isError && hasData && !_hapticScheduled) {
       _hapticScheduled = true;
       Future.microtask(() {
         if (mounted) {
@@ -317,8 +318,8 @@ class _SubstitutionPlanPageState extends ConsumerState<_SubstitutionPlanPage>
       });
     }
     
-    // Reset flag when loading starts again or error clears
-    if (isLoading || !isError) {
+    // Reset flag when loading starts again or error occurs
+    if (isLoading || isError) {
       _hapticScheduled = false;
     }
     
