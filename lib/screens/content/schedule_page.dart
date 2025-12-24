@@ -53,9 +53,14 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       curve: Curves.easeOutCubic,
     ));
     
+    // Initialize _wasSchedulesLoading based on actual initial state
+    // This prevents haptic feedback when navigating to page with already-loaded schedules
     // Only load schedules if not already loaded (avoid reloading on every screen visit)
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final scheduleState = ref.read(scheduleProvider);
+      // Set initial loading state to match actual state
+      _wasSchedulesLoading = scheduleState.isLoading;
+      
       if (!scheduleState.hasSchedules) {
         await ref.read(scheduleProvider.notifier).loadSchedules();
       }
