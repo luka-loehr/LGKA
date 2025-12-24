@@ -44,6 +44,28 @@ class NewsImage {
       };
 }
 
+/// Represents a downloadable file found in news content
+class NewsDownload {
+  final String title;
+  final String url;
+  final String fileType; // e.g., "audio", "video", "document", "image"
+  final String? size; // e.g., "3.64 MB"
+
+  NewsDownload({
+    required this.title,
+    required this.url,
+    required this.fileType,
+    this.size,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'url': url,
+        'file_type': fileType,
+        if (size != null) 'size': size,
+      };
+}
+
 /// Represents a news event from the Lessing Gymnasium website
 class NewsEvent {
   final String title;
@@ -56,6 +78,7 @@ class NewsEvent {
   final String url;
   final List<NewsLink> links;
   final List<NewsImage> images;
+  final List<NewsDownload> downloads;
 
   NewsEvent({
     required this.title,
@@ -68,6 +91,7 @@ class NewsEvent {
     required this.url,
     this.links = const [],
     this.images = const [],
+    this.downloads = const [],
   });
 
   Map<String, dynamic> toJson() => {
@@ -80,6 +104,7 @@ class NewsEvent {
         'url': url,
         'links': links.map((l) => l.toJson()).toList(),
         'images': images.map((i) => i.toJson()).toList(),
+        'downloads': downloads.map((d) => d.toJson()).toList(),
       };
 }
 
@@ -238,6 +263,7 @@ class NewsService {
             'content': contentData['content'],
             'links': contentData['links'],
             'images': contentData['images'],
+            'downloads': contentData['downloads'],
           };
         }).toList();
 
@@ -259,6 +285,7 @@ class NewsService {
               url: result['url'] as String,
               links: (result['links'] as List<NewsLink>?) ?? [],
               images: (result['images'] as List<NewsImage>?) ?? [],
+              downloads: (result['downloads'] as List<NewsDownload>?) ?? [],
             );
             events.add(event);
           } catch (e) {
@@ -334,7 +361,7 @@ class NewsService {
 
           if (response.statusCode != 200) {
             AppLogger.warning('Failed to load article: ${response.statusCode}', module: 'NewsService');
-            return {'content': null, 'links': <NewsLink>[], 'images': <NewsImage>[]};
+            return {'content': null, 'links': <NewsLink>[], 'images': <NewsImage>[], 'downloads': <NewsDownload>[]};
           }
 
           final document = html_parser.parse(response.body);
@@ -343,13 +370,90 @@ class NewsService {
           final articleBody = document.querySelector('.com-content-article__body');
           if (articleBody == null) {
             AppLogger.warning('Could not find .com-content-article__body element', module: 'NewsService');
-            return {'content': null, 'links': <NewsLink>[], 'images': <NewsImage>[]};
+            return {'content': null, 'links': <NewsLink>[], 'images': <NewsImage>[], 'downloads': <NewsDownload>[]};
           }
 
-          // Extract links from <a> tags within paragraphs
+          // Extract download links first (doclink-insert class)
+          final List<NewsDownload> downloads = [];
+          final downloadElements = articleBody.querySelectorAll('a.doclink-insert');
+          for (var downloadElement in downloadElements) {
+            try {
+              final href = downloadElement.attributes['href'];
+              if (href == null || href.isEmpty) continue;
+
+              // Convert relative URLs to absolute URLs
+              final fullUrl = href.startsWith('http')
+                  ? href
+                  : href.startsWith('/')
+                      ? 'https://lessing-gymnasium-karlsruhe.de$href'
+                      : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
+
+              // Extract title from data-title attribute or text content
+              String title = downloadElement.attributes['data-title'] ?? '';
+              if (title.isEmpty) {
+                // Get text content, but remove size information
+                title = downloadElement.text.trim();
+                // Remove size pattern like "(3.64 MB)"
+                title = title.replaceAll(RegExp(r'\s*\([^)]+\)\s*$'), '').trim();
+              }
+
+              // Extract file type from icon class or visually-hidden span
+              String fileType = 'document'; // default
+              
+              // Check for k-icon-document-{type} class
+              final iconSpan = downloadElement.querySelector('span[class*="k-icon-document"]');
+              if (iconSpan != null) {
+                final classes = iconSpan.classes;
+                for (var className in classes) {
+                  if (className.startsWith('k-icon-document-')) {
+                    fileType = className.replaceFirst('k-icon-document-', '');
+                    break;
+                  }
+                }
+              }
+              
+              // Fallback: check visually-hidden span for file type
+              if (fileType == 'document') {
+                final hiddenSpan = downloadElement.querySelector('span.k-visually-hidden');
+                if (hiddenSpan != null) {
+                  final typeText = hiddenSpan.text.trim().toLowerCase();
+                  if (typeText.isNotEmpty) {
+                    fileType = typeText;
+                  }
+                }
+              }
+
+              // Extract size from text content (pattern: "(3.64 MB)")
+              String? size;
+              final fullText = downloadElement.text;
+              final sizeMatch = RegExp(r'\(([^)]+)\)').firstMatch(fullText);
+              if (sizeMatch != null) {
+                size = sizeMatch.group(1)?.trim();
+                // Check if it looks like a size (contains MB, KB, GB, etc.)
+                if (size != null && !RegExp(r'\d+\s*(MB|KB|GB|B|bytes?)', caseSensitive: false).hasMatch(size)) {
+                  size = null; // Not a size, probably something else in parentheses
+                }
+              }
+
+              downloads.add(NewsDownload(
+                title: title,
+                url: fullUrl,
+                fileType: fileType,
+                size: size,
+              ));
+            } catch (e) {
+              AppLogger.warning('Error parsing download link: $e', module: 'NewsService');
+              continue;
+            }
+          }
+
+          // Extract regular links from <a> tags (excluding download links)
           final List<NewsLink> links = [];
           final linkElements = articleBody.querySelectorAll('a');
           for (var linkElement in linkElements) {
+            // Skip download links
+            if (linkElement.classes.contains('doclink-insert')) continue;
+            
             final href = linkElement.attributes['href'];
             final text = linkElement.text.trim();
             if (href != null && href.isNotEmpty && text.isNotEmpty) {
@@ -426,12 +530,20 @@ class NewsService {
           }
 
           // Extract text content from paragraphs (preserving structure for link replacement)
-          final paragraphs = articleBody.querySelectorAll('p');
+          // First, clone the article body and remove download links to avoid duplicates
+          final articleBodyClone = articleBody.clone(true);
+          final downloadLinksInClone = articleBodyClone.querySelectorAll('a.doclink-insert');
+          for (var downloadLink in downloadLinksInClone) {
+            // Remove the download link but keep surrounding text
+            downloadLink.remove();
+          }
+          
+          final paragraphs = articleBodyClone.querySelectorAll('p');
           
           String? fullText;
           if (paragraphs.isEmpty) {
             // Fallback: get all text from the article body
-            fullText = articleBody.text.trim();
+            fullText = articleBodyClone.text.trim();
           } else {
             // Combine all paragraph text, filtering out empty ones
             fullText = paragraphs
@@ -444,6 +556,7 @@ class NewsService {
             'content': fullText,
             'links': links,
             'images': images,
+            'downloads': downloads,
           };
         },
         maxRetries: 2,
@@ -452,7 +565,7 @@ class NewsService {
       );
     } catch (e) {
       AppLogger.warning('Error extracting full article content from $articleUrl: $e', module: 'NewsService');
-      return {'content': null, 'links': <NewsLink>[], 'images': <NewsImage>[]};
+      return {'content': null, 'links': <NewsLink>[], 'images': <NewsImage>[], 'downloads': <NewsDownload>[]};
     }
   }
 
