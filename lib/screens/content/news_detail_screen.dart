@@ -273,11 +273,9 @@ class NewsDetailScreen extends ConsumerWidget {
           // It's a text node - check for text property
           final text = (node as dynamic).text as String?;
           if (text != null && (text.trim().isNotEmpty || text.contains('\n'))) {
-            // Filter out JoomlaWorks plugin text and HTML comment text
+            // Filter out HTML comment text (shouldn't appear but safety check)
             final trimmedText = text.trim();
-            if (!trimmedText.toLowerCase().contains('joomlaworks') &&
-                !trimmedText.startsWith('<!--') &&
-                !trimmedText.contains('Simple Image Gallery')) {
+            if (!trimmedText.startsWith('<!--') && !trimmedText.endsWith('-->')) {
               nodeSpans.add(TextSpan(
                 text: text,
                 style: parentStyle ?? baseStyle,
