@@ -8,7 +8,6 @@ import '../../theme/app_theme.dart';
 import '../../providers/app_providers.dart';
 import '../../providers/color_provider.dart';
 import '../../providers/substitution_provider.dart';
-import '../../data/preferences_manager.dart';
 import '../../services/haptic_service.dart';
 import '../../navigation/app_router.dart';
 import '../../utils/app_logger.dart';
@@ -223,25 +222,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  void _onKrankmeldungPressed() {
-    final preferencesManager = ref.read(preferencesManagerProvider);
-    
-    // Check if krankmeldung info has been shown before
-    if (preferencesManager.krankmeldungInfoShown) {
-      // Navigate directly to webview
-      context.push(AppRouter.webview, extra: {
-        'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
-        'title': AppLocalizations.of(context)!.krankmeldung,
-        'headers': {
-          'User-Agent': AppInfo.userAgent,
-        },
-        'fromKrankmeldungInfo': false,
-      });
-    } else {
-      // Navigate to the info screen first
-      context.push(AppRouter.krankmeldungInfo);
-    }
-  }
 
 }
 
@@ -440,8 +420,6 @@ class _SettingsSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final preferencesManager = ref.watch(preferencesManagerProvider);
-    
     return Wrap(
       children: [
         Padding(

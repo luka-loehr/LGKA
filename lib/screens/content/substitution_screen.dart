@@ -26,7 +26,6 @@ class _SubstitutionScreenState extends ConsumerState<SubstitutionScreen>
   late Animation<double> _fadeAnimation;
   bool _hasShownButtons = false;
   bool _wasLoading = true;
-  bool _wasError = false;
   bool _hapticScheduled = false;
 
   @override
@@ -88,7 +87,6 @@ class _SubstitutionScreenState extends ConsumerState<SubstitutionScreen>
     }
     
     _wasLoading = isLoading;
-    _wasError = isError;
     
     if (!substitutionState.isInitialized || substitutionState.isLoading) {
       return _LoadingView();
@@ -218,7 +216,7 @@ class _SubstitutionScreenState extends ConsumerState<SubstitutionScreen>
 
 /// Loading view while PDFs are being initialized
 class _LoadingView extends StatelessWidget {
-  _LoadingView();
+  const _LoadingView();
 
   @override
   Widget build(BuildContext context) {

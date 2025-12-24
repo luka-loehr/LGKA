@@ -21,7 +21,6 @@ class NewsScreen extends ConsumerStatefulWidget {
 class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStateMixin {
   late AnimationController _listAnimationController;
   bool _hasAnimatedList = false;
-  bool _wasNewsLoading = true;
 
   @override
   void initState() {
@@ -57,10 +56,6 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
     final primaryTextColor = AppColors.primaryText;
     final secondaryTextColor = AppColors.secondaryText;
     final accentColor = ref.watch(currentColorProvider);
-
-    // Track news loading state
-    final becameAvailable = _wasNewsLoading && !newsState.isLoading && newsState.events.isNotEmpty;
-    _wasNewsLoading = newsState.isLoading;
 
     // Trigger list animation once when events become available
     // Only animate if we haven't animated before and events just became available

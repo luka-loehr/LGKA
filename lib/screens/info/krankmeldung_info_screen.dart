@@ -132,6 +132,9 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
     // Mark that the krankmeldung info has been shown
     await ref.read(preferencesManagerProvider.notifier).setKrankmeldungInfoShown(true);
     
+    // Check if context is still mounted before using it
+    if (!context.mounted) return;
+    
     // Navigate to the webview with the illness report
     context.push(AppRouter.webview, extra: {
       'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
