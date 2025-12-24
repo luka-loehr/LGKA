@@ -46,16 +46,22 @@ class CacheService {
   /// Cache is valid if:
   /// 1. There is a fetch time
   /// 2. App was not backgrounded since the last fetch (or was never backgrounded)
+  /// 3. If app is open, data is still within validity duration (time-based refresh)
   bool isCacheValid(CacheKey key, {DateTime? lastFetchTime}) {
     final fetchTime = lastFetchTime ?? _lastFetchTimes[key];
     if (fetchTime == null) return false;
 
-    // If app was never backgrounded in this session, cache is valid
-    if (_lastBackgroundTime == null) return true;
+    // If app was backgrounded, cache is invalid (must refetch when returning)
+    if (_lastBackgroundTime != null) {
+      // Cache is valid only if last fetch happened after the app was backgrounded
+      // (i.e., data was fetched after returning to foreground)
+      return fetchTime.isAfter(_lastBackgroundTime!);
+    }
 
-    // Cache is valid only if last fetch happened after the app was backgrounded
-    // (i.e., data was fetched after returning to foreground)
-    return fetchTime.isAfter(_lastBackgroundTime!);
+    // App is still open - check time-based expiration for periodic refreshes
+    final validityDuration = getCacheValidity(key);
+    final elapsed = DateTime.now().difference(fetchTime);
+    return elapsed < validityDuration;
   }
 
   /// Update the last fetch time for a cache key
