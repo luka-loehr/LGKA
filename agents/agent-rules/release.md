@@ -26,9 +26,11 @@ Get all changes between `[previous_tag]` and HEAD:
 ### Task 3: Create GitHub Release
 
 1. Create release notes following the template at `agents/templates/release_notes_template.md`
+   - **CRITICAL**: When creating release notes files (e.g., `RELEASE_NOTES_v2.4.0.md`), DO NOT include the template header "# GitHub Release Notes Template" or any other template metadata. The release notes file should start directly with the actual content (e.g., iOS/Android links, Highlights section, etc.). Template headers are for reference only and must be removed before using the file.
 2. Create GitHub release via CLI:
    - Title format: `LGKA+ vx.x.x`
    - Attach release notes
+   - **IMPORTANT**: Verify the release notes file does NOT contain template headers before uploading. The file should start with actual content, not template instructions.
 
 ### Task 4: Build and Upload ARM64 APK
 
