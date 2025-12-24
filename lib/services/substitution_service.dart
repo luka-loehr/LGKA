@@ -68,7 +68,7 @@ class SubstitutionService {
   static const String _todayUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_heute.pdf';
   static const String _tomorrowUrl = 'https://lessing-gymnasium-karlsruhe.de/stundenplan/schueler/v_schueler_morgen.pdf';
   static const Duration _timeout = Duration(seconds: 10);
-  static const Duration _cacheValidity = Duration(minutes: 5);
+  static const Duration _cacheValidity = Duration(minutes: 2);
 
   SubstitutionState _todayState = const SubstitutionState();
   SubstitutionState _tomorrowState = const SubstitutionState();
