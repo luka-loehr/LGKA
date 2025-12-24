@@ -11,6 +11,7 @@ import '../../utils/app_logger.dart';
 import '../../widgets/app_footer.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/substitution_service.dart';
+import '../../services/loading_spinner_tracker_service.dart';
 
 /// Substitution plan screen with today and tomorrow options
 class SubstitutionScreen extends ConsumerStatefulWidget {
@@ -25,9 +26,7 @@ class _SubstitutionScreenState extends ConsumerState<SubstitutionScreen>
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   bool _hasShownButtons = false;
-  bool _wasLoading = true;
-  bool _hadDataPreviously = false;
-  bool _hapticScheduled = false;
+  final _spinnerTracker = LoadingSpinnerTracker();
 
   @override
   void initState() {
@@ -64,33 +63,21 @@ class _SubstitutionScreenState extends ConsumerState<SubstitutionScreen>
     final isLoading = substitutionState.isLoading || !substitutionState.isInitialized;
     final isError = substitutionState.hasAnyError && !substitutionState.hasAnyData;
     final hasData = substitutionState.hasAnyData;
-    
-    // Trigger haptic when transitioning from loading to success (when spinner disappears)
-    // Only trigger if we didn't have data previously (real load, not cache check)
-    // Use a flag to ensure it only fires once even if build is called multiple times rapidly
-    if (_wasLoading && !isLoading && !isError && hasData && !_hadDataPreviously && !_hapticScheduled) {
-      _hapticScheduled = true;
-      
-      // Log successful load
-      final availableCount = (substitutionState.todayState.canDisplay ? 1 : 0) + 
+
+    // Track spinner visibility and trigger haptic feedback when spinner disappears
+    final hapticTriggered = _spinnerTracker.trackState(
+      isSpinnerVisible: isLoading,
+      hasData: hasData,
+      hasError: isError,
+      mounted: mounted,
+    );
+
+    // Log successful load when haptic is triggered
+    if (hapticTriggered) {
+      final availableCount = (substitutionState.todayState.canDisplay ? 1 : 0) +
                             (substitutionState.tomorrowState.canDisplay ? 1 : 0);
       AppLogger.success('Substitution plan load complete: $availableCount available', module: 'SubstitutionPage');
-      
-      Future.microtask(() {
-        if (mounted) {
-          HapticService.medium();
-        }
-      });
     }
-    
-    // Reset flag when loading starts again or error occurs
-    if (isLoading || isError) {
-      _hapticScheduled = false;
-    }
-    
-    // Track state for next build
-    _wasLoading = isLoading;
-    _hadDataPreviously = hasData;
     
     if (!substitutionState.isInitialized || substitutionState.isLoading) {
       return _LoadingView();

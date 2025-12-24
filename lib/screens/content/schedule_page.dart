@@ -14,6 +14,7 @@ import '../../services/schedule_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/app_logger.dart';
 import '../../widgets/app_footer.dart';
+import '../../services/loading_spinner_tracker_service.dart';
 
 class SchedulePage extends ConsumerStatefulWidget {
   const SchedulePage({super.key});
@@ -27,17 +28,14 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   bool _hasShownButtons = false;
-  
+
   // Track available schedules
   List<ScheduleItem> _availableFirstHalbjahr = [];
   List<ScheduleItem> _availableSecondHalbjahr = [];
   bool _isCheckingAvailability = false;
-  bool _wasCheckingAvailability = false;
   DateTime? _lastAvailabilityCheck;
   static const Duration _availabilityCheckInterval = Duration(minutes: 15);
-  bool _wasSchedulesLoading = true;
-  bool _hadDataPreviously = false;
-  bool _hapticScheduled = false;
+  final _spinnerTracker = LoadingSpinnerTracker();
 
   @override
   void initState() {
@@ -221,32 +219,17 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   @override
   Widget build(BuildContext context) {
     final scheduleState = ref.watch(scheduleProvider);
-    
-    final wasShowingSpinner = _wasSchedulesLoading || _wasCheckingAvailability;
+
     final isShowingSpinner = scheduleState.isLoading || _isCheckingAvailability;
     final hasData = scheduleState.hasSchedules && !scheduleState.hasError;
-    
-    // Trigger haptic when transitioning from showing spinner to showing schedule list
-    // Only trigger if we didn't have data previously (real load, not cache check)
-    // Use a flag to ensure it only fires once even if build is called multiple times rapidly
-    if (wasShowingSpinner && !isShowingSpinner && hasData && !_hadDataPreviously && !_hapticScheduled) {
-      _hapticScheduled = true;
-      Future.microtask(() {
-        if (mounted) {
-          HapticService.medium();
-        }
-      });
-    }
-    
-    // Reset flag when loading starts again or error occurs
-    if (isShowingSpinner || scheduleState.hasError) {
-      _hapticScheduled = false;
-    }
-    
-    // Track state for next build
-    _wasSchedulesLoading = scheduleState.isLoading;
-    _wasCheckingAvailability = _isCheckingAvailability;
-    _hadDataPreviously = hasData;
+
+    // Track spinner visibility and trigger haptic feedback when spinner disappears
+    _spinnerTracker.trackState(
+      isSpinnerVisible: isShowingSpinner,
+      hasData: hasData,
+      hasError: scheduleState.hasError,
+      mounted: mounted,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
