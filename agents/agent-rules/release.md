@@ -19,9 +19,24 @@ Initiate when user says: "prepare release", "release", "create release", "new re
 
 ### Task 2: Gather Changes
 
-Get all changes between `[previous_tag]` and HEAD:
-- `git log --pretty=format:"%h - %s" [previous_tag]..HEAD`
-- `git diff --stat [previous_tag]..HEAD`
+**CRITICAL**: To find what's actually new, compare the previous release tag with the current release tag, NOT just what's in the release notes file.
+
+1. First, identify the previous release tag:
+   - List available tags: `git tag --list | grep -E "^v?2\.[0-9]+\.[0-9]+" | sort -V`
+   - Fetch tags if needed: `git fetch --tags`
+   - The previous tag is typically the one before the current version (e.g., if releasing 2.4.0, previous is 2.3.0)
+
+2. Compare the two release tags to get actual changes:
+   - Get commit log: `git log --pretty=format:"%h - %s" [previous_tag]..[current_tag]`
+   - Get file statistics: `git diff --stat [previous_tag]..[current_tag]`
+   - **Note**: Tag formats may differ (e.g., `2.3.0` vs `v2.4.0`), so use the exact tag names from `git tag --list`
+
+3. Analyze the commits to identify:
+   - New features introduced
+   - User-visible changes
+   - Bug fixes
+   - Performance improvements
+   - UI/UX improvements
 
 ### Task 3: Create GitHub Release
 
@@ -52,16 +67,26 @@ Copy the archive to `~/Library/Developer/Xcode/Archives/$(date +%Y-%m-%d)/` so i
 
 ### Task 8: App Store Release Notes
 
-1. **CRITICAL**: Get the actual GitHub release URL using the CLI:
+1. **CRITICAL**: To determine what's actually new in this release, compare the previous release with the current release:
+   - Identify previous release tag: `git tag --list | grep -E "^v?2\.[0-9]+\.[0-9]+" | sort -V`
+   - Fetch tags if needed: `git fetch --tags`
+   - Compare releases: `git log --pretty=format:"%h - %s" [previous_tag]..[current_tag]`
+   - **DO NOT** rely solely on the RELEASE_NOTES file - it may contain cumulative information. Always compare actual git commits between the two release tags to identify what's newly introduced in this specific release.
+
+2. Get the actual GitHub release URL using the CLI:
    - Run: `gh release view [version_tag] --json tagName --jq .tagName` to get the tag name
    - Construct the release URL as: `github.com/luka-loehr/LGKA/releases/tag/[tagName]`
    - **DO NOT** make up or guess the release URL - always get it from the CLI using the actual tag name
    - Example: If tag is `v2.4.0`, URL is `github.com/luka-loehr/LGKA/releases/tag/v2.4.0`
-2. Create German-language release notes following `agents/templates/appstore_release_template.md`
+
+3. Create German-language release notes following `agents/templates/appstore_release_template.md`
    - Use the examples in the template as guidance for quality and style
-   - Focus on user-visible changes that students will notice
+   - Focus ONLY on user-visible changes that are NEW in this release compared to the previous release
+   - Base content on the git commit comparison, not on the full release notes file
    - Keep it concise and student-friendly
-3. **Output the App Store release notes directly in chat** (not just as a file)
+   - Highlight what students will actually notice and experience
+
+4. **Output the App Store release notes directly in chat** (not just as a file)
 
 ## File Locations
 
