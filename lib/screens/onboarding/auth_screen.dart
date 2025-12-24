@@ -186,6 +186,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     HapticService.medium();
 
     if (username == AppCredentials.username && password == AppCredentials.password) {
+      // Haptic feedback for successful authentication
+      HapticService.medium();
+      
       // Show success flash immediately
       setState(() {
         _showSuccessFlash = true;
