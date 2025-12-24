@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../utils/app_info.dart';
 import '../utils/retry_util.dart';
+import '../utils/app_logger.dart';
 import '../config/app_credentials.dart';
 
 /// Represents the state of a single PDF (today or tomorrow)
@@ -99,14 +100,19 @@ class PdfRepository {
     if (_isInitialized) {
       // Refresh in background if cache is stale and we have data
       if (hasAnyData && !_isCacheValid) {
+        AppLogger.debug('Substitution plan cache expired, refreshing in background', module: 'PdfRepository');
         unawaited(refreshInBackground());
       }
       return;
     }
 
+    AppLogger.debug('Initializing substitution plan PDFs', module: 'PdfRepository');
     await _loadBothPdfs();
     _isInitialized = true;
     _lastFetchTime = DateTime.now();
+    
+    final loadedCount = (todayState.canDisplay ? 1 : 0) + (tomorrowState.canDisplay ? 1 : 0);
+    AppLogger.debug('Substitution plan initialization complete: $loadedCount PDF(s) loaded', module: 'PdfRepository');
   }
 
   /// Load both PDFs simultaneously
@@ -124,6 +130,34 @@ class PdfRepository {
   /// Load a single PDF and update its state
   Future<bool> _loadPdf(String url, bool isToday, {bool silent = false}) async {
     final previousState = isToday ? _todayState : _tomorrowState;
+    final dayLabel = isToday ? 'today' : 'tomorrow';
+
+    // Check if PDF is already cached
+    final cacheDir = await getTemporaryDirectory();
+    final filename = isToday ? 'today.pdf' : 'tomorrow.pdf';
+    final cachedFile = File('${cacheDir.path}/$filename');
+    
+    if (await cachedFile.exists()) {
+      final fileSize = await cachedFile.length();
+      if (fileSize > 1000) {
+        AppLogger.debug('Cache hit: Substitution plan - $dayLabel', module: 'PdfRepository');
+        try {
+          final metadata = await _extractMetadata(cachedFile);
+          _updatePdfState(isToday, PdfState(
+            isLoading: false,
+            hasData: true,
+            weekday: metadata['weekday'],
+            date: metadata['date'],
+            lastUpdated: metadata['lastUpdated'],
+            file: cachedFile,
+          ));
+          return true;
+        } catch (e) {
+          // If metadata extraction fails, continue to download
+          AppLogger.debug('Failed to extract metadata from cached file, re-downloading', module: 'PdfRepository');
+        }
+      }
+    }
 
     // Set loading state
     if (!silent) {
@@ -144,7 +178,7 @@ class PdfRepository {
         file: file,
       ));
 
-
+      AppLogger.debug('Substitution plan loaded: $dayLabel (${metadata['weekday']})', module: 'PdfRepository');
       return true;
     } catch (e) {
       if (!silent) {
