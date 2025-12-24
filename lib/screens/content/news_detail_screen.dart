@@ -203,7 +203,7 @@ class NewsDetailScreen extends ConsumerWidget {
               final attributes = (node as dynamic).attributes as Map<String, String>?;
               final href = attributes?['href'];
               final linkText = ((node as dynamic).text as String?)?.trim() ?? '';
-              if (href != null && linkText.isNotEmpty) {
+              if (href != null && href.isNotEmpty) {
                 // Convert relative URLs to absolute
                 final fullUrl = href.startsWith('http')
                     ? href
@@ -220,22 +220,43 @@ class NewsDetailScreen extends ConsumerWidget {
                   }
                 }
                 
-                if (linkSpans.isEmpty) {
+                // Check if we have visible content from child nodes
+                bool hasVisibleContentFromChildren = linkSpans.any((span) => 
+                  (span.text != null && span.text!.trim().isNotEmpty) ||
+                  (span.children != null && span.children!.isNotEmpty)
+                );
+                
+                // If no visible content from children, use linkText as fallback
+                if (!hasVisibleContentFromChildren && linkText.isNotEmpty) {
                   linkSpans.add(TextSpan(
                     text: linkText,
                     style: currentStyle?.copyWith(color: accentColor),
                   ));
                 }
                 
-                nodeSpans.add(TextSpan(
-                  children: linkSpans,
-                  style: currentStyle?.copyWith(color: accentColor),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      HapticService.light();
-                      _openLink(fullUrl);
-                    },
-                ));
+                // Create link span if we have any content
+                if (linkSpans.isNotEmpty) {
+                  nodeSpans.add(TextSpan(
+                    children: linkSpans,
+                    style: currentStyle?.copyWith(color: accentColor),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        HapticService.light();
+                        _openLink(fullUrl);
+                      },
+                  ));
+                } else if (linkText.isNotEmpty) {
+                  // Fallback: create a simple link span with just the text (if linkSpans is empty)
+                  nodeSpans.add(TextSpan(
+                    text: linkText,
+                    style: currentStyle?.copyWith(color: accentColor),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        HapticService.light();
+                        _openLink(fullUrl);
+                      },
+                  ));
+                }
                 return nodeSpans; // Return early, don't process children again
               }
               break;
@@ -372,8 +393,16 @@ class NewsDetailScreen extends ConsumerWidget {
     if (htmlContent != null && htmlContent.isNotEmpty) {
       final spans = _parseHtmlToTextSpans(htmlContent, theme, accentColor, links, trimTrailingWhitespace: trimTrailingWhitespace);
       if (spans.isNotEmpty) {
+        // Base text style for RichText
+        final baseStyle = theme.textTheme.bodyLarge?.copyWith(
+          height: 1.8,
+          letterSpacing: 0.2,
+        );
         return RichText(
-          text: TextSpan(children: spans),
+          text: TextSpan(
+            style: baseStyle,
+            children: spans,
+          ),
         );
       }
     }
@@ -524,8 +553,16 @@ class NewsDetailScreen extends ConsumerWidget {
       );
     }
     
+    // Base text style for RichText
+    final baseStyle = theme.textTheme.bodyLarge?.copyWith(
+      height: 1.8,
+      letterSpacing: 0.2,
+    );
     return RichText(
-      text: TextSpan(children: spans),
+      text: TextSpan(
+        style: baseStyle,
+        children: spans,
+      ),
     );
   }
 
