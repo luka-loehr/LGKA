@@ -1,5 +1,6 @@
 // Copyright Luka Löhr 2025
 
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/news_service.dart';
 import '../utils/app_logger.dart';
