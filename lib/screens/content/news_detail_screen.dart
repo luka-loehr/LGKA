@@ -160,13 +160,7 @@ class NewsDetailScreen extends ConsumerWidget {
   }
 
   /// Builds a RichText widget with clickable embedded links from the content
-  Widget _buildContentFromHtml(String? htmlContent, String? plainContent, List<NewsLink> links, BuildContext context, ThemeData theme, Color accentColor, {bool trimTrailingWhitespace = false}) {
-    // Simply use plain text with link matching - no HTML formatting
-    return _buildContentWithLinks(plainContent ?? '', links, context, theme, accentColor, trimTrailingWhitespace: trimTrailingWhitespace);
-  }
-
-  /// Builds a RichText widget with clickable embedded links from the content
-  Widget _buildContentWithLinks(String content, List<NewsLink> links, BuildContext context, ThemeData theme, Color accentColor, {bool trimTrailingWhitespace = false}) {
+  Widget _buildContentWithLinks(String content, List<NewsLink> links, ThemeData theme, Color accentColor, {bool trimTrailingWhitespace = false}) {
     // Trim trailing whitespace if buttons will follow
     if (trimTrailingWhitespace) {
       content = content.replaceAll(RegExp(r'\s+$'), '');
@@ -601,14 +595,11 @@ class NewsDetailScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 32),
                         
-                        // Full content with embedded links and formatting
-                        if ((event.htmlContent != null && event.htmlContent!.isNotEmpty) || 
-                            (event.content != null && event.content!.isNotEmpty)) ...[
-                          _buildContentFromHtml(
-                            event.htmlContent,
-                            event.content,
+                        // Full content with clickable embedded links
+                        if (event.content != null && event.content!.isNotEmpty) ...[
+                          _buildContentWithLinks(
+                            event.content!,
                             event.links,
-                            context,
                             theme,
                             accentColor,
                             trimTrailingWhitespace: event.standaloneLinksOrEmpty.isNotEmpty || event.downloads.isNotEmpty,
