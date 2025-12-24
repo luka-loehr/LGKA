@@ -29,8 +29,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   double _lastScrollPosition = 0.0;
-  DateTime? _lastHapticTime;
-  static const Duration _hapticDebounce = Duration(milliseconds: 50);
 
   @override
   void initState() {
@@ -192,15 +190,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           final currentPosition = _pageController.page ?? 0.0;
           final scrollDelta = (currentPosition - _lastScrollPosition).abs();
           
-          // Trigger haptic feedback when scroll position changes significantly
-          // Use a threshold to avoid too frequent haptics, but still provide continuous feedback
+          // Trigger haptic feedback when scroll position changes
+          // Provides continuous feedback for every movement during swipe
           if (scrollDelta > 0.01) {
-            final now = DateTime.now();
-            if (_lastHapticTime == null || 
-                now.difference(_lastHapticTime!) >= _hapticDebounce) {
-              HapticService.medium();
-              _lastHapticTime = now;
-            }
+            HapticService.medium();
             _lastScrollPosition = currentPosition;
           }
         }
