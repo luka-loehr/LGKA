@@ -126,6 +126,7 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
   }
 
   Future<void> _refreshSchedulesSilently() async {
+    AppLogger.info('Background refresh: Schedules', module: 'ScheduleProvider');
     await _scheduleService.refreshInBackground();
     final updatedSchedules = _scheduleService.cachedSchedules;
     if (updatedSchedules != null) {
@@ -135,6 +136,7 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
         clearError: true,
         lastUpdated: _scheduleService.lastFetchTime ?? DateTime.now(),
       );
+      AppLogger.success('Background refresh complete: Schedules', module: 'ScheduleProvider');
     }
   }
 
