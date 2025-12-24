@@ -77,7 +77,7 @@ class NewsEvent {
   final int views;
   final String url;
   final List<NewsLink> links; // Embedded links in text
-  final List<NewsLink> standaloneLinks; // Standalone links (full URLs) for buttons
+  final List<NewsLink>? standaloneLinks; // Standalone links (full URLs) for buttons (nullable for backward compatibility)
   final List<NewsImage> images;
   final List<NewsDownload> downloads;
 
@@ -91,10 +91,13 @@ class NewsEvent {
     required this.views,
     required this.url,
     this.links = const [],
-    this.standaloneLinks = const [],
+    this.standaloneLinks,
     this.images = const [],
     this.downloads = const [],
   });
+  
+  /// Get standalone links, returning empty list if null (for backward compatibility)
+  List<NewsLink> get standaloneLinksOrEmpty => standaloneLinks ?? const [];
 
   Map<String, dynamic> toJson() => {
         'title': title,
@@ -105,7 +108,7 @@ class NewsEvent {
         'views': views,
         'url': url,
         'links': links.map((l) => l.toJson()).toList(),
-        'standalone_links': standaloneLinks.map((l) => l.toJson()).toList(),
+        'standalone_links': (standaloneLinks ?? []).map((l) => l.toJson()).toList(),
         'images': images.map((i) => i.toJson()).toList(),
         'downloads': downloads.map((d) => d.toJson()).toList(),
       };
@@ -288,7 +291,7 @@ class NewsService {
               views: result['views'] as int,
               url: result['url'] as String,
               links: (result['links'] as List<NewsLink>?) ?? [],
-              standaloneLinks: (result['standaloneLinks'] as List<NewsLink>?) ?? [],
+              standaloneLinks: (result['standaloneLinks'] as List<NewsLink>?),
               images: (result['images'] as List<NewsImage>?) ?? [],
               downloads: (result['downloads'] as List<NewsDownload>?) ?? [],
             );
