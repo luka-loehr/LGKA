@@ -3,7 +3,7 @@
 // Script to generate app icons from your static logo file
 // 
 // Usage:
-// 1. Place your app-logo.png (with background) in assets/images/app-icons/
+// 1. Place your app-icon.webp (with background) in assets/images/app-icons/
 // 2. Run: dart run generate_app_icons.dart
 // 
 // This will automatically generate all required app icon sizes for Android and iOS
@@ -16,14 +16,14 @@ void main() async {
   print('=' * 50);
   
   // Check if logo file exists
-  final logoFile = File('assets/images/app-icons/app-logo.png');
+  final logoFile = File('assets/images/app-icons/app-icon.webp');
   if (!logoFile.existsSync()) {
-    print('[ERROR] app-logo.png not found!');
+    print('[ERROR] app-icon.webp not found!');
     print('        Please place your logo at:');
-    print('        assets/images/app-icons/app-logo.png');
+    print('        assets/images/app-icons/app-icon.webp');
     print('');
     print('Logo Requirements:');
-    print('  - PNG format (with integrated background)');
+    print('  - WebP format (with integrated background)');
     print('  - 1024x1024px minimum size');
     print('  - Include your own background design');
     print('  - Should look good at small sizes');
@@ -31,7 +31,7 @@ void main() async {
     exit(1);
   }
   
-  print('[OK] Found app-logo.png');
+  print('[OK] Found app-icon.webp');
   
   // Check if flutter_launcher_icons is installed
   print('[INFO] Getting dependencies...');
