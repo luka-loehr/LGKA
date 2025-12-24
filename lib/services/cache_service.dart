@@ -17,7 +17,7 @@ class CacheService {
   factory CacheService() => _instance;
   CacheService._internal();
 
-  /// Cache validity durations for each cache type
+  /// Cache validity durations for each cache type (kept for backward compatibility, but not used)
   static const Map<CacheKey, Duration> _cacheValidityDurations = {
     CacheKey.substitutions: Duration(minutes: 2),
     CacheKey.schedules: Duration(minutes: 5),
@@ -28,19 +28,34 @@ class CacheService {
 
   /// Map to store last fetch time for each cache key
   final Map<CacheKey, DateTime?> _lastFetchTimes = {};
+  
+  /// Timestamp when app was last backgrounded (null if never backgrounded in this session)
+  DateTime? _lastBackgroundTime;
 
   /// Get the cache validity duration for a specific cache key
   Duration getCacheValidity(CacheKey key) {
     return _cacheValidityDurations[key] ?? const Duration(minutes: 5);
   }
 
+  /// Mark that the app was backgrounded
+  void markAppBackgrounded() {
+    _lastBackgroundTime = DateTime.now();
+  }
+
   /// Check if cache is valid for a given key
+  /// Cache is valid if:
+  /// 1. There is a fetch time
+  /// 2. App was not backgrounded since the last fetch (or was never backgrounded)
   bool isCacheValid(CacheKey key, {DateTime? lastFetchTime}) {
     final fetchTime = lastFetchTime ?? _lastFetchTimes[key];
     if (fetchTime == null) return false;
 
-    final validityDuration = getCacheValidity(key);
-    return DateTime.now().difference(fetchTime) < validityDuration;
+    // If app was never backgrounded in this session, cache is valid
+    if (_lastBackgroundTime == null) return true;
+
+    // Cache is valid only if last fetch happened after the app was backgrounded
+    // (i.e., data was fetched after returning to foreground)
+    return fetchTime.isAfter(_lastBackgroundTime!);
   }
 
   /// Update the last fetch time for a cache key
@@ -61,6 +76,11 @@ class CacheService {
   /// Clear all cache timestamps
   void clearAllCaches() {
     _lastFetchTimes.clear();
+  }
+
+  /// Mark app as backgrounded (clears cache validity)
+  void onAppBackgrounded() {
+    markAppBackgrounded();
   }
 
   /// Check if cache is expired (opposite of isCacheValid)

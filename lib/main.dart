@@ -124,7 +124,7 @@ class LGKAApp extends ConsumerStatefulWidget {
   ConsumerState<LGKAApp> createState() => _LGKAAppState();
 }
 
-class _LGKAAppState extends ConsumerState<LGKAApp> {
+class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
   late final _router = AppRouter.createRouter(initialLocation: widget.initialRoute);
   final _cacheService = CacheService();
   // Use the shortest cache validity (substitutions: 2 minutes) for refresh timer
@@ -134,6 +134,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     // Preload PDFs and weather data in background
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -144,8 +145,25 @@ class _LGKAAppState extends ConsumerState<LGKAApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _cacheRefreshTimer?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    // When app goes to background (paused or inactive), mark cache as invalid
+    // This ensures cache will be invalid when user returns to the app
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      AppLogger.info('App backgrounded - marking cache as invalid');
+      _cacheService.onAppBackgrounded();
+    }
+    // When app resumes, cache will be invalid and will refetch automatically
+    else if (state == AppLifecycleState.resumed) {
+      AppLogger.info('App resumed - cache invalidated, will refetch on next access');
+    }
   }
 
   Future<void> _preloadData() async {
