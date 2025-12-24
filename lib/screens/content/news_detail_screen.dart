@@ -344,17 +344,225 @@ class NewsDetailScreen extends ConsumerWidget {
     return spans;
   }
 
+  /// Applies link matching to formatted TextSpans, making link text clickable while preserving formatting
+  List<TextSpan> _applyLinksToFormattedSpans(List<TextSpan> formattedSpans, List<NewsLink> links, Color accentColor) {
+    if (links.isEmpty) return formattedSpans;
+    
+    // Helper to extract plain text from a span (recursive)
+    String extractText(TextSpan span) {
+      if (span.text != null) return span.text!;
+      if (span.children != null) {
+        return span.children!.map((child) {
+          if (child is TextSpan) return extractText(child);
+          return '';
+        }).join('');
+      }
+      return '';
+    }
+    
+    // Build a flat list of text segments with their spans and positions
+    final List<({TextSpan span, String text, int start, int end})> segments = [];
+    int currentPos = 0;
+    
+    void addSegment(TextSpan span) {
+      String text = extractText(span);
+      if (text.isNotEmpty) {
+        segments.add((span: span, text: text, start: currentPos, end: currentPos + text.length));
+        currentPos += text.length;
+      }
+    }
+    
+    for (var span in formattedSpans) {
+      addSegment(span);
+    }
+    
+    String fullText = segments.map((s) => s.text).join('');
+    
+    // Find link matches
+    final sortedLinks = List<NewsLink>.from(links)..sort((a, b) => b.text.length.compareTo(a.text.length));
+    final List<_LinkMatch> matches = [];
+    
+    for (var link in sortedLinks) {
+      int index = fullText.indexOf(link.text);
+      while (index != -1) {
+        matches.add(_LinkMatch(start: index, end: index + link.text.length, link: link));
+        index = fullText.indexOf(link.text, index + 1);
+      }
+    }
+    
+    matches.sort((a, b) => a.start.compareTo(b.start));
+    
+    // Remove overlapping matches
+    final List<_LinkMatch> nonOverlappingMatches = [];
+    for (var match in matches) {
+      bool overlaps = false;
+      for (var existing in nonOverlappingMatches) {
+        if (match.start < existing.end && match.end > existing.start) {
+          overlaps = true;
+          break;
+        }
+      }
+      if (!overlaps) {
+        nonOverlappingMatches.add(match);
+      }
+    }
+    
+    if (nonOverlappingMatches.isEmpty) return formattedSpans;
+    
+    // Rebuild spans with links inserted
+    final List<TextSpan> result = [];
+    int currentPos = 0;
+    
+    // Process all segments and matches together
+    int segmentIndex = 0;
+    int matchIndex = 0;
+    
+    while (segmentIndex < segments.length || matchIndex < nonOverlappingMatches.length) {
+      // Find next event (either end of segment or start/end of match)
+      bool hasNextSegment = segmentIndex < segments.length;
+      bool hasNextMatch = matchIndex < nonOverlappingMatches.length;
+      
+      if (!hasNextSegment && !hasNextMatch) break;
+      
+      int nextSegmentEnd = hasNextSegment ? segments[segmentIndex].end : 999999999;
+      int nextMatchStart = hasNextMatch ? nonOverlappingMatches[matchIndex].start : 999999999;
+      
+      // Add text before next match or segment end
+      if (nextMatchStart < nextSegmentEnd) {
+        // Match comes first - add text before match, then the link
+        if (nextMatchStart > currentPos) {
+          // Add text from current position to match start
+          _addTextSpansBetween(result, segments, currentPos, nextMatchStart);
+        }
+        
+        // Add the link span
+        final match = nonOverlappingMatches[matchIndex];
+        _addLinkSpanAtPosition(result, segments, match.start, match.end, match.link, accentColor);
+        
+        currentPos = match.end;
+        matchIndex++;
+      } else {
+        // Segment ends first - add remaining text in segment
+        if (nextSegmentEnd > currentPos) {
+          _addTextSpansBetween(result, segments, currentPos, nextSegmentEnd);
+          currentPos = nextSegmentEnd;
+        }
+        segmentIndex++;
+      }
+    }
+    
+    return result.isEmpty ? formattedSpans : result;
+  }
+  
+  /// Adds text spans between two positions, preserving formatting
+  void _addTextSpansBetween(List<TextSpan> result, List<({TextSpan span, String text, int start, int end})> segments, int startPos, int endPos) {
+    for (var segment in segments) {
+      if (segment.end <= startPos) continue;
+      if (segment.start >= endPos) break;
+      
+      int segmentStart = segment.start > startPos ? segment.start : startPos;
+      int segmentEnd = segment.end < endPos ? segment.end : endPos;
+      
+      if (segmentStart < segmentEnd) {
+        int textStart = segmentStart - segment.start;
+        int textEnd = segmentEnd - segment.start;
+        
+        if (textStart == 0 && textEnd == segment.text.length) {
+          // Use entire segment
+          result.add(segment.span);
+        } else {
+          // Use portion of segment
+          result.add(_createTextSpanFromSegment(segment.span, segment.text, textStart, textEnd));
+        }
+      }
+    }
+  }
+  
+  /// Adds a link span at a specific position, preserving formatting from the underlying segment
+  void _addLinkSpanAtPosition(List<TextSpan> result, List<({TextSpan span, String text, int start, int end})> segments, int startPos, int endPos, NewsLink link, Color accentColor) {
+    // Find the segment(s) that contain this link
+    for (var segment in segments) {
+      if (segment.end <= startPos) continue;
+      if (segment.start >= endPos) break;
+      
+      int linkStartInSegment = startPos - segment.start;
+      int linkEndInSegment = endPos - segment.start;
+      
+      if (linkStartInSegment >= 0 && linkEndInSegment <= segment.text.length) {
+        TextSpan linkSpan = _createLinkSpanFromSegment(
+          segment.span,
+          segment.text,
+          linkStartInSegment,
+          linkEndInSegment,
+          link,
+          accentColor,
+        );
+        result.add(linkSpan);
+        break; // Link should be in one segment
+      }
+    }
+  }
+  }
+  
+  /// Creates a TextSpan from a portion of a segment, preserving formatting
+  TextSpan _createTextSpanFromSegment(TextSpan originalSpan, String segmentText, int start, int end) {
+    if (start >= end || start < 0 || end > segmentText.length) {
+      return TextSpan(text: '');
+    }
+    
+    String text = segmentText.substring(start, end);
+    
+    // If original span has children, we need to preserve that structure
+    // For simplicity, create a new span with the same style
+    return TextSpan(
+      text: text,
+      style: originalSpan.style,
+    );
+  }
+  
+  /// Creates a clickable link span from a portion of a segment, preserving formatting
+  TextSpan _createLinkSpanFromSegment(TextSpan originalSpan, String segmentText, int start, int end, NewsLink link, Color accentColor) {
+    if (start >= end || start < 0 || end > segmentText.length) {
+      return TextSpan(text: '');
+    }
+    
+    String linkText = segmentText.substring(start, end);
+    
+    // Create recognizer for the link
+    final recognizer = TapGestureRecognizer()
+      ..onTap = () {
+        HapticService.light();
+        _openLink(link.url);
+      };
+    
+    // Preserve original formatting but add accent color and recognizer
+    TextStyle? linkStyle = originalSpan.style?.copyWith(color: accentColor);
+    if (linkStyle == null) {
+      linkStyle = TextStyle(color: accentColor);
+    }
+    
+    return TextSpan(
+      text: linkText,
+      style: linkStyle,
+      recognizer: recognizer,
+    );
+  }
+
   /// Builds a RichText widget with formatted HTML content and clickable links
   Widget _buildContentFromHtml(String? htmlContent, String? plainContent, List<NewsLink> links, BuildContext context, ThemeData theme, Color accentColor, {bool trimTrailingWhitespace = false}) {
-    // Strategy: 
-    // - If no embedded links: Use HTML formatting for bold/italic/etc
-    // - If embedded links exist: Use proven plain text + link matching (ensures links work)
-    // - Standalone links and downloads are always shown as buttons (handled separately)
+    // Strategy: Parse HTML for formatting, then apply link matching to formatted spans
+    // This preserves both HTML formatting (bold/italic) AND makes embedded links clickable
     
-    if (htmlContent != null && htmlContent.isNotEmpty && links.isEmpty) {
-      // No embedded links - use HTML formatting directly
-      final spans = _parseHtmlToTextSpans(htmlContent, theme, accentColor, links, trimTrailingWhitespace: trimTrailingWhitespace);
-      if (spans.isNotEmpty) {
+    if (htmlContent != null && htmlContent.isNotEmpty) {
+      // Parse HTML for formatting (skips <a> tags, just extracts text)
+      final formattedSpans = _parseHtmlToTextSpans(htmlContent, theme, accentColor, links, trimTrailingWhitespace: trimTrailingWhitespace);
+      
+      if (formattedSpans.isNotEmpty) {
+        // Apply link matching to formatted spans (preserves formatting, adds clickability)
+        final spansWithLinks = links.isNotEmpty 
+            ? _applyLinksToFormattedSpans(formattedSpans, links, accentColor)
+            : formattedSpans;
+        
         // Base text style for RichText
         final baseStyle = theme.textTheme.bodyLarge?.copyWith(
           height: 1.8,
@@ -363,16 +571,13 @@ class NewsDetailScreen extends ConsumerWidget {
         return RichText(
           text: TextSpan(
             style: baseStyle,
-            children: spans,
+            children: spansWithLinks,
           ),
         );
       }
     }
     
-    // If we have embedded links, use the proven plain text approach with link matching
-    // This ensures links work correctly
-    // Note: HTML formatting (bold/italic) is lost here, but links work reliably
-    // Standalone links and downloads are preserved as buttons
+    // Fallback to plain text with links if HTML parsing fails
     return _buildContentWithLinks(plainContent ?? '', links, context, theme, accentColor, trimTrailingWhitespace: trimTrailingWhitespace);
   }
 
