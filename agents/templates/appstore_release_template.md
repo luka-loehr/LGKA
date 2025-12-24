@@ -13,6 +13,7 @@ github.com/luka-loehr/LGKA/releases/tag/x.x.x
 ---
 
 <!-- Format Guidelines:
+- ALWAYS RETURN THE appstore release notes to the user in chat, NEVER CREATE A FILE
 - German language
 - Simple, concise bullet points (one per line, no dashes)
 - User-friendly language focusing on what users will notice
