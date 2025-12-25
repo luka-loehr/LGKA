@@ -79,6 +79,7 @@ class SubstitutionService {
   bool _isInitialized = false;
   DateTime? _lastFetchTime;
   bool _isRefreshing = false;
+  bool _refreshFailedAfterResume = false; // Track if refresh failed after app resume
 
   // Getters
   SubstitutionState get todayState => _todayState;
@@ -102,7 +103,21 @@ class SubstitutionService {
       // This ensures fresh data is ready when user accesses substitutions
       if (hasAnyData && !_isCacheValid) {
         AppLogger.info('Cache invalid on access - refreshing substitutions immediately', module: 'SubstitutionService');
+        _refreshFailedAfterResume = false; // Reset flag before refresh attempt
         await refreshInBackground(); // Wait for refresh to complete
+        
+        // If refresh failed, clear cached data and show error
+        if (_refreshFailedAfterResume) {
+          AppLogger.warning('Refresh failed after resume - clearing cached data', module: 'SubstitutionService');
+          _todayState = const SubstitutionState(
+            isLoading: false,
+            error: 'Serververbindung fehlgeschlagen',
+          );
+          _tomorrowState = const SubstitutionState(
+            isLoading: false,
+            error: 'Serververbindung fehlgeschlagen',
+          );
+        }
       }
       return;
     }
@@ -126,6 +141,7 @@ class SubstitutionService {
     if (results.any((success) => success)) {
       _lastFetchTime = DateTime.now();
       _cacheService.updateCacheTimestamp(CacheKey.substitutions, _lastFetchTime);
+      _refreshFailedAfterResume = false; // Reset flag on successful refresh
     }
   }
 
@@ -335,22 +351,25 @@ class SubstitutionService {
     } catch (e) {
       AppLogger.error('Background refresh failed: Substitution plans', module: 'SubstitutionService', error: e);
       
-      // On error, restore previous state but show error if we have no data
-      // If we have existing data, keep it and just clear loading
-      if (previousTodayState.hasData && previousTomorrowState.hasData) {
-        // Keep existing data, just clear loading state
+      // Mark that refresh failed after resume
+      _refreshFailedAfterResume = true;
+      
+      // If cache was invalid (app was backgrounded), don't show cached data
+      // Clear it and show error instead
+      if (!_isCacheValid) {
+        AppLogger.info('Refresh failed with invalid cache - clearing cached data', module: 'SubstitutionService');
+        _todayState = const SubstitutionState(
+          isLoading: false,
+          error: 'Serververbindung fehlgeschlagen',
+        );
+        _tomorrowState = const SubstitutionState(
+          isLoading: false,
+          error: 'Serververbindung fehlgeschlagen',
+        );
+      } else {
+        // Cache is still valid, keep existing data and just clear loading
         _todayState = previousTodayState.copyWith(isLoading: false);
         _tomorrowState = previousTomorrowState.copyWith(isLoading: false);
-      } else {
-        // No existing data, show error
-        _todayState = previousTodayState.copyWith(
-          isLoading: false,
-          error: 'Serververbindung fehlgeschlagen',
-        );
-        _tomorrowState = previousTomorrowState.copyWith(
-          isLoading: false,
-          error: 'Serververbindung fehlgeschlagen',
-        );
       }
     } finally {
       _isRefreshing = false;

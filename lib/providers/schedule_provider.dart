@@ -127,8 +127,10 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
 
   Future<void> _refreshSchedulesSilently() async {
     AppLogger.info('Background refresh: Schedules', module: 'ScheduleProvider');
+    final wasCacheValid = _scheduleService.hasValidCache;
     await _scheduleService.refreshInBackground();
     final updatedSchedules = _scheduleService.cachedSchedules;
+    
     if (updatedSchedules != null) {
       state = state.copyWith(
         schedules: updatedSchedules,
@@ -137,6 +139,14 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
         lastUpdated: _scheduleService.lastFetchTime ?? DateTime.now(),
       );
       AppLogger.success('Background refresh complete: Schedules', module: 'ScheduleProvider');
+    } else if (!wasCacheValid) {
+      // Cache was invalid and refresh failed - clear data and show error
+      AppLogger.info('Refresh failed with invalid cache - showing error for schedules', module: 'ScheduleProvider');
+      state = state.copyWith(
+        schedules: const [],
+        isLoading: false,
+        error: 'Serververbindung fehlgeschlagen',
+      );
     }
   }
 
