@@ -107,8 +107,8 @@ class SubstitutionService {
         AppLogger.info('Cache invalid on access - refreshing substitutions immediately', module: 'SubstitutionService');
         _refreshFailedAfterResume = false; // Reset flag before refresh attempt
         await refreshInBackground(); // Wait for refresh to complete
-        
-        // refreshInBackground() already handles clearing data on failure, no need to do it again here
+        // refreshInBackground() already handles clearing data on failure
+      }
       // If no data and cache invalid, refreshInBackground already handled it
       // Don't try to load again here to avoid infinite loops
       return;
