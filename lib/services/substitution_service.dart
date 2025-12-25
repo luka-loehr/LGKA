@@ -315,17 +315,43 @@ class SubstitutionService {
     _isRefreshing = true;
     AppLogger.info('Starting background refresh: Substitution plans', module: 'SubstitutionService');
     
+    // Store previous states to restore on error
+    final previousTodayState = _todayState;
+    final previousTomorrowState = _tomorrowState;
+    
     // Set loading state so UI shows spinner and disables buttons
     _todayState = _todayState.copyWith(isLoading: true, error: null);
     _tomorrowState = _tomorrowState.copyWith(isLoading: true, error: null);
     
     try {
-      await _loadBothPdfs(silent: true);
+      // Add timeout to prevent infinite loading (15 seconds)
+      await _loadBothPdfs(silent: true).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          throw TimeoutException('Refresh timeout after 15 seconds', const Duration(seconds: 15));
+        },
+      );
       AppLogger.success('Background refresh complete: Substitution plans', module: 'SubstitutionService');
     } catch (e) {
       AppLogger.error('Background refresh failed: Substitution plans', module: 'SubstitutionService', error: e);
-      // On error, restore previous state (don't show error in background refresh)
-      // The data will remain as it was before refresh
+      
+      // On error, restore previous state but show error if we have no data
+      // If we have existing data, keep it and just clear loading
+      if (previousTodayState.hasData && previousTomorrowState.hasData) {
+        // Keep existing data, just clear loading state
+        _todayState = previousTodayState.copyWith(isLoading: false);
+        _tomorrowState = previousTomorrowState.copyWith(isLoading: false);
+      } else {
+        // No existing data, show error
+        _todayState = previousTodayState.copyWith(
+          isLoading: false,
+          error: 'Serververbindung fehlgeschlagen',
+        );
+        _tomorrowState = previousTomorrowState.copyWith(
+          isLoading: false,
+          error: 'Serververbindung fehlgeschlagen',
+        );
+      }
     } finally {
       _isRefreshing = false;
     }
