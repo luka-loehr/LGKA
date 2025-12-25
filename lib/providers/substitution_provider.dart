@@ -130,7 +130,7 @@ class SubstitutionNotifier extends Notifier<SubstitutionProviderState> {
     // Update state immediately to show loading spinner
     _refreshState();
     await _substitutionService.refreshInBackground();
-    // Update state again after refresh completes
+    // Update state again after refresh completes (including error states)
     _refreshState();
     AppLogger.success('Background refresh complete: Substitution plans', module: 'SubstitutionProvider');
   }
