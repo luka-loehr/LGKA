@@ -106,19 +106,9 @@ class SubstitutionService {
         _refreshFailedAfterResume = false; // Reset flag before refresh attempt
         await refreshInBackground(); // Wait for refresh to complete
         
-        // If refresh failed, clear cached data and show error
-        if (_refreshFailedAfterResume) {
-          AppLogger.warning('Refresh failed after resume - clearing cached data', module: 'SubstitutionService');
-          _todayState = const SubstitutionState(
-            isLoading: false,
-            error: 'Serververbindung fehlgeschlagen',
-          );
-          _tomorrowState = const SubstitutionState(
-            isLoading: false,
-            error: 'Serververbindung fehlgeschlagen',
-          );
-        }
-      }
+        // refreshInBackground() already handles clearing data on failure, no need to do it again here
+      // If no data and cache invalid, refreshInBackground already handled it
+      // Don't try to load again here to avoid infinite loops
       return;
     }
 
@@ -358,12 +348,15 @@ class SubstitutionService {
       // Clear it and show error instead
       if (!_isCacheValid) {
         AppLogger.info('Refresh failed with invalid cache - clearing cached data', module: 'SubstitutionService');
+        // Clear data and set error - ensure isLoading is false and hasData is false
         _todayState = const SubstitutionState(
           isLoading: false,
+          hasData: false,
           error: 'Serververbindung fehlgeschlagen',
         );
         _tomorrowState = const SubstitutionState(
           isLoading: false,
+          hasData: false,
           error: 'Serververbindung fehlgeschlagen',
         );
       } else {
