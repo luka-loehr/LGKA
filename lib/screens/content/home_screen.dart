@@ -714,9 +714,9 @@ class _SettingsSheet extends ConsumerWidget {
       return const SizedBox.shrink();
     }
     
-    // Format timestamp to show only time with seconds (HH:mm:ss Uhr)
+    // Format timestamp to show only time with seconds (HH:mm:ss)
     final dateFormat = DateFormat('HH:mm:ss', 'de_DE');
-    final formattedTime = '${dateFormat.format(mostRecentTimestamp)} Uhr';
+    final formattedTime = dateFormat.format(mostRecentTimestamp);
     
     return Text(
       AppLocalizations.of(context)!.lastDownloaded(formattedTime),
