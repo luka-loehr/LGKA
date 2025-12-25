@@ -94,11 +94,13 @@ class SubstitutionService {
 
   /// Initialize the service by loading both PDFs
   Future<void> initialize() async {
-    // Already initialized - don't reload (even if we have errors)
+    // Already initialized - check if refresh is needed
     if (_isInitialized) {
-      // Refresh in background if cache is stale and we have data
+      // If cache is invalid and we have data, refresh immediately (don't wait in background)
+      // This ensures fresh data is ready when user accesses substitutions
       if (hasAnyData && !_isCacheValid) {
-        unawaited(refreshInBackground());
+        AppLogger.info('Cache invalid on access - refreshing substitutions immediately', module: 'SubstitutionService');
+        await refreshInBackground(); // Wait for refresh to complete
       }
       return;
     }
