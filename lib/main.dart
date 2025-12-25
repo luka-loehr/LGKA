@@ -160,9 +160,11 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
       AppLogger.info('App backgrounded - marking cache as invalid');
       _cacheService.onAppBackgrounded();
     }
-    // When app resumes, cache will be invalid and will refetch automatically
+    // When app resumes, immediately refresh critical data (substitutions, weather)
+    // so fresh data is ready when user accesses it
     else if (state == AppLifecycleState.resumed) {
-      AppLogger.info('App resumed - cache invalidated, will refetch on next access');
+      AppLogger.info('App resumed - cache invalidated, refreshing critical data');
+      _refreshCriticalDataOnResume();
     }
   }
 
@@ -227,6 +229,38 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
     _cacheRefreshTimer = Timer.periodic(_cacheRefreshInterval, (_) {
       unawaited(_refreshExpiredCaches());
     });
+  }
+
+  /// Refresh critical data immediately when app resumes (substitutions, weather)
+  /// This ensures fresh data is ready when user accesses it
+  Future<void> _refreshCriticalDataOnResume() async {
+    // Immediately refresh substitutions and weather (most frequently accessed)
+    final substitutionState = ref.read(substitutionProvider);
+    if (!substitutionState.isCacheValid && substitutionState.hasAnyData) {
+      AppLogger.info('App resumed: Immediately refreshing substitutions', module: 'Main');
+      unawaited(ref.read(substitutionProvider.notifier).refreshInBackground());
+    }
+
+    final weatherState = ref.read(weatherDataProvider);
+    final weatherLastUpdate = weatherState.lastUpdateTime;
+    if (weatherLastUpdate == null ||
+        _cacheService.isCacheExpired(CacheKey.weather, lastFetchTime: weatherLastUpdate)) {
+      AppLogger.info('App resumed: Immediately refreshing weather', module: 'Main');
+      unawaited(ref.read(weatherDataProvider.notifier).updateDataInBackground());
+    }
+
+    // Refresh schedules and news in background (less critical)
+    final scheduleService = ref.read(scheduleServiceProvider);
+    if (!scheduleService.hasValidCache && scheduleService.cachedSchedules != null) {
+      AppLogger.debug('App resumed: Refreshing schedules in background', module: 'Main');
+      unawaited(ref.read(scheduleProvider.notifier).refreshInBackground());
+    }
+
+    final newsService = ref.read(newsServiceProvider);
+    if (!newsService.hasValidCache && newsService.cachedEvents != null) {
+      AppLogger.debug('App resumed: Refreshing news in background', module: 'Main');
+      unawaited(ref.read(newsProvider.notifier).refreshInBackground());
+    }
   }
 
   Future<void> _refreshExpiredCaches() async {
