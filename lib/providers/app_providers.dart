@@ -402,6 +402,9 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
   /// Update data in background (silent refresh)
   Future<void> updateDataInBackground() async {
     AppLogger.info('Background refresh: Weather data', module: 'WeatherProvider');
+    final wasCacheValid = state.lastUpdateTime != null && 
+                          _cacheService.isCacheValid(CacheKey.weather, lastFetchTime: state.lastUpdateTime);
+    
     try {
       final chartDataFuture = _weatherService.fetchWeatherData();
       final latestDataFuture = _weatherService.getLatestWeatherData();
@@ -424,7 +427,18 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
       }
     } catch (e) {
       AppLogger.error('Background refresh failed: Weather data', module: 'WeatherProvider', error: e);
-      // Silent failure for background updates - don't show to user
+      
+      // If cache was invalid (app was backgrounded), clear cached data and show error
+      if (!wasCacheValid) {
+        AppLogger.info('Refresh failed with invalid cache - clearing cached weather data', module: 'WeatherProvider');
+        state = state.copyWith(
+          chartData: const [],
+          latestData: null,
+          error: 'Fehler beim Laden der Wetterdaten',
+          isLoading: false,
+        );
+      }
+      // If cache was valid, keep existing data (silent failure)
     }
   }
 }

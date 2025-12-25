@@ -106,6 +106,8 @@ class ScheduleService {
 
     _isRefreshing = true;
     AppLogger.info('Starting background refresh: Schedules', module: 'ScheduleService');
+    final wasCacheValid = hasValidCache;
+    
     try {
       final schedules = await _scrapeSchedules();
       _cachedSchedules = schedules;
@@ -114,7 +116,14 @@ class ScheduleService {
       AppLogger.success('Background refresh complete: Schedules', module: 'ScheduleService');
     } catch (e) {
       AppLogger.error('Background refresh failed: Schedules', module: 'ScheduleService', error: e);
-      // Ignore background refresh errors - don't show to user
+      
+      // If cache was invalid (app was backgrounded), clear cached data
+      if (!wasCacheValid) {
+        AppLogger.info('Refresh failed with invalid cache - clearing cached schedules', module: 'ScheduleService');
+        _cachedSchedules = null;
+        _lastFetchTime = null;
+      }
+      // If cache was valid, keep existing data (silent failure)
     } finally {
       _isRefreshing = false;
     }

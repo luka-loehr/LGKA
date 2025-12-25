@@ -363,14 +363,22 @@ class NewsService {
 
   /// Refresh cache in background
   Future<void> _refreshCacheInBackground() async {
+    final wasCacheValid = hasValidCache;
     try {
       final events = await fetchNewsEvents(forceRefresh: true);
       _cachedEvents = events;
       _lastFetchTime = DateTime.now();
       _cacheService.updateCacheTimestamp(CacheKey.news, _lastFetchTime);
     } catch (e) {
-      // Ignore background refresh errors
       AppLogger.debug('Background news refresh failed', module: 'NewsService');
+      
+      // If cache was invalid (app was backgrounded), clear cached data
+      if (!wasCacheValid) {
+        AppLogger.info('Refresh failed with invalid cache - clearing cached news', module: 'NewsService');
+        _cachedEvents = null;
+        _lastFetchTime = null;
+      }
+      // If cache was valid, keep existing data (silent failure)
     }
   }
 
