@@ -437,23 +437,39 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
       displayText = weekday;
     }
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          displayText,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: isDisabled 
-                ? AppColors.appOnSurface.withValues(alpha: 0.5)
-                : AppColors.appOnSurface,
-            fontWeight: FontWeight.w500,
-          ),
+        Row(
+          children: [
+            Text(
+              displayText,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: isDisabled 
+                    ? AppColors.appOnSurface.withValues(alpha: 0.5)
+                    : AppColors.appOnSurface,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            if (date.isNotEmpty && !isDisabled) ...[
+              const SizedBox(width: 8),
+              Text(
+                date,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.secondaryText,
+                ),
+              ),
+            ],
+          ],
         ),
-        if (date.isNotEmpty && !isDisabled) ...[
-          const SizedBox(width: 8),
+        // Debug: Show download timestamp
+        if (widget.pdfState.downloadTimestamp != null && !isDisabled) ...[
+          const SizedBox(height: 4),
           Text(
-            date,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.secondaryText,
+            'Downloaded: ${_formatTimestamp(widget.pdfState.downloadTimestamp!)}',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.secondaryText.withValues(alpha: 0.7),
+              fontSize: 11,
             ),
           ),
         ],
@@ -497,5 +513,12 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
       HapticService.medium();
       widget.onTap();
     }
+  }
+
+  String _formatTimestamp(DateTime timestamp) {
+    final hour = timestamp.hour.toString().padLeft(2, '0');
+    final minute = timestamp.minute.toString().padLeft(2, '0');
+    final second = timestamp.second.toString().padLeft(2, '0');
+    return '$hour:$minute:$second';
   }
 }
