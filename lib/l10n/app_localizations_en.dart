@@ -460,4 +460,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get supportProject => 'Support Project';
+
+  @override
+  String lastDownloaded(String time) {
+    return 'Last downloaded: $time';
+  }
 }

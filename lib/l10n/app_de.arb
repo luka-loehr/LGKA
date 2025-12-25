@@ -186,5 +186,13 @@
   "colorPeach": "Pfirsich",
   "csvFileTooLarge": "CSV-Datei zu groß oder beschädigt",
   "errorLoadingWeather": "Fehler beim Laden der Wetterdaten",
-  "supportProject": "Projekt unterstützen"
+  "supportProject": "Projekt unterstützen",
+  "lastDownloaded": "Zuletzt aktualisiert: {time}",
+  "@lastDownloaded": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }
