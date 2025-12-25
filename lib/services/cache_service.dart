@@ -19,7 +19,7 @@ class CacheService {
 
   /// Cache validity durations for each cache type (kept for backward compatibility, but not used)
   static const Map<CacheKey, Duration> _cacheValidityDurations = {
-    CacheKey.substitutions: Duration(minutes: 2),
+    CacheKey.substitutions: Duration(minutes: 1),
     CacheKey.schedules: Duration(minutes: 5),
     CacheKey.scheduleAvailability: Duration(minutes: 15),
     CacheKey.news: Duration(minutes: 5),
