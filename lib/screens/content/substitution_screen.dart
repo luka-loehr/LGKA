@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/substitution_provider.dart';
 import '../../services/haptic_service.dart';
@@ -116,12 +115,6 @@ class _SubstitutionScreenState extends ConsumerState<SubstitutionScreen>
             child: _buildPlanOptions(substitutionState, ref),
           ),
           
-          // Last downloaded notice
-          FadeTransition(
-            opacity: _fadeAnimation,
-            child: _buildLastDownloadedNotice(substitutionState),
-          ),
-          
           const Spacer(),
           
           // Footer
@@ -189,43 +182,6 @@ class _SubstitutionScreenState extends ConsumerState<SubstitutionScreen>
         'dayName': weekday,
       });
     }
-  }
-
-  Widget _buildLastDownloadedNotice(SubstitutionProviderState substitutionState) {
-    // Get the most recent download timestamp from both today and tomorrow
-    final todayTimestamp = substitutionState.todayState.downloadTimestamp;
-    final tomorrowTimestamp = substitutionState.tomorrowState.downloadTimestamp;
-    
-    DateTime? mostRecentTimestamp;
-    if (todayTimestamp != null && tomorrowTimestamp != null) {
-      mostRecentTimestamp = todayTimestamp.isAfter(tomorrowTimestamp) 
-          ? todayTimestamp 
-          : tomorrowTimestamp;
-    } else if (todayTimestamp != null) {
-      mostRecentTimestamp = todayTimestamp;
-    } else if (tomorrowTimestamp != null) {
-      mostRecentTimestamp = tomorrowTimestamp;
-    }
-    
-    // Only show notice if we have a timestamp
-    if (mostRecentTimestamp == null) {
-      return const SizedBox.shrink();
-    }
-    
-    // Format timestamp to show only time with seconds (HH:mm:ss Uhr)
-    final dateFormat = DateFormat('HH:mm:ss', 'de_DE');
-    final formattedTime = '${dateFormat.format(mostRecentTimestamp)} Uhr';
-    
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: Text(
-        AppLocalizations.of(context)!.lastDownloaded(formattedTime),
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: AppColors.secondaryText,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
   }
 
   Widget _buildFooter(BuildContext context) {
