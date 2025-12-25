@@ -976,6 +976,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Support Project'**
   String get supportProject;
+
+  /// No description provided for @lastDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Last downloaded: {time}'**
+  String lastDownloaded(String time);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
