@@ -22,6 +22,7 @@ class SubstitutionState {
   final String? date;
   final String? lastUpdated;
   final File? file;
+  final DateTime? downloadTimestamp; // Debug: timestamp when PDF was downloaded
 
   const SubstitutionState({
     this.isLoading = false,
@@ -31,6 +32,7 @@ class SubstitutionState {
     this.date,
     this.lastUpdated,
     this.file,
+    this.downloadTimestamp,
   });
 
   SubstitutionState copyWith({
@@ -144,6 +146,8 @@ class SubstitutionService {
         AppLogger.debug('Cache hit: Substitution plan - $dayLabel', module: 'SubstitutionService');
         try {
           final metadata = await _extractMetadata(cachedFile);
+          // For cached files, use existing timestamp if available, otherwise set current time
+          final existingState = isToday ? _todayState : _tomorrowState;
           _updatePdfState(isToday, SubstitutionState(
             isLoading: false,
             hasData: true,
@@ -151,6 +155,7 @@ class SubstitutionService {
             date: metadata['date'],
             lastUpdated: metadata['lastUpdated'],
             file: cachedFile,
+            downloadTimestamp: existingState.downloadTimestamp ?? DateTime.now(), // Keep existing timestamp or set new
           ));
           return true;
         } catch (e) {
@@ -176,6 +181,7 @@ class SubstitutionService {
       final metadata = await _extractMetadata(file);
 
       // Update state with success
+      final downloadTime = DateTime.now();
       _updatePdfState(isToday, SubstitutionState(
         isLoading: false,
         hasData: true,
@@ -183,6 +189,7 @@ class SubstitutionService {
         date: metadata['date'],
         lastUpdated: metadata['lastUpdated'],
         file: file,
+        downloadTimestamp: downloadTime, // Debug: store download timestamp
       ));
 
       AppLogger.debug('Substitution plan loaded: $dayLabel (${metadata['weekday']})', module: 'SubstitutionService');
