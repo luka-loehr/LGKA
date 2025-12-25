@@ -212,8 +212,8 @@ class _SubstitutionScreenState extends ConsumerState<SubstitutionScreen>
       return const SizedBox.shrink();
     }
     
-    // Format timestamp in German locale (DD.MM.YYYY, HH:mm Uhr)
-    final dateFormat = DateFormat('dd.MM.yyyy, HH:mm', 'de_DE');
+    // Format timestamp to show only time with seconds (HH:mm:ss Uhr)
+    final dateFormat = DateFormat('HH:mm:ss', 'de_DE');
     final formattedTime = '${dateFormat.format(mostRecentTimestamp)} Uhr';
     
     return Padding(
