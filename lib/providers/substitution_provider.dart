@@ -124,10 +124,13 @@ class SubstitutionNotifier extends Notifier<SubstitutionProviderState> {
     _refreshState();
   }
 
-  /// Refresh in background (silent - no UI updates, only logs)
+  /// Refresh in background - shows loading spinner and disables interaction
   Future<void> refreshInBackground() async {
     AppLogger.info('Background refresh: Substitution plans', module: 'SubstitutionProvider');
+    // Update state immediately to show loading spinner
+    _refreshState();
     await _substitutionService.refreshInBackground();
+    // Update state again after refresh completes
     _refreshState();
     AppLogger.success('Background refresh complete: Substitution plans', module: 'SubstitutionProvider');
   }

@@ -301,16 +301,24 @@ class SubstitutionService {
   }
 
   /// Trigger a silent background refresh when cache is stale
+  /// Sets loading state so UI shows spinner and disables interaction
   Future<void> refreshInBackground() async {
     if (_isRefreshing) return;
 
     _isRefreshing = true;
     AppLogger.info('Starting background refresh: Substitution plans', module: 'SubstitutionService');
+    
+    // Set loading state so UI shows spinner and disables buttons
+    _todayState = _todayState.copyWith(isLoading: true, error: null);
+    _tomorrowState = _tomorrowState.copyWith(isLoading: true, error: null);
+    
     try {
       await _loadBothPdfs(silent: true);
       AppLogger.success('Background refresh complete: Substitution plans', module: 'SubstitutionService');
     } catch (e) {
       AppLogger.error('Background refresh failed: Substitution plans', module: 'SubstitutionService', error: e);
+      // On error, restore previous state (don't show error in background refresh)
+      // The data will remain as it was before refresh
     } finally {
       _isRefreshing = false;
     }
