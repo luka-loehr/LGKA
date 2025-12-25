@@ -462,17 +462,6 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
             ],
           ],
         ),
-        // Debug: Show download timestamp
-        if (widget.pdfState.downloadTimestamp != null && !isDisabled) ...[
-          const SizedBox(height: 4),
-          Text(
-            'Downloaded: ${_formatTimestamp(widget.pdfState.downloadTimestamp!)}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.secondaryText.withValues(alpha: 0.7),
-              fontSize: 11,
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -513,12 +502,5 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
       HapticService.medium();
       widget.onTap();
     }
-  }
-
-  String _formatTimestamp(DateTime timestamp) {
-    final hour = timestamp.hour.toString().padLeft(2, '0');
-    final minute = timestamp.minute.toString().padLeft(2, '0');
-    final second = timestamp.second.toString().padLeft(2, '0');
-    return '$hour:$minute:$second';
   }
 }
