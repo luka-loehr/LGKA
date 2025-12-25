@@ -104,6 +104,8 @@ class NewsNotifier extends Notifier<NewsState> {
 
   Future<void> _refreshNewsSilently() async {
     AppLogger.info('Background refresh: News', module: 'NewsProvider');
+    final wasCacheValid = _newsService.hasValidCache;
+    
     try {
       await _newsService.fetchNewsEvents(forceRefresh: true);
       final updatedEvents = _newsService.cachedEvents;
@@ -118,7 +120,17 @@ class NewsNotifier extends Notifier<NewsState> {
       }
     } catch (e) {
       AppLogger.error('Background refresh failed: News', module: 'NewsProvider', error: e);
-      // Ignore background refresh errors - don't show to user
+      
+      // If cache was invalid (app was backgrounded), clear cached data and show error
+      if (!wasCacheValid) {
+        AppLogger.info('Refresh failed with invalid cache - clearing cached news', module: 'NewsProvider');
+        state = state.copyWith(
+          events: const [],
+          isLoading: false,
+          error: 'Fehler beim Laden der Neuigkeiten',
+        );
+      }
+      // If cache was valid, keep existing data (silent failure)
     }
   }
 
