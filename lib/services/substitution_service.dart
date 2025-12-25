@@ -43,6 +43,7 @@ class SubstitutionState {
     String? date,
     String? lastUpdated,
     File? file,
+    DateTime? downloadTimestamp,
   }) {
     return SubstitutionState(
       isLoading: isLoading ?? this.isLoading,
@@ -52,6 +53,7 @@ class SubstitutionState {
       date: date,
       lastUpdated: lastUpdated,
       file: file,
+      downloadTimestamp: downloadTimestamp ?? this.downloadTimestamp,
     );
   }
 
