@@ -193,6 +193,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     final classInput = _classInputController.text.trim();
     if (classInput.isEmpty || _isValidatingClass) return;
     
+    // Haptic feedback for save button press
+    HapticService.medium();
+    
     // Start loading state
     setState(() {
       _isValidatingClass = true;
