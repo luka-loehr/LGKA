@@ -79,6 +79,9 @@ dependencies:
   
   # Modal Bottom Sheets
   modal_bottom_sheet: ^3.0.0
+  
+  # Search Bar
+  searchfield: ^1.2.0
 
 dev_dependencies:
   flutter_test:
