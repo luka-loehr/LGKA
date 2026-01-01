@@ -76,6 +76,9 @@ dependencies:
   
   # Fireworks
   flutter_fireworks: ^1.0.8
+  
+  # Modal Bottom Sheets
+  modal_bottom_sheet: ^3.0.0
 
 dev_dependencies:
   flutter_test:
