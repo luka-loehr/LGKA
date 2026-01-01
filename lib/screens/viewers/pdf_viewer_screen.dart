@@ -10,6 +10,7 @@ import 'package:pdfx/pdfx.dart' as pdfx;
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:searchfield/searchfield.dart';
 import '../../l10n/app_localizations.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart' as syncfusion;
 import '../../utils/app_logger.dart';
@@ -610,6 +611,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       _isSearchBarVisible = true;
     });
     
+    // Add listener for text submission
+    _searchController.addListener(_handleSearchInput);
+    
     // Focus the search field after the widget is built to open keyboard
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -628,12 +632,25 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       }
     });
   }
+  
+  void _handleSearchInput() {
+    // Auto-submit when 3 characters are entered (max length)
+    if (_searchController.text.length == 3 && _searchController.text.trim().isNotEmpty) {
+      // Small delay to ensure the text is fully entered
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted && _searchController.text.length == 3) {
+          _onSearchSubmitted(_searchController.text);
+        }
+      });
+    }
+  }
 
   void _hideSearchBar() {
     setState(() {
       _isSearchBarVisible = false;
       _searchResults.clear();
     });
+    _searchController.removeListener(_handleSearchInput);
     _searchController.clear();
   }
 
@@ -846,14 +863,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
               child: Row(
                 children: [
                   Expanded(
-                    child: TextField(
+                    child: SearchField(
                       controller: _searchController,
                       focusNode: _searchFocusNode,
                       autofocus: true,
                       inputFormatters: [
                         LengthLimitingTextInputFormatter(3),
                       ],
-                      decoration: InputDecoration(
+                      suggestions: const [],
+                      searchInputDecoration: SearchInputDecoration(
                         hintText: AppLocalizations.of(context)!.searchHint,
                         prefixIcon: const Icon(Icons.search, color: AppColors.secondaryText),
                         border: OutlineInputBorder(
@@ -873,11 +891,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                         fillColor: AppColors.appBackground,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.primaryText,
-                      ),
-                      onSubmitted: _onSearchSubmitted,
-                      onTapOutside: (event) => _hideSearchBar(),
+                      textInputAction: TextInputAction.search,
+                      onSuggestionTap: (value) {
+                        _onSearchSubmitted(value.searchKey);
+                      },
                     ),
                   ),
                   const SizedBox(width: 12),
