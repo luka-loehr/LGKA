@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/app_providers.dart';
 import '../../providers/color_provider.dart';
@@ -202,10 +203,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showSettings() {
-    showModalBottomSheet(
+    showMaterialModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1E1E1E),
-      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -214,10 +214,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showDrawer() {
-    showModalBottomSheet(
+    showMaterialModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1E1E1E),
-      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
