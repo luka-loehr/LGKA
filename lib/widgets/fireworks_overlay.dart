@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fireworks/flutter_fireworks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/fireworks_provider.dart';
+import '../services/haptic_service.dart';
 
 class FireworksOverlay extends ConsumerStatefulWidget {
   final Widget child;
@@ -51,6 +52,8 @@ class _FireworksOverlayState extends ConsumerState<FireworksOverlay> {
 
   void _launchSingleRocket() {
     _controller?.fireSingleRocket(color: _colors[_random.nextInt(_colors.length)]);
+    // Add haptic feedback when rocket launches
+    HapticService.medium();
   }
 
 
