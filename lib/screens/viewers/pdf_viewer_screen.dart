@@ -946,8 +946,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                       const SizedBox(width: 12),
                       ElevatedButton(
                         onPressed: () {
-                          if (_searchController.text.trim().isNotEmpty) {
-                            _onSearchSubmitted(_searchController.text);
+                          final query = _searchController.text.trim();
+                          if (query.isNotEmpty) {
+                            HapticService.light();
+                            _onSearchSubmitted(query);
                           }
                         },
                         style: ElevatedButton.styleFrom(
