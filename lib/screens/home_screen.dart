@@ -216,12 +216,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _showSettings() {
     HapticService.subtle();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
+    
     showMaterialModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1E1E1E),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      constraints: isTablet 
+          ? BoxConstraints(maxWidth: 600)
+          : null,
       builder: (context) => _SettingsSheet(),
     );
   }
