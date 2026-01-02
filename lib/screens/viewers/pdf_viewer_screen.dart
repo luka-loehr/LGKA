@@ -839,8 +839,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                     : AppLocalizations.of(context)!.newSearch,
               ),
             ] else ...[
-              // Placeholder to maintain layout when search bar is visible
-              const SizedBox(width: 48),
+              // Close button when search bar is visible
+              IconButton(
+                onPressed: _hideSearchBar,
+                icon: const Icon(
+                  Icons.close,
+                  color: AppColors.secondaryText,
+                ),
+                tooltip: AppLocalizations.of(context)!.cancelSearch,
+              ),
             ],
           ],
           IconButton(
@@ -927,10 +934,21 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                         ),
                       ),
                       const SizedBox(width: 12),
-                      IconButton(
-                        onPressed: _hideSearchBar,
-                        icon: const Icon(Icons.close, color: AppColors.secondaryText),
-                        tooltip: AppLocalizations.of(context)!.cancelSearch,
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_searchController.text.trim().isNotEmpty) {
+                            _onSearchSubmitted(_searchController.text);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Icon(Icons.check, size: 20),
                       ),
                     ],
                   ),
