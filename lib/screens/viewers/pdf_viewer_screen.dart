@@ -1027,7 +1027,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                             child: TextField(
                               controller: _searchController,
                               focusNode: _searchFocusNode,
-                              autofocus: true,
+                              autofocus: false, // Focus handled by _showSearchBar()
                               inputFormatters: [
                                 LengthLimitingTextInputFormatter(3),
                               ],
@@ -1178,7 +1178,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
               TextField(
                 controller: _classInputController,
                 focusNode: _classInputFocusNode,
-                autofocus: false,
+                autofocus: true,
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(3),
                 ],
