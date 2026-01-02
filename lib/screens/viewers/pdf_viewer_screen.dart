@@ -88,7 +88,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   void initState() {
     super.initState();
     
-    // Setup button color animation
+    // Setup button color animation for error state
     _buttonColorController = AnimationController(
       duration: _buttonAnimationDuration,
       vsync: this,
@@ -100,18 +100,17 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       vsync: this,
     );
     
-    // Initialize animation - will be updated in didChangeDependencies with actual theme color
+    // Initialize animations with placeholder colors (updated in didChangeDependencies)
     _buttonColorAnimation = ColorTween(
-      begin: Colors.blue, // Temporary, will be updated
+      begin: Colors.blue,
       end: _errorRedColor,
     ).animate(CurvedAnimation(
       parent: _buttonColorController,
       curve: Curves.easeInOut,
     ));
     
-    // Initialize success animation - will be updated in didChangeDependencies with actual theme color
     _successColorAnimation = ColorTween(
-      begin: Colors.blue, // Temporary, will be updated
+      begin: Colors.blue,
       end: _successGreenColor,
     ).animate(CurvedAnimation(
       parent: _successColorController,
@@ -130,7 +129,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         setState(() {
           _showClassSuccessFlash = false;
         });
-        _successColorController.reset();
+        _successColorController.reverse();
       }
       setState(() {});
     });
@@ -209,36 +208,40 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     if (!mounted) return;
     
     if (!classExists) {
-      // Class not found - show error
+      // Class not found - show error with animation
       setState(() {
         _isValidatingClass = false;
         _showClassNotFoundError = true;
       });
       
-      // Animate button to red
+      // Animate to red
       _buttonColorController.forward();
       
-      
-      // Reset button color after delay
+      // Hold red briefly, then animate back
       Future.delayed(const Duration(milliseconds: 600), () {
         if (mounted) {
-          _buttonColorController.reverse();
+          _buttonColorController.reverse().then((_) {
+            if (mounted) {
+              setState(() {
+                _showClassNotFoundError = false;
+              });
+            }
+          });
         }
       });
       
       return;
     }
     
-    // Class found - show success flash immediately
+    // Class found - show success flash with animation
     setState(() {
       _isValidatingClass = false;
       _showClassSuccessFlash = true;
       _showClassNotFoundError = false;
     });
     
-    // Start success animation with smooth fade
+    // Animate to green
     _successColorController.forward();
-    
     
     if (!mounted) return;
     
@@ -255,7 +258,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       _showClassSuccessFlash = false;
     });
     
-    // Reset success animation
+    // Reset the success animation for next use
     _successColorController.reset();
     
     // Wait for PDF to be ready before performing search
@@ -324,14 +327,17 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   }
   
   Color get _currentButtonColor {
+    // Success animation takes priority
     if (_showClassSuccessFlash) {
       return _successColorAnimation.value ?? _successGreenColor;
     }
     
+    // Error animation
     if (_showClassNotFoundError) {
       return _buttonColorAnimation.value ?? _errorRedColor;
     }
     
+    // Normal states: active or inactive
     if (_canSaveClass) {
       return Theme.of(context).colorScheme.primary;
     }
@@ -343,7 +349,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   void didChangeDependencies() {
     super.didChangeDependencies();
     
-    // Update button color animation with actual theme color
+    // Update animations with actual theme color
     _buttonColorAnimation = ColorTween(
       begin: Theme.of(context).colorScheme.primary,
       end: _errorRedColor,
@@ -352,7 +358,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       curve: Curves.easeInOut,
     ));
     
-    // Update success color animation with actual theme color
     _successColorAnimation = ColorTween(
       begin: Theme.of(context).colorScheme.primary,
       end: _successGreenColor,
@@ -1095,12 +1100,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
               ),
               const SizedBox(height: 24),
               AnimatedBuilder(
-                animation: _buttonColorAnimation,
+                animation: Listenable.merge([_buttonColorAnimation, _successColorAnimation]),
                 builder: (context, child) {
                   return Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: _canSaveClass ? _validateAndSaveClass : null,
+                      onTap: _canSaveClass && !_isValidatingClass ? _validateAndSaveClass : null,
                       borderRadius: BorderRadius.circular(12),
                       splashColor: Colors.white.withValues(alpha: 0.2),
                       highlightColor: Colors.white.withValues(alpha: 0.1),
