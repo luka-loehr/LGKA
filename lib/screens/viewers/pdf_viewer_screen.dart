@@ -951,6 +951,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                           const SizedBox(width: 12),
                           ElevatedButton(
                             onPressed: () {
+                              // Unfocus the TextField first
+                              _searchFocusNode.unfocus();
                               final query = _searchController.text.trim();
                               if (query.isNotEmpty) {
                                 HapticService.light();
