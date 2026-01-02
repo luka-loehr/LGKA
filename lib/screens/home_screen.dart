@@ -218,6 +218,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     HapticService.subtle();
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
+    final maxWidth = isTablet ? 600.0 : screenWidth;
     
     showMaterialModalBottomSheet(
       context: context,
@@ -225,10 +226,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Center(
-        child: ConstrainedBox(
+      builder: (context) => Align(
+        alignment: Alignment.bottomCenter,
+        child: Container(
+          width: maxWidth,
           constraints: BoxConstraints(
-            maxWidth: isTablet ? 600 : double.infinity,
+            maxWidth: maxWidth,
+          ),
+          decoration: const BoxDecoration(
+            color: Color(0xFF1E1E1E),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: _SettingsSheet(),
         ),
