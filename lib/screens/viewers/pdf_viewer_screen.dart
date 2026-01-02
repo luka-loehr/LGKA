@@ -57,6 +57,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   
   // Search bar state
   bool _isSearchBarVisible = false;
+  bool _canDismissSearchBar = false;
   
   // PDF loading state
   bool _isPdfReady = false;
@@ -608,6 +609,16 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   void _showSearchBar() {
     setState(() {
       _isSearchBarVisible = true;
+      _canDismissSearchBar = false; // Prevent immediate dismissal
+    });
+    
+    // Enable dismissal after a delay to prevent immediate close
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted && _isSearchBarVisible) {
+        setState(() {
+          _canDismissSearchBar = true;
+        });
+      }
     });
     
     // Focus the search field after the widget is built to open keyboard
@@ -650,8 +661,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   }
 
   void _hideSearchBar() {
+    if (!_canDismissSearchBar) return; // Prevent dismissal if not ready
+    
     setState(() {
       _isSearchBarVisible = false;
+      _canDismissSearchBar = false;
       _searchResults.clear();
     });
     _searchController.clear();
@@ -918,7 +932,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                           color: AppColors.primaryText,
                         ),
                         onSubmitted: _onSearchSubmitted,
-                        onTapOutside: (event) => _hideSearchBar(),
+                        onTapOutside: (event) {
+                          if (_canDismissSearchBar) {
+                            _hideSearchBar();
+                          }
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),
