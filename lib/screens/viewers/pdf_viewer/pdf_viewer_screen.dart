@@ -265,6 +265,25 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
     final pageFromIndex = scheduleNotifier.getClassPage(classInput);
 
+    // If we already know the class exists (from index), show success immediately
+    if (pageFromIndex != null) {
+      setState(() {
+        _isValidatingClass = true;
+        _showClassNotFoundError = false;
+        _showClassSuccessFlash = true;
+      });
+      _successColorController.forward();
+
+      // Wait 1 second while showing green loading
+      await Future.delayed(const Duration(seconds: 1));
+
+      if (!mounted) return;
+
+      await _handleSuccessfulValidation(classInput, pageFromIndex, container, skipAnimation: true);
+      return;
+    }
+
+    // Otherwise, validate via PDF search
     setState(() {
       _isValidatingClass = true;
       _showClassNotFoundError = false;
@@ -272,9 +291,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
     // Validate with minimum loading time
     final results = await Future.wait([
-      pageFromIndex != null
-          ? Future.value(true)
-          : PdfSearchService.checkQueryExistsInPdf(widget.pdfFile, classInput),
+      PdfSearchService.checkQueryExistsInPdf(widget.pdfFile, classInput),
       Future.delayed(const Duration(seconds: 1)),
     ]);
     final classExists = results[0] as bool;
@@ -328,25 +345,28 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   Future<void> _handleSuccessfulValidation(
     String classInput,
     int? pageFromIndex,
-    ProviderContainer container,
-  ) async {
-    // Keep loading spinner visible and turn button green
-    setState(() {
-      _showClassSuccessFlash = true;
-      _showClassNotFoundError = false;
-      // Keep _isValidatingClass = true to show loading spinner
-    });
+    ProviderContainer container, {
+    bool skipAnimation = false,
+  }) async {
+    // If not coming from instant success path, start the animation now
+    if (!skipAnimation) {
+      setState(() {
+        _showClassSuccessFlash = true;
+        _showClassNotFoundError = false;
+        // Keep _isValidatingClass = true to show loading spinner
+      });
 
-    _successColorController.forward();
+      _successColorController.forward();
+
+      // Keep loading spinner visible for 1 second while button is green
+      await Future.delayed(const Duration(seconds: 1));
+    }
 
     if (!mounted) return;
 
     await container
         .read(preferencesManagerProvider.notifier)
         .setLastScheduleQuery5to10(classInput);
-
-    // Keep loading spinner visible for 1 second while button is green
-    await Future.delayed(const Duration(seconds: 1));
 
     if (!mounted) return;
 
