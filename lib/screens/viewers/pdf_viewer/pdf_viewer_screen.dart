@@ -660,7 +660,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     _searchController.clear();
   }
 
-  void _onSearchSubmitted(String query) async {
+  Future<void> _onSearchSubmitted(String query) async {
     if (query.trim().isEmpty) return;
 
     final trimmedQuery = query.trim().toLowerCase();
@@ -675,8 +675,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     }
 
     // For other schedules (J11/J12), use normal search
-    _searchInPdf(query);
+    // Hide search bar first and let animation complete before PDF search
     setState(() => _isSearchBarVisible = false);
+
+    // Wait for search bar slide/fade animation to complete
+    await Future.delayed(_searchBarAnimationDuration);
+
+    if (!mounted) return;
+
+    _searchInPdf(query);
 
     try {
       final prefsNotifier =
@@ -688,6 +695,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       AppLogger.debug('Error saving search query: $e', module: 'PDFViewer');
     }
   }
+
+  /// Duration to wait for search bar animation to complete before PDF operations.
+  /// This prevents the main thread PDF rendering from interrupting the animation.
+  static const Duration _searchBarAnimationDuration = Duration(milliseconds: 320);
 
   Future<void> _handleSchedule5to10Search(
     String trimmedQuery,
@@ -716,7 +727,14 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         scheduleState.classIndex5to10.containsKey(trimmedQuery)) {
       final page = scheduleNotifier.getClassPage(trimmedQuery);
       if (page != null) {
+        // Hide search bar first and let animation complete before PDF jump
         setState(() => _isSearchBarVisible = false);
+
+        // Wait for search bar slide/fade animation to complete
+        // This prevents the main-thread PDF rendering from interrupting the animation
+        await Future.delayed(_searchBarAnimationDuration);
+
+        if (!mounted) return;
 
         _pdfController.jumpToPage(page - 1);
 
