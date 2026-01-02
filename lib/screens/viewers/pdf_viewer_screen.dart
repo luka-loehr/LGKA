@@ -838,6 +838,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                     ? AppLocalizations.of(context)!.searchInPdf
                     : AppLocalizations.of(context)!.newSearch,
               ),
+            ] else ...[
+              // Placeholder to maintain layout when search bar is visible
+              const SizedBox(width: 48),
             ],
           ],
           IconButton(
