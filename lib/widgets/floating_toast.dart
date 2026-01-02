@@ -96,7 +96,7 @@ class _FloatingToastWidgetState extends State<_FloatingToastWidget>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
 
@@ -164,7 +164,7 @@ class _FloatingToastWidgetState extends State<_FloatingToastWidget>
                       widget.message,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
