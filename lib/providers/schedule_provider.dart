@@ -2,12 +2,62 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart' as syncfusion;
 import '../services/schedule_service.dart';
 import '../utils/app_logger.dart';
 import '../services/haptic_service.dart';
 import 'app_providers.dart';
+
+/// Top-level function for building class index in background isolate
+/// This must be a top-level function to work with compute()
+Future<Map<String, int>> _buildClassIndexInIsolate(String pdfPath) async {
+  try {
+    final file = File(pdfPath);
+    final bytes = await file.readAsBytes();
+    final document = syncfusion.PdfDocument(inputBytes: bytes);
+    final pageCount = document.pages.count;
+    
+    final classToPage = <String, int>{};
+    
+    // Build list of classes to search for
+    final classesToFind = <String>[];
+    for (int grade = 5; grade <= 10; grade++) {
+      for (final letter in ['a', 'b', 'c', 'd', 'e']) {
+        classesToFind.add('$grade$letter');
+      }
+    }
+    
+    // Search each page and record which classes are found on which page
+    final textExtractor = syncfusion.PdfTextExtractor(document);
+    for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+      try {
+        final pageText = textExtractor.extractText(
+          startPageIndex: pageIndex,
+          endPageIndex: pageIndex,
+        ).toLowerCase();
+        
+        for (final className in classesToFind) {
+          // Only record first occurrence (don't overwrite if already found)
+          if (!classToPage.containsKey(className) && pageText.contains(className)) {
+            // Page numbers are 1-based, but PDF uses offset so +2 for display
+            classToPage[className] = pageIndex + 2;
+          }
+        }
+      } catch (e) {
+        // Skip pages with extraction errors
+        continue;
+      }
+    }
+    
+    document.dispose();
+    return classToPage;
+  } catch (e) {
+    // Return empty map on error
+    return {};
+  }
+}
 
 /// State class for schedule data
 class ScheduleState {
@@ -214,50 +264,16 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
   
   /// Build class index from a 5-10 schedule PDF file
   /// Searches for classes 5a-5e, 6a-6e, ... up to 10a-10e and maps them to page numbers
+  /// Runs in a background isolate to avoid blocking the main thread
   Future<void> buildClassIndex(File pdfFile) async {
     if (state.isIndexBuilt) return; // Already built
     
     try {
-      AppLogger.info('Building class index from PDF...', module: 'ScheduleProvider');
+      AppLogger.info('Building class index from PDF in background isolate...', module: 'ScheduleProvider');
       final stopwatch = Stopwatch()..start();
       
-      final bytes = await pdfFile.readAsBytes();
-      final document = syncfusion.PdfDocument(inputBytes: bytes);
-      final pageCount = document.pages.count;
-      
-      final classToPage = <String, int>{};
-      
-      // Build list of classes to search for
-      final classesToFind = <String>[];
-      for (int grade = 5; grade <= 10; grade++) {
-        for (final letter in ['a', 'b', 'c', 'd', 'e']) {
-          classesToFind.add('$grade$letter');
-        }
-      }
-      
-      // Search each page and record which classes are found on which page
-      final textExtractor = syncfusion.PdfTextExtractor(document);
-      for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-        try {
-          final pageText = textExtractor.extractText(
-            startPageIndex: pageIndex,
-            endPageIndex: pageIndex,
-          ).toLowerCase();
-          
-          for (final className in classesToFind) {
-            // Only record first occurrence (don't overwrite if already found)
-            if (!classToPage.containsKey(className) && pageText.contains(className)) {
-              // Page numbers are 1-based, but PDF uses offset so +2 for display
-              classToPage[className] = pageIndex + 2;
-            }
-          }
-        } catch (e) {
-          // Skip pages with extraction errors
-          continue;
-        }
-      }
-      
-      document.dispose();
+      // Run the heavy PDF processing in a background isolate
+      final classToPage = await compute(_buildClassIndexInIsolate, pdfFile.path);
       
       stopwatch.stop();
       AppLogger.success(
