@@ -120,6 +120,12 @@
       "query": { "type": "String" }
     }
   },
+  "classAlreadySet": "Klasse {className} ist bereits eingestellt.",
+  "@classAlreadySet": {
+    "placeholders": {
+      "className": { "type": "String" }
+    }
+  },
   "multipleResultsFound": "{count} Ergebnisse gefunden",
   "@multipleResultsFound": {
     "placeholders": {
