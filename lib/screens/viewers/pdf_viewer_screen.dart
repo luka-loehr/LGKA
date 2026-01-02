@@ -628,7 +628,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         if (mounted) {
           FloatingToast.show(
             context,
-            message: AppLocalizations.of(context)!.noResultsFound,
+            message: AppLocalizations.of(context)!.noResultsFound(query.trim().toUpperCase()),
             duration: const Duration(seconds: 2),
           );
         }
@@ -805,7 +805,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       if (mounted) {
         FloatingToast.show(
           context,
-          message: AppLocalizations.of(context)!.noResultsFound,
+          message: AppLocalizations.of(context)!.noResultsFound(trimmedQuery.toUpperCase()),
           duration: const Duration(seconds: 2),
         );
       }
