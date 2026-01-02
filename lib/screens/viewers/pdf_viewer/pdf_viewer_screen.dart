@@ -876,7 +876,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
             )
           else
             IconButton(
-              onPressed: _hideSearchBar,
+              onPressed: () {
+                HapticService.light();
+                _hideSearchBar();
+              },
               icon: const Icon(Icons.close, color: AppColors.secondaryText),
               tooltip: AppLocalizations.of(context)!.cancelSearch,
             ),
