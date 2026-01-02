@@ -826,34 +826,17 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         actions: [
           // Search functionality - only show for schedules, not substitution plans
           if (isSchedule) ...[
-            if (_searchResults.isEmpty && !_isSearchBarVisible) ...[
+            if (!_isSearchBarVisible) ...[
+              // Show search icon when search bar is not visible
               IconButton(
                 onPressed: _showSearchBar,
                 icon: const Icon(
                   Icons.search,
                   color: AppColors.secondaryText,
                 ),
-                tooltip: AppLocalizations.of(context)!.searchInPdf,
-              ),
-            ] else if (_isSearchBarVisible) ...[
-              // Clear search when search bar is visible
-              IconButton(
-                onPressed: _hideSearchBar,
-                icon: const Icon(
-                  Icons.close,
-                  color: AppColors.secondaryText,
-                ),
-                tooltip: AppLocalizations.of(context)!.cancelSearch,
-              ),
-            ] else if (_searchResults.isNotEmpty) ...[
-              // Search icon only - navigation arrows removed
-              IconButton(
-                onPressed: _showSearchBar,
-                icon: const Icon(
-                  Icons.search,
-                  color: AppColors.secondaryText,
-                ),
-                tooltip: AppLocalizations.of(context)!.newSearch,
+                tooltip: _searchResults.isEmpty 
+                    ? AppLocalizations.of(context)!.searchInPdf
+                    : AppLocalizations.of(context)!.newSearch,
               ),
             ],
           ],
