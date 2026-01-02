@@ -15,7 +15,7 @@ class ScheduleState {
   final bool isLoading;
   final String? error;
   final DateTime? lastUpdated;
-  final Set<String> classIndex5to10; // Index of all valid classes for 5-10 schedule
+  final Map<String, int> classIndex5to10; // Maps class name -> page number (1-based)
   final bool isIndexBuilt;
 
   const ScheduleState({
@@ -33,7 +33,7 @@ class ScheduleState {
     String? error,
     bool clearError = false,
     DateTime? lastUpdated,
-    Set<String>? classIndex5to10,
+    Map<String, int>? classIndex5to10,
     bool? isIndexBuilt,
   }) {
     return ScheduleState(
@@ -213,7 +213,7 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
   }
   
   /// Build class index from a 5-10 schedule PDF file
-  /// Searches for classes 5a-5e, 6a-6e, ... up to 10a-10e
+  /// Searches for classes 5a-5e, 6a-6e, ... up to 10a-10e and maps them to page numbers
   Future<void> buildClassIndex(File pdfFile) async {
     if (state.isIndexBuilt) return; // Already built
     
@@ -225,45 +225,57 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
       final document = syncfusion.PdfDocument(inputBytes: bytes);
       final pageCount = document.pages.count;
       
-      final textExtractor = syncfusion.PdfTextExtractor(document);
-      final allText = textExtractor.extractText(
-        startPageIndex: 0,
-        endPageIndex: pageCount - 1,
-      ).toLowerCase();
+      final classToPage = <String, int>{};
       
-      document.dispose();
-      
-      final foundClasses = <String>{};
-      
-      // Search for classes: 5a-5e, 6a-6e, ... 10a-10e
+      // Build list of classes to search for
+      final classesToFind = <String>[];
       for (int grade = 5; grade <= 10; grade++) {
         for (final letter in ['a', 'b', 'c', 'd', 'e']) {
-          final className = '$grade$letter';
-          if (allText.contains(className)) {
-            foundClasses.add(className);
-          } else {
-            // If this letter not found, skip to next grade
-            break;
-          }
+          classesToFind.add('$grade$letter');
         }
       }
       
+      // Search each page and record which classes are found on which page
+      final textExtractor = syncfusion.PdfTextExtractor(document);
+      for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+        try {
+          final pageText = textExtractor.extractText(
+            startPageIndex: pageIndex,
+            endPageIndex: pageIndex,
+          ).toLowerCase();
+          
+          for (final className in classesToFind) {
+            // Only record first occurrence (don't overwrite if already found)
+            if (!classToPage.containsKey(className) && pageText.contains(className)) {
+              // Page numbers are 1-based, but PDF uses offset so +2 for display
+              classToPage[className] = pageIndex + 2;
+            }
+          }
+        } catch (e) {
+          // Skip pages with extraction errors
+          continue;
+        }
+      }
+      
+      document.dispose();
+      
       stopwatch.stop();
       AppLogger.success(
-        'Class index built: ${foundClasses.length} classes found in ${stopwatch.elapsedMilliseconds}ms',
+        'Class index built: ${classToPage.length} classes found in ${stopwatch.elapsedMilliseconds}ms',
         module: 'ScheduleProvider',
       );
-      // Sort classes by grade (5-10) then letter (a-e)
-      final sortedClasses = foundClasses.toList()..sort((a, b) {
-        final gradeA = int.tryParse(a.replaceAll(RegExp(r'[a-z]'), '')) ?? 0;
-        final gradeB = int.tryParse(b.replaceAll(RegExp(r'[a-z]'), '')) ?? 0;
+      
+      // Sort and log classes by grade (5-10) then letter (a-e)
+      final sortedEntries = classToPage.entries.toList()..sort((a, b) {
+        final gradeA = int.tryParse(a.key.replaceAll(RegExp(r'[a-z]'), '')) ?? 0;
+        final gradeB = int.tryParse(b.key.replaceAll(RegExp(r'[a-z]'), '')) ?? 0;
         if (gradeA != gradeB) return gradeA.compareTo(gradeB);
-        return a.compareTo(b);
+        return a.key.compareTo(b.key);
       });
-      AppLogger.debug('Classes: $sortedClasses', module: 'ScheduleProvider');
+      AppLogger.debug('Classes: ${sortedEntries.map((e) => "${e.key}:p${e.value}").join(", ")}', module: 'ScheduleProvider');
       
       state = state.copyWith(
-        classIndex5to10: foundClasses,
+        classIndex5to10: classToPage,
         isIndexBuilt: true,
       );
     } catch (e) {
@@ -276,7 +288,12 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
   /// Check if a class exists in the index (instant check, no PDF parsing)
   bool isClassInIndex(String className) {
     if (!state.isIndexBuilt) return true; // If index not built, assume valid
-    return state.classIndex5to10.contains(className.toLowerCase());
+    return state.classIndex5to10.containsKey(className.toLowerCase());
+  }
+  
+  /// Get the page number for a class (1-based), or null if not found
+  int? getClassPage(String className) {
+    return state.classIndex5to10[className.toLowerCase()];
   }
 }
 
