@@ -235,7 +235,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   color: Color(0xFF1E1E1E),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
-                child: _SettingsSheet(),
+                child: SingleChildScrollView(
+                  controller: ModalScrollController.of(context),
+                  child: _SettingsSheet(),
+                ),
               ),
             ),
           ),
@@ -277,7 +280,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   color: Color(0xFF1E1E1E),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
-                child: _DrawerSheet(),
+                child: SingleChildScrollView(
+                  controller: ModalScrollController.of(context),
+                  child: _DrawerSheet(),
+                ),
               ),
             ),
           ),
