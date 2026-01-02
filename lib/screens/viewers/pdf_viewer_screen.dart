@@ -860,9 +860,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
           pdfx.PdfView(
             controller: _pdfController,
             builders: pdfx.PdfViewBuilders<pdfx.DefaultBuilderOptions>(
-              options: const pdfx.DefaultBuilderOptions(
-                loaderSwitchDuration: Duration.zero, // Remove animation duration
-                transitionBuilder: _noTransition, // Use instant transition
+              options: pdfx.DefaultBuilderOptions(
+                loaderSwitchDuration: const Duration(milliseconds: 200), // Smooth transition duration
+                transitionBuilder: _smoothTransition, // Use smooth fade transition
               ),
               documentLoaderBuilder: (_) => const SizedBox.shrink(), // Remove document loading spinner
               pageLoaderBuilder: (_) => const SizedBox.shrink(), // Remove page loading spinner
@@ -1003,7 +1003,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     );
   }
 
-  // Custom transition that removes all animations
+  // Smooth fade transition for page changes
+  static Widget _smoothTransition(Widget child, Animation<double> animation) {
+    return FadeTransition(
+      opacity: animation,
+      child: child,
+    );
+  }
+
+  // Custom transition that removes all animations (kept for reference)
   static Widget _noTransition(Widget child, Animation<double> animation) {
     return child; // Return the widget directly without any animation
   }
