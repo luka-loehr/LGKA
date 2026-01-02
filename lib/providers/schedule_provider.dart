@@ -295,6 +295,51 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
   int? getClassPage(String className) {
     return state.classIndex5to10[className.toLowerCase()];
   }
+  
+  /// Preload the class index by finding, downloading, and indexing the 5-10 schedule
+  Future<void> preloadClassIndex() async {
+    if (state.isIndexBuilt) return; // Already built
+    
+    try {
+      // Find the 5-10 schedule from available schedules
+      final schedules = state.schedules;
+      if (schedules.isEmpty) {
+        AppLogger.debug('No schedules loaded yet, skipping class index preload', module: 'ScheduleProvider');
+        return;
+      }
+      
+      // Find a 5-10 schedule (prefer first halbjahr, then second)
+      ScheduleItem? schedule5to10;
+      for (final schedule in schedules) {
+        if (schedule.gradeLevel == 'Klassen 5-10') {
+          // Check availability
+          if (await isScheduleAvailable(schedule)) {
+            schedule5to10 = schedule;
+            break;
+          }
+        }
+      }
+      
+      if (schedule5to10 == null) {
+        AppLogger.debug('No available 5-10 schedule found for indexing', module: 'ScheduleProvider');
+        return;
+      }
+      
+      // Download the PDF
+      AppLogger.info('Downloading 5-10 schedule for class index...', module: 'ScheduleProvider');
+      final pdfFile = await _scheduleService.downloadSchedule(schedule5to10);
+      
+      if (pdfFile == null) {
+        AppLogger.error('Failed to download 5-10 schedule for indexing', module: 'ScheduleProvider');
+        return;
+      }
+      
+      // Build the index
+      await buildClassIndex(pdfFile);
+    } catch (e) {
+      AppLogger.error('Failed to preload class index', module: 'ScheduleProvider', error: e);
+    }
+  }
 }
 
 /// Provider for schedule state
