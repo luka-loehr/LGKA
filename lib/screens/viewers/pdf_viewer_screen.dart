@@ -881,26 +881,31 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
             ),
           ),
           // Search bar overlay - only show for schedules
-          if (_isSearchBarVisible && isSchedule)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: SafeArea(
-                bottom: false,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.4),
-                        blurRadius: 16,
-                        offset: const Offset(0, 4),
-                        spreadRadius: 2,
+          if (isSchedule)
+            AnimatedOpacity(
+              opacity: _isSearchBarVisible ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: IgnorePointer(
+                ignoring: !_isSearchBarVisible,
+                child: Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: SafeArea(
+                    bottom: false,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.4),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
+                            spreadRadius: 2,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Row(
+                      child: Row(
                     children: [
                       Expanded(
                         child: TextField(
@@ -962,11 +967,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                         ),
                         child: const Icon(Icons.check, size: 20),
                       ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
+          ),
         ],
       ),
     );
