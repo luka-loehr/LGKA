@@ -794,8 +794,8 @@ abstract class AppLocalizations {
   /// No description provided for @noResultsFound.
   ///
   /// In en, this message translates to:
-  /// **'Class {query} was not found.'**
-  String noResultsFound(String query);
+  /// **'Class doesn\'t exist'**
+  String get noResultsFound;
 
   /// No description provided for @shareError.
   ///
