@@ -209,10 +209,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     
     showMaterialModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E1E1E),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (context) => Align(
         alignment: Alignment.bottomCenter,
         child: Container(
@@ -237,10 +234,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     
     showMaterialModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E1E1E),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (context) => Align(
         alignment: Alignment.bottomCenter,
         child: Container(
