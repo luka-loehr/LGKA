@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/app_providers.dart';
+import '../providers/color_provider.dart';
 
 /// Shows a floating toast message with accent color, rounded corners, and shadow
 class FloatingToast {
