@@ -220,8 +220,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   Widget build(BuildContext context) {
     final scheduleState = ref.watch(scheduleProvider);
 
-    final isShowingSpinner = scheduleState.isLoading || _isCheckingAvailability;
-    final hasData = scheduleState.hasSchedules && !scheduleState.hasError;
+    final isShowingSpinner = scheduleState.isLoading || _isCheckingAvailability || !scheduleState.isIndexBuilt;
+    final hasData = scheduleState.hasSchedules && !scheduleState.hasError && scheduleState.isIndexBuilt;
 
     // Track spinner visibility and trigger haptic feedback when spinner disappears
     _spinnerTracker.trackState(
@@ -274,8 +274,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       );
     }
 
-    // Show availability checking state if schedules are loaded but availability is still being checked
-    if (_isCheckingAvailability) {
+    // Show availability checking state if schedules are loaded but availability or class index is still being checked
+    if (_isCheckingAvailability || !state.isIndexBuilt) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
