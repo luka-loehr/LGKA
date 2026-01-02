@@ -489,8 +489,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       if ((widget.targetPages == null || widget.targetPages!.isEmpty) && 
           lastPage != null && lastPage > 0) {
         
-        // Try to jump immediately first
-        _tryJumpToPage(lastPage);
+        // Try to jump immediately first (silent - expected to fail while PDF loads)
+        _tryJumpToPage(lastPage, silent: true);
         
         // If that fails, set up a retry mechanism
         if (!_hasJumpedToSavedPage) {
@@ -504,14 +504,16 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   }
 
   /// Try to jump to a specific page
-  void _tryJumpToPage(int pageNumber, {int attemptNumber = 1}) {
+  void _tryJumpToPage(int pageNumber, {int attemptNumber = 1, bool silent = false}) {
     try {
       _pdfController.jumpToPage(pageNumber - 1); // Convert to 0-based index
       _hasJumpedToSavedPage = true;
       AppLogger.pdf('Navigated to page $pageNumber in "${widget.dayName}" (attempt $attemptNumber)');
     } catch (e) {
-      // Don't log failure here - let the retry mechanism handle final failure logging
-      AppLogger.debug('Jump to page failed: $e', module: 'PDFViewer');
+      // Only log if not silent (initial attempts are expected to fail while PDF loads)
+      if (!silent) {
+        AppLogger.debug('Jump to page failed: $e', module: 'PDFViewer');
+      }
     }
   }
 
@@ -534,7 +536,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       }
 
       retryCount++;
-      _tryJumpToPage(pageNumber, attemptNumber: retryCount);
+      _tryJumpToPage(pageNumber, attemptNumber: retryCount, silent: true);
     });
   }
 
