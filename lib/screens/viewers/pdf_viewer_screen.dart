@@ -612,22 +612,42 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     });
     
     // Focus the search field after the widget is built to open keyboard
+    // Use multiple callbacks for better reliability on iPad
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        // Use a small delay to ensure the TextField is fully rendered
-        Future.delayed(const Duration(milliseconds: 50), () {
-          if (mounted) {
-            // Request focus using the dedicated focus node
-            _searchFocusNode.requestFocus();
-            
-            // Set cursor position to end of text
-            _searchController.selection = TextSelection.fromPosition(
-              TextPosition(offset: _searchController.text.length),
-            );
+        // First attempt after a short delay
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted && _isSearchBarVisible) {
+            _requestSearchFocus();
+          }
+        });
+        
+        // Retry after a longer delay for iPad (which may need more time)
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (mounted && _isSearchBarVisible && !_searchFocusNode.hasFocus) {
+            _requestSearchFocus();
           }
         });
       }
     });
+  }
+  
+  void _requestSearchFocus() {
+    if (!mounted || !_isSearchBarVisible) return;
+    
+    // Check if focus node is attached before requesting focus
+    if (_searchFocusNode.canRequestFocus) {
+      _searchFocusNode.requestFocus();
+      
+      // Set cursor position to end of text after focus is granted
+      Future.delayed(const Duration(milliseconds: 50), () {
+        if (mounted && _searchFocusNode.hasFocus) {
+          _searchController.selection = TextSelection.fromPosition(
+            TextPosition(offset: _searchController.text.length),
+          );
+        }
+      });
+    }
   }
 
   void _hideSearchBar() {
