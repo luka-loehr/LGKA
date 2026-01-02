@@ -788,7 +788,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       if (mounted) {
         FloatingToast.show(
           context,
-          message: AppLocalizations.of(context)!.noResultsFound,
+          message: AppLocalizations.of(context)!.noResultsFound(trimmedQuery),
           duration: const Duration(seconds: 2),
         );
       }
