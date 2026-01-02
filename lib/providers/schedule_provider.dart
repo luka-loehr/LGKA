@@ -253,7 +253,14 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
         'Class index built: ${foundClasses.length} classes found in ${stopwatch.elapsedMilliseconds}ms',
         module: 'ScheduleProvider',
       );
-      AppLogger.debug('Classes: ${foundClasses.toList()..sort()}', module: 'ScheduleProvider');
+      // Sort classes by grade (5-10) then letter (a-e)
+      final sortedClasses = foundClasses.toList()..sort((a, b) {
+        final gradeA = int.tryParse(a.replaceAll(RegExp(r'[a-z]'), '')) ?? 0;
+        final gradeB = int.tryParse(b.replaceAll(RegExp(r'[a-z]'), '')) ?? 0;
+        if (gradeA != gradeB) return gradeA.compareTo(gradeB);
+        return a.compareTo(b);
+      });
+      AppLogger.debug('Classes: $sortedClasses', module: 'ScheduleProvider');
       
       state = state.copyWith(
         classIndex5to10: foundClasses,
