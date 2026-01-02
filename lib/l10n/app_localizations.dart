@@ -785,6 +785,12 @@ abstract class AppLocalizations {
   /// **'We\'ll always show class {query} for you now.'**
   String singleResultFound(String query);
 
+  /// No description provided for @classAlreadySet.
+  ///
+  /// In en, this message translates to:
+  /// **'Class {className} is already set.'**
+  String classAlreadySet(String className);
+
   /// No description provided for @multipleResultsFound.
   ///
   /// In en, this message translates to:

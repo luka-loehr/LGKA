@@ -356,6 +356,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String classAlreadySet(String className) {
+    return 'Klasse $className ist bereits eingestellt.';
+  }
+
+  @override
   String multipleResultsFound(int count) {
     return '$count Ergebnisse gefunden';
   }

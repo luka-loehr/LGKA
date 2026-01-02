@@ -124,6 +124,12 @@
       "query": { "type": "String" }
     }
   },
+  "classAlreadySet": "Class {className} is already set.",
+  "@classAlreadySet": {
+    "placeholders": {
+      "className": { "type": "String" }
+    }
+  },
   "multipleResultsFound": "{count} results found",
   "@multipleResultsFound": {
     "placeholders": {
