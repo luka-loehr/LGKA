@@ -740,26 +740,75 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     _searchController.clear();
   }
 
-  void _onSearchSubmitted(String query) {
-    if (query.trim().isNotEmpty) {
-      _searchInPdf(query);
+  void _onSearchSubmitted(String query) async {
+    if (query.trim().isEmpty) return;
+    
+    final trimmedQuery = query.trim().toLowerCase();
+    final container = ProviderScope.containerOf(context, listen: false);
+    final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen') || (widget.dayName ?? '').contains('Grades');
+    final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
+    
+    // For 5-10 schedules, only allow indexed classes
+    if (isSchedule5to10) {
+      final scheduleState = container.read(scheduleProvider);
+      final scheduleNotifier = container.read(scheduleProvider.notifier);
+      
+      // Check if query is a valid class in the index
+      if (scheduleState.isIndexBuilt && scheduleState.classIndex5to10.containsKey(trimmedQuery)) {
+        // Class found in index - jump directly to page
+        final page = scheduleNotifier.getClassPage(trimmedQuery);
+        if (page != null) {
+          setState(() {
+            _isSearchBarVisible = false;
+          });
+          
+          _pdfController.jumpToPage(page - 1); // Convert to 0-based index
+          
+          // Save for next time
+          final prefsNotifier = container.read(preferencesManagerProvider.notifier);
+          unawaited(prefsNotifier.setLastSchedulePage5to10(page));
+          unawaited(prefsNotifier.setLastScheduleQuery5to10(trimmedQuery));
+          
+          if (mounted) {
+            FloatingToast.show(
+              context,
+              message: AppLocalizations.of(context)!.singleResultFound(trimmedQuery),
+              duration: const Duration(seconds: 2),
+            );
+          }
+          return;
+        }
+      }
+      
+      // Class not found in index - show error
       setState(() {
         _isSearchBarVisible = false;
       });
-      // Optimistically store query; page will be stored on navigation
-      try {
-        final container = ProviderScope.containerOf(context, listen: false);
-        final prefsNotifier = container.read(preferencesManagerProvider.notifier);
-        final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen') || (widget.dayName ?? '').contains('Grades');
-        final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
-        if (isSchedule5to10) {
-          unawaited(prefsNotifier.setLastScheduleQuery5to10(query.trim()));
-        } else if (isScheduleJ11J12) {
-          unawaited(prefsNotifier.setLastScheduleQueryJ11J12(query.trim()));
-        }
-      } catch (e) {
-        AppLogger.debug('Error saving search query: $e', module: 'PDFViewer');
+      
+      if (mounted) {
+        FloatingToast.show(
+          context,
+          message: AppLocalizations.of(context)!.noResultsFound,
+          duration: const Duration(seconds: 2),
+        );
       }
+      return;
+    }
+    
+    // For other schedules (J11/J12), use normal search
+    _searchInPdf(query);
+    setState(() {
+      _isSearchBarVisible = false;
+    });
+    
+    // Save query for J11/J12
+    try {
+      final prefsNotifier = container.read(preferencesManagerProvider.notifier);
+      if (isScheduleJ11J12) {
+        unawaited(prefsNotifier.setLastScheduleQueryJ11J12(query.trim()));
+      }
+    } catch (e) {
+      AppLogger.debug('Error saving search query: $e', module: 'PDFViewer');
     }
   }
 
