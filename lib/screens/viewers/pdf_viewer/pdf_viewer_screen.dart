@@ -744,7 +744,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   @override
   Widget build(BuildContext context) {
     final headerTitle = _getHeaderTitle();
-    final isSchedule = _isSchedule();
+    final isSchedule5to10 = _isSchedule5to10();
 
     if (_showClassModal) {
       return ClassInputModal(
@@ -763,11 +763,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: _buildAppBar(headerTitle, isSchedule),
+      appBar: _buildAppBar(headerTitle, isSchedule5to10),
       body: Stack(
         children: [
           _buildPdfViewer(),
-          if (isSchedule) _buildSearchBarOverlay(),
+          if (isSchedule5to10) _buildSearchBarOverlay(),
         ],
       ),
     );
@@ -795,7 +795,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         dn.contains('J11/J12');
   }
 
-  AppBar _buildAppBar(String headerTitle, bool isSchedule) {
+  bool _isSchedule5to10() {
+    if (widget.dayName == null || widget.dayName!.isEmpty) return false;
+    final dn = widget.dayName!;
+    return dn.contains('Klassen') || dn.contains('Grades');
+  }
+
+  AppBar _buildAppBar(String headerTitle, bool isSchedule5to10) {
     return AppBar(
       title: Text(
         headerTitle,
@@ -817,7 +823,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         },
       ),
       actions: [
-        if (isSchedule) ...[
+        if (isSchedule5to10) ...[
           if (!_isSearchBarVisible)
             IconButton(
               onPressed: _showSearchBar,
