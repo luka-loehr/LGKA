@@ -3,28 +3,26 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-/// Helper function to show a modal bottom sheet with proper width constraints
+/// Reusable modal bottom sheet wrapper with proper width constraints
 /// for iPad/tablet devices and transparent tappable barrier.
 /// 
 /// On tablets (width > 600px), the modal is constrained to 600px width.
 /// On phones, it uses full width.
-/// 
-/// The modal includes:
-/// - Transparent tappable barrier to dismiss when tapping outside
-/// - Proper scroll controller for status bar tap functionality
-/// - Centered alignment on tablets
-Future<void> showConstrainedModalBottomSheet({
-  required BuildContext context,
-  required Widget Function(BuildContext) builder,
-}) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  final isTablet = screenWidth > 600;
-  final maxWidth = isTablet ? 600.0 : screenWidth;
-  
-  return showMaterialModalBottomSheet(
-    context: context,
-    backgroundColor: Colors.transparent,
-    builder: (context) => Stack(
+class ConstrainedModalBottomSheet extends StatelessWidget {
+  final Widget child;
+
+  const ConstrainedModalBottomSheet({
+    super.key,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
+    final maxWidth = isTablet ? 600.0 : screenWidth;
+
+    return Stack(
       children: [
         // Tappable barrier to dismiss
         Positioned.fill(
@@ -51,12 +49,26 @@ Future<void> showConstrainedModalBottomSheet({
               ),
               child: SingleChildScrollView(
                 controller: ModalScrollController.of(context),
-                child: builder(context),
+                child: child,
               ),
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Helper function to show a constrained modal bottom sheet
+Future<void> showConstrainedModalBottomSheet({
+  required BuildContext context,
+  required Widget child,
+}) {
+  return showMaterialModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (context) => ConstrainedModalBottomSheet(
+      child: child,
     ),
   );
 }
