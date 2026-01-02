@@ -906,68 +906,69 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                         ],
                       ),
                       child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          focusNode: _searchFocusNode,
-                          autofocus: true,
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(3),
-                          ],
-                          textInputAction: TextInputAction.done,
-                          keyboardType: TextInputType.text,
-                          decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!.searchHint,
-                            prefixIcon: const Icon(Icons.school, color: AppColors.secondaryText),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              focusNode: _searchFocusNode,
+                              autofocus: true,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(3),
+                              ],
+                              textInputAction: TextInputAction.done,
+                              keyboardType: TextInputType.text,
+                              decoration: InputDecoration(
+                                hintText: AppLocalizations.of(context)!.searchHint,
+                                prefixIcon: const Icon(Icons.school, color: AppColors.secondaryText),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    width: 2,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: AppColors.appBackground,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              ),
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: AppColors.primaryText,
+                              ),
+                              onSubmitted: _onSearchSubmitted,
+                              onTapOutside: (event) {
+                                if (_canDismissSearchBar) {
+                                  _hideSearchBar();
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          ElevatedButton(
+                            onPressed: () {
+                              final query = _searchController.text.trim();
+                              if (query.isNotEmpty) {
+                                HapticService.light();
+                                _onSearchSubmitted(query);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 2,
-                              ),
-                            ),
-                            filled: true,
-                            fillColor: AppColors.appBackground,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            child: const Icon(Icons.check, size: 20),
                           ),
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColors.primaryText,
-                          ),
-                          onSubmitted: _onSearchSubmitted,
-                          onTapOutside: (event) {
-                            if (_canDismissSearchBar) {
-                              _hideSearchBar();
-                            }
-                          },
-                        ),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      ElevatedButton(
-                        onPressed: () {
-                          final query = _searchController.text.trim();
-                          if (query.isNotEmpty) {
-                            HapticService.light();
-                            _onSearchSubmitted(query);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Icon(Icons.check, size: 20),
-                      ),
-                      ],
                     ),
                   ),
                 ),
