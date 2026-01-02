@@ -893,10 +893,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                        spreadRadius: 0,
+                        color: Colors.black.withOpacity(0.4),
+                        blurRadius: 16,
+                        offset: const Offset(0, 4),
+                        spreadRadius: 2,
                       ),
                     ],
                   ),
