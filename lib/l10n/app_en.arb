@@ -138,8 +138,12 @@
       }
     }
   },
-  "noResultsFound": "Class doesn't exist",
-  "@noResultsFound": {},
+  "noResultsFound": "Class {className} doesn't exist.",
+  "@noResultsFound": {
+    "placeholders": {
+      "className": { "type": "String" }
+    }
+  },
   "shareError": "Error sharing",
   "errorNavigatingToPage": "Error navigating to page {page}",
   "@errorNavigatingToPage": {

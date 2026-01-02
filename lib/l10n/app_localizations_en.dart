@@ -366,7 +366,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get noResultsFound => 'Class doesn\'t exist';
+  String noResultsFound(String className) {
+    return 'Class $className doesn\'t exist.';
+  }
 
   @override
   String get shareError => 'Error sharing';

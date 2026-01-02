@@ -288,7 +288,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)!.noResultsFound),
+              content: Text(AppLocalizations.of(context)!.noResultsFound(query.trim().toUpperCase())),
               duration: const Duration(seconds: 2),
               backgroundColor: Colors.orange,
             ),
