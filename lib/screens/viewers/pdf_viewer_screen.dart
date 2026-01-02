@@ -611,9 +611,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       _isSearchBarVisible = true;
     });
     
-    // Add listener for text submission
-    _searchController.addListener(_handleSearchInput);
-    
     // Focus the search field after the widget is built to open keyboard
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -632,25 +629,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       }
     });
   }
-  
-  void _handleSearchInput() {
-    // Auto-submit when 3 characters are entered (max length)
-    if (_searchController.text.length == 3 && _searchController.text.trim().isNotEmpty) {
-      // Small delay to ensure the text is fully entered
-      Future.delayed(const Duration(milliseconds: 100), () {
-        if (mounted && _searchController.text.length == 3) {
-          _onSearchSubmitted(_searchController.text);
-        }
-      });
-    }
-  }
 
   void _hideSearchBar() {
     setState(() {
       _isSearchBarVisible = false;
       _searchResults.clear();
     });
-    _searchController.removeListener(_handleSearchInput);
     _searchController.clear();
   }
 
