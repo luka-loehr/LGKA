@@ -223,19 +223,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showMaterialModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Align(
-        alignment: Alignment.bottomCenter,
-        child: Container(
-          width: maxWidth,
-          constraints: BoxConstraints(
-            maxWidth: maxWidth,
+      builder: (context) => Stack(
+        children: [
+          // Tappable barrier to dismiss
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                color: Colors.black.withOpacity(0.5),
+              ),
+            ),
           ),
-          decoration: const BoxDecoration(
-            color: Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          // Modal content
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: GestureDetector(
+              onTap: () {}, // Prevent tap from propagating to barrier
+              child: Container(
+                width: maxWidth,
+                constraints: BoxConstraints(
+                  maxWidth: maxWidth,
+                ),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF1E1E1E),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: _SettingsSheet(),
+              ),
+            ),
           ),
-          child: _SettingsSheet(),
-        ),
+        ],
       ),
     );
   }
