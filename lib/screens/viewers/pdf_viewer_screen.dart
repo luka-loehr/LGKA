@@ -10,7 +10,6 @@ import 'package:pdfx/pdfx.dart' as pdfx;
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:searchfield/searchfield.dart';
 import '../../l10n/app_localizations.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart' as syncfusion;
 import '../../utils/app_logger.dart';
@@ -867,51 +866,39 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
               child: Row(
                 children: [
                   Expanded(
-                    child: Focus(
-                      onKeyEvent: (node, event) {
-                        if (event is KeyDownEvent && 
-                            (event.logicalKey == LogicalKeyboardKey.enter || 
-                             event.logicalKey == LogicalKeyboardKey.numpadEnter)) {
-                          if (_searchController.text.trim().isNotEmpty) {
-                            _onSearchSubmitted(_searchController.text);
-                            return KeyEventResult.handled;
-                          }
-                        }
-                        return KeyEventResult.ignored;
-                      },
-                      child: SearchField(
-                        controller: _searchController,
-                        focusNode: _searchFocusNode,
-                        autofocus: true,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(3),
-                        ],
-                        suggestions: const [],
-                        searchInputDecoration: SearchInputDecoration(
-                          hintText: AppLocalizations.of(context)!.searchHint,
-                          prefixIcon: const Icon(Icons.search, color: AppColors.secondaryText),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-                            ),
+                    child: TextField(
+                      controller: _searchController,
+                      focusNode: _searchFocusNode,
+                      autofocus: true,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(3),
+                      ],
+                      textInputAction: TextInputAction.search,
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!.searchHint,
+                        prefixIcon: const Icon(Icons.search, color: AppColors.secondaryText),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 2,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: AppColors.appBackground,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         ),
-                        textInputAction: TextInputAction.search,
-                        onSuggestionTap: (value) {
-                          _onSearchSubmitted(value.searchKey);
-                        },
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 2,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: AppColors.appBackground,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppColors.primaryText,
+                      ),
+                      onSubmitted: _onSearchSubmitted,
+                      onTapOutside: (event) => _hideSearchBar(),
                     ),
                   ),
                   const SizedBox(width: 12),
