@@ -314,10 +314,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     int? pageFromIndex,
     ProviderContainer container,
   ) async {
+    // Keep loading spinner visible and turn button green
     setState(() {
-      _isValidatingClass = false;
       _showClassSuccessFlash = true;
       _showClassNotFoundError = false;
+      // Keep _isValidatingClass = true to show loading spinner
     });
 
     _successColorController.forward();
@@ -328,11 +329,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         .read(preferencesManagerProvider.notifier)
         .setLastScheduleQuery5to10(classInput);
 
-    await Future.delayed(const Duration(milliseconds: 600));
+    // Keep loading spinner visible for 1 second while button is green
+    await Future.delayed(const Duration(seconds: 1));
 
     if (!mounted) return;
 
     setState(() {
+      _isValidatingClass = false; // Now stop loading
       _showClassModal = false;
       _showClassSuccessFlash = false;
     });
