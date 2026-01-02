@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:lgka_flutter/theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
+import 'package:lgka_flutter/providers/schedule_provider.dart';
 import 'package:lgka_flutter/services/haptic_service.dart';
 import 'package:lgka_flutter/widgets/floating_toast.dart';
 import 'package:pdfx/pdfx.dart' as pdfx;
@@ -181,6 +182,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       final prefsState = container.read(preferencesManagerProvider);
       final currentClass = prefsState.lastScheduleQuery5to10;
       
+      // Build class index in the background for instant validation
+      final scheduleNotifier = container.read(scheduleProvider.notifier);
+      scheduleNotifier.buildClassIndex(widget.pdfFile);
+      
       if (currentClass == null || currentClass.trim().isEmpty) {
         setState(() {
           _showClassModal = true;
@@ -196,7 +201,36 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     // Haptic feedback for save button press
     HapticService.medium();
     
-    // Start loading state
+    // Check class index first for instant validation (no loading spinner)
+    final container = ProviderScope.containerOf(context, listen: false);
+    final scheduleState = container.read(scheduleProvider);
+    
+    if (scheduleState.isIndexBuilt && !scheduleState.classIndex5to10.contains(classInput.toLowerCase())) {
+      // Class not in index - show instant error without loading
+      setState(() {
+        _showClassNotFoundError = true;
+      });
+      
+      // Animate to red
+      _buttonColorController.forward();
+      
+      // Hold red briefly, then animate back
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (mounted) {
+          _buttonColorController.reverse().then((_) {
+            if (mounted) {
+              setState(() {
+                _showClassNotFoundError = false;
+              });
+            }
+          });
+        }
+      });
+      
+      return;
+    }
+    
+    // Class might exist - show loading and validate with PDF
     setState(() {
       _isValidatingClass = true;
       _showClassNotFoundError = false;
