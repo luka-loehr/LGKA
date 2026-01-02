@@ -207,8 +207,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     // Check class index first for instant validation (no loading spinner)
     final container = ProviderScope.containerOf(context, listen: false);
     final scheduleState = container.read(scheduleProvider);
+    final scheduleNotifier = container.read(scheduleProvider.notifier);
     
-    if (scheduleState.isIndexBuilt && !scheduleState.classIndex5to10.contains(classInput.toLowerCase())) {
+    if (scheduleState.isIndexBuilt && !scheduleState.classIndex5to10.containsKey(classInput.toLowerCase())) {
       // Class not in index - show instant error without loading
       setState(() {
         _showClassNotFoundError = true;
@@ -233,6 +234,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       return;
     }
     
+    // Get page number from index if available
+    final pageFromIndex = scheduleNotifier.getClassPage(classInput);
+    
     // Class might exist - show loading and validate with PDF
     setState(() {
       _isValidatingClass = true;
@@ -241,7 +245,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     
     // Validate class exists in PDF with minimum 1s loading time
     final results = await Future.wait([
-      _checkClassExistsInPdf(classInput),
+      pageFromIndex != null ? Future.value(true) : _checkClassExistsInPdf(classInput),
       Future.delayed(const Duration(seconds: 1)),
     ]);
     final classExists = results[0] as bool;
@@ -301,13 +305,30 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     // Reset the success animation for next use
     _successColorController.reset();
     
-    // Wait for PDF to be ready before performing search
+    // Wait for PDF to be ready before navigating
     await _waitForPdfReady();
     
     if (!mounted) return;
     
-    // Perform search with the entered class (will show success message if found)
-    _onSearchSubmitted(classInput);
+    // Jump directly to page from index if available, otherwise search
+    if (pageFromIndex != null) {
+      // Jump directly to the indexed page
+      _pdfController.jumpToPage(pageFromIndex - 1); // Convert to 0-based index
+      
+      // Save the page and query for next time
+      await container.read(preferencesManagerProvider.notifier).setLastSchedulePage5to10(pageFromIndex);
+      
+      if (mounted) {
+        FloatingToast.show(
+          context,
+          message: AppLocalizations.of(context)!.singleResultFound(classInput),
+          duration: const Duration(seconds: 2),
+        );
+      }
+    } else {
+      // Fall back to search if page not in index
+      _onSearchSubmitted(classInput);
+    }
   }
   
   Future<bool> _checkClassExistsInPdf(String className) async {
