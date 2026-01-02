@@ -5,7 +5,7 @@ import '../../../../services/haptic_service.dart';
 import '../../../../theme/app_theme.dart';
 
 /// A search bar overlay for searching within PDF documents.
-class PdfSearchBar extends StatelessWidget {
+class PdfSearchBar extends StatefulWidget {
   /// Controller for the search text field.
   final TextEditingController controller;
 
@@ -27,14 +27,39 @@ class PdfSearchBar extends StatelessWidget {
   });
 
   @override
+  State<PdfSearchBar> createState() => _PdfSearchBarState();
+}
+
+class _PdfSearchBarState extends State<PdfSearchBar> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onTextChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onTextChanged);
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    setState(() {});
+  }
+
+  bool get _canSubmit {
+    return widget.controller.text.trim().length >= 2;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return AnimatedOpacity(
-      opacity: isVisible ? 1.0 : 0.0,
+      opacity: widget.isVisible ? 1.0 : 0.0,
       duration: const Duration(milliseconds: 100),
       child: IgnorePointer(
-        ignoring: !isVisible,
+        ignoring: !widget.isVisible,
         child: SafeArea(
           bottom: false,
           child: Container(
@@ -66,8 +91,8 @@ class PdfSearchBar extends StatelessWidget {
 
   Widget _buildTextField(BuildContext context, AppLocalizations l10n) {
     return TextField(
-      controller: controller,
-      focusNode: focusNode,
+      controller: widget.controller,
+      focusNode: widget.focusNode,
       autofocus: false, // Focus handled externally
       inputFormatters: [
         LengthLimitingTextInputFormatter(3),
@@ -97,23 +122,29 @@ class PdfSearchBar extends StatelessWidget {
       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             color: AppColors.primaryText,
           ),
-      onSubmitted: onSubmitted,
+      onSubmitted: (_) {
+        if (_canSubmit) {
+          widget.onSubmitted(widget.controller.text.trim());
+        }
+      },
     );
   }
 
   Widget _buildSubmitButton(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        // Unfocus the TextField first
-        focusNode.unfocus();
-        final query = controller.text.trim();
-        if (query.isNotEmpty) {
-          HapticService.medium();
-          onSubmitted(query);
-        }
-      },
+      onPressed: _canSubmit
+          ? () {
+              // Unfocus the TextField first
+              widget.focusNode.unfocus();
+              final query = widget.controller.text.trim();
+              HapticService.medium();
+              widget.onSubmitted(query);
+            }
+          : null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: _canSubmit
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         shape: RoundedRectangleBorder(
