@@ -67,6 +67,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   // Class input modal state
   bool _showClassModal = false;
   final TextEditingController _classInputController = TextEditingController();
+  final FocusNode _classInputFocusNode = FocusNode();
   bool _isValidatingClass = false;
   bool _showClassNotFoundError = false;
   bool _showClassSuccessFlash = false;
@@ -368,6 +369,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     _searchController.dispose();
     _searchFocusNode.dispose();
     _classInputController.dispose();
+    _classInputFocusNode.dispose();
     _buttonColorController.dispose();
     _successColorController.dispose();
     // Restore portrait-only orientation when leaving PDF viewer
@@ -931,11 +933,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                                 color: AppColors.primaryText,
                               ),
                               onSubmitted: _onSearchSubmitted,
-                              onTapOutside: (event) {
-                                if (_canDismissSearchBar) {
-                                  _hideSearchBar();
-                                }
-                              },
+                              // Note: Removed onTapOutside - it was hiding the search bar
+                              // when tapping the submit button. Use the X button to dismiss instead.
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -1054,6 +1053,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
               const SizedBox(height: 32),
               TextField(
                 controller: _classInputController,
+                focusNode: _classInputFocusNode,
                 autofocus: true,
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(3),
@@ -1097,54 +1097,40 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
               AnimatedBuilder(
                 animation: _buttonColorAnimation,
                 builder: (context, child) {
-                  return SizedBox(
-                    width: double.infinity,
-                    height: 46,
-                    child: Stack(
-                      children: [
-                        // Animated background button
-                        Positioned.fill(
-                          child: AnimatedContainer(
-                            duration: _buttonAnimationDuration,
-                            curve: Curves.easeInOut,
-                            decoration: BoxDecoration(
-                              color: _currentButtonColor,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
+                  return Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: _canSaveClass ? _validateAndSaveClass : null,
+                      borderRadius: BorderRadius.circular(12),
+                      splashColor: Colors.white.withValues(alpha: 0.2),
+                      highlightColor: Colors.white.withValues(alpha: 0.1),
+                      child: Container(
+                        width: double.infinity,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: _currentButtonColor,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        
-                        // Clickable transparent button with always-white text
-                        SizedBox(
-                          width: double.infinity,
-                          height: double.infinity,
-                          child: InkWell(
-                            onTap: _canSaveClass ? _validateAndSaveClass : null,
-                            borderRadius: BorderRadius.circular(12),
-                            splashColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            child: Center(
-                              child: _isValidatingClass
-                                  ? SizedBox(
-                                      width: 22,
-                                      height: 22,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        strokeCap: StrokeCap.round,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        child: Center(
+                          child: _isValidatingClass
+                              ? SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    strokeCap: StrokeCap.round,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                )
+                              : Text(
+                                  AppLocalizations.of(context)!.setClassButton,
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
                                       ),
-                                    )
-                                  : Text(
-                                      AppLocalizations.of(context)!.setClassButton,
-                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
-                                          ),
-                                    ),
-                            ),
-                          ),
+                                ),
                         ),
-                      ],
+                      ),
                     ),
                   );
                 },
