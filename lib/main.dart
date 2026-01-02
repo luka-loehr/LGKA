@@ -264,6 +264,11 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
       AppLogger.debug('App resumed: Refreshing news in background', module: 'Main');
       unawaited(ref.read(newsProvider.notifier).refreshInBackground());
     }
+    
+    // Rebuild class index in background (schedule PDF may have changed)
+    final scheduleNotifier = ref.read(scheduleProvider.notifier);
+    scheduleNotifier.invalidateClassIndex();
+    unawaited(scheduleNotifier.preloadClassIndex());
   }
 
   Future<void> _refreshExpiredCaches() async {

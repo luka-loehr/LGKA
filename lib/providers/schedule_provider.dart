@@ -296,6 +296,15 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
     return state.classIndex5to10[className.toLowerCase()];
   }
   
+  /// Invalidate the class index (called on app resume to force rebuild)
+  void invalidateClassIndex() {
+    state = state.copyWith(
+      classIndex5to10: {},
+      isIndexBuilt: false,
+    );
+    AppLogger.debug('Class index invalidated', module: 'ScheduleProvider');
+  }
+  
   /// Preload the class index by finding, downloading, and indexing the 5-10 schedule
   Future<void> preloadClassIndex() async {
     if (state.isIndexBuilt) return; // Already built
