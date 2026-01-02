@@ -879,6 +879,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                       onSuggestionTap: (value) {
                         _onSearchSubmitted(value.searchKey);
                       },
+                      onSubmitted: (value) {
+                        _onSearchSubmitted(value);
+                      },
                     ),
                   ),
                   const SizedBox(width: 12),
