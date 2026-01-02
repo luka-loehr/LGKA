@@ -804,6 +804,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
               color: AppColors.primaryText,
             ),
       ),
+      centerTitle: isSchedule,
       backgroundColor: AppColors.appBackground,
       elevation: 0,
       iconTheme: const IconThemeData(color: AppColors.primaryText),
