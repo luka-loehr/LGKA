@@ -106,6 +106,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       vsync: this,
     );
 
+    // Add listeners to trigger rebuilds when animations change
+    _buttonColorController.addListener(_onAnimationTick);
+    _successColorController.addListener(_onAnimationTick);
+
     // Initialize with placeholder colors (updated in didChangeDependencies)
     _buttonColorAnimation = ColorTween(
       begin: Colors.blue,
@@ -122,6 +126,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       parent: _successColorController,
       curve: Curves.easeInOut,
     ));
+  }
+
+  void _onAnimationTick() {
+    if (mounted) setState(() {});
   }
 
   void _setupTextControllerListener() {
@@ -203,6 +211,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     _searchFocusNode.dispose();
     _classInputController.dispose();
     _classInputFocusNode.dispose();
+    _buttonColorController.removeListener(_onAnimationTick);
+    _successColorController.removeListener(_onAnimationTick);
     _buttonColorController.dispose();
     _successColorController.dispose();
 
