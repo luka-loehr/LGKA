@@ -153,41 +153,45 @@ class ClassInputModal extends StatelessWidget {
   }
 
   Widget _buildButtonContent(BuildContext context, AppLocalizations l10n) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: canSave && !isValidating ? onSave : null,
-        borderRadius: BorderRadius.circular(12),
-        splashColor: Colors.white.withValues(alpha: 0.2),
-        highlightColor: Colors.white.withValues(alpha: 0.1),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          width: double.infinity,
-          height: 46,
-          decoration: BoxDecoration(
-            color: buttonColor,
-            borderRadius: BorderRadius.circular(12),
+    return SizedBox(
+      width: double.infinity,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        decoration: BoxDecoration(
+          color: buttonColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ElevatedButton(
+          onPressed: canSave && !isValidating ? onSave : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            foregroundColor: Colors.white,
+            shadowColor: Colors.transparent,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            minimumSize: const Size(double.infinity, 40),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
-          child: Center(
-            child: isValidating
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      strokeCap: StrokeCap.round,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : Text(
-                    l10n.setClassButton,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+          child: isValidating
+              ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    strokeCap: StrokeCap.round,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
-          ),
+                )
+              : Text(
+                  l10n.setClassButton,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                ),
         ),
       ),
     );
