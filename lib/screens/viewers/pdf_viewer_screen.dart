@@ -751,6 +751,24 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     if (isSchedule5to10) {
       final scheduleState = container.read(scheduleProvider);
       final scheduleNotifier = container.read(scheduleProvider.notifier);
+      final prefsState = container.read(preferencesManagerProvider);
+      final currentClass = prefsState.lastScheduleQuery5to10?.toLowerCase();
+      
+      // Check if the class is already set to this value
+      if (currentClass != null && currentClass == trimmedQuery) {
+        setState(() {
+          _isSearchBarVisible = false;
+        });
+        
+        if (mounted) {
+          FloatingToast.show(
+            context,
+            message: AppLocalizations.of(context)!.classAlreadySet(trimmedQuery.toUpperCase()),
+            duration: const Duration(seconds: 2),
+          );
+        }
+        return;
+      }
       
       // Check if query is a valid class in the index
       if (scheduleState.isIndexBuilt && scheduleState.classIndex5to10.containsKey(trimmedQuery)) {
@@ -771,7 +789,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
           if (mounted) {
             FloatingToast.show(
               context,
-              message: AppLocalizations.of(context)!.singleResultFound(trimmedQuery),
+              message: AppLocalizations.of(context)!.classChanged(trimmedQuery.toUpperCase()),
               duration: const Duration(seconds: 2),
             );
           }
