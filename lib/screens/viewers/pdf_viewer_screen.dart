@@ -882,15 +882,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
           ),
           // Search bar overlay - only show for schedules
           if (isSchedule)
-            AnimatedOpacity(
-              opacity: _isSearchBarVisible ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 100),
-              child: IgnorePointer(
-                ignoring: !_isSearchBarVisible,
-                child: Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: AnimatedOpacity(
+                opacity: _isSearchBarVisible ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 100),
+                child: IgnorePointer(
+                  ignoring: !_isSearchBarVisible,
                   child: SafeArea(
                     bottom: false,
                     child: Container(
@@ -973,7 +973,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
