@@ -124,6 +124,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
         ),
       ),
       body: CustomScrollView(
+        key: const PageStorageKey<String>('news_screen_scroll'),
         slivers: [
           if (newsState.isLoading && newsState.events.isEmpty)
             SliverFillRemaining(
