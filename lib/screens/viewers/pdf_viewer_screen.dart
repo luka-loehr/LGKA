@@ -861,19 +861,76 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         children: [
           // PDF viewer - takes full space
           pdfx.PdfView(
-              controller: _pdfController,
-              builders: pdfx.PdfViewBuilders<pdfx.DefaultBuilderOptions>(
-                options: const pdfx.DefaultBuilderOptions(
-                  loaderSwitchDuration: Duration.zero, // Remove animation duration
-                  transitionBuilder: _noTransition, // Use instant transition
-                ),
-                documentLoaderBuilder: (_) => const SizedBox.shrink(), // Remove document loading spinner
-                pageLoaderBuilder: (_) => const SizedBox.shrink(), // Remove page loading spinner
-                errorBuilder: (_, error) => Center(child: Text(error.toString())),
-                pageBuilder: _pageBuilder,
+            controller: _pdfController,
+            builders: pdfx.PdfViewBuilders<pdfx.DefaultBuilderOptions>(
+              options: const pdfx.DefaultBuilderOptions(
+                loaderSwitchDuration: Duration.zero, // Remove animation duration
+                transitionBuilder: _noTransition, // Use instant transition
               ),
+              documentLoaderBuilder: (_) => const SizedBox.shrink(), // Remove document loading spinner
+              pageLoaderBuilder: (_) => const SizedBox.shrink(), // Remove page loading spinner
+              errorBuilder: (_, error) => Center(child: Text(error.toString())),
+              pageBuilder: _pageBuilder,
             ),
           ),
+          // Search bar overlay - only show for schedules
+          if (_isSearchBarVisible && isSchedule)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                color: AppColors.appSurface.withValues(alpha: 0.95),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        autofocus: true,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(3),
+                        ],
+                        textInputAction: TextInputAction.done,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)!.searchHint,
+                          prefixIcon: const Icon(Icons.school, color: AppColors.secondaryText),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: AppColors.appBackground,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        ),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: AppColors.primaryText,
+                        ),
+                        onSubmitted: _onSearchSubmitted,
+                        onTapOutside: (event) => _hideSearchBar(),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    IconButton(
+                      onPressed: _hideSearchBar,
+                      icon: const Icon(Icons.close, color: AppColors.secondaryText),
+                      tooltip: AppLocalizations.of(context)!.cancelSearch,
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
