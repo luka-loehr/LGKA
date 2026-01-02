@@ -128,14 +128,8 @@
       }
     }
   },
-  "noResultsFound": "Klasse {query} wurde nicht gefunden.",
-  "@noResultsFound": {
-    "placeholders": {
-      "query": {
-        "type": "String"
-      }
-    }
-  },
+  "noResultsFound": "Klasse existiert nicht",
+  "@noResultsFound": {},
   "shareError": "Fehler beim Teilen",
   "errorNavigatingToPage": "Fehler beim Navigieren zur Seite {page}",
   "@errorNavigatingToPage": {
