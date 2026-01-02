@@ -202,10 +202,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       _showClassNotFoundError = false;
     });
     
-    // Validate class exists in PDF with minimum 0.5s loading time
+    // Validate class exists in PDF with minimum 1s loading time
     final results = await Future.wait([
       _checkClassExistsInPdf(classInput),
-      Future.delayed(const Duration(milliseconds: 500)),
+      Future.delayed(const Duration(seconds: 1)),
     ]);
     final classExists = results[0] as bool;
     
