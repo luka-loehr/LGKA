@@ -361,9 +361,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String noResultsFound(String query) {
-    return 'Klasse $query wurde nicht gefunden.';
-  }
+  String get noResultsFound => 'Klasse existiert nicht';
 
   @override
   String get shareError => 'Fehler beim Teilen';
