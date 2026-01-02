@@ -132,14 +132,8 @@
       }
     }
   },
-  "noResultsFound": "Class {query} was not found.",
-  "@noResultsFound": {
-    "placeholders": {
-      "query": {
-        "type": "String"
-      }
-    }
-  },
+  "noResultsFound": "Class doesn't exist",
+  "@noResultsFound": {},
   "shareError": "Error sharing",
   "errorNavigatingToPage": "Error navigating to page {page}",
   "@errorNavigatingToPage": {
