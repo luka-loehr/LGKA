@@ -108,7 +108,7 @@ class PdfSearchBar extends StatelessWidget {
         focusNode.unfocus();
         final query = controller.text.trim();
         if (query.isNotEmpty) {
-          HapticService.light();
+          HapticService.medium();
           onSubmitted(query);
         }
       },
