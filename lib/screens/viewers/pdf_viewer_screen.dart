@@ -788,6 +788,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     }
     
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
           headerTitle,
