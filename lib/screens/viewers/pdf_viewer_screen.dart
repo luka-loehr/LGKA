@@ -202,8 +202,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       _showClassNotFoundError = false;
     });
     
-    // Validate class exists in PDF
-    final classExists = await _checkClassExistsInPdf(classInput);
+    // Validate class exists in PDF with minimum 0.5s loading time
+    final results = await Future.wait([
+      _checkClassExistsInPdf(classInput),
+      Future.delayed(const Duration(milliseconds: 500)),
+    ]);
+    final classExists = results[0] as bool;
     
     if (!mounted) return;
     
@@ -1069,17 +1073,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: _showClassNotFoundError 
-                          ? Colors.red 
-                          : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: _showClassNotFoundError 
-                          ? Colors.red 
-                          : Theme.of(context).colorScheme.primary,
+                      color: Theme.of(context).colorScheme.primary,
                       width: 2,
                     ),
                   ),
