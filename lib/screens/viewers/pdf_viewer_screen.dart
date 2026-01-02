@@ -185,9 +185,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       final prefsState = container.read(preferencesManagerProvider);
       final currentClass = prefsState.lastScheduleQuery5to10;
       
-      // Build class index in the background for instant validation
-      final scheduleNotifier = container.read(scheduleProvider.notifier);
-      scheduleNotifier.buildClassIndex(widget.pdfFile);
+      // Class index is built at app start via preloadClassIndex()
+      // No need to build it here
       
       if (currentClass == null || currentClass.trim().isEmpty) {
         setState(() {

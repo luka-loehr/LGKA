@@ -208,6 +208,9 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
       final scheduleNotifier = ref.read(scheduleProvider.notifier);
       await scheduleNotifier.loadSchedules();
       AppLogger.success('Schedules preloaded');
+      
+      // Build class index for 5-10 schedule (runs after schedules are loaded)
+      await scheduleNotifier.preloadClassIndex();
     } catch (e) {
       AppLogger.error('Failed to preload schedules', error: e);
     }
