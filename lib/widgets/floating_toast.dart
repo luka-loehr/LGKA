@@ -105,7 +105,7 @@ class _FloatingToastWidgetState extends State<_FloatingToastWidget>
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOut,
+      curve: Curves.easeIn,
     ));
 
     _fadeAnimation = Tween<double>(
@@ -113,7 +113,7 @@ class _FloatingToastWidgetState extends State<_FloatingToastWidget>
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOut,
+      curve: Curves.easeIn,
     ));
 
     _controller.forward();
