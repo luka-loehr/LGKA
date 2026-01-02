@@ -847,41 +847,51 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
               child: Row(
                 children: [
                   Expanded(
-                    child: SearchField(
-                      controller: _searchController,
-                      focusNode: _searchFocusNode,
-                      autofocus: true,
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(3),
-                      ],
-                      suggestions: const [],
-                      searchInputDecoration: SearchInputDecoration(
-                        hintText: AppLocalizations.of(context)!.searchHint,
-                        prefixIcon: const Icon(Icons.search, color: AppColors.secondaryText),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                    child: Focus(
+                      onKeyEvent: (node, event) {
+                        if (event is KeyDownEvent && 
+                            (event.logicalKey == LogicalKeyboardKey.enter || 
+                             event.logicalKey == LogicalKeyboardKey.numpadEnter)) {
+                          if (_searchController.text.trim().isNotEmpty) {
+                            _onSearchSubmitted(_searchController.text);
+                            return KeyEventResult.handled;
+                          }
+                        }
+                        return KeyEventResult.ignored;
+                      },
+                      child: SearchField(
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        autofocus: true,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(3),
+                        ],
+                        suggestions: const [],
+                        searchInputDecoration: SearchInputDecoration(
+                          hintText: AppLocalizations.of(context)!.searchHint,
+                          prefixIcon: const Icon(Icons.search, color: AppColors.secondaryText),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.primary,
-                            width: 2,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2,
+                            ),
                           ),
+                          filled: true,
+                          fillColor: AppColors.appBackground,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         ),
-                        filled: true,
-                        fillColor: AppColors.appBackground,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        textInputAction: TextInputAction.search,
+                        onSuggestionTap: (value) {
+                          _onSearchSubmitted(value.searchKey);
+                        },
                       ),
-                      textInputAction: TextInputAction.search,
-                      onSuggestionTap: (value) {
-                        _onSearchSubmitted(value.searchKey);
-                      },
-                      onSubmitted: (value) {
-                        _onSearchSubmitted(value);
-                      },
                     ),
                   ),
                   const SizedBox(width: 12),
