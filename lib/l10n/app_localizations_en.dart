@@ -468,6 +468,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String lastDownloaded(String time) {
-    return 'Last downloaded: $time';
+    return 'Last updated: $time';
   }
 }

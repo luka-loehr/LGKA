@@ -192,7 +192,7 @@
   "csvFileTooLarge": "CSV file too large or corrupted",
   "errorLoadingWeather": "Error loading weather data",
   "supportProject": "Support Project",
-  "lastDownloaded": "Last downloaded: {time}",
+  "lastDownloaded": "Last updated: {time}",
   "@lastDownloaded": {
     "placeholders": {
       "time": {
