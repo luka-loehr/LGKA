@@ -857,65 +857,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // Expandable search bar below app bar - only show for schedules
-          if (_isSearchBarVisible && isSchedule) ...[
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: AppColors.appSurface.withValues(alpha: 0.95),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      focusNode: _searchFocusNode,
-                      autofocus: true,
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(3),
-                      ],
-                      textInputAction: TextInputAction.done,
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!.searchHint,
-                        prefixIcon: const Icon(Icons.school, color: AppColors.secondaryText),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.primary,
-                            width: 2,
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: AppColors.appBackground,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      ),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.primaryText,
-                      ),
-                      onSubmitted: _onSearchSubmitted,
-                      onTapOutside: (event) => _hideSearchBar(),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  IconButton(
-                    onPressed: _hideSearchBar,
-                    icon: const Icon(Icons.close, color: AppColors.secondaryText),
-                    tooltip: AppLocalizations.of(context)!.cancelSearch,
-                  ),
-                ],
-              ),
-            ),
-          ],
-          // PDF viewer
-          Expanded(
-            child: pdfx.PdfView(
+          // PDF viewer - takes full space
+          pdfx.PdfView(
               controller: _pdfController,
               builders: pdfx.PdfViewBuilders<pdfx.DefaultBuilderOptions>(
                 options: const pdfx.DefaultBuilderOptions(
