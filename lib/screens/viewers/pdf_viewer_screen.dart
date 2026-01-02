@@ -136,12 +136,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     });
     
     // Allow all orientations for PDF viewing (landscape is useful for documents)
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
+    // Wrapped in try-catch for iPad Stage Manager which doesn't allow orientation changes
+    try {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    } catch (_) {}
     
     // Check if this is a 5-10 schedule and if class needs to be set
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -420,10 +423,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     _buttonColorController.dispose();
     _successColorController.dispose();
     // Restore portrait-only orientation when leaving PDF viewer
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+    // Wrapped in try-catch for iPad Stage Manager which doesn't allow orientation changes
+    try {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    } catch (_) {}
     super.dispose();
   }
 
