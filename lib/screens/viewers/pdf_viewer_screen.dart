@@ -1178,7 +1178,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
               TextField(
                 controller: _classInputController,
                 focusNode: _classInputFocusNode,
-                autofocus: true,
+                autofocus: false,
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(3),
                 ],
