@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/color_provider.dart';
 
@@ -42,8 +43,12 @@ class FloatingToast {
       ),
     );
 
-    // Insert overlay
-    Overlay.of(context).insert(_overlayEntry!);
+    // Insert overlay after the current frame to ensure smooth animation
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_overlayEntry != null) {
+        Overlay.of(context).insert(_overlayEntry!);
+      }
+    });
 
     // Auto-hide after duration
     _timer = Timer(duration, () {
@@ -116,7 +121,12 @@ class _FloatingToastWidgetState extends State<_FloatingToastWidget>
       curve: Curves.easeOutCubic,
     ));
 
-    _controller.forward();
+    // Start animation in the next frame to ensure smooth animation even during heavy rendering
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _controller.forward();
+      }
+    });
   }
 
   /// Animate out the toast
