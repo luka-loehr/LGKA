@@ -869,7 +869,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                 HapticService.light();
                 _showSearchBar();
               },
-              icon: const Icon(Icons.search, color: AppColors.secondaryText),
+              icon: const Icon(Icons.school, color: AppColors.secondaryText),
               tooltip: _searchResults.isEmpty
                   ? AppLocalizations.of(context)!.searchInPdf
                   : AppLocalizations.of(context)!.newSearch,
