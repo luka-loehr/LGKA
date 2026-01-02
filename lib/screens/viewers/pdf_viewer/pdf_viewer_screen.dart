@@ -865,7 +865,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         if (isSchedule5to10) ...[
           if (!_isSearchBarVisible)
             IconButton(
-              onPressed: _showSearchBar,
+              onPressed: () {
+                HapticService.light();
+                _showSearchBar();
+              },
               icon: const Icon(Icons.search, color: AppColors.secondaryText),
               tooltip: _searchResults.isEmpty
                   ? AppLocalizations.of(context)!.searchInPdf
