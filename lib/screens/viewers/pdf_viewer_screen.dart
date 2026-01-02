@@ -341,6 +341,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       return _buttonColorAnimation.value ?? _errorRedColor;
     }
     
+    // Loading state - keep primary color
+    if (_isValidatingClass) {
+      return Theme.of(context).colorScheme.primary;
+    }
+    
     // Normal states: active or inactive
     if (_canSaveClass) {
       return Theme.of(context).colorScheme.primary;
