@@ -873,10 +873,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                       inputFormatters: [
                         LengthLimitingTextInputFormatter(3),
                       ],
-                      textInputAction: TextInputAction.search,
+                      textInputAction: TextInputAction.done,
+                      keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                         hintText: AppLocalizations.of(context)!.searchHint,
-                        prefixIcon: const Icon(Icons.search, color: AppColors.secondaryText),
+                        prefixIcon: const Icon(Icons.school, color: AppColors.secondaryText),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
