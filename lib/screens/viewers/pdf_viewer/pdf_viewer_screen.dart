@@ -293,6 +293,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     setState(() => _showClassNotFoundError = true);
     _buttonColorController.forward();
 
+    // Re-request focus to keep keyboard open
+    _classInputFocusNode.requestFocus();
+
     Future.delayed(const Duration(milliseconds: 600), () {
       if (mounted) {
         _buttonColorController.reverse().then((_) {
@@ -309,6 +312,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     });
 
     _buttonColorController.forward();
+
+    // Re-request focus to keep keyboard open
+    _classInputFocusNode.requestFocus();
 
     Future.delayed(const Duration(milliseconds: 600), () {
       if (mounted) {
