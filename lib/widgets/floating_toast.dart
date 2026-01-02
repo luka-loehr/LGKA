@@ -11,6 +11,7 @@ class FloatingToast {
   static OverlayEntry? _overlayEntry;
   static Timer? _timer;
   static GlobalKey<_FloatingToastWidgetState>? _stateKey;
+  static bool _isInserting = false;
 
   /// Show a floating toast message
   static void show(
@@ -19,8 +20,15 @@ class FloatingToast {
     Duration duration = const Duration(seconds: 2),
     Color? backgroundColor,
   }) {
-    // Hide any existing toast
-    hide();
+    // Cancel any pending insertion and timers
+    _timer?.cancel();
+    _timer = null;
+    _isInserting = false;
+    
+    // Remove any existing overlay immediately (skip animation for rapid calls)
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    _stateKey = null;
 
     // Get accent color from provider
     Color accentColor;
@@ -33,20 +41,29 @@ class FloatingToast {
 
     // Create state key
     _stateKey = GlobalKey<_FloatingToastWidgetState>();
+    final currentKey = _stateKey;
 
     // Create overlay entry
     _overlayEntry = OverlayEntry(
       builder: (context) => _FloatingToastWidget(
-        key: _stateKey,
+        key: currentKey,
         message: message,
         backgroundColor: accentColor,
       ),
     );
+    final currentEntry = _overlayEntry;
+    _isInserting = true;
 
     // Insert overlay after the current frame to ensure smooth animation
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_overlayEntry != null) {
-        Overlay.of(context).insert(_overlayEntry!);
+      // Only insert if this is still the current entry (no new show() called)
+      if (_isInserting && currentEntry == _overlayEntry && currentEntry != null) {
+        try {
+          Overlay.of(context).insert(currentEntry);
+        } catch (e) {
+          // Context might be invalid
+        }
+        _isInserting = false;
       }
     });
 
@@ -60,19 +77,23 @@ class FloatingToast {
   static void hide() {
     _timer?.cancel();
     _timer = null;
+    _isInserting = false;
     
     // Animate out before removing
     final state = _stateKey?.currentState;
+    final entry = _overlayEntry;
+    final key = _stateKey;
+    
+    // Clear references immediately to prevent conflicts
+    _overlayEntry = null;
+    _stateKey = null;
+    
     if (state != null && state.mounted) {
       state.animateOut().then((_) {
-        _overlayEntry?.remove();
-        _overlayEntry = null;
-        _stateKey = null;
+        entry?.remove();
       });
     } else {
-      _overlayEntry?.remove();
-      _overlayEntry = null;
-      _stateKey = null;
+      entry?.remove();
     }
   }
 }
