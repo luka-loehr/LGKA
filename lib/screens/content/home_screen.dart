@@ -217,7 +217,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: GestureDetector(
               onTap: () => Navigator.of(context).pop(),
               child: Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.transparent,
               ),
             ),
           ),
@@ -259,7 +259,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: GestureDetector(
               onTap: () => Navigator.of(context).pop(),
               child: Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.transparent,
               ),
             ),
           ),
