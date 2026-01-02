@@ -365,6 +365,55 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
       AppLogger.error('Failed to preload class index', module: 'ScheduleProvider', error: e);
     }
   }
+  
+  /// Silently rebuild the class index in the background (app resume scenario)
+  /// This method is designed to be non-intrusive and won't trigger loading states
+  Future<void> rebuildClassIndexSilently() async {
+    if (state.isIndexBuilt) {
+      AppLogger.debug('Class index already built, skipping silent rebuild', module: 'ScheduleProvider');
+      return;
+    }
+    
+    try {
+      AppLogger.info('Silent rebuild: Starting class index rebuild in background', module: 'ScheduleProvider');
+      
+      // Find the 5-10 schedule from available schedules
+      final schedules = state.schedules;
+      if (schedules.isEmpty) {
+        AppLogger.debug('Silent rebuild: No schedules available, skipping', module: 'ScheduleProvider');
+        return;
+      }
+      
+      // Find a 5-10 schedule (prefer first halbjahr, then second)
+      ScheduleItem? schedule5to10;
+      for (final schedule in schedules) {
+        if (schedule.gradeLevel == 'Klassen 5-10') {
+          schedule5to10 = schedule;
+          break;
+        }
+      }
+      
+      if (schedule5to10 == null) {
+        AppLogger.debug('Silent rebuild: No 5-10 schedule found', module: 'ScheduleProvider');
+        return;
+      }
+      
+      // Try to use cached PDF or download silently (no loading state changes)
+      final pdfFile = await _scheduleService.downloadSchedule(schedule5to10);
+      
+      if (pdfFile == null) {
+        AppLogger.debug('Silent rebuild: PDF not available, will retry later', module: 'ScheduleProvider');
+        return;
+      }
+      
+      // Build the index in background isolate
+      await buildClassIndex(pdfFile);
+      AppLogger.success('Silent rebuild: Class index rebuilt successfully', module: 'ScheduleProvider');
+    } catch (e) {
+      // Fail silently - don't disrupt user experience
+      AppLogger.debug('Silent rebuild: Failed quietly ($e), will retry on next app resume', module: 'ScheduleProvider');
+    }
+  }
 }
 
 /// Provider for schedule state
