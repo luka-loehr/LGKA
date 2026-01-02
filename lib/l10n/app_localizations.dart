@@ -800,8 +800,8 @@ abstract class AppLocalizations {
   /// No description provided for @noResultsFound.
   ///
   /// In en, this message translates to:
-  /// **'Class doesn\'t exist'**
-  String get noResultsFound;
+  /// **'Class {className} doesn\'t exist.'**
+  String noResultsFound(String className);
 
   /// No description provided for @shareError.
   ///

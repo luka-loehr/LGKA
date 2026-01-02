@@ -134,8 +134,12 @@
       }
     }
   },
-  "noResultsFound": "Klasse existiert nicht",
-  "@noResultsFound": {},
+  "noResultsFound": "Klasse {className} existiert nicht.",
+  "@noResultsFound": {
+    "placeholders": {
+      "className": { "type": "String" }
+    }
+  },
   "shareError": "Fehler beim Teilen",
   "errorNavigatingToPage": "Fehler beim Navigieren zur Seite {page}",
   "@errorNavigatingToPage": {
