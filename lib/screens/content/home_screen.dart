@@ -212,10 +212,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      constraints: isTablet 
-          ? BoxConstraints(maxWidth: 600)
-          : null,
-      builder: (context) => _SettingsSheet(),
+      builder: (context) => Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isTablet ? 600 : double.infinity,
+          ),
+          child: _SettingsSheet(),
+        ),
+      ),
     );
   }
 
@@ -229,10 +233,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      constraints: isTablet 
-          ? BoxConstraints(maxWidth: 600)
-          : null,
-      builder: (context) => _DrawerSheet(),
+      builder: (context) => Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isTablet ? 600 : double.infinity,
+          ),
+          child: _DrawerSheet(),
+        ),
+      ),
     );
   }
 
