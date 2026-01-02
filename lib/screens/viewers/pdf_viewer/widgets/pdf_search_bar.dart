@@ -30,16 +30,59 @@ class PdfSearchBar extends StatefulWidget {
   State<PdfSearchBar> createState() => _PdfSearchBarState();
 }
 
-class _PdfSearchBarState extends State<PdfSearchBar> {
+class _PdfSearchBarState extends State<PdfSearchBar>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(_onTextChanged);
+
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+
+    if (widget.isVisible) {
+      _animationController.forward();
+    }
+  }
+
+  @override
+  void didUpdateWidget(PdfSearchBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isVisible != oldWidget.isVisible) {
+      if (widget.isVisible) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    }
   }
 
   @override
   void dispose() {
     widget.controller.removeListener(_onTextChanged);
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -55,33 +98,35 @@ class _PdfSearchBarState extends State<PdfSearchBar> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return AnimatedOpacity(
-      opacity: widget.isVisible ? 1.0 : 0.0,
-      duration: const Duration(milliseconds: 100),
-      child: IgnorePointer(
-        ignoring: !widget.isVisible,
-        child: SafeArea(
-          bottom: false,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.4),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(context, l10n),
-                ),
-                const SizedBox(width: 12),
-                _buildSubmitButton(context),
-              ],
+    return IgnorePointer(
+      ignoring: !widget.isVisible,
+      child: SafeArea(
+        bottom: false,
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.4),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildTextField(context, l10n),
+                  ),
+                  const SizedBox(width: 12),
+                  _buildSubmitButton(context),
+                ],
+              ),
             ),
           ),
         ),
