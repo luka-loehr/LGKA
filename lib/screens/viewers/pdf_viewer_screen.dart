@@ -283,7 +283,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     
     if (!mounted) return;
     
-    final container = ProviderScope.containerOf(context, listen: false);
     await container.read(preferencesManagerProvider.notifier).setLastScheduleQuery5to10(classInput);
     
     // Hold the green color briefly
