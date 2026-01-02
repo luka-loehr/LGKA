@@ -9,6 +9,7 @@ import '../providers/color_provider.dart';
 class FloatingToast {
   static OverlayEntry? _overlayEntry;
   static Timer? _timer;
+  static GlobalKey<_FloatingToastWidgetState>? _stateKey;
 
   /// Show a floating toast message
   static void show(
@@ -29,9 +30,13 @@ class FloatingToast {
       accentColor = container.read(currentColorProvider);
     }
 
+    // Create state key
+    _stateKey = GlobalKey<_FloatingToastWidgetState>();
+
     // Create overlay entry
     _overlayEntry = OverlayEntry(
       builder: (context) => _FloatingToastWidget(
+        key: _stateKey,
         message: message,
         backgroundColor: accentColor,
       ),
@@ -46,22 +51,36 @@ class FloatingToast {
     });
   }
 
-  /// Hide the current toast
+  /// Hide the current toast with animation
   static void hide() {
     _timer?.cancel();
     _timer = null;
-    _overlayEntry?.remove();
-    _overlayEntry = null;
+    
+    // Animate out before removing
+    final state = _stateKey?.currentState;
+    if (state != null && state.mounted) {
+      state.animateOut().then((_) {
+        _overlayEntry?.remove();
+        _overlayEntry = null;
+        _stateKey = null;
+      });
+    } else {
+      _overlayEntry?.remove();
+      _overlayEntry = null;
+      _stateKey = null;
+    }
   }
 }
 
 class _FloatingToastWidget extends StatefulWidget {
   final String message;
   final Color backgroundColor;
+  final GlobalKey<_FloatingToastWidgetState>? stateKey;
 
   const _FloatingToastWidget({
     required this.message,
     required this.backgroundColor,
+    this.stateKey,
   });
 
   @override
@@ -83,7 +102,7 @@ class _FloatingToastWidgetState extends State<_FloatingToastWidget>
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, -1),
+      begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
@@ -101,6 +120,11 @@ class _FloatingToastWidgetState extends State<_FloatingToastWidget>
     _controller.forward();
   }
 
+  /// Animate out the toast
+  Future<void> animateOut() async {
+    await _controller.reverse();
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -110,7 +134,7 @@ class _FloatingToastWidgetState extends State<_FloatingToastWidget>
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 16,
+      bottom: MediaQuery.of(context).padding.bottom + 16,
       left: 16,
       right: 16,
       child: SlideTransition(
