@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/modal_bottom_sheet_helper.dart';
 import '../../providers/app_providers.dart';
 import '../../providers/color_provider.dart';
 import '../../providers/substitution_provider.dart';
@@ -203,92 +203,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showSettings() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
-    final maxWidth = isTablet ? 600.0 : screenWidth;
-    
-    showMaterialModalBottomSheet(
+    showConstrainedModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Stack(
-        children: [
-          // Tappable barrier to dismiss
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: () => Navigator.of(context).pop(),
-              child: Container(
-                color: Colors.transparent,
-              ),
-            ),
-          ),
-          // Modal content
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: GestureDetector(
-              onTap: () {}, // Prevent tap from propagating to barrier
-              child: Container(
-                width: maxWidth,
-                constraints: BoxConstraints(
-                  maxWidth: maxWidth,
-                ),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1E1E1E),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                child: SingleChildScrollView(
-                  controller: ModalScrollController.of(context),
-                  child: _SettingsSheet(),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      builder: (context) => _SettingsSheet(),
     );
   }
 
   void _showDrawer() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
-    final maxWidth = isTablet ? 600.0 : screenWidth;
-    
-    showMaterialModalBottomSheet(
+    showConstrainedModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Stack(
-        children: [
-          // Tappable barrier to dismiss
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: () => Navigator.of(context).pop(),
-              child: Container(
-                color: Colors.transparent,
-              ),
-            ),
-          ),
-          // Modal content
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: GestureDetector(
-              onTap: () {}, // Prevent tap from propagating to barrier
-              child: Container(
-                width: maxWidth,
-                constraints: BoxConstraints(
-                  maxWidth: maxWidth,
-                ),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1E1E1E),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                child: SingleChildScrollView(
-                  controller: ModalScrollController.of(context),
-                  child: _DrawerSheet(),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      builder: (context) => _DrawerSheet(),
     );
   }
 
