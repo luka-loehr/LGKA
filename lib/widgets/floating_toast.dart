@@ -75,12 +75,11 @@ class FloatingToast {
 class _FloatingToastWidget extends StatefulWidget {
   final String message;
   final Color backgroundColor;
-  final GlobalKey<_FloatingToastWidgetState>? stateKey;
 
   const _FloatingToastWidget({
+    super.key,
     required this.message,
     required this.backgroundColor,
-    this.stateKey,
   });
 
   @override
