@@ -6,6 +6,7 @@ import 'package:lgka_flutter/theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:lgka_flutter/services/haptic_service.dart';
+import 'package:lgka_flutter/widgets/floating_toast.dart';
 import 'package:pdfx/pdfx.dart' as pdfx;
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -156,14 +157,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         final targetPage = widget.targetPages!.first;
         _pdfController.jumpToPage(targetPage - 1); // Convert to 0-based index
         
-        // Show snackbar with found pages
+        // Show toast with found pages
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context)!.foundPages(widget.targetPages!.join(", "))),
-              duration: const Duration(seconds: 3),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-            ),
+          FloatingToast.show(
+            context,
+            message: AppLocalizations.of(context)!.foundPages(widget.targetPages!.join(", ")),
+            duration: const Duration(seconds: 3),
           );
         }
       });
@@ -539,37 +538,30 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         // Show success message
         if (mounted) {
           final firstQuery = results.first.query;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                results.length == 1
-                    ? AppLocalizations.of(context)!.singleResultFound(firstQuery)
-                    : AppLocalizations.of(context)!.multipleResultsFound(results.length),
-              ),
-              duration: const Duration(seconds: 2),
-              backgroundColor: Colors.green,
-            ),
+          FloatingToast.show(
+            context,
+            message: results.length == 1
+                ? AppLocalizations.of(context)!.singleResultFound(firstQuery)
+                : AppLocalizations.of(context)!.multipleResultsFound(results.length),
+            duration: const Duration(seconds: 2),
           );
         }
       } else {
         // Show a message when no results are found
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context)!.noResultsFound(query)),
-              duration: const Duration(seconds: 2),
-              backgroundColor: Colors.orange,
-            ),
+          FloatingToast.show(
+            context,
+            message: AppLocalizations.of(context)!.noResultsFound(query),
+            duration: const Duration(seconds: 2),
           );
         }
       }
     } catch (e) {
       if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('${AppLocalizations.of(context)!.errorLoadingGeneric}: $e'),
-            backgroundColor: Colors.red,
-          ),
+        FloatingToast.show(
+          context,
+          message: '${AppLocalizations.of(context)!.errorLoadingGeneric}: $e',
+          duration: const Duration(seconds: 3),
         );
       }
     }
@@ -595,11 +587,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       }
     } catch (e) {
       if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-                content: Text(AppLocalizations.of(context)!.errorNavigatingToPage(result.pageNumber.toString())),
-            backgroundColor: Colors.red,
-          ),
+        FloatingToast.show(
+          context,
+          message: AppLocalizations.of(context)!.errorNavigatingToPage(result.pageNumber.toString()),
+          duration: const Duration(seconds: 3),
         );
       }
     }
@@ -766,11 +757,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       // No success message needed - users can see the sharing worked themselves
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${AppLocalizations.of(context)!.shareError}: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
+        FloatingToast.show(
+          context,
+          message: '${AppLocalizations.of(context)!.shareError}: ${e.toString()}',
+          duration: const Duration(seconds: 3),
         );
       }
     }
