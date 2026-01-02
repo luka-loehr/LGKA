@@ -131,27 +131,36 @@ class _PdfSearchBarState extends State<PdfSearchBar> {
   }
 
   Widget _buildSubmitButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: _canSubmit
-          ? () {
-              // Unfocus the TextField first
-              widget.focusNode.unfocus();
-              final query = widget.controller.text.trim();
-              HapticService.medium();
-              widget.onSubmitted(query);
-            }
-          : null,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: _canSubmit
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+    final buttonColor = _canSubmit
+        ? Theme.of(context).colorScheme.primary
+        : Theme.of(context).colorScheme.primary.withValues(alpha: 0.5);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: _canSubmit
+            ? () {
+                // Unfocus the TextField first
+                widget.focusNode.unfocus();
+                final query = widget.controller.text.trim();
+                HapticService.medium();
+                widget.onSubmitted(query);
+              }
+            : null,
+        borderRadius: BorderRadius.circular(12),
+        splashColor: Colors.white.withValues(alpha: 0.2),
+        highlightColor: Colors.white.withValues(alpha: 0.1),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          decoration: BoxDecoration(
+            color: buttonColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Icon(Icons.check, size: 20, color: Colors.white),
         ),
       ),
-      child: const Icon(Icons.check, size: 20),
     );
   }
 }
