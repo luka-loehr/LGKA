@@ -1104,7 +1104,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                       borderRadius: BorderRadius.circular(12),
                       splashColor: Colors.white.withValues(alpha: 0.2),
                       highlightColor: Colors.white.withValues(alpha: 0.1),
-                      child: Container(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOut,
                         width: double.infinity,
                         height: 46,
                         decoration: BoxDecoration(
