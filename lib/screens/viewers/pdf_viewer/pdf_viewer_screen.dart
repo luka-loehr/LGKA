@@ -795,7 +795,19 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         dn.contains('J11/J12');
   }
 
+  bool _isSubstitution() {
+    if (widget.dayName == null || widget.dayName!.isEmpty) return false;
+    final dn = widget.dayName!;
+    // Check for weekday names in both German and English
+    const weekdays = [
+      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
+      'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'
+    ];
+    return weekdays.any((day) => dn.contains(day));
+  }
+
   AppBar _buildAppBar(String headerTitle, bool isSchedule) {
+    final shouldCenter = isSchedule || _isSubstitution();
     return AppBar(
       title: Text(
         headerTitle,
@@ -804,7 +816,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
               color: AppColors.primaryText,
             ),
       ),
-      centerTitle: isSchedule,
+      centerTitle: shouldCenter,
       backgroundColor: AppColors.appBackground,
       elevation: 0,
       iconTheme: const IconThemeData(color: AppColors.primaryText),
