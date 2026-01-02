@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart' as syncfusion;
 import '../services/schedule_service.dart';
 import '../utils/app_logger.dart';
 import '../services/haptic_service.dart';
@@ -14,12 +15,16 @@ class ScheduleState {
   final bool isLoading;
   final String? error;
   final DateTime? lastUpdated;
+  final Set<String> classIndex5to10; // Index of all valid classes for 5-10 schedule
+  final bool isIndexBuilt;
 
   const ScheduleState({
     this.schedules = const [],
     this.isLoading = false,
     this.error,
     this.lastUpdated,
+    this.classIndex5to10 = const {},
+    this.isIndexBuilt = false,
   });
 
   ScheduleState copyWith({
@@ -28,12 +33,16 @@ class ScheduleState {
     String? error,
     bool clearError = false,
     DateTime? lastUpdated,
+    Set<String>? classIndex5to10,
+    bool? isIndexBuilt,
   }) {
     return ScheduleState(
       schedules: schedules ?? this.schedules,
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : (error ?? this.error),
       lastUpdated: lastUpdated ?? this.lastUpdated,
+      classIndex5to10: classIndex5to10 ?? this.classIndex5to10,
+      isIndexBuilt: isIndexBuilt ?? this.isIndexBuilt,
     );
   }
 
@@ -201,6 +210,66 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
     }
     
     return availableSchedules;
+  }
+  
+  /// Build class index from a 5-10 schedule PDF file
+  /// Searches for classes 5a-5e, 6a-6e, ... up to 10a-10e
+  Future<void> buildClassIndex(File pdfFile) async {
+    if (state.isIndexBuilt) return; // Already built
+    
+    try {
+      AppLogger.info('Building class index from PDF...', module: 'ScheduleProvider');
+      final stopwatch = Stopwatch()..start();
+      
+      final bytes = await pdfFile.readAsBytes();
+      final document = syncfusion.PdfDocument(inputBytes: bytes);
+      final pageCount = document.pages.count;
+      
+      final textExtractor = syncfusion.PdfTextExtractor(document);
+      final allText = textExtractor.extractText(
+        startPageIndex: 0,
+        endPageIndex: pageCount - 1,
+      ).toLowerCase();
+      
+      document.dispose();
+      
+      final foundClasses = <String>{};
+      
+      // Search for classes: 5a-5e, 6a-6e, ... 10a-10e
+      for (int grade = 5; grade <= 10; grade++) {
+        for (final letter in ['a', 'b', 'c', 'd', 'e']) {
+          final className = '$grade$letter';
+          if (allText.contains(className)) {
+            foundClasses.add(className);
+          } else {
+            // If this letter not found, skip to next grade
+            break;
+          }
+        }
+      }
+      
+      stopwatch.stop();
+      AppLogger.success(
+        'Class index built: ${foundClasses.length} classes found in ${stopwatch.elapsedMilliseconds}ms',
+        module: 'ScheduleProvider',
+      );
+      AppLogger.debug('Classes: ${foundClasses.toList()..sort()}', module: 'ScheduleProvider');
+      
+      state = state.copyWith(
+        classIndex5to10: foundClasses,
+        isIndexBuilt: true,
+      );
+    } catch (e) {
+      AppLogger.error('Failed to build class index', module: 'ScheduleProvider', error: e);
+      // Don't fail - just mark as built with empty index (will fall back to PDF search)
+      state = state.copyWith(isIndexBuilt: true);
+    }
+  }
+  
+  /// Check if a class exists in the index (instant check, no PDF parsing)
+  bool isClassInIndex(String className) {
+    if (!state.isIndexBuilt) return true; // If index not built, assume valid
+    return state.classIndex5to10.contains(className.toLowerCase());
   }
 }
 
