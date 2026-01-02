@@ -7,7 +7,7 @@ import '../screens/onboarding/what_you_can_do_screen.dart';
 import '../screens/onboarding/accent_color_screen.dart';
 import '../screens/onboarding/auth_screen.dart';
 import '../screens/content/home_screen.dart';
-import '../screens/viewers/pdf_viewer_screen.dart';
+import '../screens/viewers/pdf_viewer/pdf_viewer.dart';
 import '../screens/content/schedule_page.dart';
 import '../screens/info/legal_screen.dart';
 import '../screens/viewers/webview_screen.dart';
