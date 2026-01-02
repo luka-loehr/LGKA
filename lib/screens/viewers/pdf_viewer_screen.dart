@@ -884,7 +884,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
           if (isSchedule)
             AnimatedOpacity(
               opacity: _isSearchBarVisible ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 100),
               child: IgnorePointer(
                 ignoring: !_isSearchBarVisible,
                 child: Positioned(
