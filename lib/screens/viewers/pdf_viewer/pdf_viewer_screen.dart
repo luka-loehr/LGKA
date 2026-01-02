@@ -610,6 +610,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   void _hideSearchBar() {
     if (!_canDismissSearchBar) return;
 
+    // Unfocus to dismiss keyboard
+    _searchFocusNode.unfocus();
+
     setState(() {
       _isSearchBarVisible = false;
       _canDismissSearchBar = false;
