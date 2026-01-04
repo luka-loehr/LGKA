@@ -8,7 +8,6 @@ import '../application/news_provider.dart';
 import '../../../../providers/color_provider.dart';
 import '../../../../services/haptic_service.dart';
 import '../domain/news_models.dart';
-import '../data/news_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../navigation/app_router.dart';
 import '../../../../services/loading_spinner_tracker_service.dart';
