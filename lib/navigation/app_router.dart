@@ -2,20 +2,20 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../screens/onboarding/welcome_screen.dart';
-import '../screens/onboarding/what_you_can_do_screen.dart';
-import '../screens/onboarding/accent_color_screen.dart';
-import '../screens/onboarding/auth_screen.dart';
-import '../screens/content/home_screen.dart';
-import '../screens/viewers/pdf_viewer/pdf_viewer.dart';
-import '../screens/content/schedule_page.dart';
-import '../screens/info/legal_screen.dart';
-import '../screens/viewers/webview_screen.dart';
-import '../screens/info/krankmeldung_info_screen.dart';
-import '../screens/settings/bug_report_screen.dart';
-import '../screens/content/news_screen.dart';
-import '../screens/content/news_detail_screen.dart';
-import '../models/news_models.dart';
+import '../features/onboarding/presentation/welcome_screen.dart';
+import '../features/onboarding/presentation/what_you_can_do_screen.dart';
+import '../features/onboarding/presentation/accent_color_screen.dart';
+import '../features/onboarding/presentation/auth_screen.dart';
+import '../features/home/presentation/home_screen.dart';
+import '../features/pdf_viewer/presentation/pdf_viewer/pdf_viewer.dart';
+import '../features/schedule/presentation/schedule_page.dart';
+import '../features/info/presentation/legal_screen.dart';
+import '../features/pdf_viewer/presentation/webview_screen.dart';
+import '../features/info/presentation/krankmeldung_info_screen.dart';
+import '../features/settings/presentation/bug_report_screen.dart';
+import '../features/news/presentation/news_screen.dart';
+import '../features/news/presentation/news_detail_screen.dart';
+import '../features/news/domain/news_models.dart';
 
 class AppRouter {
   // Route names
