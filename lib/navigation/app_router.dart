@@ -15,7 +15,7 @@ import '../screens/info/krankmeldung_info_screen.dart';
 import '../screens/settings/bug_report_screen.dart';
 import '../screens/content/news_screen.dart';
 import '../screens/content/news_detail_screen.dart';
-import '../services/news_service.dart';
+import '../models/news_models.dart';
 
 class AppRouter {
   // Route names
