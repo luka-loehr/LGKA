@@ -1,7 +1,6 @@
 // Copyright Luka Löhr 2025
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/app_providers.dart';
 import '../features/schedule/application/schedule_provider.dart';
 import '../features/substitution/application/substitution_provider.dart';
 import '../features/weather/application/weather_provider.dart';
