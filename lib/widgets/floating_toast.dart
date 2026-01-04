@@ -2,7 +2,6 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/color_provider.dart';
 
@@ -82,7 +81,6 @@ class FloatingToast {
     // Animate out before removing
     final state = _stateKey?.currentState;
     final entry = _overlayEntry;
-    final key = _stateKey;
     
     // Clear references immediately to prevent conflicts
     _overlayEntry = null;
