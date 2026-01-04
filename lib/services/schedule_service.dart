@@ -6,33 +6,12 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html;
 import 'package:path_provider/path_provider.dart';
+import '../models/schedule_models.dart';
 import '../utils/app_logger.dart';
 import '../utils/app_info.dart';
 import '../config/app_credentials.dart';
 import '../utils/retry_util.dart';
 import 'cache_service.dart';
-
-/// Represents a schedule PDF with metadata
-class ScheduleItem {
-  final String title;
-  final String url;
-  final String halbjahr;
-  final String gradeLevel;
-  final String fullUrl;
-
-  const   ScheduleItem({
-    required this.title,
-    required this.url,
-    required this.halbjahr,
-    required this.gradeLevel,
-    required this.fullUrl,
-  });
-
-  @override
-  String toString() {
-    return 'ScheduleItem(title: $title, halbjahr: $halbjahr, gradeLevel: $gradeLevel)';
-  }
-}
 
 /// Service for managing schedule PDFs through web scraping
 class ScheduleService {

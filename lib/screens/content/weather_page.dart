@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:timezone/timezone.dart' as tz;
+import '../../models/weather_models.dart';
 import '../../services/weather_service.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/app_providers.dart';
