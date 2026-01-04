@@ -423,7 +423,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               Container(
                                 height: 1,
                                 margin: const EdgeInsets.symmetric(horizontal: 16),
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                               ),
                               
                               // Password Field with rounded corners

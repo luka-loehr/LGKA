@@ -17,8 +17,6 @@
 ///   ),
 /// );
 /// ```
-library pdf_viewer;
-
 export 'models/search_result.dart';
 export 'pdf_viewer_screen.dart';
 export 'services/pdf_search_service.dart';
