@@ -1,94 +1,12 @@
+// Copyright Luka Löhr 2025
+
 import 'package:http/http.dart' as http;
 import 'package:csv/csv.dart';
 import 'dart:convert';
+import '../models/weather_models.dart';
 import '../utils/app_logger.dart';
 import '../utils/app_info.dart';
 import '../utils/retry_util.dart';
-
-class WeatherData {
-  final DateTime time;
-  final double temperature;
-  final double humidity;
-  final double windSpeed;
-  final String windDirection;
-  final double precipitation;
-  final double pressure;
-  final double radiation;
-
-  WeatherData({
-    required this.time,
-    required this.temperature,
-    required this.humidity,
-    required this.windSpeed,
-    required this.windDirection,
-    required this.precipitation,
-    required this.pressure,
-    required this.radiation,
-  });
-
-  // JSON serialization
-  Map<String, dynamic> toJson() {
-    return {
-      'time': time.millisecondsSinceEpoch,
-      'temperature': temperature,
-      'humidity': humidity,
-      'windSpeed': windSpeed,
-      'windDirection': windDirection,
-      'precipitation': precipitation,
-      'pressure': pressure,
-      'radiation': radiation,
-    };
-  }
-
-  factory WeatherData.fromJson(Map<String, dynamic> json) {
-    try {
-      // Safe parsing with defaults for all fields
-      final timeValue = json['time'];
-      final time = timeValue != null
-          ? DateTime.fromMillisecondsSinceEpoch(
-              timeValue is int ? timeValue : int.tryParse(timeValue.toString()) ?? 0)
-          : DateTime.now();
-
-      return WeatherData(
-        time: time,
-        temperature: _safeToDouble(json['temperature'], 0.0),
-        humidity: _safeToDouble(json['humidity'], 0.0),
-        windSpeed: _safeToDouble(json['windSpeed'], 0.0),
-        windDirection: json['windDirection']?.toString() ?? '',
-        precipitation: _safeToDouble(json['precipitation'], 0.0),
-        pressure: _safeToDouble(json['pressure'], 0.0),
-        radiation: _safeToDouble(json['radiation'], 0.0),
-      );
-    } catch (e) {
-      // Return default WeatherData if parsing fails completely
-      return WeatherData(
-        time: DateTime.now(),
-        temperature: 0.0,
-        humidity: 0.0,
-        windSpeed: 0.0,
-        windDirection: '',
-        precipitation: 0.0,
-        pressure: 0.0,
-        radiation: 0.0,
-      );
-    }
-  }
-
-  /// Safely convert a value to double with a default fallback
-  static double _safeToDouble(dynamic value, double defaultValue) {
-    if (value == null) return defaultValue;
-    if (value is double) return value;
-    if (value is int) return value.toDouble();
-    if (value is String) {
-      return double.tryParse(value) ?? defaultValue;
-    }
-    try {
-      return (value as num).toDouble();
-    } catch (_) {
-      return defaultValue;
-    }
-  }
-}
 
 class WeatherService {
   static const String csvUrl = 'https://lessing-gymnasium-karlsruhe.de/wetter/lg_wetter_heute.csv';
