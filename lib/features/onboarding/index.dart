@@ -1,6 +1,5 @@
 // Copyright Luka Löhr 2025
 
-/// Barrel file for onboarding feature
 export 'presentation/welcome_screen.dart';
 export 'presentation/what_you_can_do_screen.dart';
 export 'presentation/accent_color_screen.dart';
