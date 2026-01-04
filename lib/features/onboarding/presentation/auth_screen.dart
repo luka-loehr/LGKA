@@ -30,7 +30,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   bool _showErrorFlash = false;
   bool _showSuccessFlash = false;
   bool _shouldShowOffset = false;
-  String _currentAccentColor = 'blue';
   bool _hasInitializedAnimations = false;
   
   // Adaptive offset calculation based on screen height
@@ -67,9 +66,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     super.initState();
     
     // Get initial accent color
+    // Initialize accent color from preferences
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final prefsManager = ref.read(preferencesManagerProvider);
-      _currentAccentColor = prefsManager.accentColor;
+      // Accent color is managed via provider, no need to store locally
     });
     
     // Setup button color animation with accent color
@@ -217,7 +216,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       
       // Update authentication state
       await ref.read(preferencesManagerProvider.notifier).setAuthenticated(true);
-      ref.read(isAuthenticatedProvider.notifier).state = true;
+      // isAuthenticatedProvider is managed via preferencesManagerProvider
       
       // Additional success haptic just before navigation
       await HapticService.light();
@@ -297,7 +296,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     // Listen for accent color changes
     ref.listen(preferencesManagerProvider, (previous, next) {
       if (previous?.accentColor != next.accentColor) {
-        _currentAccentColor = next.accentColor;
         _updateAnimations();
         setState(() {}); // Trigger rebuild to update colors
       }

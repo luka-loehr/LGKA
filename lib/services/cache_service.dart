@@ -1,7 +1,5 @@
 // Copyright Luka Löhr 2025
 
-import 'dart:async';
-
 /// Cache keys for different data types
 enum CacheKey {
   substitutions,

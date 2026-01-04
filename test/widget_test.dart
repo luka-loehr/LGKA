@@ -5,11 +5,13 @@ import 'package:lgka_flutter/main.dart';
 import 'package:lgka_flutter/data/preferences_manager.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
 import 'package:lgka_flutter/navigation/app_router.dart';
-import 'package:lgka_flutter/services/weather_service.dart';
-import 'package:lgka_flutter/services/schedule_service.dart';
-import 'package:lgka_flutter/services/substitution_service.dart';
-import 'package:lgka_flutter/providers/substitution_provider.dart';
-import 'package:lgka_flutter/screens/welcome_screen.dart';
+import 'package:lgka_flutter/features/weather/data/weather_service.dart';
+import 'package:lgka_flutter/features/weather/application/weather_provider.dart';
+import 'package:lgka_flutter/features/schedule/data/schedule_service.dart';
+import 'package:lgka_flutter/features/substitution/data/substitution_service.dart';
+import 'package:lgka_flutter/features/onboarding/presentation/welcome_screen.dart';
+import 'package:lgka_flutter/features/weather/domain/weather_models.dart';
+import 'package:lgka_flutter/features/schedule/domain/schedule_models.dart';
 
 // Mocks
 class MockSubstitutionService extends SubstitutionService {
@@ -59,7 +61,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          preferencesManagerProvider.overrideWith((ref) => preferencesManager),
+          preferencesManagerProvider.overrideWith(() => PreferencesManagerNotifier()),
           // Override services to prevent network calls
           substitutionServiceProvider.overrideWith((ref) => MockSubstitutionService()),
           weatherServiceProvider.overrideWith((ref) => MockWeatherService()),
