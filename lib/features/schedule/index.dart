@@ -1,0 +1,7 @@
+// Copyright Luka Löhr 2025
+
+/// Barrel file for schedule feature
+export 'presentation/schedule_page.dart';
+export 'application/schedule_provider.dart';
+export 'domain/schedule_models.dart';
+export 'data/schedule_service.dart';
