@@ -844,14 +844,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     return AppLocalizations.of(context)!.documentTitle;
   }
 
-  bool _isSchedule() {
-    if (widget.dayName == null || widget.dayName!.isEmpty) return false;
-    final dn = widget.dayName!;
-    return dn.contains('Klassen') ||
-        dn.contains('Grades') ||
-        dn.contains('J11/J12');
-  }
-
   bool _isSchedule5to10() {
     if (widget.dayName == null || widget.dayName!.isEmpty) return false;
     final dn = widget.dayName!;

@@ -27,7 +27,6 @@ class SubstitutionService {
   bool _isInitialized = false;
   DateTime? _lastFetchTime;
   bool _isRefreshing = false;
-  bool _refreshFailedAfterResume = false; // Track if refresh failed after app resume
 
   // Getters
   SubstitutionState get todayState => _todayState;
@@ -51,7 +50,7 @@ class SubstitutionService {
       // This ensures fresh data is ready when user accesses substitutions
       if (hasAnyData && !_isCacheValid) {
         AppLogger.info('Cache invalid on access - refreshing substitutions immediately', module: 'SubstitutionService');
-        _refreshFailedAfterResume = false; // Reset flag before refresh attempt
+        // Reset state before refresh attempt
         await refreshInBackground(); // Wait for refresh to complete
         // refreshInBackground() already handles clearing data on failure
       }
@@ -79,7 +78,7 @@ class SubstitutionService {
     if (results.any((success) => success)) {
       _lastFetchTime = DateTime.now();
       _cacheService.updateCacheTimestamp(CacheKey.substitutions, _lastFetchTime);
-      _refreshFailedAfterResume = false; // Reset flag on successful refresh
+      // Reset state on successful refresh
     }
   }
 
@@ -290,7 +289,7 @@ class SubstitutionService {
       AppLogger.error('Background refresh failed: Substitution plans', module: 'SubstitutionService', error: e);
       
       // Mark that refresh failed after resume
-      _refreshFailedAfterResume = true;
+      // Refresh failed after resume - will retry on next access
       
       // If cache was invalid (app was backgrounded), don't show cached data
       // Clear it and show error instead
