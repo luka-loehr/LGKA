@@ -2,8 +2,9 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
-import '../providers/schedule_provider.dart';
-import '../providers/substitution_provider.dart';
+import '../features/schedule/application/schedule_provider.dart';
+import '../features/substitution/application/substitution_provider.dart';
+import '../features/weather/application/weather_provider.dart';
 
 
 /// Centralized service for retrying all data sources

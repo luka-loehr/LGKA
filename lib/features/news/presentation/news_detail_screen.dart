@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../theme/app_theme.dart';
 import '../domain/news_models.dart';
-import '../data/news_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../providers/color_provider.dart';
 import '../../../../services/haptic_service.dart';

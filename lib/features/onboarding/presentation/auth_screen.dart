@@ -7,7 +7,6 @@ import '../../../../providers/app_providers.dart';
 import '../../../../providers/color_provider.dart';
 import '../../../../navigation/app_router.dart';
 import '../../../../services/haptic_service.dart';
-import '../../../../theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../config/app_credentials.dart';
 

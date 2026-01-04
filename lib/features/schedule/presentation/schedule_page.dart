@@ -10,7 +10,6 @@ import '../application/schedule_provider.dart';
 import '../../../../services/haptic_service.dart';
 import '../../../../theme/app_theme.dart';
 import '../domain/schedule_models.dart';
-import '../data/schedule_service.dart';
 // import '../../../../services/retry_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../utils/app_logger.dart';

@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 import '../../../../theme/app_theme.dart';
-import '../../../../providers/app_providers.dart';
 import '../../../../providers/color_provider.dart';
 import '../../substitution/application/substitution_provider.dart';
 import '../../../../services/haptic_service.dart';
