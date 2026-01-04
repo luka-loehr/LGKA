@@ -5,14 +5,10 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import '../data/preferences_manager.dart';
-import '../features/weather/application/weather_provider.dart';
 import '../features/schedule/data/schedule_service.dart';
 import '../features/news/data/news_service.dart';
 import '../features/substitution/data/substitution_service.dart';
-import '../services/cache_service.dart';
 import '../theme/app_theme.dart';
-import '../utils/app_logger.dart';
-import '../services/haptic_service.dart';
 
 /// State class for preferences manager
 class PreferencesManagerState {

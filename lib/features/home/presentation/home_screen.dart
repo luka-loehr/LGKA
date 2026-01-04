@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../theme/app_theme.dart';
-import '../../../../providers/app_providers.dart';
 import '../../substitution/application/substitution_provider.dart';
 import '../../substitution/presentation/substitution_screen.dart';
 import '../../weather/application/weather_provider.dart';

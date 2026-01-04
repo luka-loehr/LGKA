@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:timezone/timezone.dart' as tz;
 import '../domain/weather_models.dart';
-import '../data/weather_service.dart';
 import '../../../../theme/app_theme.dart';
 import '../application/weather_provider.dart';
 import '../../../../services/haptic_service.dart';
@@ -14,7 +13,7 @@ import '../../../../utils/app_logger.dart';
 
 import '../../../../widgets/app_footer.dart';
 import 'package:intl/intl.dart';
-import '../../services/loading_spinner_tracker_service.dart';
+import '../../../../services/loading_spinner_tracker_service.dart';
 
 
 // Helper function for robust navigation bar detection across all Android devices

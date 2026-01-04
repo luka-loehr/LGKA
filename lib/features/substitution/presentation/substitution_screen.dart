@@ -11,7 +11,6 @@ import '../../../../navigation/app_router.dart';
 import '../../../../utils/app_logger.dart';
 import '../../../../widgets/app_footer.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../data/substitution_service.dart';
 import '../../../../services/loading_spinner_tracker_service.dart';
 
 /// Substitution plan screen with today and tomorrow options
