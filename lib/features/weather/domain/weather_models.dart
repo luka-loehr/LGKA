@@ -1,4 +1,4 @@
-// Copyright Luka Löhr 2025
+// Copyright Luka Löhr 2026
 
 /// Represents weather data at a specific point in time
 class WeatherData {

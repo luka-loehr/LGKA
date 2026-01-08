@@ -1,4 +1,4 @@
-// Copyright Luka Löhr 2025
+// Copyright Luka Löhr 2026
 
 export 'accent_color_screen.dart';
 export 'auth_screen.dart';
