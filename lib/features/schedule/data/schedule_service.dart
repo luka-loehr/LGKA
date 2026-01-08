@@ -353,10 +353,13 @@ List<ScheduleItem> _parseScheduleHtml(String htmlContent) {
 
     // Find all links in the module
     final links = module.querySelectorAll('a[href*="stundenplan"]');
+    final seenUrls = <String>{}; // Deduplicate by fullUrl
     
     for (final link in links) {
       final href = link.attributes['href'];
-      final title = link.attributes['title'] ?? link.text.trim();
+      // Use link text first (it's correct), fallback to title attribute
+      final linkText = link.text.trim();
+      final title = linkText.isNotEmpty ? linkText : (link.attributes['title'] ?? '');
       
       if (href != null && title.isNotEmpty) {
         // Convert relative URL to absolute with validation
@@ -379,7 +382,19 @@ List<ScheduleItem> _parseScheduleHtml(String htmlContent) {
           continue; // Skip this URL if processing fails
         }
 
-        final halbjahr = _extractHalbjahr(title);
+        // Deduplicate by fullUrl
+        if (seenUrls.contains(fullUrl)) {
+          AppLogger.debug('Skipping duplicate schedule: $fullUrl', module: 'ScheduleService');
+          continue;
+        }
+        seenUrls.add(fullUrl);
+
+        // Extract halbjahr from href URL (most reliable - contains hj1 or hj2)
+        final halbjahr = href.contains('hj2') ? '2. Halbjahr' : 
+                         href.contains('hj1') ? '1. Halbjahr' : 
+                         _extractHalbjahr(title); // Fallback to title parsing
+        
+        // Extract grade level from title (link text is correct)
         final gradeLevel = _extractGradeLevel(title);
 
         AppLogger.debug('Parsed schedule: $title ($halbjahr, $gradeLevel)', module: 'ScheduleService');
