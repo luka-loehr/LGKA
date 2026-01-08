@@ -216,6 +216,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       
       // Update authentication state
       await ref.read(preferencesManagerProvider.notifier).setAuthenticated(true);
+      await ref.read(preferencesManagerProvider.notifier).setFirstLaunch(false);
+      await ref.read(preferencesManagerProvider.notifier).setOnboardingCompleted(true);
       // isAuthenticatedProvider is managed via preferencesManagerProvider
       
       // Additional success haptic just before navigation
