@@ -62,6 +62,10 @@ Initiate when user says: "prepare release", "release", "create release", "new re
    - Title format: `LGKA+ vx.x.x`
    - Attach release notes
    - **IMPORTANT**: Verify the release notes file does NOT contain template headers before uploading. The file should start with actual content, not template instructions.
+3. **CRITICAL**: After the GitHub release is created and the release notes are uploaded:
+   - Delete the temporary release notes file (e.g., `RELEASE_NOTES_v2.4.1.md`)
+   - **DO NOT commit** the temporary release notes file to git - it should only exist temporarily until uploaded to GitHub
+   - The release notes are now stored in the GitHub release, so the local file is no longer needed
 
 ### Task 4: Build and Upload ARM64 APK
 
