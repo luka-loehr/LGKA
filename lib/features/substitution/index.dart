@@ -1,4 +1,4 @@
-// Copyright Luka Löhr 2025
+// Copyright Luka Löhr 2026
 
 export 'presentation/substitution_screen.dart';
 export 'application/substitution_provider.dart';

@@ -1,4 +1,4 @@
-// Copyright Luka Löhr 2025
+// Copyright Luka Löhr 2026
 
 export 'presentation/schedule_page.dart';
 export 'application/schedule_provider.dart';
