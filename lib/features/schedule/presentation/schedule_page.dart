@@ -107,11 +107,11 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     try {
       final scheduleNotifier = ref.read(scheduleProvider.notifier);
       
-      // Get all schedules to check
+      // Get all schedules to check and deduplicate
       final allSchedules = [
         ...ref.read(scheduleProvider).firstHalbjahrSchedules,
         ...ref.read(scheduleProvider).secondHalbjahrSchedules,
-      ];
+      ].toSet().toList(); // Deduplicate
       
       // Check availability concurrently instead of sequentially
       final availabilityFutures = allSchedules.map((schedule) async {

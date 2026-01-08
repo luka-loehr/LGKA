@@ -130,8 +130,11 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
     final lastFetchTime = _scheduleService.lastFetchTime;
 
     if (!forceRefresh && cachedSchedules != null) {
+      // Deduplicate cached schedules
+      final uniqueSchedules = cachedSchedules.toSet().toList();
+      
       state = state.copyWith(
-        schedules: cachedSchedules,
+        schedules: uniqueSchedules,
         isLoading: false,
         clearError: true,
         lastUpdated: lastFetchTime ?? state.lastUpdated,
@@ -163,8 +166,11 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
         return;
       }
 
+      // Deduplicate schedules by converting to Set and back to List
+      final uniqueSchedules = schedules.toSet().toList();
+
       state = state.copyWith(
-        schedules: schedules,
+        schedules: uniqueSchedules,
         isLoading: false,
         clearError: true,
         lastUpdated: _scheduleService.lastFetchTime ?? DateTime.now(),
@@ -192,8 +198,11 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
     final updatedSchedules = _scheduleService.cachedSchedules;
     
     if (updatedSchedules != null) {
+      // Deduplicate schedules
+      final uniqueSchedules = updatedSchedules.toSet().toList();
+      
       state = state.copyWith(
-        schedules: updatedSchedules,
+        schedules: uniqueSchedules,
         isLoading: false,
         clearError: true,
         lastUpdated: _scheduleService.lastFetchTime ?? DateTime.now(),

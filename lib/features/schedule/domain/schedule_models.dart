@@ -20,4 +20,20 @@ class ScheduleItem {
   String toString() {
     return 'ScheduleItem(title: $title, halbjahr: $halbjahr, gradeLevel: $gradeLevel)';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ScheduleItem &&
+        other.title == title &&
+        other.url == url &&
+        other.halbjahr == halbjahr &&
+        other.gradeLevel == gradeLevel &&
+        other.fullUrl == fullUrl;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(title, url, halbjahr, gradeLevel, fullUrl);
+  }
 }
