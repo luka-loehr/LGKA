@@ -36,7 +36,7 @@ Private student project – non-commercial use only.
 ## Support
 
 - [Report bugs](https://github.com/luka-loehr/LGKA/issues)  
-- Questions: [contact@lukaloehr.de](mailto:contact@lukaloehr.de)  
+- [contact@lukaloehr.de](mailto:contact@lukaloehr.de)  
 
 ---
 
