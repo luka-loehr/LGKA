@@ -1,4 +1,4 @@
-// Copyright Luka Löhr 2025
+// Copyright Luka Löhr 2026
 
 import 'package:http/http.dart' as http;
 import 'package:csv/csv.dart';

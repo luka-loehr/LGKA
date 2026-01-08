@@ -1,4 +1,4 @@
-// Copyright Luka Löhr 2025
+// Copyright Luka Löhr 2026
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

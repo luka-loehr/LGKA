@@ -1,4 +1,4 @@
-// Copyright Luka Löhr 2025
+// Copyright Luka Löhr 2026
 
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/app_logger.dart';

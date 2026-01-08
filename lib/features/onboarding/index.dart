@@ -1,4 +1,4 @@
-// Copyright Luka Löhr 2025
+// Copyright Luka Löhr 2026
 
 export 'presentation/welcome_screen.dart';
 export 'presentation/what_you_can_do_screen.dart';

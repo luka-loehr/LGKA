@@ -1,4 +1,4 @@
-// Copyright Luka Löhr 2025
+// Copyright Luka Löhr 2026
 
 export 'presentation/weather_page.dart';
 export 'application/weather_provider.dart';

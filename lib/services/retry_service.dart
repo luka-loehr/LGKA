@@ -1,4 +1,4 @@
-// Copyright Luka Löhr 2025
+// Copyright Luka Löhr 2026
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/schedule/application/schedule_provider.dart';

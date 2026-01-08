@@ -29,7 +29,7 @@ of the Lessing-Gymnasium Karlsruhe. Built with Flutter, featuring a clean Materi
 ## License
 
 Proprietary - [View License](LICENSE)  
-Source code available for transparency only – not open source.
+Source code available for transparency only.
 
 ---
 

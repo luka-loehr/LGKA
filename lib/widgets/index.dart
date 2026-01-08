@@ -1,4 +1,4 @@
-// Copyright Luka Löhr 2025
+// Copyright Luka Löhr 2026
 
 export 'app_footer.dart';
 export 'constrained_modal_bottom_sheet.dart';
