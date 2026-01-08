@@ -20,7 +20,7 @@ of the Lessing-Gymnasium Karlsruhe. Built with Flutter, featuring a clean Materi
 - **News feed** with articles, images, and downloadable attachments from the school
 - **Integrated PDF viewer** with zoom, share, and fast class lookup
 - **Live weather data** from the school's rooftop station with smooth charts
-- **Dark-only Material Design 3** with customizable accent colors
+- **Customizable accent colors** to personalize your experience
 - **Smart onboarding** with guided setup and color customization
 - **Absence reporting** via official school form
 - **Haptic feedback** throughout the app for better user experience
