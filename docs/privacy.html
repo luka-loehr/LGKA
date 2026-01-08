@@ -39,7 +39,7 @@
   <p><strong>Stand: 7. November 2025</strong></p>
 
   <div class="summary">
-    <p>Die App speichert ausschließlich technische Einstellungen und temporäre Daten lokal auf dem Gerät des Nutzers. Es erfolgt keine automatische Erhebung oder dauerhafte Speicherung personenbezogener Daten. Die optionale Bug-Melde-Funktion nutzt Google Forms zur Übermittlung von Fehlermeldungen, wobei ausschließlich die vom Nutzer eingegebenen Texte übermittelt werden.</p>
+    <p>Die App speichert ausschließlich technische Einstellungen und temporäre Daten lokal auf dem Gerät des Nutzers. Es erfolgt keine automatische Erhebung oder dauerhafte Speicherung personenbezogener Daten. Die App ruft Vertretungspläne, Stundenpläne, Neuigkeiten und Wetterdaten von den Servern des Lessing-Gymnasiums ab und speichert diese temporär. Die optionale Bug-Melde-Funktion nutzt Google Forms zur Übermittlung von Fehlermeldungen, wobei ausschließlich die vom Nutzer eingegebenen Texte übermittelt werden.</p>
   </div>
 
   <h2>1. Verantwortlicher</h2>
@@ -62,20 +62,25 @@
     <li>Onboarding-Status</li>
     <li>Authentifizierungsstatus</li>
     <li>Anzeigestatus der Krankmeldungsinformation</li>
-    <li>Suchverlauf (letzte Suchbegriffe und Seitenzahlen für Stundenpläne)</li>
+    <li>Suchverlauf (letzte Suchbegriffe und Seitenzahlen für Vertretungspläne und Stundenpläne, getrennt nach Plan-Typ)</li>
+    <li>Debug-Einstellungen (nur bei aktiviertem Debug-Modus)</li>
   </ul>
 
   <h3>2.2 Temporäre Datenspeicherung</h3>
-  <p>Folgende Daten werden temporär im app-spezifischen Cache-Verzeichnis gespeichert:</p>
+  <p>Folgende Daten werden temporär gespeichert:</p>
   <ul>
-    <li>PDF-Dateien (Vertretungspläne und Stundenpläne)</li>
-    <li>Wetterdaten</li>
+    <li><strong>Im Cache-Verzeichnis:</strong> PDF-Dateien (Vertretungspläne und Stundenpläne), Wetterdaten</li>
+    <li><strong>Im Arbeitsspeicher:</strong> Vertretungspläne, Stundenpläne, Verfügbarkeitsinformationen für Stundenpläne, Neuigkeiten (Artikel mit vollständigem Inhalt, Bildern, Links und Downloads), Wetterdaten</li>
   </ul>
+  <p>Die im Arbeitsspeicher gespeicherten Daten werden bei Beendigung der App oder beim Wechsel in den Hintergrund gelöscht und bei erneutem Öffnen der App neu abgerufen.</p>
 
   <h3>2.3 Netzwerkkommunikation</h3>
-  <p>Die App kommuniziert mit Servern des Lessing-Gymnasiums Karlsruhe zur Bereitstellung von Vertretungsplänen, Stundenplänen und Wetterdaten. Für die Datenverarbeitung durch die Schule gilt die <a href="https://lessing-gymnasium-karlsruhe.de/cm3/index.php/impressum/datenschutzerklaerung" target="_blank">Datenschutzerklärung des Lessing-Gymnasiums</a>.</p>
+  <p>Die App kommuniziert mit Servern des Lessing-Gymnasiums Karlsruhe zur Bereitstellung von Vertretungsplänen, Stundenplänen, Neuigkeiten und Wetterdaten. Für die Datenverarbeitung durch die Schule gilt die <a href="https://lessing-gymnasium-karlsruhe.de/cm3/index.php/impressum/datenschutzerklaerung" target="_blank">Datenschutzerklärung des Lessing-Gymnasiums</a>.</p>
   
   <p>Bei der Kommunikation mit den Servern des Lessing-Gymnasiums wird technisch bedingt die IP-Adresse des Nutzers an die Server übermittelt. Die App speichert oder verarbeitet diese IP-Adresse nicht.</p>
+  
+  <h4>2.3.1 Neuigkeiten</h4>
+  <p>Die App ruft Neuigkeiten von der Website des Lessing-Gymnasiums ab. Dabei werden Artikel mit vollständigem Inhalt, Bildern, Links und Downloads abgerufen und temporär im Arbeitsspeicher gespeichert. Die vollständigen Artikelinhalte werden von den Servern des Lessing-Gymnasiums abgerufen.</p>
 
   <h3>2.4 Krankmeldungsfunktion</h3>
   <p>Die App stellt eine Verlinkung zur offiziellen Krankmeldungsseite des Lessing-Gymnasiums bereit. Die App überträgt keine Daten im Rahmen dieser Verlinkung.</p>
@@ -84,12 +89,12 @@
   <p>Die App bietet eine optionale Funktion zur Übermittlung von Fehlermeldungen über ein von Google bereitgestelltes Formular. Bei Nutzung dieser Funktion werden die vom Nutzer eingegebenen Texte an Google übermittelt. Die Verarbeitung erfolgt durch Google gemäß der <a href="https://policies.google.com/privacy" target="_blank">Datenschutzerklärung von Google</a>. Die Nutzung dieser Funktion erfolgt auf freiwilliger Basis.</p>
 
   <h2>3. Speicherdauer</h2>
-  <p>Lokal gespeicherte App-Einstellungen verbleiben auf dem Gerät bis zur Deinstallation der App. Temporäre Cache-Daten werden durch das Betriebssystem verwaltet und können bei App-Updates oder manueller Bereinigung entfernt werden. Mit der Deinstallation der App werden alle lokal gespeicherten Daten gelöscht.</p>
+  <p>Lokal gespeicherte App-Einstellungen verbleiben auf dem Gerät bis zur Deinstallation der App. Temporäre Cache-Daten (PDF-Dateien, Wetterdaten) werden durch das Betriebssystem verwaltet und können bei App-Updates oder manueller Bereinigung entfernt werden. Im Arbeitsspeicher gespeicherte Daten (Vertretungspläne, Stundenpläne, Neuigkeiten, Wetterdaten) werden bei Beendigung der App oder beim Wechsel in den Hintergrund gelöscht. Mit der Deinstallation der App werden alle lokal gespeicherten Daten gelöscht.</p>
 
   <h2>4. Berechtigungen</h2>
   <p>Die App benötigt folgende Berechtigungen zur Funktionsausübung:</p>
   <ul>
-    <li>Internetzugriff für den Abruf von Vertretungsplänen, Stundenplänen und Wetterdaten</li>
+    <li>Internetzugriff für den Abruf von Vertretungsplänen, Stundenplänen, Neuigkeiten und Wetterdaten</li>
     <li>App-spezifischer Speicherzugriff für die lokale Speicherung von Einstellungen und temporären Daten</li>
   </ul>
 
