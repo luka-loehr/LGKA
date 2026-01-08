@@ -127,20 +127,24 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       
       if (!mounted) return;
       
-      // Separate results by halbjahr
-      _availableFirstHalbjahr = [];
-      _availableSecondHalbjahr = [];
+      // Separate results by halbjahr and deduplicate
+      final firstSemesterSet = <ScheduleItem>{};
+      final secondSemesterSet = <ScheduleItem>{};
       
       for (final result in results) {
         if (result['isAvailable'] as bool) {
           final schedule = result['schedule'] as ScheduleItem;
           if (schedule.halbjahr == '1. Halbjahr') {
-            _availableFirstHalbjahr.add(schedule);
+            firstSemesterSet.add(schedule);
           } else if (schedule.halbjahr == '2. Halbjahr') {
-            _availableSecondHalbjahr.add(schedule);
+            secondSemesterSet.add(schedule);
           }
         }
       }
+      
+      // Convert sets to lists (automatically deduplicated)
+      _availableFirstHalbjahr = firstSemesterSet.toList();
+      _availableSecondHalbjahr = secondSemesterSet.toList();
 
       final availableCount = results.where((r) => r['isAvailable'] as bool).length;
       AppLogger.success('Schedule availability check complete: $availableCount available', module: 'SchedulePage');
@@ -160,7 +164,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   
   /// Restore availability from cache by checking which schedules have cached PDFs
   Future<void> _restoreAvailabilityFromCache(List<ScheduleItem> allSchedules) async {
-    for (final schedule in allSchedules) {
+    // Deduplicate input schedules first
+    final uniqueSchedules = allSchedules.toSet().toList();
+    
+    for (final schedule in uniqueSchedules) {
       final cachedFile = await _getCachedScheduleFile(schedule);
       if (cachedFile != null && await cachedFile.exists()) {
         if (schedule.halbjahr == '1. Halbjahr') {
