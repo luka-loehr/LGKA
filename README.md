@@ -23,7 +23,6 @@ of the Lessing-Gymnasium Karlsruhe. Built with Flutter, featuring a clean Materi
 - **Customizable accent colors** to personalize your experience
 - **Smart onboarding** with guided setup and color customization
 - **Absence reporting** via official school form
-- **Haptic feedback** throughout the app for better user experience
 
 ---
 
