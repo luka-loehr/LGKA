@@ -17,6 +17,7 @@
     h1, h2 {
       border-bottom: 1px solid #eaecef;
       padding-bottom: 0.3em;
+      margin-top: 1.5em;
     }
     a {
       color: #0366d6;
@@ -32,14 +33,17 @@
       border-left: 4px solid #0366d6;
       margin: 24px 0;
     }
+    ul {
+      padding-left: 20px;
+    }
   </style>
 </head>
 <body>
   <h1>Datenschutzerklärung – LGKA+</h1>
-  <p><strong>Stand: 7. November 2025</strong></p>
+  <p><strong>Stand: Januar 2026</strong></p>
 
   <div class="summary">
-    <p>Die App speichert ausschließlich technische Einstellungen und temporäre Daten lokal auf dem Gerät des Nutzers. Es erfolgt keine automatische Erhebung oder dauerhafte Speicherung personenbezogener Daten. Die App ruft Vertretungspläne, Stundenpläne, Neuigkeiten und Wetterdaten von den Servern des Lessing-Gymnasiums ab und speichert diese temporär. Die optionale Bug-Melde-Funktion nutzt Google Forms zur Übermittlung von Fehlermeldungen, wobei ausschließlich die vom Nutzer eingegebenen Texte übermittelt werden.</p>
+    <p>Die App „LGKA+" respektiert die Privatsphäre ihrer Nutzer. Es kommen keine Tracker oder Werbedienste zum Einsatz. Personenbezogene Daten werden nicht auf Servern des Entwicklers gespeichert. Alle persönlichen Einstellungen verbleiben lokal auf dem Gerät. Schulische Daten (z. B. Vertretungspläne) werden direkt von den Servern der Schule geladen und lediglich in der App angezeigt.</p>
   </div>
 
   <h2>1. Verantwortlicher</h2>
@@ -49,66 +53,41 @@
     E-Mail: <a href="mailto:contact@lukaloehr.de">contact@lukaloehr.de</a>
   </p>
   <p>
-    Die App ist ein unabhängiges, nicht-kommerzielles Privatprojekt für das Lessing-Gymnasium Karlsruhe und steht in keinem rechtlichen Zusammenhang mit der Schule. Der Quellcode ist öffentlich einsehbar:<br>
-    <a href="https://github.com/luka-loehr/LGKA" target="_blank">github.com/luka-loehr/LGKA</a>
+    Diese App ist ein unabhängiges, nicht-kommerzielles Open-Source-Projekt und steht in keinem offiziellen oder rechtlichen Zusammenhang mit dem Lessing-Gymnasium Karlsruhe. <br>
+    Der Quellcode ist transparent einsehbar: <a href="https://github.com/luka-loehr/LGKA" target="_blank">github.com/luka-loehr/LGKA</a>
   </p>
 
-  <h2>2. Umfang der Datenverarbeitung</h2>
+  <h2>2. Welche Daten gespeichert werden</h2>
   
-  <h3>2.1 Lokale Datenspeicherung</h3>
-  <p>Die App speichert folgende Daten ausschließlich lokal auf dem Gerät des Nutzers im app-spezifischen Verzeichnis:</p>
+  <h3>2.1 Lokale Daten auf dem Gerät</h3>
+  <p>Damit die App benutzerfreundlich funktioniert, werden bestimmte Einstellungen <strong>ausschließlich lokal</strong> im geschützten Speicherbereich der App abgelegt. Diese Daten verlassen das Gerät nicht:</p>
   <ul>
-    <li>App-Einstellungen (Akzentfarbe, Vibrationseinstellungen)</li>
-    <li>Onboarding-Status</li>
-    <li>Authentifizierungsstatus</li>
-    <li>Anzeigestatus der Krankmeldungsinformation</li>
-    <li>Suchverlauf (letzte Suchbegriffe und Seitenzahlen für Vertretungspläne und Stundenpläne, getrennt nach Plan-Typ)</li>
-    <li>Debug-Einstellungen (nur bei aktiviertem Debug-Modus)</li>
+    <li><strong>App-Einstellungen:</strong> Gewählte Akzentfarbe, Vibrationseinstellungen, Onboarding-Status.</li>
+    <li><strong>Suchhistorie & Komfort:</strong> Zuletzt gesuchte Klassen oder Kurse, um diese beim nächsten Start schneller bereitzustellen.</li>
+    <li><strong>Authentifizierung:</strong> Die Zugangsdaten werden sicher verschlüsselt im Speicher des Geräts (Keychain/Keystore) abgelegt, um den automatischen Login bei den Schulservern zu ermöglichen.</li>
+  </ul>
+  <p>Bei der Deinstallation der App werden diese Daten restlos vom Gerät gelöscht.</p>
+
+  <h3>2.2 Kommunikation mit dem Lessing-Gymnasium</h3>
+  <p>Die Kernfunktion der App ist das Anzeigen von schulspezifischen Informationen (Vertretungspläne, Stundenpläne, Neuigkeiten, Wetter). Hierfür stellt die App eine direkte Verbindung zu den Servern des Lessing-Gymnasiums her.</p>
+  <p>Dabei gelten folgende Grundsätze:</p>
+  <ul>
+    <li>Die App fungiert als reiner „Browser“ für diese Daten.</li>
+    <li>Beim Abruf der Daten wird technisch bedingt die IP-Adresse des Nutzers an den Server der Schule übertragen (wie beim Aufruf einer Webseite).</li>
+    <li>Für die Datenverarbeitung auf den Schulservern gilt die <a href="https://lessing-gymnasium-karlsruhe.de/cm3/index.php/impressum/datenschutzerklaerung" target="_blank">Datenschutzerklärung des Lessing-Gymnasiums</a>.</li>
   </ul>
 
-  <h3>2.2 Temporäre Datenspeicherung</h3>
-  <p>Folgende Daten werden temporär gespeichert:</p>
-  <ul>
-    <li><strong>Im Cache-Verzeichnis:</strong> PDF-Dateien (Vertretungspläne und Stundenpläne), Wetterdaten</li>
-    <li><strong>Im Arbeitsspeicher:</strong> Vertretungspläne, Stundenpläne, Verfügbarkeitsinformationen für Stundenpläne, Neuigkeiten (Artikel mit vollständigem Inhalt, Bildern, Links und Downloads), Wetterdaten</li>
-  </ul>
-  <p>Die im Arbeitsspeicher gespeicherten Daten werden bei Beendigung der App oder beim Wechsel in den Hintergrund gelöscht und bei erneutem Öffnen der App neu abgerufen.</p>
+  <h3>2.3 Bug-Reports (Freiwillig)</h3>
+  <p>Sollten Fehler in der App auftreten, können diese über eine integrierte Funktion gemeldet werden. Hierfür wird <strong>Google Forms</strong> genutzt. Bei Nutzung dieser Funktion werden die eingegebenen Texte sowie technische Basisinformationen zum Fehler an Google übermittelt. Dies geschieht nur, wenn das Formular aktiv abgesendet wird. Es gilt hierfür die <a href="https://policies.google.com/privacy" target="_blank">Datenschutzerklärung von Google</a>.</p>
 
-  <h3>2.3 Netzwerkkommunikation</h3>
-  <p>Die App kommuniziert mit Servern des Lessing-Gymnasiums Karlsruhe zur Bereitstellung von Vertretungsplänen, Stundenplänen, Neuigkeiten und Wetterdaten. Für die Datenverarbeitung durch die Schule gilt die <a href="https://lessing-gymnasium-karlsruhe.de/cm3/index.php/impressum/datenschutzerklaerung" target="_blank">Datenschutzerklärung des Lessing-Gymnasiums</a>.</p>
-  
-  <p>Bei der Kommunikation mit den Servern des Lessing-Gymnasiums wird technisch bedingt die IP-Adresse des Nutzers an die Server übermittelt. Die App speichert oder verarbeitet diese IP-Adresse nicht.</p>
-  
-  <h4>2.3.1 Neuigkeiten</h4>
-  <p>Die App ruft Neuigkeiten von der Website des Lessing-Gymnasiums ab. Dabei werden Artikel mit vollständigem Inhalt, Bildern, Links und Downloads abgerufen und temporär im Arbeitsspeicher gespeichert. Die vollständigen Artikelinhalte werden von den Servern des Lessing-Gymnasiums abgerufen.</p>
+  <h2>3. Berechtigungen der App</h2>
+  <p>Die App ist sparsam konzipiert und fordert lediglich den <strong>Internetzugriff</strong> an, um die aktuellen Daten der Schule abrufen zu können. Es werden keine Zugriffe auf Kontakte, Standort, Kalender oder den externen Gerätespeicher angefordert.</p>
 
-  <h3>2.4 Krankmeldungsfunktion</h3>
-  <p>Die App stellt eine Verlinkung zur offiziellen Krankmeldungsseite des Lessing-Gymnasiums bereit. Die App überträgt keine Daten im Rahmen dieser Verlinkung.</p>
+  <h2>4. Rechte der Nutzer</h2>
+  <p>Da der Entwickler keine personenbezogenen Daten auf eigenen Servern speichert, kann keine Auskunft über extern gespeicherte Daten gegeben werden – es existieren keine. Die volle Kontrolle liegt beim Nutzer: Durch das Deinstallieren der App werden alle durch die App gespeicherten Daten vom Endgerät entfernt.</p>
 
-  <h3>2.5 Bug-Meldungen</h3>
-  <p>Die App bietet eine optionale Funktion zur Übermittlung von Fehlermeldungen über ein von Google bereitgestelltes Formular. Bei Nutzung dieser Funktion werden die vom Nutzer eingegebenen Texte an Google übermittelt. Die Verarbeitung erfolgt durch Google gemäß der <a href="https://policies.google.com/privacy" target="_blank">Datenschutzerklärung von Google</a>. Die Nutzung dieser Funktion erfolgt auf freiwilliger Basis.</p>
-
-  <h2>3. Speicherdauer</h2>
-  <p>Lokal gespeicherte App-Einstellungen verbleiben auf dem Gerät bis zur Deinstallation der App. Temporäre Cache-Daten (PDF-Dateien, Wetterdaten) werden durch das Betriebssystem verwaltet und können bei App-Updates oder manueller Bereinigung entfernt werden. Im Arbeitsspeicher gespeicherte Daten (Vertretungspläne, Stundenpläne, Neuigkeiten, Wetterdaten) werden bei Beendigung der App oder beim Wechsel in den Hintergrund gelöscht. Mit der Deinstallation der App werden alle lokal gespeicherten Daten gelöscht.</p>
-
-  <h2>4. Berechtigungen</h2>
-  <p>Die App benötigt folgende Berechtigungen zur Funktionsausübung:</p>
-  <ul>
-    <li>Internetzugriff für den Abruf von Vertretungsplänen, Stundenplänen, Neuigkeiten und Wetterdaten</li>
-    <li>App-spezifischer Speicherzugriff für die lokale Speicherung von Einstellungen und temporären Daten</li>
-  </ul>
-
-  <h2>5. Rechtsgrundlage</h2>
-  <p>Die Verarbeitung der technischen Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Funktionsfähigkeit der App). Die lokale Speicherung dient der Benutzerfreundlichkeit und erfolgt zur Erfüllung des Vertrags über die Nutzung der App gemäß Art. 6 Abs. 1 lit. b DSGVO.</p>
-
-  <h2>6. Betroffenenrechte</h2>
-  <p>Sie haben das Recht, Auskunft über die von Ihnen verarbeiteten personenbezogenen Daten zu erhalten (Art. 15 DSGVO). Sie können jederzeit die App deinstallieren, wodurch alle lokal gespeicherten Daten gelöscht werden. Bei Fragen zum Datenschutz können Sie sich an den Verantwortlichen wenden.</p>
-
-  <h2>7. Änderungen dieser Datenschutzerklärung</h2>
-  <p>Diese Datenschutzerklärung kann bei Änderungen der App-Funktionalitäten angepasst werden. Die aktuelle Version ist stets unter dieser Adresse abrufbar.</p>
-
-  <h2>8. Kontakt</h2>
-  <p>Bei Fragen zum Datenschutz wenden Sie sich bitte an: <a href="mailto:contact@lukaloehr.de">contact@lukaloehr.de</a></p>
+  <h2>5. Kontakt</h2>
+  <p>Bei Fragen zur App oder zum Datenschutz stehe ich gerne zur Verfügung: <a href="mailto:contact@lukaloehr.de">contact@lukaloehr.de</a></p>
 
 </body>
 </html>
