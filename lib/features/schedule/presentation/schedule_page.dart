@@ -141,11 +141,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           }
         }
       }
-      
-      // EXCLUSIVE LOGIC: If second half-year is available, clear first half-year
-      if (_availableSecondHalbjahr.isNotEmpty) {
-        _availableFirstHalbjahr.clear(); // Only show second half-year
-      }
 
       final availableCount = results.where((r) => r['isAvailable'] as bool).length;
       AppLogger.success('Schedule availability check complete: $availableCount available', module: 'SchedulePage');
@@ -402,6 +397,11 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   }
 
   Widget _buildScheduleList(ScheduleState state) {
+    final firstSemesterSchedules = _availableFirstHalbjahr;
+    final secondSemesterSchedules = _availableSecondHalbjahr;
+    final hasBothSemesters = firstSemesterSchedules.isNotEmpty && 
+                             secondSemesterSchedules.isNotEmpty;
+    
     return Column(
       children: [
         const SizedBox(height: 24),
@@ -409,15 +409,32 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           child: ListView(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
             children: [
-              // Build all available schedules with consistent spacing
-              if (_availableFirstHalbjahr.isNotEmpty || _availableSecondHalbjahr.isNotEmpty) ...[
-                // Get all available schedules (either first or second half-year)
-                ...(_availableFirstHalbjahr.isNotEmpty ? _availableFirstHalbjahr : _availableSecondHalbjahr)
-                    .where((schedule) => schedule.gradeLevel == 'Klassen 5-10')
+              // First Semester (if available)
+              if (firstSemesterSchedules.isNotEmpty) ...[
+                ...firstSemesterSchedules
+                    .where((s) => s.gradeLevel == 'Klassen 5-10')
                     .map((schedule) => _buildScheduleCard(schedule)),
-                const SizedBox(height: 16), // Consistent spacing between grade levels
-                ...(_availableFirstHalbjahr.isNotEmpty ? _availableFirstHalbjahr : _availableSecondHalbjahr)
-                    .where((schedule) => schedule.gradeLevel == 'J11/J12')
+                const SizedBox(height: 16),
+                ...firstSemesterSchedules
+                    .where((s) => s.gradeLevel == 'J11/J12')
+                    .map((schedule) => _buildScheduleCard(schedule)),
+              ],
+              
+              // Separator if both semesters exist
+              if (hasBothSemesters) ...[
+                const SizedBox(height: 24),
+                Divider(height: 1, color: AppColors.secondaryText.withValues(alpha: 0.2)),
+                const SizedBox(height: 24),
+              ],
+              
+              // Second Semester (if available)
+              if (secondSemesterSchedules.isNotEmpty) ...[
+                ...secondSemesterSchedules
+                    .where((s) => s.gradeLevel == 'Klassen 5-10')
+                    .map((schedule) => _buildScheduleCard(schedule)),
+                const SizedBox(height: 16),
+                ...secondSemesterSchedules
+                    .where((s) => s.gradeLevel == 'J11/J12')
                     .map((schedule) => _buildScheduleCard(schedule)),
               ],
             ],
