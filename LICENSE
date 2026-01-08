@@ -1,36 +1,44 @@
-# License
+PROPRIETARY LICENSE
 
-**Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)**  
-Effective Date: 2025  
-Copyright © 2025 Luka Löhr  
+Copyright (c) 2025 Luka Löhr
+All rights reserved.
 
----
+TERMS AND CONDITIONS
 
-### You are free to
-- **Share** — copy and redistribute the material in any medium or format  
-- These freedoms cannot be revoked as long as you follow the license terms  
+1. DEFINITIONS
+   "Software" refers to the LGKA+ application, including all source code,
+   documentation, and associated materials in this repository.
 
----
+2. SOURCE AVAILABILITY
+   The source code is made publicly available for transparency and educational
+   purposes only. This allows the school administration and users to verify
+   that the Software contains no tracking, malicious code, or privacy concerns.
 
-### Under the following terms
-- **Attribution** — You must give appropriate credit, provide a link to the license,  
-  and indicate if changes were made. Not in a way that suggests endorsement.  
-- **NonCommercial** — You may not use the material for commercial purposes.  
-- **NoDerivatives** — If you remix, transform, or build upon the material,  
-  you may not distribute the modified material.  
-- **Deployment Restriction** — The app and its source code may **not** be re-used, re-branded,  
-  or deployed at other schools or institutions. Deployment rights remain **exclusively** with the author.  
-- **No additional restrictions** — You may not apply legal terms or technological measures  
-  that legally restrict others from doing anything the license permits.  
+3. RESTRICTIONS
+   You may NOT:
+   - Use, copy, modify, or distribute the Software
+   - Create derivative works based on the Software
+   - Deploy the Software at other schools or institutions
+   - Use the Software for commercial purposes
+   - Rebrand or redistribute the Software under any name
 
----
+4. PERMITTED USES
+   You may:
+   - View and study the source code
+   - Report bugs or security issues to the copyright holder
+   - Reference the code for educational purposes
 
-### Notices
-- You do not have to comply with the license for elements in the public domain  
-  or where your use is permitted by an applicable exception or limitation.  
-- No warranties are given. The license may not give you all permissions necessary  
-  for your intended use (e.g., publicity, privacy, or moral rights may still apply).  
+5. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+   OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
 
----
+6. ENFORCEMENT
+   Any unauthorized use of the Software is a violation of this license and of
+   applicable copyright law.
 
-**Full text:** [Creative Commons BY-NC-ND 4.0 Legal Code](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode)
+For questions or permissions, contact: contact@lukaloehr.de
