@@ -137,7 +137,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
     
     // Navigate to the webview with the illness report
     context.push(AppRouter.webview, extra: {
-      'url': 'https://apps.lgka-online.de/apps/krankmeldung/',
+      'url': 'https://drkrankmeldung.lgka-online.de',
       'title': AppLocalizations.of(context)!.krankmeldung,
       'headers': {
         'User-Agent': AppInfo.userAgent,
