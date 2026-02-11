@@ -3,27 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../theme/app_theme.dart';
-import '../../substitution/application/substitution_provider.dart';
 import '../../substitution/domain/substitution_models.dart';
 import '../domain/schedule_models.dart';
 import '../data/schedule_service.dart';
+import '../data/schedule_mock_data.dart';
 import '../../../../services/haptic_service.dart';
 import '../../../../utils/app_logger.dart';
-
-/// Standard lesson times
-const Map<int, LessonTime> standardLessonTimes = {
-  1: LessonTime(startTime: '08:00', endTime: '08:45'),
-  2: LessonTime(startTime: '08:55', endTime: '09:40'),
-  3: LessonTime(startTime: '09:50', endTime: '10:35'),
-  4: LessonTime(startTime: '10:55', endTime: '11:40'),
-  5: LessonTime(startTime: '11:50', endTime: '12:35'),
-  6: LessonTime(startTime: '12:45', endTime: '13:30'),
-  7: LessonTime(startTime: '13:35', endTime: '14:20'),
-  8: LessonTime(startTime: '14:25', endTime: '15:10'),
-  9: LessonTime(startTime: '15:15', endTime: '16:00'),
-  10: LessonTime(startTime: '16:05', endTime: '16:50'),
-  11: LessonTime(startTime: '16:55', endTime: '17:40'),
-};
 
 /// Selected class notifier
 class SelectedScheduleClassNotifier extends Notifier<String?> {
@@ -46,12 +31,15 @@ class SchedulePage extends ConsumerStatefulWidget {
 }
 
 class _SchedulePageState extends ConsumerState<SchedulePage> {
+  late List<SubstitutionEntry> _mockSubstitutions;
+
   @override
   void initState() {
     super.initState();
     // Load mock data and auto-select 5a
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       scheduleService.loadMockData();
+      _mockSubstitutions = ScheduleMockData.getMockSubstitutions();
       // Auto-select class 5a
       ref.read(selectedScheduleClassProvider.notifier).select('5a');
       if (mounted) setState(() {});
@@ -100,7 +88,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
               : _WeekScheduleGrid(
                   className: selectedClass,
                   schedule: scheduleService.getScheduleForClass(selectedClass),
-                  substitutions: ref.watch(substitutionProvider),
+                  substitutions: _mockSubstitutions,
                 ),
         ),
       ],
@@ -388,7 +376,7 @@ class _EmptyClassView extends StatelessWidget {
 class _WeekScheduleGrid extends StatelessWidget {
   final String className;
   final ClassSchedule? schedule;
-  final SubstitutionProviderState substitutions;
+  final List<SubstitutionEntry> substitutions;
 
   const _WeekScheduleGrid({
     required this.className,
@@ -398,31 +386,19 @@ class _WeekScheduleGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get all substitutions for this class organized by period
-    final substitutionMap = <String, SubstitutionEntry>{};
-    
-    // Helper to add substitutions to map
-    void addSubstitutions(ParsedSubstitutionData? data) {
-      if (data == null) return;
-      final entries = data.getEntriesForClass(className);
-      for (final entry in entries) {
-        // Key format: "period" (just the period number)
-        // Handle period ranges like "1-2"
-        final periodParts = entry.period.split('-');
-        final startPeriod = int.tryParse(periodParts[0]) ?? 0;
-        final endPeriod = periodParts.length > 1 
-            ? int.tryParse(periodParts[1]) ?? startPeriod
-            : startPeriod;
-        
-        for (int p = startPeriod; p <= endPeriod; p++) {
-          final key = '$p';
-          substitutionMap[key] = entry;
-        }
+    // Create substitution map by period
+    final substitutionMap = <int, SubstitutionEntry>{};
+    for (final sub in substitutions) {
+      final periodParts = sub.period.split('-');
+      final startPeriod = int.tryParse(periodParts[0]) ?? 0;
+      final endPeriod = periodParts.length > 1 
+          ? int.tryParse(periodParts[1]) ?? startPeriod
+          : startPeriod;
+      
+      for (int p = startPeriod; p <= endPeriod; p++) {
+        substitutionMap[p] = sub;
       }
     }
-    
-    addSubstitutions(substitutions.todayData);
-    addSubstitutions(substitutions.tomorrowData);
 
     final periods = List.generate(11, (i) => i + 1);
     
@@ -446,7 +422,7 @@ class _WeekScheduleGrid extends StatelessWidget {
 class _PeriodRow extends StatelessWidget {
   final int period;
   final ClassSchedule? schedule;
-  final Map<String, SubstitutionEntry> substitutionMap;
+  final Map<int, SubstitutionEntry> substitutionMap;
   final LessonTime? timeInfo;
 
   const _PeriodRow({
@@ -459,7 +435,7 @@ class _PeriodRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 65,
+      height: 70,
       margin: const EdgeInsets.only(bottom: 4),
       child: Row(
         children: [
@@ -503,11 +479,13 @@ class _PeriodRow extends StatelessWidget {
               }
             }
             
-            // Find substitution using just the period number
-            final substitution = substitutionMap['$period'];
+            // Find substitution for this period
+            final substitution = substitutionMap[period];
             
             return Expanded(
               child: _DayCell(
+                period: period,
+                dayIndex: dayIndex,
                 lesson: lesson,
                 substitution: substitution,
                 margin: EdgeInsets.only(left: dayIndex > 0 ? 4 : 0),
@@ -522,11 +500,15 @@ class _PeriodRow extends StatelessWidget {
 
 /// Single day cell in the grid
 class _DayCell extends StatelessWidget {
+  final int period;
+  final int dayIndex;
   final ScheduleLesson? lesson;
   final SubstitutionEntry? substitution;
   final EdgeInsets margin;
 
   const _DayCell({
+    required this.period,
+    required this.dayIndex,
     this.lesson,
     this.substitution,
     required this.margin,
@@ -535,7 +517,8 @@ class _DayCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasLesson = lesson != null && lesson!.subject.isNotEmpty;
-    final hasSubstitution = substitution != null && substitution!.period.isNotEmpty;
+    final hasSubstitution = substitution != null;
+    final isCancellation = hasSubstitution && substitution!.isCancellation;
     
     // Determine display values
     final displaySubject = hasSubstitution && substitution!.subject.isNotEmpty
@@ -548,93 +531,110 @@ class _DayCell extends StatelessWidget {
         ? substitution!.room
         : (lesson?.room ?? '');
     
-    return Container(
-      margin: margin,
-      decoration: BoxDecoration(
-        color: hasSubstitution 
-            ? Color(substitution!.typeColor).withAlpha(40)
-            : hasLesson 
-                ? AppColors.appSurface 
-                : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-        border: hasSubstitution
-            ? Border.all(
-                color: Color(substitution!.typeColor),
-                width: 1.5,
-              )
-            : (hasLesson ? Border.all(
-                color: AppColors.appSurface.withAlpha(100),
-                width: 1,
-              ) : null),
-      ),
-      child: hasLesson || hasSubstitution
-          ? Padding(
-              padding: const EdgeInsets.all(3),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Substitution badge (only if there's actually a substitution)
-                  if (hasSubstitution)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 1),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4, 
-                        vertical: 1,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Color(substitution!.typeColor),
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      child: Text(
-                        _getShortTypeLabel(substitution!.type),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 7,
+    return GestureDetector(
+      onTap: () {
+        if (hasLesson || hasSubstitution) {
+          HapticService.medium();
+          _showLessonDetail(context, lesson, substitution);
+        }
+      },
+      child: Container(
+        margin: margin,
+        decoration: BoxDecoration(
+          color: hasSubstitution 
+              ? Color(substitution!.typeColor).withAlpha(40)
+              : hasLesson 
+                  ? AppColors.appSurface 
+                  : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: hasSubstitution
+              ? Border.all(
+                  color: Color(substitution!.typeColor),
+                  width: 2,
+                )
+              : (hasLesson ? Border.all(
+                  color: AppColors.appSurface.withAlpha(100),
+                  width: 1,
+                ) : null),
+        ),
+        child: hasLesson || hasSubstitution
+            ? Padding(
+                padding: const EdgeInsets.all(4),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Substitution badge
+                    if (hasSubstitution)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5, 
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isCancellation 
+                              ? const Color(0xFFEF4444)  // Red for cancellation
+                              : Color(substitution!.typeColor),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          isCancellation ? 'Entfall' : _getShortTypeLabel(substitution!.type),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 8,
+                          ),
                         ),
                       ),
-                    ),
-                  
-                  // Subject
-                  if (displaySubject.isNotEmpty)
-                    Text(
-                      displaySubject,
-                      style: TextStyle(
-                        color: AppColors.primaryText,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 11,
-                        decoration: hasSubstitution && substitution!.isCancellation
-                            ? TextDecoration.lineThrough
-                            : null,
+                    
+                    // Subject (with strikethrough if cancelled)
+                    if (displaySubject.isNotEmpty)
+                      Text(
+                        displaySubject,
+                        style: TextStyle(
+                          color: isCancellation 
+                              ? AppColors.secondaryText.withAlpha(150)
+                              : AppColors.primaryText,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                          decoration: isCancellation
+                              ? TextDecoration.lineThrough
+                              : null,
+                          decorationColor: const Color(0xFFEF4444),
+                          decorationThickness: 2,
+                        ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                  
-                  // Teacher & Room
-                  if (displayTeacher.isNotEmpty || displayRoom.isNotEmpty)
-                    Text(
-                      '$displayTeacher ${displayRoom.isNotEmpty ? "· $displayRoom" : ""}',
-                      style: TextStyle(
-                        color: hasSubstitution 
-                            ? Color(substitution!.typeColor)
-                            : AppColors.secondaryText,
-                        fontSize: 8,
-                        fontWeight: hasSubstitution ? FontWeight.w500 : null,
-                        decoration: hasSubstitution && substitution!.isCancellation
-                            ? TextDecoration.lineThrough
-                            : null,
+                    
+                    // Teacher & Room
+                    if (displayTeacher.isNotEmpty || displayRoom.isNotEmpty)
+                      Text(
+                        '$displayTeacher ${displayRoom.isNotEmpty ? "· $displayRoom" : ""}',
+                        style: TextStyle(
+                          color: isCancellation
+                              ? AppColors.secondaryText.withAlpha(100)
+                              : (hasSubstitution 
+                                  ? Color(substitution!.typeColor)
+                                  : AppColors.secondaryText),
+                          fontSize: 9,
+                          fontWeight: hasSubstitution ? FontWeight.w600 : null,
+                          decoration: isCancellation
+                              ? TextDecoration.lineThrough
+                              : null,
+                          decorationColor: const Color(0xFFEF4444),
+                        ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                ],
-              ),
-            )
-          : null,
+                  ],
+                ),
+              )
+            : null,
+      ),
     );
   }
   
@@ -643,7 +643,7 @@ class _DayCell extends StatelessWidget {
       case SubstitutionType.substitution:
         return 'Ver';
       case SubstitutionType.cancellation:
-        return 'Ent';
+        return 'Entfall';
       case SubstitutionType.roomChange:
         return 'Raum';
       case SubstitutionType.exchange:
@@ -660,4 +660,258 @@ class _DayCell extends StatelessWidget {
         return 'Sonst';
     }
   }
+
+  void _showLessonDetail(BuildContext context, ScheduleLesson? lesson, SubstitutionEntry? substitution) {
+    final hasSubstitution = substitution != null;
+    final isCancellation = hasSubstitution && substitution!.isCancellation;
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        margin: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.appSurface,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: hasSubstitution 
+                    ? Color(substitution!.typeColor).withAlpha(50)
+                    : Theme.of(context).colorScheme.primary.withAlpha(30),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: hasSubstitution 
+                          ? Color(substitution!.typeColor)
+                          : Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      hasSubstitution 
+                          ? (isCancellation ? 'Entfall' : substitution!.typeLabel)
+                          : 'Regulär',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${germanWeekdays[dayIndex]}, $period. Stunde',
+                          style: TextStyle(
+                            color: AppColors.primaryText,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
+                          ),
+                        ),
+                        if (lesson?.timeInfo != null)
+                          Text(
+                            '${lesson!.timeInfo!.startTime} - ${lesson.timeInfo!.endTime}',
+                            style: TextStyle(
+                              color: AppColors.secondaryText,
+                              fontSize: 14,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Content
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Subject
+                  _DetailRow(
+                    icon: Icons.book_outlined,
+                    label: 'Fach',
+                    value: hasSubstitution && substitution!.subject.isNotEmpty
+                        ? substitution.subject
+                        : (lesson?.subject ?? '-'),
+                    isStrikethrough: isCancellation,
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Teacher
+                  _DetailRow(
+                    icon: Icons.person_outline,
+                    label: hasSubstitution && substitution!.substituteTeacher.isNotEmpty
+                        ? 'Vertretung'
+                        : 'Lehrer',
+                    value: hasSubstitution && substitution!.substituteTeacher.isNotEmpty
+                        ? '${substitution.substituteTeacher} (statt ${substitution.originalTeacher ?? lesson?.teacher ?? '-'})'
+                        : (lesson?.teacher ?? '-'),
+                    valueColor: hasSubstitution 
+                        ? Color(substitution!.typeColor)
+                        : AppColors.primaryText,
+                    isStrikethrough: isCancellation,
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Room
+                  _DetailRow(
+                    icon: Icons.room_outlined,
+                    label: 'Raum',
+                    value: hasSubstitution && substitution!.room.isNotEmpty
+                        ? substitution.room
+                        : (lesson?.room ?? '-'),
+                    valueColor: hasSubstitution && substitution!.room != lesson?.room
+                        ? Color(substitution!.typeColor)
+                        : AppColors.primaryText,
+                    isStrikethrough: isCancellation,
+                  ),
+                  
+                  // Substitution info
+                  if (hasSubstitution && substitution!.text != null && substitution!.text!.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Color(substitution!.typeColor).withAlpha(20),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Color(substitution!.typeColor).withAlpha(100),
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: Color(substitution!.typeColor),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Information',
+                                  style: TextStyle(
+                                    color: Color(substitution!.typeColor),
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  substitution!.text!,
+                                  style: TextStyle(
+                                    color: AppColors.primaryText,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            
+            // Close button
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Schließen'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
+
+/// Detail row for modal
+class _DetailRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color? valueColor;
+  final bool isStrikethrough;
+
+  const _DetailRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.valueColor,
+    this.isStrikethrough = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 24,
+          color: AppColors.secondaryText,
+        ),
+        const SizedBox(width: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: AppColors.secondaryText,
+                fontSize: 12,
+              ),
+            ),
+            Text(
+              value,
+              style: TextStyle(
+                color: valueColor ?? AppColors.primaryText,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+                decoration: isStrikethrough ? TextDecoration.lineThrough : null,
+                decorationColor: const Color(0xFFEF4444),
+                decorationThickness: 2,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+const List<String> germanWeekdays = [
+  'Montag',
+  'Dienstag',
+  'Mittwoch',
+  'Donnerstag',
+  'Freitag',
+];
