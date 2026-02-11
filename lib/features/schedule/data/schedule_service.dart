@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import '../domain/schedule_models.dart';
 import 'schedule_pdf_parser.dart';
+import 'schedule_mock_data.dart';
 
 /// Service for managing school schedules
 class ScheduleService {
@@ -22,6 +23,12 @@ class ScheduleService {
     return _schoolSchedule.getScheduleForClass(className);
   }
 
+  /// Load mock data for testing
+  void loadMockData() {
+    _schoolSchedule = ScheduleMockData.getMockSchedule();
+    _isLoaded = true;
+  }
+
   /// Load schedule from asset bundle
   Future<void> loadFromAssets() async {
     try {
@@ -30,8 +37,8 @@ class ScheduleService {
       _schoolSchedule = SchoolSchedule.fromJson(json);
       _isLoaded = true;
     } catch (e) {
-      _schoolSchedule = SchoolSchedule.empty();
-      _isLoaded = false;
+      // Fall back to mock data
+      loadMockData();
     }
   }
 
@@ -48,8 +55,8 @@ class ScheduleService {
       _schoolSchedule = SchoolSchedule.fromJson(json);
       _isLoaded = true;
     } catch (e) {
-      _schoolSchedule = SchoolSchedule.empty();
-      _isLoaded = false;
+      // Fall back to mock data
+      loadMockData();
     }
   }
 

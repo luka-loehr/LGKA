@@ -49,9 +49,11 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
   @override
   void initState() {
     super.initState();
-    // Load schedule data
+    // Load mock data and auto-select 5a
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await scheduleService.loadFromAssets();
+      scheduleService.loadMockData();
+      // Auto-select class 5a
+      ref.read(selectedScheduleClassProvider.notifier).select('5a');
       if (mounted) setState(() {});
     });
   }
