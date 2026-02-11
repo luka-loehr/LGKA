@@ -289,7 +289,7 @@ class _WeekHeader extends StatelessWidget {
         children: [
           // Time column header
           Container(
-            width: 50,
+            width: 45,
             alignment: Alignment.center,
             child: Text(
               '',
@@ -317,14 +317,14 @@ class _WeekHeader extends StatelessWidget {
                       style: TextStyle(
                         color: AppColors.primaryText,
                         fontWeight: FontWeight.w700,
-                        fontSize: 14,
+                        fontSize: 13,
                       ),
                     ),
                     Text(
                       days[index].substring(2),
                       style: TextStyle(
                         color: AppColors.secondaryText,
-                        fontSize: 10,
+                        fontSize: 9,
                       ),
                     ),
                   ],
@@ -396,14 +396,31 @@ class _WeekScheduleGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get all substitutions for this class
-    final allSubstitutions = <SubstitutionEntry>[];
-    if (substitutions.todayData?.hasEntriesForClass(className) ?? false) {
-      allSubstitutions.addAll(substitutions.todayData!.getEntriesForClass(className));
+    // Get all substitutions for this class organized by period
+    final substitutionMap = <String, SubstitutionEntry>{};
+    
+    // Helper to add substitutions to map
+    void addSubstitutions(ParsedSubstitutionData? data) {
+      if (data == null) return;
+      final entries = data.getEntriesForClass(className);
+      for (final entry in entries) {
+        // Key format: "period" (just the period number)
+        // Handle period ranges like "1-2"
+        final periodParts = entry.period.split('-');
+        final startPeriod = int.tryParse(periodParts[0]) ?? 0;
+        final endPeriod = periodParts.length > 1 
+            ? int.tryParse(periodParts[1]) ?? startPeriod
+            : startPeriod;
+        
+        for (int p = startPeriod; p <= endPeriod; p++) {
+          final key = '$p';
+          substitutionMap[key] = entry;
+        }
+      }
     }
-    if (substitutions.tomorrowData?.hasEntriesForClass(className) ?? false) {
-      allSubstitutions.addAll(substitutions.tomorrowData!.getEntriesForClass(className));
-    }
+    
+    addSubstitutions(substitutions.todayData);
+    addSubstitutions(substitutions.tomorrowData);
 
     final periods = List.generate(11, (i) => i + 1);
     
@@ -415,7 +432,7 @@ class _WeekScheduleGrid extends StatelessWidget {
         return _PeriodRow(
           period: period,
           schedule: schedule,
-          allSubstitutions: allSubstitutions,
+          substitutionMap: substitutionMap,
           timeInfo: standardLessonTimes[period],
         );
       },
@@ -427,26 +444,26 @@ class _WeekScheduleGrid extends StatelessWidget {
 class _PeriodRow extends StatelessWidget {
   final int period;
   final ClassSchedule? schedule;
-  final List<SubstitutionEntry> allSubstitutions;
+  final Map<String, SubstitutionEntry> substitutionMap;
   final LessonTime? timeInfo;
 
   const _PeriodRow({
     required this.period,
     required this.schedule,
-    required this.allSubstitutions,
+    required this.substitutionMap,
     this.timeInfo,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 70,
+      height: 65,
       margin: const EdgeInsets.only(bottom: 4),
       child: Row(
         children: [
           // Period number and time
           Container(
-            width: 50,
+            width: 45,
             alignment: Alignment.center,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -455,7 +472,7 @@ class _PeriodRow extends StatelessWidget {
                   '$period.',
                   style: TextStyle(
                     color: AppColors.secondaryText,
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -464,7 +481,7 @@ class _PeriodRow extends StatelessWidget {
                     timeInfo!.startTime,
                     style: TextStyle(
                       color: AppColors.secondaryText.withAlpha(150),
-                      fontSize: 10,
+                      fontSize: 9,
                     ),
                   ),
               ],
@@ -476,31 +493,21 @@ class _PeriodRow extends StatelessWidget {
             ScheduleLesson? lesson;
             if (schedule != null) {
               final dayLessons = schedule!.getLessonsForDay(dayIndex);
-              lesson = dayLessons.cast<ScheduleLesson?>().firstWhere(
-                (l) => l?.period == period,
-                orElse: () => null,
-              );
+              for (final l in dayLessons) {
+                if (l.period == period) {
+                  lesson = l;
+                  break;
+                }
+              }
             }
             
-            // Find substitution for this slot
-            final substitution = allSubstitutions.firstWhere(
-              (s) => (s.period == period.toString() || s.period.startsWith('$period-')),
-              orElse: () => SubstitutionEntry(
-                type: SubstitutionType.unknown,
-                period: '',
-                className: '',
-                subject: '',
-                room: '',
-                substituteTeacher: '',
-                rawText: '',
-              ),
-            );
-            final hasSubstitution = substitution.period.isNotEmpty;
+            // Find substitution using just the period number
+            final substitution = substitutionMap['$period'];
             
             return Expanded(
               child: _DayCell(
                 lesson: lesson,
-                substitution: hasSubstitution ? substitution : null,
+                substitution: substitution,
                 margin: EdgeInsets.only(left: dayIndex > 0 ? 4 : 0),
               ),
             );
@@ -526,7 +533,18 @@ class _DayCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasLesson = lesson != null && lesson!.subject.isNotEmpty;
-    final hasSubstitution = substitution != null;
+    final hasSubstitution = substitution != null && substitution!.period.isNotEmpty;
+    
+    // Determine display values
+    final displaySubject = hasSubstitution && substitution!.subject.isNotEmpty
+        ? substitution!.subject
+        : (lesson?.subject ?? '');
+    final displayTeacher = hasSubstitution && substitution!.substituteTeacher.isNotEmpty
+        ? substitution!.substituteTeacher
+        : (lesson?.teacher ?? '');
+    final displayRoom = hasSubstitution && substitution!.room.isNotEmpty
+        ? substitution!.room
+        : (lesson?.room ?? '');
     
     return Container(
       margin: margin,
@@ -535,95 +553,109 @@ class _DayCell extends StatelessWidget {
             ? Color(substitution!.typeColor).withAlpha(40)
             : hasLesson 
                 ? AppColors.appSurface 
-                : AppColors.appSurface.withAlpha(30),
+                : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         border: hasSubstitution
             ? Border.all(
                 color: Color(substitution!.typeColor),
                 width: 1.5,
               )
-            : null,
+            : (hasLesson ? Border.all(
+                color: AppColors.appSurface.withAlpha(100),
+                width: 1,
+              ) : null),
       ),
       child: hasLesson || hasSubstitution
           ? Padding(
-              padding: const EdgeInsets.all(4),
+              padding: const EdgeInsets.all(3),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Substitution badge
+                  // Substitution badge (only if there's actually a substitution)
                   if (hasSubstitution)
                     Container(
-                      margin: const EdgeInsets.only(bottom: 2),
+                      margin: const EdgeInsets.only(bottom: 1),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 4, 
                         vertical: 1,
                       ),
                       decoration: BoxDecoration(
                         color: Color(substitution!.typeColor),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(3),
                       ),
                       child: Text(
-                        substitution!.typeLabel.substring(0, 3),
+                        _getShortTypeLabel(substitution!.type),
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
-                          fontSize: 8,
+                          fontSize: 7,
                         ),
                       ),
                     ),
                   
                   // Subject
-                  if (hasLesson)
+                  if (displaySubject.isNotEmpty)
                     Text(
-                      lesson!.subject,
+                      displaySubject,
                       style: TextStyle(
                         color: AppColors.primaryText,
                         fontWeight: FontWeight.w700,
-                        fontSize: 12,
+                        fontSize: 11,
                         decoration: hasSubstitution && substitution!.isCancellation
                             ? TextDecoration.lineThrough
                             : null,
                       ),
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
                   
                   // Teacher & Room
-                  if (hasLesson) ...[
-                    const SizedBox(height: 1),
+                  if (displayTeacher.isNotEmpty || displayRoom.isNotEmpty)
                     Text(
-                      hasSubstitution && substitution!.substituteTeacher.isNotEmpty
-                          ? substitution!.substituteTeacher
-                          : lesson!.teacher,
+                      '$displayTeacher ${displayRoom.isNotEmpty ? "· $displayRoom" : ""}',
                       style: TextStyle(
                         color: hasSubstitution 
                             ? Color(substitution!.typeColor)
                             : AppColors.secondaryText,
-                        fontSize: 9,
-                        fontWeight: hasSubstitution ? FontWeight.w600 : null,
-                      ),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      hasSubstitution && substitution!.room.isNotEmpty
-                          ? substitution!.room
-                          : lesson!.room,
-                      style: TextStyle(
-                        color: hasSubstitution && substitution!.room != lesson!.room
-                            ? Color(substitution!.typeColor)
-                            : AppColors.secondaryText.withAlpha(180),
                         fontSize: 8,
+                        fontWeight: hasSubstitution ? FontWeight.w500 : null,
+                        decoration: hasSubstitution && substitution!.isCancellation
+                            ? TextDecoration.lineThrough
+                            : null,
                       ),
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
-                  ],
                 ],
               ),
             )
           : null,
     );
+  }
+  
+  String _getShortTypeLabel(SubstitutionType type) {
+    switch (type) {
+      case SubstitutionType.substitution:
+        return 'Ver';
+      case SubstitutionType.cancellation:
+        return 'Ent';
+      case SubstitutionType.roomChange:
+        return 'Raum';
+      case SubstitutionType.exchange:
+        return 'Tausch';
+      case SubstitutionType.relocation:
+        return 'Verl';
+      case SubstitutionType.supervision:
+        return 'Bet';
+      case SubstitutionType.specialUnit:
+        return 'Sond';
+      case SubstitutionType.teacherObservation:
+        return 'Lehr';
+      case SubstitutionType.unknown:
+        return 'Sonst';
+    }
   }
 }
