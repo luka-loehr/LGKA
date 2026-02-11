@@ -1,21 +1,55 @@
 // Copyright Luka Löhr 2026
 
-import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:path_provider/path_provider.dart';
-import '../application/schedule_provider.dart';
-import '../../../../services/haptic_service.dart';
 import '../../../../theme/app_theme.dart';
+import '../../substitution/application/substitution_provider.dart';
+import '../../substitution/domain/substitution_models.dart';
 import '../domain/schedule_models.dart';
-// import '../../../../services/retry_service.dart';
-import '../../../../l10n/app_localizations.dart';
+import '../data/schedule_service.dart';
+import '../../../../services/haptic_service.dart';
 import '../../../../utils/app_logger.dart';
-import '../../../../widgets/app_footer.dart';
-import '../../../../services/loading_spinner_tracker_service.dart';
 
+/// Standard lesson times
+const Map<int, LessonTime> standardLessonTimes = {
+  1: LessonTime(startTime: '08:00', endTime: '08:45'),
+  2: LessonTime(startTime: '08:55', endTime: '09:40'),
+  3: LessonTime(startTime: '09:50', endTime: '10:35'),
+  4: LessonTime(startTime: '10:55', endTime: '11:40'),
+  5: LessonTime(startTime: '11:50', endTime: '12:35'),
+  6: LessonTime(startTime: '12:45', endTime: '13:30'),
+  7: LessonTime(startTime: '13:35', endTime: '14:20'),
+  8: LessonTime(startTime: '14:25', endTime: '15:10'),
+  9: LessonTime(startTime: '15:15', endTime: '16:00'),
+  10: LessonTime(startTime: '16:05', endTime: '16:50'),
+  11: LessonTime(startTime: '16:55', endTime: '17:40'),
+};
+
+/// Notifier for selected class
+class SelectedScheduleClassNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+  void select(String? className) => state = className;
+}
+
+/// Selected class provider
+final selectedScheduleClassProvider = NotifierProvider<SelectedScheduleClassNotifier, String?>(
+  SelectedScheduleClassNotifier.new,
+);
+
+/// Notifier for selected day
+class SelectedDayIndexNotifier extends Notifier<int> {
+  @override
+  int build() => DateTime.now().weekday - 1;
+  void select(int dayIndex) => state = dayIndex;
+}
+
+/// Selected day provider (0=Monday, etc.)
+final selectedDayIndexProvider = NotifierProvider<SelectedDayIndexNotifier, int>(
+  SelectedDayIndexNotifier.new,
+);
+
+/// Schedule page with week view and integrated substitutions
 class SchedulePage extends ConsumerStatefulWidget {
   const SchedulePage({super.key});
 
@@ -23,625 +57,716 @@ class SchedulePage extends ConsumerStatefulWidget {
   ConsumerState<SchedulePage> createState() => _SchedulePageState();
 }
 
-class _SchedulePageState extends ConsumerState<SchedulePage>
-    with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
-  bool _hasShownButtons = false;
-
-  // Track available schedules
-  List<ScheduleItem> _availableFirstHalbjahr = [];
-  List<ScheduleItem> _availableSecondHalbjahr = [];
-  bool _isCheckingAvailability = false;
-  DateTime? _lastAvailabilityCheck;
-  static const Duration _availabilityCheckInterval = Duration(minutes: 15);
-  final _spinnerTracker = LoadingSpinnerTracker();
-
+class _SchedulePageState extends ConsumerState<SchedulePage> {
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOutCubic,
-    ));
-    
-    // Only load schedules if not already loaded (avoid reloading on every screen visit)
+    // Load schedule data
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final scheduleState = ref.read(scheduleProvider);
-      if (!scheduleState.hasSchedules) {
-        await ref.read(scheduleProvider.notifier).loadSchedules();
-      }
-      
-      // Check availability only if it hasn't been checked recently
-      if (_shouldCheckAvailability()) {
-        await _checkScheduleAvailability();
-      } else {
-        // If we have cached availability results, restore them from the schedule state
-        final allSchedules = [
-          ...scheduleState.firstHalbjahrSchedules,
-          ...scheduleState.secondHalbjahrSchedules,
-        ];
-        if (allSchedules.isNotEmpty && (_availableFirstHalbjahr.isEmpty && _availableSecondHalbjahr.isEmpty)) {
-          // Restore availability from cache by checking which schedules have cached PDFs
-          await _restoreAvailabilityFromCache(allSchedules);
-        }
-      }
+      await scheduleService.loadFromAssets();
+      if (mounted) setState(() {});
     });
-  }
-
-  @override
-  void dispose() {
-    _fadeController.dispose();
-    super.dispose();
-  }
-
-  /// Check if availability should be checked (based on timing and cached data)
-  bool _shouldCheckAvailability() {
-    // If we have cached results and they're recent, don't check again
-    if (_lastAvailabilityCheck != null && 
-        _availableFirstHalbjahr.isNotEmpty || _availableSecondHalbjahr.isNotEmpty) {
-      final timeSinceLastCheck = DateTime.now().difference(_lastAvailabilityCheck!);
-      if (timeSinceLastCheck < _availabilityCheckInterval) {
-        return false;
-      }
-    }
-    return true;
-  }
-  
-  /// Check which schedules have available PDFs
-  Future<void> _checkScheduleAvailability() async {
-    if (_isCheckingAvailability) return;
-    
-    if (!mounted) return;
-    setState(() {
-      _isCheckingAvailability = true;
-    });
-    
-    try {
-      final scheduleNotifier = ref.read(scheduleProvider.notifier);
-      
-      // Get all schedules to check and deduplicate
-      final allSchedules = {
-        ...ref.read(scheduleProvider).firstHalbjahrSchedules,
-        ...ref.read(scheduleProvider).secondHalbjahrSchedules,
-      }.toList(); // Deduplicate
-      
-      // Check availability concurrently instead of sequentially
-      final availabilityFutures = allSchedules.map((schedule) async {
-        final isAvailable = await scheduleNotifier.isScheduleAvailable(schedule);
-        if (mounted) {
-          setState(() {});
-        }
-        return {'schedule': schedule, 'isAvailable': isAvailable};
-      });
-      
-      // Wait for all availability checks to complete
-      final results = await Future.wait(availabilityFutures);
-      
-      if (!mounted) return;
-      
-      // Separate results by halbjahr and deduplicate
-      final firstSemesterSet = <ScheduleItem>{};
-      final secondSemesterSet = <ScheduleItem>{};
-      
-      for (final result in results) {
-        if (result['isAvailable'] as bool) {
-          final schedule = result['schedule'] as ScheduleItem;
-          if (schedule.halbjahr == '1. Halbjahr') {
-            firstSemesterSet.add(schedule);
-          } else if (schedule.halbjahr == '2. Halbjahr') {
-            secondSemesterSet.add(schedule);
-          }
-        }
-      }
-      
-      // Convert sets to lists (automatically deduplicated)
-      _availableFirstHalbjahr = firstSemesterSet.toList();
-      _availableSecondHalbjahr = secondSemesterSet.toList();
-
-      final availableCount = results.where((r) => r['isAvailable'] as bool).length;
-      AppLogger.success('Schedule availability check complete: $availableCount available', module: 'SchedulePage');
-      setState(() {});
-      
-      // Preload PDFs for available schedules in the background
-      _preloadSchedulePDFs();
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isCheckingAvailability = false;
-          _lastAvailabilityCheck = DateTime.now();
-        });
-      }
-    }
-  }
-  
-  /// Restore availability from cache by checking which schedules have cached PDFs
-  Future<void> _restoreAvailabilityFromCache(List<ScheduleItem> allSchedules) async {
-    // Deduplicate input schedules first
-    final uniqueSchedules = allSchedules.toSet().toList();
-    
-    for (final schedule in uniqueSchedules) {
-      final cachedFile = await _getCachedScheduleFile(schedule);
-      if (cachedFile != null && await cachedFile.exists()) {
-        if (schedule.halbjahr == '1. Halbjahr') {
-          if (!_availableFirstHalbjahr.contains(schedule)) {
-            _availableFirstHalbjahr.add(schedule);
-          }
-        } else if (schedule.halbjahr == '2. Halbjahr') {
-          if (!_availableSecondHalbjahr.contains(schedule)) {
-            _availableSecondHalbjahr.add(schedule);
-          }
-        }
-      }
-    }
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  /// Preload PDFs for available schedules in the background
-  void _preloadSchedulePDFs() {
-    final allAvailableSchedules = [
-      ..._availableFirstHalbjahr,
-      ..._availableSecondHalbjahr,
-    ];
-    
-    if (allAvailableSchedules.isEmpty) return;
-    
-    // Preload all available schedules in the background
-    for (final schedule in allAvailableSchedules) {
-      // Check if PDF is already cached before downloading
-      unawaited(
-        _getCachedScheduleFile(schedule).then((cachedFile) async {
-          if (cachedFile != null && await cachedFile.exists()) {
-            AppLogger.debug('Schedule PDF already cached: ${schedule.title}', module: 'SchedulePage');
-            return;
-          }
-          // Download schedule PDF in background only if not cached
-          try {
-            await ref.read(scheduleProvider.notifier).downloadSchedule(schedule);
-          } catch (e) {
-            // Silently handle errors - preloading shouldn't show errors to user
-            AppLogger.debug('Failed to preload schedule PDF: ${schedule.title}', module: 'SchedulePage');
-          }
-        })
-      );
-    }
-    
-    AppLogger.debug('Started preloading ${allAvailableSchedules.length} schedule PDF(s)', module: 'SchedulePage');
   }
 
   @override
   Widget build(BuildContext context) {
-    final scheduleState = ref.watch(scheduleProvider);
-
-    final isShowingSpinner = scheduleState.isLoading || _isCheckingAvailability || !scheduleState.isIndexBuilt;
-    final hasData = scheduleState.hasSchedules && !scheduleState.hasError && scheduleState.isIndexBuilt;
-
-    // Track spinner visibility and trigger haptic feedback when spinner disappears
-    _spinnerTracker.trackState(
-      isSpinnerVisible: isShowingSpinner,
-      hasData: hasData,
-      hasError: scheduleState.hasError,
-      mounted: mounted,
+    final selectedClass = ref.watch(selectedScheduleClassProvider);
+    final selectedDay = ref.watch(selectedDayIndexProvider);
+    
+    return Column(
+      children: [
+        // Class selector
+        _ClassSelector(
+          classes: scheduleService.classNames.isEmpty 
+              ? ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '7d', 
+                 '8a', '8b', '8c', '8d', '9a', '9b', '9c', '9d',
+                 '10a', '10b', '10c', '10d', '10e']
+              : scheduleService.classNames,
+          selectedClass: selectedClass,
+          onClassSelected: (className) {
+            HapticService.light();
+            ref.read(selectedScheduleClassProvider.notifier).select(className);
+            AppLogger.navigation('Selected class: $className');
+          },
+        ),
+        
+        const SizedBox(height: 12),
+        
+        // Day selector
+        _DaySelector(
+          selectedDay: selectedDay,
+          onDaySelected: (dayIndex) {
+            HapticService.light();
+            ref.read(selectedDayIndexProvider.notifier).select(dayIndex);
+          },
+        ),
+        
+        const SizedBox(height: 12),
+        
+        // Schedule grid
+        Expanded(
+          child: selectedClass == null
+              ? _EmptyClassView(
+                  onSelectClass: () => _showClassPicker(context, 
+                    scheduleService.classNames.isEmpty 
+                        ? ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '7d',
+                           '8a', '8b', '8c', '8d', '9a', '9b', '9c', '9d',
+                           '10a', '10b', '10c', '10d', '10e']
+                        : scheduleService.classNames),
+                )
+              : _ScheduleGrid(
+                  className: selectedClass,
+                  dayIndex: selectedDay,
+                  schedule: scheduleService.getScheduleForClass(selectedClass),
+                  substitutions: ref.watch(substitutionProvider),
+                ),
+        ),
+      ],
     );
+  }
 
-    return Scaffold(
-      backgroundColor: AppColors.appBackground,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: _buildBody(scheduleState),
+  void _showClassPicker(BuildContext context, List<String> classes) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.appSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-    );
-  }
-
-  Widget _buildBody(ScheduleState state) {
-    if (state.isLoading) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              AppLocalizations.of(context)!.checkingAvailability,
-              style: const TextStyle(
-                color: AppColors.secondaryText,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (state.hasError) {
-      return Center(
-        child: _buildErrorState(state.error!),
-      );
-    }
-
-    if (!state.hasSchedules) {
-      return Center(
-        child: _buildEmptyState(),
-      );
-    }
-
-    // Show availability checking state if schedules are loaded but availability or class index is still being checked
-    if (_isCheckingAvailability || !state.isIndexBuilt) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              AppLocalizations.of(context)!.loadingSchedules,
-              style: const TextStyle(
-                color: AppColors.secondaryText,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // Start animation when buttons should be visible
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final hasAnyButtons = _availableFirstHalbjahr.isNotEmpty || _availableSecondHalbjahr.isNotEmpty;
-      if (hasAnyButtons && !_hasShownButtons) {
-        _hasShownButtons = true;
-        _fadeController.forward();
-        AppLogger.schedule('Schedule buttons shown: ${_availableFirstHalbjahr.length + _availableSecondHalbjahr.length} available');
-      }
-    });
-
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: _buildScheduleList(state),
-    );
-  }
-
-  Widget _buildErrorState(String error) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.schedule_outlined,
-              size: 64,
-              color: AppColors.secondaryText.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              AppLocalizations.of(context)!.serverConnectionFailed,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.primaryText,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              AppLocalizations.of(context)!.serverConnectionHint,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.secondaryText,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () async {
-                HapticService.medium();
-                await ref.read(scheduleProvider.notifier).refreshSchedules();
-                await _checkScheduleAvailability();
-              },
-              icon: const Icon(Icons.refresh),
-              label: Text(AppLocalizations.of(context)!.tryAgain),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Klasse auswählen',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: AppColors.primaryText,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Expanded(
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    childAspectRatio: 1.5,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: classes.length,
+                  itemBuilder: (context, index) {
+                    final className = classes[index];
+                    return GestureDetector(
+                      onTap: () {
+                        ref.read(selectedScheduleClassProvider.notifier).select(className);
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withAlpha(30),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.primary.withAlpha(100),
+                            width: 1,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            className,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildEmptyState() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 24.0),
-      child: Column(
+/// Class selector widget
+class _ClassSelector extends StatelessWidget {
+  final List<String> classes;
+  final String? selectedClass;
+  final ValueChanged<String> onClassSelected;
+
+  const _ClassSelector({
+    required this.classes,
+    required this.selectedClass,
+    required this.onClassSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.appSurface,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
         children: [
-          const Icon(
-            Icons.schedule,
-            color: AppColors.secondaryText,
-            size: 64,
-          ),
-          const SizedBox(height: 16),
           Text(
-            AppLocalizations.of(context)!.noSchedulesAvailable,
-            style: const TextStyle(
-              color: AppColors.primaryText,
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            AppLocalizations.of(context)!.tryAgainLater,
-            style: const TextStyle(
+            'Klasse:',
+            style: TextStyle(
               color: AppColors.secondaryText,
-              fontSize: 14,
+              fontSize: 16,
             ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: selectedClass == null
+                ? GestureDetector(
+                    onTap: () => _showClassDropdown(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Auswählen',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : GestureDetector(
+                    onTap: () => _showClassDropdown(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            selectedClass!,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildScheduleList(ScheduleState state) {
-    final firstSemesterSchedules = _availableFirstHalbjahr;
-    final secondSemesterSchedules = _availableSecondHalbjahr;
-    final hasBothSemesters = firstSemesterSchedules.isNotEmpty && 
-                             secondSemesterSchedules.isNotEmpty;
+  void _showClassDropdown(BuildContext context) {
+    onClassSelected(selectedClass ?? classes.first);
+  }
+}
+
+/// Day selector
+class _DaySelector extends StatelessWidget {
+  final int selectedDay;
+  final ValueChanged<int> onDaySelected;
+
+  const _DaySelector({
+    required this.selectedDay,
+    required this.onDaySelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final days = ['Mo', 'Di', 'Mi', 'Do', 'Fr'];
     
-    return Column(
-      children: [
-        const SizedBox(height: 24),
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-            children: [
-              // First Semester (if available)
-              if (firstSemesterSchedules.isNotEmpty) ...[
-                ...firstSemesterSchedules
-                    .where((s) => s.gradeLevel == 'Klassen 5-10')
-                    .map((schedule) => _buildScheduleCard(schedule)),
-                const SizedBox(height: 16),
-                ...firstSemesterSchedules
-                    .where((s) => s.gradeLevel == 'J11/J12')
-                    .map((schedule) => _buildScheduleCard(schedule)),
-              ],
-              
-              // Separator if both semesters exist
-              if (hasBothSemesters) ...[
-                const SizedBox(height: 24),
-                Divider(height: 1, color: AppColors.secondaryText.withValues(alpha: 0.2)),
-                const SizedBox(height: 24),
-              ],
-              
-              // Second Semester (if available)
-              if (secondSemesterSchedules.isNotEmpty) ...[
-                ...secondSemesterSchedules
-                    .where((s) => s.gradeLevel == 'Klassen 5-10')
-                    .map((schedule) => _buildScheduleCard(schedule)),
-                const SizedBox(height: 16),
-                ...secondSemesterSchedules
-                    .where((s) => s.gradeLevel == 'J11/J12')
-                    .map((schedule) => _buildScheduleCard(schedule)),
-              ],
-            ],
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: List.generate(5, (index) {
+          final isSelected = selectedDay == index;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onDaySelected(index),
+              child: Container(
+                margin: EdgeInsets.only(right: index < 4 ? 8 : 0),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: isSelected 
+                      ? Theme.of(context).colorScheme.primary 
+                      : AppColors.appSurface,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    days[index],
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : AppColors.secondaryText,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+/// Empty class view
+class _EmptyClassView extends StatelessWidget {
+  final VoidCallback onSelectClass;
+
+  const _EmptyClassView({required this.onSelectClass});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.calendar_today_outlined,
+            size: 64,
+            color: AppColors.secondaryText.withAlpha(100),
           ),
-        ),
-        const SizedBox(height: 20),
-        _buildFooter(context),
-      ],
+          const SizedBox(height: 16),
+          Text(
+            'Stundenplan',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: AppColors.primaryText,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Wähle eine Klasse aus, um den Stundenplan zu sehen',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.secondaryText,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: onSelectClass,
+            child: const Text('Klasse auswählen'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Schedule grid with lessons and substitutions
+class _ScheduleGrid extends StatelessWidget {
+  final String className;
+  final int dayIndex;
+  final ClassSchedule? schedule;
+  final SubstitutionProviderState substitutions;
+
+  const _ScheduleGrid({
+    required this.className,
+    required this.dayIndex,
+    required this.schedule,
+    required this.substitutions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (schedule == null) {
+      return _MockScheduleGrid(
+        className: className,
+        dayIndex: dayIndex,
+        substitutions: substitutions,
+      );
+    }
+
+    // Get lessons for selected day
+    final dayLessons = schedule!.getLessonsForDay(dayIndex);
+    
+    // Get substitutions for this class
+    final classSubstitutions = <SubstitutionEntry>[];
+    if (substitutions.todayData?.hasEntriesForClass(className) ?? false) {
+      classSubstitutions.addAll(substitutions.todayData!.getEntriesForClass(className));
+    }
+    if (substitutions.tomorrowData?.hasEntriesForClass(className) ?? false) {
+      classSubstitutions.addAll(substitutions.tomorrowData!.getEntriesForClass(className));
+    }
+
+    // Merge lessons with substitutions
+    final periods = List.generate(11, (i) => i + 1);
+    
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: periods.length,
+      itemBuilder: (context, index) {
+        final period = periods[index];
+        final lesson = dayLessons.firstWhere(
+          (l) => l.period == period,
+          orElse: () => ScheduleLesson(
+            period: period,
+            subject: '',
+            teacher: '',
+            room: '',
+            dayIndex: dayIndex,
+            timeInfo: standardLessonTimes[period],
+          ),
+        );
+        
+        // Check for substitution
+        final substitution = _findSubstitutionForPeriod(period, classSubstitutions);
+        
+        return _PeriodCard(
+          period: period,
+          lesson: lesson,
+          substitution: substitution,
+          timeInfo: standardLessonTimes[period],
+        );
+      },
     );
   }
 
-  Widget _buildScheduleCard(ScheduleItem schedule) {
-    return GestureDetector(
-      onTap: () {
-        HapticService.medium();
-        _openSchedule(schedule);
+  SubstitutionEntry? _findSubstitutionForPeriod(
+    int period, 
+    List<SubstitutionEntry> substitutions,
+  ) {
+    for (final entry in substitutions) {
+      if (entry.period == period.toString() || entry.period.startsWith('$period-')) {
+        return entry;
+      }
+    }
+    return null;
+  }
+}
+
+/// Mock schedule grid when no data is loaded
+class _MockScheduleGrid extends StatelessWidget {
+  final String className;
+  final int dayIndex;
+  final SubstitutionProviderState substitutions;
+
+  const _MockScheduleGrid({
+    required this.className,
+    required this.dayIndex,
+    required this.substitutions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Get substitutions for this class
+    final classSubstitutions = <SubstitutionEntry>[];
+    if (substitutions.todayData?.hasEntriesForClass(className) ?? false) {
+      classSubstitutions.addAll(substitutions.todayData!.getEntriesForClass(className));
+    }
+    if (substitutions.tomorrowData?.hasEntriesForClass(className) ?? false) {
+      classSubstitutions.addAll(substitutions.tomorrowData!.getEntriesForClass(className));
+    }
+
+    final periods = List.generate(11, (i) => i + 1);
+    
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: periods.length,
+      itemBuilder: (context, index) {
+        final period = periods[index];
+        final substitution = _findSubstitutionForPeriod(period, classSubstitutions);
+        
+        return _PeriodCard(
+          period: period,
+          lesson: ScheduleLesson(
+            period: period,
+            subject: '',
+            teacher: '',
+            room: '',
+            dayIndex: dayIndex,
+            timeInfo: standardLessonTimes[period],
+          ),
+          substitution: substitution,
+          timeInfo: standardLessonTimes[period],
+        );
       },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        decoration: BoxDecoration(
-          color: AppColors.appSurface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+    );
+  }
+
+  SubstitutionEntry? _findSubstitutionForPeriod(
+    int period, 
+    List<SubstitutionEntry> substitutions,
+  ) {
+    for (final entry in substitutions) {
+      if (entry.period == period.toString() || entry.period.startsWith('$period-')) {
+        return entry;
+      }
+    }
+    return null;
+  }
+}
+
+/// Period card showing lesson and substitution
+class _PeriodCard extends StatelessWidget {
+  final int period;
+  final ScheduleLesson lesson;
+  final SubstitutionEntry? substitution;
+  final LessonTime? timeInfo;
+
+  const _PeriodCard({
+    required this.period,
+    required this.lesson,
+    this.substitution,
+    this.timeInfo,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasLesson = lesson.subject.isNotEmpty;
+    final hasSubstitution = substitution != null;
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          // Period number and time
+          Container(
+            width: 60,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Column(
+              children: [
+                Text(
+                  '$period.',
+                  style: TextStyle(
+                    color: AppColors.secondaryText,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (timeInfo != null)
+                  Text(
+                    timeInfo!.startTime,
+                    style: TextStyle(
+                      color: AppColors.secondaryText.withAlpha(150),
+                      fontSize: 11,
+                    ),
+                  ),
+              ],
             ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
+          ),
+          
+          // Lesson card
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                shape: BoxShape.circle,
+                color: hasSubstitution 
+                    ? Color(substitution!.typeColor).withAlpha(30)
+                    : hasLesson 
+                        ? AppColors.appSurface 
+                        : AppColors.appSurface.withAlpha(50),
+                borderRadius: BorderRadius.circular(12),
+                border: hasSubstitution
+                    ? Border.all(
+                        color: Color(substitution!.typeColor),
+                        width: 2,
+                      )
+                    : null,
               ),
-              child: const Icon(
-                Icons.schedule,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    _localizeGradeLevel(context, schedule.gradeLevel),
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.primaryText,
-                      fontWeight: FontWeight.w500,
+                  if (hasLesson) ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            lesson.subject,
+                            style: TextStyle(
+                              color: AppColors.primaryText,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              decoration: hasSubstitution && substitution!.isCancellation
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
+                          ),
+                        ),
+                        if (hasSubstitution)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8, 
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Color(substitution!.typeColor),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              substitution!.typeLabel,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    _localizeHalbjahr(context, schedule.halbjahr),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.secondaryText,
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.person_outline,
+                          size: 14,
+                          color: AppColors.secondaryText,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          hasSubstitution && substitution!.substituteTeacher.isNotEmpty
+                              ? '${substitution!.substituteTeacher} (statt ${lesson.teacher})'
+                              : lesson.teacher,
+                          style: TextStyle(
+                            color: hasSubstitution 
+                                ? Color(substitution!.typeColor)
+                                : AppColors.secondaryText,
+                            fontSize: 13,
+                            fontWeight: hasSubstitution ? FontWeight.w600 : null,
+                            decoration: hasSubstitution && substitution!.isCancellation
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Icon(
+                          Icons.room_outlined,
+                          size: 14,
+                          color: AppColors.secondaryText,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          hasSubstitution && substitution!.room.isNotEmpty
+                              ? substitution!.room
+                              : lesson.room,
+                          style: TextStyle(
+                            color: hasSubstitution && substitution!.room != lesson.room
+                                ? Color(substitution!.typeColor)
+                                : AppColors.secondaryText,
+                            fontSize: 13,
+                            fontWeight: hasSubstitution && substitution!.room != lesson.room
+                                ? FontWeight.w600 
+                                : null,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                    if (hasSubstitution && substitution!.text != null) ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withAlpha(30),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 14,
+                              color: AppColors.secondaryText,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                substitution!.text!,
+                                style: TextStyle(
+                                  color: AppColors.secondaryText,
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ] else if (hasSubstitution) ...[
+                    // Show substitution even when no regular lesson
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8, 
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Color(substitution!.typeColor),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            substitution!.typeLabel,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            '${substitution!.subject} - ${substitution!.substituteTeacher} - ${substitution!.room}',
+                            style: TextStyle(
+                              color: AppColors.primaryText,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    Text(
+                      'Frei',
+                      style: TextStyle(
+                        color: AppColors.secondaryText.withAlpha(100),
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: AppColors.secondaryText,
-              size: 16,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-
-  String _localizeGradeLevel(BuildContext context, String gradeLevel) {
-    final l10n = AppLocalizations.of(context)!;
-    if (gradeLevel == 'Klassen 5-10') {
-      return l10n.grades5to10;
-    }
-    if (gradeLevel == 'J11/J12') {
-      return l10n.j11j12;
-    }
-    return gradeLevel;
-  }
-
-  String _localizeHalbjahr(BuildContext context, String halbjahr) {
-    final l10n = AppLocalizations.of(context)!;
-    if (halbjahr == '1. Halbjahr') {
-      return l10n.firstSemester;
-    }
-    if (halbjahr == '2. Halbjahr') {
-      return l10n.secondSemester;
-    }
-    return halbjahr;
-  }
-
-  Widget _buildFooter(BuildContext context) {
-    return AppFooter(bottomPadding: _getFooterPadding(context));
-  }
-
-  double _getFooterPadding(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final gestureInsets = mediaQuery.systemGestureInsets.bottom;
-    final viewPadding = mediaQuery.viewPadding.bottom;
-    
-    // Determine navigation mode based on gesture insets
-    if (gestureInsets >= 45) {
-      return 34.0; // Button navigation
-    } else if (gestureInsets <= 25) {
-      return 8.0; // Gesture navigation
-    } else {
-      // Ambiguous range - use viewPadding as secondary indicator
-      return viewPadding > 50 ? 34.0 : 8.0;
-    }
-  }
-
-  /// Get the cached schedule file path (same logic as ScheduleService)
-  Future<File?> _getCachedScheduleFile(ScheduleItem schedule) async {
-    try {
-      final cacheDir = await getTemporaryDirectory();
-      final sanitizedGradeLevel = schedule.gradeLevel.replaceAll('/', '_');
-      final sanitizedHalbjahr = schedule.halbjahr.replaceAll('.', '_');
-      final filename = '${sanitizedGradeLevel}_$sanitizedHalbjahr.pdf';
-      return File('${cacheDir.path}/$filename');
-    } catch (e) {
-      return null;
-    }
-  }
-
-  void _openSchedule(ScheduleItem schedule) async {
-    // Check if PDF is already downloaded (from preloading)
-    final cachedFile = await _getCachedScheduleFile(schedule);
-    if (cachedFile != null && await cachedFile.exists()) {
-      // PDF is already cached, open immediately
-      if (mounted) {
-        context.push('/pdf-viewer', extra: {
-          'file': cachedFile,
-          'dayName': '${_localizeGradeLevel(context, schedule.gradeLevel)} - ${_localizeHalbjahr(context, schedule.halbjahr)}',
-        });
-      }
-      return;
-    }
-    
-    // Check mounted before using context after async operation
-    if (!mounted) return;
-    
-    // Show loading dialog if PDF needs to be downloaded
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        content: Row(
-          children: [
-            CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
-            ),
-            const SizedBox(width: 16),
-            Text(AppLocalizations.of(context)!.loadingSchedule),
-          ],
-        ),
-      ),
-    );
-
-    // Download schedule in background
-    ref.read(scheduleProvider.notifier).downloadSchedule(schedule).then((file) {
-      if (mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
-        
-        if (file != null) {
-          // Navigate to PDF viewer
-          context.push('/pdf-viewer', extra: {
-            'file': file,
-            'dayName': '${_localizeGradeLevel(context, schedule.gradeLevel)} - ${_localizeHalbjahr(context, schedule.halbjahr)}',
-          });
-        } else {
-          // PDF is not available yet
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${_localizeHalbjahr(context, schedule.halbjahr)} ${AppLocalizations.of(context)!.scheduleNotAvailable}'),
-              backgroundColor: Colors.orange,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-        }
-      }
-    }).catchError((e) {
-      if (mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
-        
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(AppLocalizations.of(context)!.errorLoadingGeneric),
-                backgroundColor: Colors.red,
-              ),
-            );
-      }
-    });
-  }
-} 
+}

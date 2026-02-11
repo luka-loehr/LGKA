@@ -1,0 +1,740 @@
+{
+  "5a": {
+    "className": "5a",
+    "lessons": [
+      {
+        "period": 1,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "E",
+        "teacher": "Hum",
+        "room": "109"
+      },
+      {
+        "period": 2,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "D",
+        "teacher": "Blm",
+        "room": "109"
+      },
+      {
+        "period": 5,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "M",
+        "teacher": "Web",
+        "room": "109"
+      },
+      {
+        "period": 6,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "KL .KL",
+        "teacher": "Blm Web",
+        "room": "109 109"
+      }
+    ],
+    "totalLessons": 4
+  },
+  "5b": {
+    "className": "5b",
+    "lessons": [
+      {
+        "period": 1,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "M",
+        "teacher": "Hof",
+        "room": "110"
+      },
+      {
+        "period": 2,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "KL .KL",
+        "teacher": "Baz Hof",
+        "room": "110 110"
+      },
+      {
+        "period": 5,
+        "dayIndex": 0,
+        "dayName": "Montag",
+        "subject": "E",
+        "teacher": "Lm",
+        "room": "110"
+      },
+      {
+        "period": 6,
+        "dayIndex": 0,
+        "dayName": "Montag",
+        "subject": "D",
+        "teacher": "Baz",
+        "room": "110"
+      }
+    ],
+    "totalLessons": 4
+  },
+  "5c": {
+    "className": "5c",
+    "lessons": [
+      {
+        "period": 3,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "E",
+        "teacher": "Btl",
+        "room": "201"
+      },
+      {
+        "period": 3,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "D",
+        "teacher": "Bet",
+        "room": "201"
+      },
+      {
+        "period": 4,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "KL .KL",
+        "teacher": "Btl Bet",
+        "room": "201 201"
+      },
+      {
+        "period": 6,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "M",
+        "teacher": "Bur",
+        "room": "201"
+      }
+    ],
+    "totalLessons": 4
+  },
+  "6a": {
+    "className": "6a",
+    "lessons": [
+      {
+        "period": 7,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "KL .KL",
+        "teacher": "Shn Nam",
+        "room": "209 209"
+      }
+    ],
+    "totalLessons": 1
+  },
+  "6b": {
+    "className": "6b",
+    "lessons": [
+      {
+        "period": 5,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "KL .KL",
+        "teacher": "Smi Stü",
+        "room": "111 111"
+      }
+    ],
+    "totalLessons": 1
+  },
+  "6c": {
+    "className": "6c",
+    "lessons": [
+      {
+        "period": 7,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "KL .KL",
+        "teacher": "Bm Dös",
+        "room": "112 112"
+      }
+    ],
+    "totalLessons": 1
+  },
+  "7a": {
+    "className": "7a",
+    "lessons": [
+      {
+        "period": 7,
+        "dayIndex": 0,
+        "dayName": "Montag",
+        "subject": "KL",
+        "teacher": "Blb",
+        "room": "102"
+      },
+      {
+        "period": 7,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "FUF",
+        "teacher": "Btl",
+        "room": "102"
+      },
+      {
+        "period": 7,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "FUL",
+        "teacher": "Kob",
+        "room": "102"
+      }
+    ],
+    "totalLessons": 3
+  },
+  "7b": {
+    "className": "7b",
+    "lessons": [
+      {
+        "period": 7,
+        "dayIndex": 0,
+        "dayName": "Montag",
+        "subject": "KL",
+        "teacher": "Ste",
+        "room": "210"
+      },
+      {
+        "period": 7,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "FUF",
+        "teacher": "Nm",
+        "room": "210"
+      },
+      {
+        "period": 7,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "FUL",
+        "teacher": "Kob",
+        "room": "102"
+      }
+    ],
+    "totalLessons": 3
+  },
+  "7c": {
+    "className": "7c",
+    "lessons": [
+      {
+        "period": 5,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "M",
+        "teacher": "Meh",
+        "room": "203"
+      },
+      {
+        "period": 5,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "M",
+        "teacher": "Meh",
+        "room": "203"
+      },
+      {
+        "period": 7,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "FUF",
+        "teacher": "Glz",
+        "room": "203"
+      },
+      {
+        "period": 7,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "KL",
+        "teacher": "Meh",
+        "room": "203"
+      }
+    ],
+    "totalLessons": 4
+  },
+  "7d": {
+    "className": "7d",
+    "lessons": [
+      {
+        "period": 5,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "F",
+        "teacher": "Now",
+        "room": "212"
+      },
+      {
+        "period": 7,
+        "dayIndex": 0,
+        "dayName": "Montag",
+        "subject": "KL",
+        "teacher": "Lm",
+        "room": "212"
+      },
+      {
+        "period": 8,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "F",
+        "teacher": "Now",
+        "room": "212"
+      },
+      {
+        "period": 9,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "FUF",
+        "teacher": "Now",
+        "room": "211"
+      }
+    ],
+    "totalLessons": 4
+  },
+  "8a": {
+    "className": "8a",
+    "lessons": [
+      {
+        "period": 3,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "E",
+        "teacher": "Hum",
+        "room": "311"
+      },
+      {
+        "period": 6,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "KL",
+        "teacher": "Bch",
+        "room": "311"
+      }
+    ],
+    "totalLessons": 2
+  },
+  "8b": {
+    "className": "8b",
+    "lessons": [
+      {
+        "period": 7,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "KL",
+        "teacher": "Bau",
+        "room": "309"
+      },
+      {
+        "period": 8,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "E",
+        "teacher": "Vog",
+        "room": "309"
+      }
+    ],
+    "totalLessons": 2
+  },
+  "8c": {
+    "className": "8c",
+    "lessons": [
+      {
+        "period": 8,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "E",
+        "teacher": "Btl",
+        "room": "211"
+      },
+      {
+        "period": 9,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "KL",
+        "teacher": "Nm",
+        "room": "211"
+      }
+    ],
+    "totalLessons": 2
+  },
+  "8d": {
+    "className": "8d",
+    "lessons": [
+      {
+        "period": 8,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "E",
+        "teacher": "Vog",
+        "room": "312"
+      },
+      {
+        "period": 9,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "KL",
+        "teacher": "Vog",
+        "room": "312"
+      }
+    ],
+    "totalLessons": 2
+  },
+  "9a": {
+    "className": "9a",
+    "lessons": [
+      {
+        "period": 5,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "L .F",
+        "teacher": "Stz Nm",
+        "room": "310 323"
+      },
+      {
+        "period": 6,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "E",
+        "teacher": "Meh",
+        "room": "323"
+      },
+      {
+        "period": 7,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "FUE",
+        "teacher": "Meh",
+        "room": "323"
+      },
+      {
+        "period": 7,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "KL",
+        "teacher": "Bas",
+        "room": "323"
+      }
+    ],
+    "totalLessons": 4
+  },
+  "9b": {
+    "className": "9b",
+    "lessons": [
+      {
+        "period": 5,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "L .F",
+        "teacher": "Stz Nm",
+        "room": "310 323"
+      },
+      {
+        "period": 6,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "E",
+        "teacher": "Oes",
+        "room": "310"
+      },
+      {
+        "period": 7,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "KL",
+        "teacher": "Dom",
+        "room": "310"
+      }
+    ],
+    "totalLessons": 3
+  },
+  "9c": {
+    "className": "9c",
+    "lessons": [
+      {
+        "period": 5,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "E",
+        "teacher": "Oes",
+        "room": "322"
+      },
+      {
+        "period": 8,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "F",
+        "teacher": "Glz",
+        "room": "322"
+      },
+      {
+        "period": 9,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "KL",
+        "teacher": "Glz",
+        "room": "322"
+      }
+    ],
+    "totalLessons": 3
+  },
+  "9d": {
+    "className": "9d",
+    "lessons": [
+      {
+        "period": 3,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "E",
+        "teacher": "Wez",
+        "room": "409"
+      },
+      {
+        "period": 4,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "F",
+        "teacher": "OrJ",
+        "room": "409"
+      },
+      {
+        "period": 7,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "KL",
+        "teacher": "Kub",
+        "room": "409"
+      }
+    ],
+    "totalLessons": 3
+  },
+  "10a": {
+    "className": "10a",
+    "lessons": [
+      {
+        "period": 2,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "WBS",
+        "teacher": "Brd",
+        "room": "413"
+      },
+      {
+        "period": 5,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "L",
+        "teacher": "Stz",
+        "room": "413"
+      },
+      {
+        "period": 6,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "E",
+        "teacher": "Meh",
+        "room": "413"
+      },
+      {
+        "period": 6,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "M",
+        "teacher": "Stt",
+        "room": "413"
+      },
+      {
+        "period": 10,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "KL",
+        "teacher": "Stz",
+        "room": "413"
+      }
+    ],
+    "totalLessons": 5
+  },
+  "10b": {
+    "className": "10b",
+    "lessons": [
+      {
+        "period": 2,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "WBS",
+        "teacher": "Brr",
+        "room": "414"
+      },
+      {
+        "period": 3,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "F",
+        "teacher": "Man",
+        "room": "414"
+      },
+      {
+        "period": 4,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "E",
+        "teacher": "Meh",
+        "room": "414"
+      },
+      {
+        "period": 7,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "KL",
+        "teacher": "Man",
+        "room": "414"
+      },
+      {
+        "period": 7,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "M",
+        "teacher": "Hel",
+        "room": "414"
+      }
+    ],
+    "totalLessons": 5
+  },
+  "10c": {
+    "className": "10c",
+    "lessons": [
+      {
+        "period": 3,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "F",
+        "teacher": "Brn",
+        "room": "403"
+      },
+      {
+        "period": 4,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "E",
+        "teacher": "Wez",
+        "room": "403"
+      },
+      {
+        "period": 7,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "M",
+        "teacher": "Jak",
+        "room": "403"
+      },
+      {
+        "period": 8,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "WBS",
+        "teacher": "Blm",
+        "room": "403"
+      },
+      {
+        "period": 9,
+        "dayIndex": 2,
+        "dayName": "Mittwoch",
+        "subject": "KL",
+        "teacher": "Brn",
+        "room": "403"
+      }
+    ],
+    "totalLessons": 5
+  },
+  "10d": {
+    "className": "10d",
+    "lessons": [
+      {
+        "period": 3,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "WBS",
+        "teacher": "Brd",
+        "room": "303"
+      },
+      {
+        "period": 4,
+        "dayIndex": 3,
+        "dayName": "Donnerstag",
+        "subject": "E",
+        "teacher": "Wez",
+        "room": "303"
+      },
+      {
+        "period": 5,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "F",
+        "teacher": "Mai",
+        "room": "303"
+      },
+      {
+        "period": 6,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "M",
+        "teacher": "Del",
+        "room": "303"
+      },
+      {
+        "period": 7,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "KL",
+        "teacher": "Sa",
+        "room": "211"
+      }
+    ],
+    "totalLessons": 5
+  },
+  "10e": {
+    "className": "10e",
+    "lessons": [
+      {
+        "period": 5,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "WBS",
+        "teacher": "Baz",
+        "room": "410"
+      },
+      {
+        "period": 6,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "M",
+        "teacher": "Fei",
+        "room": "410"
+      },
+      {
+        "period": 6,
+        "dayIndex": 4,
+        "dayName": "Freitag",
+        "subject": "E",
+        "teacher": "Höh",
+        "room": "410"
+      },
+      {
+        "period": 7,
+        "dayIndex": 0,
+        "dayName": "Montag",
+        "subject": "KL",
+        "teacher": "Fei",
+        "room": "410"
+      },
+      {
+        "period": 8,
+        "dayIndex": 1,
+        "dayName": "Dienstag",
+        "subject": "F",
+        "teacher": "Man",
+        "room": "410"
+      }
+    ],
+    "totalLessons": 5
+  }
+}

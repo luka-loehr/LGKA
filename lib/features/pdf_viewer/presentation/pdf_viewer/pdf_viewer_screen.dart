@@ -9,7 +9,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_providers.dart';
-import '../../../schedule/application/schedule_provider.dart';
+// import '../../../schedule/application/schedule_provider.dart';
 import '../../../../../services/haptic_service.dart';
 import '../../../../../theme/app_theme.dart';
 import '../../../../../utils/app_logger.dart';
@@ -253,17 +253,19 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     HapticService.medium();
 
     final container = ProviderScope.containerOf(context, listen: false);
-    final scheduleState = container.read(scheduleProvider);
-    final scheduleNotifier = container.read(scheduleProvider.notifier);
+    // TODO: Reimplement with new schedule service
+    // final scheduleState = container.read(scheduleProvider);
+    // final scheduleNotifier = container.read(scheduleProvider.notifier);
 
     // Check class index for instant validation
-    if (scheduleState.isIndexBuilt &&
-        !scheduleState.classIndex5to10.containsKey(classInput.toLowerCase())) {
-      _showInstantError();
-      return;
-    }
+    // if (scheduleState.isIndexBuilt &&
+    //     !scheduleState.classIndex5to10.containsKey(classInput.toLowerCase())) {
+    //   _showInstantError();
+    //   return;
+    // }
 
-    final pageFromIndex = scheduleNotifier.getClassPage(classInput);
+    // final pageFromIndex = scheduleNotifier.getClassPage(classInput);
+    final pageFromIndex = null;
 
     // If we already know the class exists (from index), show success immediately
     if (pageFromIndex != null) {
@@ -704,8 +706,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     String trimmedQuery,
     ProviderContainer container,
   ) async {
-    final scheduleState = container.read(scheduleProvider);
-    final scheduleNotifier = container.read(scheduleProvider.notifier);
+    // TODO: Reimplement with new schedule service
+    // final scheduleState = container.read(scheduleProvider);
+    // final scheduleNotifier = container.read(scheduleProvider.notifier);
     final prefsState = container.read(preferencesManagerProvider);
     final currentClass = prefsState.lastScheduleQuery5to10?.toLowerCase();
 
@@ -723,37 +726,37 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       return;
     }
 
-    if (scheduleState.isIndexBuilt &&
-        scheduleState.classIndex5to10.containsKey(trimmedQuery)) {
-      final page = scheduleNotifier.getClassPage(trimmedQuery);
-      if (page != null) {
-        // Hide search bar first and let animation complete before PDF jump
-        setState(() => _isSearchBarVisible = false);
-
-        // Wait for search bar slide/fade animation to complete
-        // This prevents the main-thread PDF rendering from interrupting the animation
-        await Future.delayed(_searchBarAnimationDuration);
-
-        if (!mounted) return;
-
-        _pdfController.jumpToPage(page - 1);
-
-        final prefsNotifier =
-            container.read(preferencesManagerProvider.notifier);
-        unawaited(prefsNotifier.setLastSchedulePage5to10(page));
-        unawaited(prefsNotifier.setLastScheduleQuery5to10(trimmedQuery));
-
-        if (mounted) {
-          FloatingToast.show(
-            context,
-            message: AppLocalizations.of(context)!
-                .classChanged(trimmedQuery.toUpperCase()),
-            duration: const Duration(seconds: 2),
-          );
-        }
-        return;
-      }
-    }
+    // if (scheduleState.isIndexBuilt &&
+    //     scheduleState.classIndex5to10.containsKey(trimmedQuery)) {
+    //   final page = scheduleNotifier.getClassPage(trimmedQuery);
+    //   if (page != null) {
+    //     // Hide search bar first and let animation complete before PDF jump
+    //     setState(() => _isSearchBarVisible = false);
+    //
+    //     // Wait for search bar slide/fade animation to complete
+    //     // This prevents the main-thread PDF rendering from interrupting the animation
+    //     await Future.delayed(_searchBarAnimationDuration);
+    //
+    //     if (!mounted) return;
+    //
+    //     _pdfController.jumpToPage(page - 1);
+    //
+    //     final prefsNotifier =
+    //         container.read(preferencesManagerProvider.notifier);
+    //     unawaited(prefsNotifier.setLastSchedulePage5to10(page));
+    //     unawaited(prefsNotifier.setLastScheduleQuery5to10(trimmedQuery));
+    //
+    //     if (mounted) {
+    //       FloatingToast.show(
+    //         context,
+    //         message: AppLocalizations.of(context)!
+    //             .classChanged(trimmedQuery.toUpperCase()),
+    //         duration: const Duration(seconds: 2),
+    //       );
+    //     }
+    //     return;
+    //   }
+    // }
 
     setState(() => _isSearchBarVisible = false);
 

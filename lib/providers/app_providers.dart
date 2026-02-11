@@ -241,7 +241,7 @@ final currentRouteProvider = NotifierProvider<CurrentRouteNotifier, String>(Curr
 
 // Schedule Provider
 final scheduleServiceProvider = Provider<ScheduleService>((ref) {
-  return ScheduleService();
+  return scheduleService;
 });
 
 // News Service Provider

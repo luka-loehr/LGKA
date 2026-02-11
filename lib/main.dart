@@ -10,7 +10,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:lgka_flutter/navigation/app_router.dart';
 import 'package:lgka_flutter/providers/app_providers.dart';
-import 'package:lgka_flutter/features/schedule/application/schedule_provider.dart';
+// import 'package:lgka_flutter/features/schedule/application/schedule_provider.dart';
 import 'package:lgka_flutter/features/news/application/news_provider.dart';
 import 'package:lgka_flutter/features/substitution/application/substitution_provider.dart';
 import 'package:lgka_flutter/features/weather/application/weather_provider.dart';
@@ -204,17 +204,18 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
   }
 
   Future<void> _preloadSchedules() async {
-    try {
-      AppLogger.init('Preloading schedules');
-      final scheduleNotifier = ref.read(scheduleProvider.notifier);
-      await scheduleNotifier.loadSchedules();
-      AppLogger.success('Schedules preloaded');
-      
-      // Build class index for 5-10 schedule (runs after schedules are loaded)
-      await scheduleNotifier.preloadClassIndex();
-    } catch (e) {
-      AppLogger.error('Failed to preload schedules', error: e);
-    }
+    // TODO: Reimplement with new schedule service
+    // try {
+    //   AppLogger.init('Preloading schedules');
+    //   final scheduleNotifier = ref.read(scheduleProvider.notifier);
+    //   await scheduleNotifier.loadSchedules();
+    //   AppLogger.success('Schedules preloaded');
+    //   
+    //   // Build class index for 5-10 schedule (runs after schedules are loaded)
+    //   await scheduleNotifier.preloadClassIndex();
+    // } catch (e) {
+    //   AppLogger.error('Failed to preload schedules', error: e);
+    // }
   }
 
   Future<void> _preloadNews() async {
@@ -253,24 +254,14 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
       unawaited(ref.read(weatherDataProvider.notifier).updateDataInBackground());
     }
 
-    // Refresh schedules and news in background (less critical)
-    final scheduleService = ref.read(scheduleServiceProvider);
-    if (!scheduleService.hasValidCache && scheduleService.cachedSchedules != null) {
-      AppLogger.debug('App resumed: Refreshing schedules in background', module: 'Main');
-      unawaited(ref.read(scheduleProvider.notifier).refreshInBackground());
-    }
-
+    // Refresh news in background (less critical)
     final newsService = ref.read(newsServiceProvider);
     if (!newsService.hasValidCache && newsService.cachedEvents != null) {
       AppLogger.debug('App resumed: Refreshing news in background', module: 'Main');
       unawaited(ref.read(newsProvider.notifier).refreshInBackground());
     }
     
-    // Rebuild class index silently in background (schedule PDF may have changed)
-    // This is non-intrusive and won't show loading spinners
-    final scheduleNotifier = ref.read(scheduleProvider.notifier);
-    scheduleNotifier.invalidateClassIndex();
-    unawaited(scheduleNotifier.rebuildClassIndexSilently());
+    // TODO: Reimplement schedule refresh with new service
   }
 
   Future<void> _refreshExpiredCaches() async {
@@ -282,11 +273,12 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
       unawaited(ref.read(substitutionProvider.notifier).refreshInBackground());
     }
 
-    final scheduleService = ref.read(scheduleServiceProvider);
-    if (!scheduleService.hasValidCache && scheduleService.cachedSchedules != null) {
-      AppLogger.debug('Cache refresh timer: Triggering background refresh for schedules', module: 'Main');
-      unawaited(ref.read(scheduleProvider.notifier).refreshInBackground());
-    }
+    // TODO: Reimplement schedule refresh with new service
+    // final scheduleService = ref.read(scheduleServiceProvider);
+    // if (!scheduleService.hasValidCache && scheduleService.cachedSchedules != null) {
+    //   AppLogger.debug('Cache refresh timer: Triggering background refresh for schedules', module: 'Main');
+    //   unawaited(ref.read(scheduleProvider.notifier).refreshInBackground());
+    // }
 
     final weatherState = ref.read(weatherDataProvider);
     final weatherLastUpdate = weatherState.lastUpdateTime;
