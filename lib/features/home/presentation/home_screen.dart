@@ -66,7 +66,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       appBar: _buildAppBar(),
-      body: _buildBody(),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 8),
+            _buildSegmentedControl(),
+            const SizedBox(height: 8),
+            Expanded(
+              child: _buildBody(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -74,17 +85,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return AppBar(
       backgroundColor: AppColors.appBackground,
       elevation: 0,
+      toolbarHeight: 56,
       leading: IconButton(
         onPressed: () {
           HapticService.light();
           _showDrawer();
         },
-        icon: const Icon(
-          Icons.menu,
-          color: AppColors.secondaryText,
+        icon: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.appSurface,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(
+            Icons.menu,
+            color: AppColors.primaryText,
+            size: 20,
+          ),
         ),
       ),
-      title: _buildSegmentedControl(),
+      title: Text(
+        'LGKA+',
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.w700,
+          fontSize: 22,
+        ),
+      ),
       centerTitle: true,
       actions: [
         IconButton(
@@ -92,9 +119,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             HapticService.light();
             _showSettings();
           },
-          icon: const Icon(
-            Icons.settings_outlined,
-            color: AppColors.secondaryText,
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.appSurface,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              Icons.settings_outlined,
+              color: AppColors.primaryText,
+              size: 20,
+            ),
           ),
         ),
       ],
@@ -102,67 +137,76 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildSegmentedControl() {
+    final tabs = [
+      _TabData(
+        icon: Icons.calendar_today_outlined,
+        activeIcon: Icons.calendar_today,
+        label: AppLocalizations.of(context)!.substitutionPlan,
+      ),
+      _TabData(
+        icon: Icons.wb_sunny_outlined,
+        activeIcon: Icons.wb_sunny,
+        label: AppLocalizations.of(context)!.weather,
+      ),
+      _TabData(
+        icon: Icons.schedule_outlined,
+        activeIcon: Icons.schedule,
+        label: AppLocalizations.of(context)!.schedule,
+      ),
+    ];
+
     return Container(
-      height: 36,
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.appSurface.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(18),
+        color: AppColors.appSurface,
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildSegmentedButton(0, AppLocalizations.of(context)!.substitutionPlan, Icons.calendar_today),
-          _buildSegmentedButton(1, AppLocalizations.of(context)!.weather, Icons.wb_sunny_outlined),
-          _buildSegmentedButton(2, AppLocalizations.of(context)!.schedule, Icons.schedule),
-        ],
+        children: List.generate(tabs.length, (index) {
+          return Expanded(
+            child: _buildSegmentedButton(index, tabs[index]),
+          );
+        }),
       ),
     );
   }
 
-  Widget _buildSegmentedButton(int index, String title, IconData icon) {
+  Widget _buildSegmentedButton(int index, _TabData tab) {
     final isSelected = _currentPage == index;
-    final shouldShowText = _shouldShowTextForTab(index);
-    
+
     return GestureDetector(
       onTap: () => _switchToPage(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(
-          horizontal: shouldShowText ? 16 : 12,
-          vertical: 8,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
+          color: isSelected 
+              ? Theme.of(context).colorScheme.primary 
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              icon,
+              isSelected ? tab.activeIcon : tab.icon,
               size: 18,
               color: isSelected ? Colors.white : AppColors.secondaryText,
             ),
-            if (shouldShowText) ...[
-              const SizedBox(width: 6),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: isSelected ? Colors.white : AppColors.secondaryText,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                ),
+            const SizedBox(width: 8),
+            Text(
+              tab.label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : AppColors.secondaryText,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                fontSize: 14,
               ),
-            ],
+            ),
           ],
         ),
       ),
     );
-  }
-
-  /// Determine if text should be shown for a specific tab based on current page
-  bool _shouldShowTextForTab(int tabIndex) {
-    // Only show text for the current page
-    return tabIndex == _currentPage;
   }
 
   void _switchToPage(int index) {
@@ -183,17 +227,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return PageView(
       controller: _pageController,
       onPageChanged: (index) {
-        // Trigger haptic feedback every time the page changes
-        // This fires whenever the category in the top navbar switches
         if (_currentPage != index) {
           HapticService.medium();
         }
         setState(() => _currentPage = index);
       },
-      children: [
-        const SubstitutionScreen(),
-        const WeatherPage(),
-        const SchedulePage(),
+      children: const [
+        SubstitutionScreen(),
+        WeatherPage(),
+        SchedulePage(),
       ],
     );
   }
@@ -211,7 +253,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: const DrawerModal(),
     );
   }
-
-
 }
 
+/// Tab data helper class
+class _TabData {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+
+  _TabData({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+  });
+}

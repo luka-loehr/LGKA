@@ -1,6 +1,5 @@
 // Copyright Luka Löhr 2026
 
-import 'dart:async';
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/substitution_models.dart';
@@ -33,6 +32,63 @@ class SubstitutionProviderState {
   bool get isCacheValid {
     if (lastFetchTime == null) return false;
     return CacheService().isCacheValid(CacheKey.substitutions, lastFetchTime: lastFetchTime);
+  }
+
+  /// Get today's parsed data
+  ParsedSubstitutionData? get todayData => todayState.parsedData;
+  
+  /// Get tomorrow's parsed data
+  ParsedSubstitutionData? get tomorrowData => tomorrowState.parsedData;
+  
+  /// Get all unique classes from both today and tomorrow
+  List<String> get allClasses {
+    final classes = <String>{};
+    if (todayData != null) {
+      classes.addAll(todayData!.uniqueClasses);
+    }
+    if (tomorrowData != null) {
+      classes.addAll(tomorrowData!.uniqueClasses);
+    }
+    final sorted = classes.toList()..sort(_compareClasses);
+    return sorted;
+  }
+  
+  /// Get entries for a specific class (combines today and tomorrow)
+  Map<String, List<SubstitutionEntry>> getEntriesForClass(String className) {
+    final result = <String, List<SubstitutionEntry>>{};
+    
+    if (todayData != null && todayData!.hasEntriesForClass(className)) {
+      result['today'] = todayData!.getEntriesForClass(className);
+    }
+    
+    if (tomorrowData != null && tomorrowData!.hasEntriesForClass(className)) {
+      result['tomorrow'] = tomorrowData!.getEntriesForClass(className);
+    }
+    
+    return result;
+  }
+  
+  /// Compare class names for sorting
+  static int _compareClasses(String a, String b) {
+    final aMatch = RegExp(r'(\d+|[A-Z]+)([a-z]?)').firstMatch(a);
+    final bMatch = RegExp(r'(\d+|[A-Z]+)([a-z]?)').firstMatch(b);
+    
+    if (aMatch == null || bMatch == null) return a.compareTo(b);
+    
+    final aNum = int.tryParse(aMatch.group(1) ?? '');
+    final bNum = int.tryParse(bMatch.group(1) ?? '');
+    final aLetter = aMatch.group(2) ?? '';
+    final bLetter = bMatch.group(2) ?? '';
+    
+    if (aNum != null && bNum != null) {
+      if (aNum != bNum) return aNum.compareTo(bNum);
+      return aLetter.compareTo(bLetter);
+    }
+    
+    if (aNum == null && bNum != null) return 1;
+    if (aNum != null && bNum == null) return -1;
+    
+    return a.compareTo(b);
   }
 
   SubstitutionProviderState copyWith({
@@ -93,15 +149,12 @@ class SubstitutionNotifier extends Notifier<SubstitutionProviderState> {
 
   /// Retry loading a specific PDF
   Future<void> retryPdf(bool isToday) async {
-    // Set loading state immediately so UI shows loading indicator
     _substitutionService.setLoadingStateForPdf(isToday, true);
     _refreshState();
     
-    // Then perform the actual retry
     await _substitutionService.retryPdf(isToday);
     _refreshState();
     
-    // Check if retry failed and trigger haptic feedback
     final pdfState = isToday ? state.todayState : state.tomorrowState;
     if (pdfState.error != null) {
       HapticService.medium();
@@ -110,11 +163,9 @@ class SubstitutionNotifier extends Notifier<SubstitutionProviderState> {
 
   /// Retry loading both PDFs
   Future<void> retryAll() async {
-    // Set loading state immediately so UI shows loading indicator
     _substitutionService.setLoadingState(true);
     _refreshState();
     
-    // Then perform the actual retry
     await _substitutionService.retryAll();
     _refreshState();
   }
@@ -125,13 +176,11 @@ class SubstitutionNotifier extends Notifier<SubstitutionProviderState> {
     _refreshState();
   }
 
-  /// Refresh in background - shows loading spinner and disables interaction
+  /// Refresh in background
   Future<void> refreshInBackground() async {
     AppLogger.info('Background refresh: Substitution plans', module: 'SubstitutionProvider');
-    // Update state immediately to show loading spinner
     _refreshState();
     await _substitutionService.refreshInBackground();
-    // Update state again after refresh completes (including error states)
     _refreshState();
     AppLogger.success('Background refresh complete: Substitution plans', module: 'SubstitutionProvider');
   }
@@ -139,6 +188,11 @@ class SubstitutionNotifier extends Notifier<SubstitutionProviderState> {
   /// Get the file for a specific PDF if available
   File? getPdfFile(bool isToday) {
     return _substitutionService.getPdfFile(isToday);
+  }
+  
+  /// Get parsed data for a specific day
+  ParsedSubstitutionData? getParsedData(bool isToday) {
+    return _substitutionService.getParsedData(isToday);
   }
 
   /// Check if a PDF can be opened
