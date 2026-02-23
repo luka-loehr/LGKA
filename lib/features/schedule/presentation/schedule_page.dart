@@ -6,9 +6,24 @@ import '../../../../theme/app_theme.dart';
 import '../../substitution/domain/substitution_models.dart';
 import '../domain/schedule_models.dart';
 import '../data/schedule_service.dart';
-import '../data/schedule_mock_data.dart';
+
 import '../../../../services/haptic_service.dart';
 import '../../../../utils/app_logger.dart';
+
+/// Local standard lesson times
+const Map<int, LessonTime> _standardLessonTimes = {
+  1: LessonTime(startTime: '08:00', endTime: '08:45'),
+  2: LessonTime(startTime: '08:55', endTime: '09:40'),
+  3: LessonTime(startTime: '09:50', endTime: '10:35'),
+  4: LessonTime(startTime: '10:55', endTime: '11:40'),
+  5: LessonTime(startTime: '11:50', endTime: '12:35'),
+  6: LessonTime(startTime: '12:45', endTime: '13:30'),
+  7: LessonTime(startTime: '13:35', endTime: '14:20'),
+  8: LessonTime(startTime: '14:25', endTime: '15:10'),
+  9: LessonTime(startTime: '15:15', endTime: '16:00'),
+  10: LessonTime(startTime: '16:05', endTime: '16:50'),
+  11: LessonTime(startTime: '16:55', endTime: '17:40'),
+};
 
 /// Selected class notifier
 class SelectedScheduleClassNotifier extends Notifier<String?> {
@@ -31,15 +46,12 @@ class SchedulePage extends ConsumerStatefulWidget {
 }
 
 class _SchedulePageState extends ConsumerState<SchedulePage> {
-  late List<SubstitutionEntry> _mockSubstitutions;
-
   @override
   void initState() {
     super.initState();
-    // Load mock data and auto-select 5a
+    // Load real schedule data and auto-select 5a
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      scheduleService.loadMockData();
-      _mockSubstitutions = ScheduleMockData.getMockSubstitutions();
+      await scheduleService.loadFromAssets();
       // Auto-select class 5a
       ref.read(selectedScheduleClassProvider.notifier).select('5a');
       if (mounted) setState(() {});
@@ -49,16 +61,19 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
   @override
   Widget build(BuildContext context) {
     final selectedClass = ref.watch(selectedScheduleClassProvider);
+    final isLoading = !scheduleService.isLoaded;
+    
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     
     return Column(
       children: [
         // Class selector
         _ClassSelector(
-          classes: scheduleService.classNames.isEmpty 
-              ? ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '7d', 
-                 '8a', '8b', '8c', '8d', '9a', '9b', '9c', '9d',
-                 '10a', '10b', '10c', '10d', '10e']
-              : scheduleService.classNames,
+          classes: scheduleService.classNames,
           selectedClass: selectedClass,
           onClassSelected: (className) {
             HapticService.light();
@@ -78,17 +93,12 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
         Expanded(
           child: selectedClass == null
               ? _EmptyClassView(
-                  onSelectClass: () => _showClassPicker(context, 
-                    scheduleService.classNames.isEmpty 
-                        ? ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '7d',
-                           '8a', '8b', '8c', '8d', '9a', '9b', '9c', '9d',
-                           '10a', '10b', '10c', '10d', '10e']
-                        : scheduleService.classNames),
+                  onSelectClass: () => _showClassPicker(context, scheduleService.classNames),
                 )
               : _WeekScheduleGrid(
                   className: selectedClass,
                   schedule: scheduleService.getScheduleForClass(selectedClass),
-                  substitutions: _mockSubstitutions,
+                  substitutions: scheduleService.getAllSubstitutions(selectedClass),
                 ),
         ),
       ],
@@ -197,64 +207,35 @@ class _ClassSelector extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: selectedClass == null
-                ? GestureDetector(
-                    onTap: () => _showClassDropdown(context),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Auswählen',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ],
+            child: GestureDetector(
+              onTap: () => _showClassDropdown(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      selectedClass ?? 'Auswählen',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
                       ),
                     ),
-                  )
-                : GestureDetector(
-                    onTap: () => _showClassDropdown(context),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            selectedClass!,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 18,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ],
-                      ),
+                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.white,
+                      size: 18,
                     ),
-                  ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -411,7 +392,7 @@ class _WeekScheduleGrid extends StatelessWidget {
           period: period,
           schedule: schedule,
           substitutionMap: substitutionMap,
-          timeInfo: standardLessonTimes[period],
+          timeInfo: _standardLessonTimes[period],
         );
       },
     );
@@ -570,20 +551,20 @@ class _DayCell extends StatelessWidget {
                         margin: const EdgeInsets.only(bottom: 2),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 5, 
-                          vertical: 2,
+                          vertical: 1,
                         ),
                         decoration: BoxDecoration(
                           color: isCancellation 
-                              ? const Color(0xFFEF4444)  // Red for cancellation
+                              ? const Color(0xFFEF4444)
                               : Color(substitution!.typeColor),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(3),
                         ),
                         child: Text(
                           isCancellation ? 'Entfall' : _getShortTypeLabel(substitution!.type),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
-                            fontSize: 8,
+                            fontSize: 7,
                           ),
                         ),
                       ),
@@ -597,7 +578,7 @@ class _DayCell extends StatelessWidget {
                               ? AppColors.secondaryText.withAlpha(150)
                               : AppColors.primaryText,
                           fontWeight: FontWeight.w700,
-                          fontSize: 12,
+                          fontSize: 11,
                           decoration: isCancellation
                               ? TextDecoration.lineThrough
                               : null,
@@ -619,7 +600,7 @@ class _DayCell extends StatelessWidget {
                               : (hasSubstitution 
                                   ? Color(substitution!.typeColor)
                                   : AppColors.secondaryText),
-                          fontSize: 9,
+                          fontSize: 8,
                           fontWeight: hasSubstitution ? FontWeight.w600 : null,
                           decoration: isCancellation
                               ? TextDecoration.lineThrough
@@ -908,10 +889,4 @@ class _DetailRow extends StatelessWidget {
   }
 }
 
-const List<String> germanWeekdays = [
-  'Montag',
-  'Dienstag',
-  'Mittwoch',
-  'Donnerstag',
-  'Freitag',
-];
+

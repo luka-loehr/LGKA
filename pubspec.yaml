@@ -115,6 +115,8 @@ flutter:
   # Assets configuration - using WebP format for better compression
   assets:
     - assets/images/app-icons/app-icon.webp
+    - assets/data/schedule_data.json
+    - assets/data/substitutions.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
