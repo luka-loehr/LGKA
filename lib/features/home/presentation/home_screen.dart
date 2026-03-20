@@ -30,11 +30,7 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _subFadeController;
-  late Animation<double> _subFadeAnimation;
-  bool _subAnimated = false;
+class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   // Schedule availability — mirrors SchedulePage logic exactly
   List<ScheduleItem> _availableFirstHalbjahr = [];
@@ -46,15 +42,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _subFadeController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    _subFadeAnimation = CurvedAnimation(
-      parent: _subFadeController,
-      curve: Curves.easeOutCubic,
-    );
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // 1. Boot substitution loading
       await ref.read(substitutionProvider.notifier).initialize();
@@ -85,7 +72,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   void dispose() {
-    _subFadeController.dispose();
     super.dispose();
   }
 
@@ -273,12 +259,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final subState = ref.watch(substitutionProvider);
     final isSubLoading = subState.isLoading || !subState.isInitialized;
 
-    if (!isSubLoading && !_subAnimated) {
-      _subAnimated = true;
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => _subFadeController.forward());
-    }
-
     // When main.dart finishes preloading the class index (which also downloads
     // the schedule PDF), re-run availability so we find the newly cached file.
     ref.listen<ScheduleState>(scheduleProvider, (prev, next) {
@@ -422,6 +402,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
+  /// Crossfades between states identified by [key]. Pure opacity — no scale.
+  Widget _fadeSwitch(String key, Widget child) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 450),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeIn,
+      transitionBuilder: (child, animation) =>
+          FadeTransition(opacity: animation, child: child),
+      child: KeyedSubtree(key: ValueKey(key), child: child),
+    );
+  }
+
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
@@ -435,19 +427,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // ── Substitution ──────────────────────────────────────────────────────────
 
   Widget _buildSubstitution(SubstitutionProviderState state, bool isLoading) {
+    final Widget child;
+    final String key;
+
     if (isLoading) {
-      return Column(children: [
+      key = 'sub-loading';
+      child = Column(children: [
         _SkeletonCard(),
         const SizedBox(height: 12),
         _SkeletonCard(),
       ]);
-    }
-    if (state.hasAnyError && !state.hasAnyData) {
-      return _buildSubError();
-    }
-    return FadeTransition(
-      opacity: _subFadeAnimation,
-      child: Column(children: [
+    } else if (state.hasAnyError && !state.hasAnyData) {
+      key = 'sub-error';
+      child = _buildSubError();
+    } else {
+      key = 'sub-content';
+      child = Column(children: [
         _SubstitutionCard(
           pdfState: state.todayState,
           label: AppLocalizations.of(context)!.today,
@@ -463,8 +458,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           onRetry: () =>
               ref.read(substitutionProvider.notifier).retryPdf(false),
         ),
-      ]),
-    );
+      ]);
+    }
+
+    return _fadeSwitch(key, child);
   }
 
   Widget _buildSubError() {
@@ -555,37 +552,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget _buildScheduleSection() {
     final scheduleState = ref.watch(scheduleProvider);
 
-    // Show spinner while loading schedule list or running availability check
-    // (mirrors SchedulePage: isLoading || _isCheckingAvailability || !isIndexBuilt)
     if (scheduleState.isLoading ||
         _isCheckingAvailability ||
         !scheduleState.isIndexBuilt) {
-      return _SkeletonCard();
+      return _fadeSwitch('sched-loading', _SkeletonCard());
     }
 
-    // Server-level error: couldn't even fetch the schedule list
     if (scheduleState.hasError) {
-      return _buildScheduleError(scheduleState);
+      return _fadeSwitch('sched-error', _buildScheduleError(scheduleState));
     }
 
-    // No schedule items at all from server
     if (!scheduleState.hasSchedules) {
-      return _buildScheduleEmpty();
+      return _fadeSwitch('sched-empty', _buildScheduleEmpty());
     }
 
-    // Schedules loaded but none available yet — nothing to show (same as old page)
     if (_availableFirstHalbjahr.isEmpty && _availableSecondHalbjahr.isEmpty) {
-      return const SizedBox.shrink();
+      return _fadeSwitch('sched-none', const SizedBox.shrink());
     }
 
-    // Prefer 2nd semester; fall back to 1st if 2nd is not available
     final activeGroup = _availableSecondHalbjahr.isNotEmpty
         ? _availableSecondHalbjahr
         : _availableFirstHalbjahr;
 
     final l10n = AppLocalizations.of(context)!;
     final items = <Widget>[];
-
     final g5 = activeGroup.where((s) => s.gradeLevel == 'Klassen 5-10').toList();
     final gJ = activeGroup.where((s) => s.gradeLevel == 'J11/J12').toList();
     for (final s in [...g5, ...gJ]) {
@@ -594,8 +584,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
     if (items.isNotEmpty && items.last is SizedBox) items.removeLast();
 
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start, children: items);
+    return _fadeSwitch(
+      'sched-content',
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: items),
+    );
   }
 
   Widget _buildInlineScheduleCard(
