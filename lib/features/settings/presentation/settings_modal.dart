@@ -57,14 +57,31 @@ class SettingsModal extends ConsumerWidget {
 
   Widget _buildThemeModeSetting(BuildContext context, WidgetRef ref) {
     final currentMode = ref.watch(preferencesManagerProvider).themeMode;
-    final isDark = context.appBrightness == Brightness.dark;
-    final segmentBg = isDark ? AppColors.appBackground : const Color(0xFFE5E5EA);
-    final activeBg = isDark ? const Color(0xFF3A3A3C) : Colors.white;
+    final accentColor = Theme.of(context).colorScheme.primary;
 
+    // Circle background and icon color for each mode
     final modes = [
-      ('dark', Icons.dark_mode_outlined, 'Dunkel'),
-      ('light', Icons.light_mode_outlined, 'Hell'),
-      ('system', Icons.brightness_auto_outlined, 'System'),
+      (
+        mode: 'dark',
+        label: 'Dunkel',
+        icon: Icons.dark_mode_rounded,
+        circleBg: const Color(0xFF1C1C1E),
+        iconColor: Colors.white,
+      ),
+      (
+        mode: 'light',
+        label: 'Hell',
+        icon: Icons.light_mode_rounded,
+        circleBg: const Color(0xFFF2F2F7),
+        iconColor: const Color(0xFF1C1C1E),
+      ),
+      (
+        mode: 'system',
+        label: 'System',
+        icon: Icons.brightness_auto_rounded,
+        circleBg: const Color(0xFF8E8E93),
+        iconColor: Colors.white,
+      ),
     ];
 
     return Column(
@@ -85,68 +102,63 @@ class SettingsModal extends ConsumerWidget {
               ),
         ),
         const SizedBox(height: 16),
-        Container(
-          decoration: BoxDecoration(
-            color: segmentBg,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: const EdgeInsets.all(4),
-          child: Row(
-            children: modes.map((entry) {
-              final (mode, icon, label) = entry;
-              final isSelected = currentMode == mode;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    HapticService.light();
-                    ref.read(preferencesManagerProvider.notifier).setThemeMode(mode);
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
+        Wrap(
+          spacing: 12,
+          runSpacing: 8,
+          children: modes.map((entry) {
+            final isSelected = currentMode == entry.mode;
+            return GestureDetector(
+              onTap: () {
+                HapticService.light();
+                ref.read(preferencesManagerProvider.notifier).setThemeMode(entry.mode);
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 60),
                     curve: Curves.easeInOut,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
-                      color: isSelected ? activeBg : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
+                      color: entry.circleBg,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected ? accentColor : Colors.transparent,
+                        width: isSelected ? 3 : 0,
+                      ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 1),
+                                color: accentColor.withValues(alpha: 0.5),
+                                blurRadius: 8,
+                                spreadRadius: 2,
                               ),
                             ]
                           : null,
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          icon,
-                          size: 20,
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.primary
-                              : context.appSecondaryText,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          label,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: isSelected
-                                    ? Theme.of(context).colorScheme.primary
-                                    : context.appSecondaryText,
-                                fontWeight: isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.normal,
-                              ),
-                        ),
-                      ],
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 60),
+                      opacity: 1.0,
+                      child: Icon(
+                        isSelected ? Icons.check_rounded : entry.icon,
+                        color: isSelected ? accentColor : entry.iconColor,
+                        size: 22,
+                      ),
                     ),
                   ),
-                ),
-              );
-            }).toList(),
-          ),
+                  const SizedBox(height: 6),
+                  Text(
+                    entry.label,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: isSelected ? accentColor : context.appSecondaryText,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
