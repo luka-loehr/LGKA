@@ -22,6 +22,8 @@ import '../../../../widgets/app_footer.dart';
 import '../../../../providers/app_providers.dart';
 import '../../../../l10n/app_localizations.dart';
 
+const double _kCardHeight = 80.0;
+
 /// Main home screen — scrollable dashboard
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -443,21 +445,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     } else {
       key = 'sub-content';
       child = Column(children: [
-        _SubstitutionCard(
-          pdfState: state.todayState,
-          label: AppLocalizations.of(context)!.today,
-          onTap: () => _openPdf(state, true),
-          onRetry: () =>
-              ref.read(substitutionProvider.notifier).retryPdf(true),
-        ),
+        _buildSubCard(state.todayState, state, true),
         const SizedBox(height: 12),
-        _SubstitutionCard(
-          pdfState: state.tomorrowState,
-          label: AppLocalizations.of(context)!.tomorrow,
-          onTap: () => _openPdf(state, false),
-          onRetry: () =>
-              ref.read(substitutionProvider.notifier).retryPdf(false),
-        ),
+        _buildSubCard(state.tomorrowState, state, false),
       ]);
     }
 
@@ -517,6 +507,121 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Widget _buildSubCard(
+      SubstitutionState pdfState, SubstitutionProviderState state, bool isToday) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final isDisabled = !pdfState.canDisplay;
+    final hasError = pdfState.error != null;
+    final isLoading = pdfState.isLoading;
+
+    String weekday = pdfState.weekday ?? '';
+    final date = pdfState.date ?? '';
+    final locale = Localizations.localeOf(context).languageCode;
+    if (locale == 'en' && weekday.isNotEmpty) {
+      const de2en = {
+        'Montag': 'Monday',
+        'Dienstag': 'Tuesday',
+        'Mittwoch': 'Wednesday',
+        'Donnerstag': 'Thursday',
+        'Freitag': 'Friday',
+        'Samstag': 'Saturday',
+        'Sonntag': 'Sunday',
+      };
+      weekday = de2en[weekday] ?? weekday;
+    }
+    final isWeekend = weekday == 'weekend' || weekday.isEmpty;
+    final l10n = AppLocalizations.of(context)!;
+    final dayDisplay = isWeekend
+        ? l10n.noInfoYet
+        : hasError
+            ? l10n.errorLoading
+            : weekday;
+
+    final row = Row(children: [
+      Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: isDisabled
+              ? primary.withValues(alpha: 0.08)
+              : primary.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: isLoading
+            ? Padding(
+                padding: const EdgeInsets.all(12),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation(
+                      primary.withValues(alpha: isDisabled ? 0.4 : 1.0)),
+                ),
+              )
+            : Icon(
+                hasError ? Icons.refresh : Icons.calendar_today_outlined,
+                color: isDisabled ? primary.withValues(alpha: 0.35) : primary,
+                size: 20,
+              ),
+      ),
+      const SizedBox(width: 14),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              dayDisplay,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: isDisabled
+                        ? context.appPrimaryText.withValues(alpha: 0.35)
+                        : context.appPrimaryText,
+                    fontWeight: FontWeight.w600,
+                    height: 1.1,
+                  ),
+            ),
+            if (date.isNotEmpty && !isDisabled && !hasError) ...[
+              const SizedBox(height: 2),
+              Text(
+                date,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: context.appSecondaryText,
+                    ),
+              ),
+            ],
+          ],
+        ),
+      ),
+      if (!isDisabled && !hasError)
+        Icon(Icons.arrow_forward_ios,
+            size: 14, color: context.appSecondaryText.withValues(alpha: 0.5)),
+      if (hasError)
+        Icon(Icons.refresh, size: 18, color: primary.withValues(alpha: 0.7)),
+    ]);
+
+    if (isDisabled) {
+      return Container(
+        height: _kCardHeight,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        decoration: BoxDecoration(
+          color: context.appSurfaceColor.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: row,
+      );
+    }
+
+    return _TappableCard(
+      onTap: () {
+        if (hasError) {
+          HapticService.medium();
+          ref.read(substitutionProvider.notifier).retryPdf(isToday);
+        } else {
+          HapticService.medium();
+          _openPdf(state, isToday);
+        }
+      },
+      child: row,
+    );
+  }
+
   void _openPdf(SubstitutionProviderState state, bool isToday) {
     final notifier = ref.read(substitutionProvider.notifier);
     if (!notifier.canOpenPdf(isToday)) return;
@@ -555,7 +660,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (scheduleState.isLoading ||
         _isCheckingAvailability ||
         !scheduleState.isIndexBuilt) {
-      return _fadeSwitch('sched-loading', _SkeletonCard());
+      return _fadeSwitch(
+        'sched-loading',
+        Column(children: [
+          const _SkeletonCard(),
+          const SizedBox(height: 12),
+          const _SkeletonCard(),
+        ]),
+      );
     }
 
     if (scheduleState.hasError) {
@@ -700,206 +812,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-// ── Substitution card ──────────────────────────────────────────────────────────
-
-class _SubstitutionCard extends ConsumerStatefulWidget {
-  final SubstitutionState pdfState;
-  final String label;
-  final VoidCallback onTap;
-  final VoidCallback onRetry;
-
-  const _SubstitutionCard({
-    required this.pdfState,
-    required this.label,
-    required this.onTap,
-    required this.onRetry,
-  });
-
-  @override
-  ConsumerState<_SubstitutionCard> createState() => _SubstitutionCardState();
-}
-
-class _SubstitutionCardState extends ConsumerState<_SubstitutionCard>
-    with SingleTickerProviderStateMixin {
-  bool _pressed = false;
-  late final AnimationController _scale;
-
-  @override
-  void initState() {
-    super.initState();
-    _scale = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 120),
-      lowerBound: 0.97,
-      upperBound: 1.0,
-      value: 1.0,
-    );
-  }
-
-  @override
-  void dispose() {
-    _scale.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isDisabled = !widget.pdfState.canDisplay;
-    final hasError = widget.pdfState.error != null;
-    final isLoading = widget.pdfState.isLoading;
-
-    return GestureDetector(
-      onTapDown: isDisabled ? null : (_) => _onDown(),
-      onTapUp: isDisabled ? null : (_) => _onUp(),
-      onTapCancel: isDisabled ? null : _onCancel,
-      onTap: isDisabled
-          ? null
-          : () {
-              if (hasError) {
-                HapticService.medium();
-                widget.onRetry();
-              } else {
-                HapticService.medium();
-                widget.onTap();
-              }
-            },
-      child: AnimatedBuilder(
-        animation: _scale,
-        builder: (context, child) => Transform.scale(
-          scale: _pressed ? _scale.value : 1.0,
-          child: _buildCard(context, isDisabled, hasError, isLoading),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCard(
-      BuildContext context, bool isDisabled, bool hasError, bool isLoading) {
-    final primary = Theme.of(context).colorScheme.primary;
-
-    String weekday = widget.pdfState.weekday ?? '';
-    final date = widget.pdfState.date ?? '';
-    final locale = Localizations.localeOf(context).languageCode;
-    if (locale == 'en' && weekday.isNotEmpty) {
-      const de2en = {
-        'Montag': 'Monday',
-        'Dienstag': 'Tuesday',
-        'Mittwoch': 'Wednesday',
-        'Donnerstag': 'Thursday',
-        'Freitag': 'Friday',
-        'Samstag': 'Saturday',
-        'Sonntag': 'Sunday',
-      };
-      weekday = de2en[weekday] ?? weekday;
-    }
-    final isWeekend = weekday == 'weekend' || weekday.isEmpty;
-    final dayDisplay = isWeekend
-        ? AppLocalizations.of(context)!.noInfoYet
-        : hasError
-            ? AppLocalizations.of(context)!.errorLoading
-            : weekday;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: isDisabled
-            ? context.appSurfaceColor.withValues(alpha: 0.5)
-            : context.appSurfaceColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: isDisabled || _pressed
-            ? null
-            : [
-                BoxShadow(
-                  color: primary.withValues(alpha: 0.08),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-        child: Row(children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: isDisabled
-                  ? primary.withValues(alpha: 0.08)
-                  : primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: isLoading
-                ? Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation(
-                          primary.withValues(alpha: isDisabled ? 0.4 : 1.0)),
-                    ),
-                  )
-                : Icon(
-                    hasError
-                        ? Icons.refresh
-                        : Icons.calendar_today_outlined,
-                    color: isDisabled
-                        ? primary.withValues(alpha: 0.35)
-                        : primary,
-                    size: 20,
-                  ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  dayDisplay,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: isDisabled
-                            ? context.appPrimaryText.withValues(alpha: 0.35)
-                            : context.appPrimaryText,
-                        fontWeight: FontWeight.w600,
-                        height: 1.1,
-                      ),
-                ),
-                if (date.isNotEmpty && !isDisabled && !hasError) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    date,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: context.appSecondaryText,
-                        ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          if (!isDisabled && !hasError)
-            Icon(Icons.arrow_forward_ios,
-                size: 14,
-                color: context.appSecondaryText.withValues(alpha: 0.5)),
-          if (hasError)
-            Icon(Icons.refresh,
-                size: 18, color: primary.withValues(alpha: 0.7)),
-        ]),
-      ),
-    );
-  }
-
-  void _onDown() {
-    setState(() => _pressed = true);
-    _scale.reverse();
-  }
-
-  void _onUp() {
-    setState(() => _pressed = false);
-    _scale.forward();
-  }
-
-  void _onCancel() {
-    setState(() => _pressed = false);
-    _scale.forward();
-  }
-}
 
 // ── Skeleton ───────────────────────────────────────────────────────────────────
 
@@ -937,7 +849,7 @@ class _SkeletonCardState extends State<_SkeletonCard>
       builder: (context, child) => Opacity(
         opacity: _opacity.value,
         child: Container(
-          height: 80,
+          height: _kCardHeight,
           decoration: BoxDecoration(
             color: context.appSurfaceColor,
             borderRadius: BorderRadius.circular(16),
@@ -1003,6 +915,7 @@ class _TappableCardState extends State<_TappableCard>
         builder: (context, child) => Transform.scale(
           scale: _pressed ? _scale.value : 1.0,
           child: Container(
+            height: _kCardHeight,
             padding:
                 const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             decoration: BoxDecoration(
