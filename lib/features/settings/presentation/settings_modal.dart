@@ -21,47 +21,35 @@ class SettingsModal extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Wrap(
       children: [
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-              child: Text(
+        Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, _getBottomPadding(context)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
                 AppLocalizations.of(context)!.settings,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: context.appPrimaryText,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + _getBottomPadding(context)),
-              decoration: BoxDecoration(
-                color: context.appBgColor,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              ),
-              child: Column(
-                children: [
-                  _buildThemeModeSetting(context, ref),
-                  const SizedBox(height: 20),
-                  _buildDivider(context),
-                  const SizedBox(height: 20),
-                  _buildAccentColorSetting(context, ref),
-                  const SizedBox(height: 20),
-                  _buildDivider(context),
-                  const SizedBox(height: 20),
-                  _buildLegalLinks(context),
-                  const SizedBox(height: 20),
-                  _buildDivider(context),
-                  const SizedBox(height: 20),
-                  _buildLastDownloadedNotice(context, ref),
-                ],
-              ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              _buildThemeModeSetting(context, ref),
+              const SizedBox(height: 20),
+              _buildDivider(context),
+              const SizedBox(height: 20),
+              _buildAccentColorSetting(context, ref),
+              const SizedBox(height: 20),
+              _buildDivider(context),
+              const SizedBox(height: 20),
+              _buildLegalLinks(context),
+              const SizedBox(height: 20),
+              _buildDivider(context),
+              const SizedBox(height: 20),
+              _buildLastDownloadedNotice(context, ref),
+            ],
+          ),
         ),
       ],
     );
