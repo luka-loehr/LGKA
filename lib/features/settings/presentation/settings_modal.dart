@@ -188,7 +188,7 @@ class SettingsModal extends ConsumerWidget {
                   color: colorPalette.color,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSelected ? context.appSurfaceColor : Colors.transparent,
+                    color: isSelected ? Colors.white : Colors.transparent,
                     width: isSelected ? 3 : 0,
                   ),
                   boxShadow: isSelected
