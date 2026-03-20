@@ -71,30 +71,14 @@ class SettingsModal extends ConsumerWidget {
     final currentMode = ref.watch(preferencesManagerProvider).themeMode;
     final accentColor = Theme.of(context).colorScheme.primary;
 
-    // Fixed circle colors — same in both dark and light mode so they
-    // always look intentional regardless of the current app theme.
+    final isDark = context.appBrightness == Brightness.dark;
+    final circleBg = isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5EA);
+    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+
     final modes = [
-      (
-        mode: 'dark',
-        label: 'Dunkel',
-        icon: Icons.dark_mode_rounded,
-        circleBg: const Color(0xFF3A3A3C),
-        iconColor: Colors.white,
-      ),
-      (
-        mode: 'light',
-        label: 'Hell',
-        icon: Icons.light_mode_rounded,
-        circleBg: const Color(0xFFFFD60A),
-        iconColor: const Color(0xFF1C1C1E),
-      ),
-      (
-        mode: 'system',
-        label: 'System',
-        icon: Icons.brightness_auto_rounded,
-        circleBg: const Color(0xFF636366),
-        iconColor: Colors.white,
-      ),
+      (mode: 'dark',   label: 'Dunkel', icon: Icons.dark_mode_rounded),
+      (mode: 'light',  label: 'Hell',   icon: Icons.light_mode_rounded),
+      (mode: 'system', label: 'System', icon: Icons.brightness_auto_rounded),
     ];
 
     return Column(
@@ -134,7 +118,7 @@ class SettingsModal extends ConsumerWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: entry.circleBg,
+                      color: circleBg,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isSelected ? accentColor : Colors.transparent,
@@ -150,14 +134,10 @@ class SettingsModal extends ConsumerWidget {
                             ]
                           : null,
                     ),
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 60),
-                      opacity: 1.0,
-                      child: Icon(
-                        isSelected ? Icons.check_rounded : entry.icon,
-                        color: entry.iconColor,
-                        size: 22,
-                      ),
+                    child: Icon(
+                      isSelected ? Icons.check_rounded : entry.icon,
+                      color: iconColor,
+                      size: 22,
                     ),
                   ),
                   const SizedBox(height: 6),
