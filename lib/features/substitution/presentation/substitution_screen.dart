@@ -221,7 +221,7 @@ class _LoadingView extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             AppLocalizations.of(context)!.loadingSubstitutions,
-            style: const TextStyle(color: AppColors.secondaryText),
+            style: TextStyle(color: context.appSecondaryText),
           ),
         ],
       ),
@@ -245,13 +245,13 @@ class _ErrorView extends StatelessWidget {
           Icon(
             Icons.calendar_today,
             size: 64,
-            color: AppColors.secondaryText.withValues(alpha: 0.5),
+            color: context.appSecondaryText.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
             AppLocalizations.of(context)!.serverConnectionFailed,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.primaryText,
+              color: context.appPrimaryText,
             ),
             textAlign: TextAlign.center,
           ),
@@ -259,7 +259,7 @@ class _ErrorView extends StatelessWidget {
           Text(
             AppLocalizations.of(context)!.serverConnectionHint,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.secondaryText,
+              color: context.appSecondaryText,
             ),
             textAlign: TextAlign.center,
           ),
@@ -371,12 +371,12 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
 
   Color _getBackgroundColor(bool isDisabled) {
     if (isDisabled) {
-      return AppColors.appSurface.withValues(alpha: 0.5);
+      return context.appSurfaceColor.withValues(alpha: 0.5);
     }
     if (_isPressed) {
-      return AppColors.appSurface.withValues(alpha: 0.8);
+      return context.appSurfaceColor.withValues(alpha: 0.8);
     }
-    return AppColors.appSurface;
+    return context.appSurfaceColor;
   }
 
   List<BoxShadow> _getBoxShadow(bool isDisabled) {
@@ -445,9 +445,9 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
             Text(
               displayText,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: isDisabled 
-                    ? AppColors.appOnSurface.withValues(alpha: 0.5)
-                    : AppColors.appOnSurface,
+                color: isDisabled
+                    ? context.appPrimaryText.withValues(alpha: 0.5)
+                    : context.appPrimaryText,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -456,7 +456,7 @@ class _PlanOptionButtonState extends ConsumerState<_PlanOptionButton>
               Text(
                 date,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.secondaryText,
+                  color: context.appSecondaryText,
                 ),
               ),
             ],

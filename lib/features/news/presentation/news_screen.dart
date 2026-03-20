@@ -56,10 +56,9 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     final newsState = ref.watch(newsProvider);
-    final backgroundColor = AppColors.appBackground;
-    final surfaceColor = AppColors.appSurface;
-    final primaryTextColor = AppColors.primaryText;
-    final secondaryTextColor = AppColors.secondaryText;
+    final surfaceColor = context.appSurfaceColor;
+    final primaryTextColor = context.appPrimaryText;
+    final secondaryTextColor = context.appSecondaryText;
     final accentColor = ref.watch(currentColorProvider);
 
     // Track spinner visibility and trigger haptic feedback when spinner disappears
@@ -98,10 +97,8 @@ class _NewsScreenState extends ConsumerState<NewsScreen> with TickerProviderStat
     }
 
     return Scaffold(
-      backgroundColor: backgroundColor,
       extendBody: true,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(

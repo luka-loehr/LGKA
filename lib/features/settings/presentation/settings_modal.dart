@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 import '../../../../theme/app_theme.dart';
+import '../../../../providers/app_providers.dart';
 import '../../../../providers/color_provider.dart';
 import '../../substitution/application/substitution_provider.dart';
 import '../../../../services/haptic_service.dart';
@@ -34,7 +35,7 @@ class SettingsModal extends ConsumerWidget {
               Text(
                 AppLocalizations.of(context)!.settings,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: AppColors.appOnSurface,
+                  color: context.appPrimaryText,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -45,24 +46,125 @@ class SettingsModal extends ConsumerWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.appSurface,
+                  color: context.appBgColor,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
                   children: [
+                    _buildThemeModeSetting(context, ref),
+                    const SizedBox(height: 20),
+                    _buildDivider(context),
+                    const SizedBox(height: 20),
                     _buildAccentColorSetting(context, ref),
                     const SizedBox(height: 20),
-                    _buildDivider(),
+                    _buildDivider(context),
                     const SizedBox(height: 20),
                     _buildLegalLinks(context),
                     const SizedBox(height: 20),
-                    _buildDivider(),
+                    _buildDivider(context),
                     const SizedBox(height: 20),
                     _buildLastDownloadedNotice(context, ref),
                   ],
                 ),
               ),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildThemeModeSetting(BuildContext context, WidgetRef ref) {
+    final currentMode = ref.watch(preferencesManagerProvider).themeMode;
+    final isDark = context.appBrightness == Brightness.dark;
+    final segmentBg = isDark ? AppColors.appBackground : const Color(0xFFE5E5EA);
+    final activeBg = isDark ? const Color(0xFF3A3A3C) : Colors.white;
+
+    final modes = [
+      ('dark', Icons.dark_mode_outlined, 'Dunkel'),
+      ('light', Icons.light_mode_outlined, 'Hell'),
+      ('system', Icons.brightness_auto_outlined, 'System'),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Erscheinungsbild',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: context.appPrimaryText,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Wähle zwischen hellem und dunklem Modus.',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: context.appSecondaryText,
+              ),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          decoration: BoxDecoration(
+            color: segmentBg,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.all(4),
+          child: Row(
+            children: modes.map((entry) {
+              final (mode, icon, label) = entry;
+              final isSelected = currentMode == mode;
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    HapticService.light();
+                    ref.read(preferencesManagerProvider.notifier).setThemeMode(mode);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    curve: Curves.easeInOut,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected ? activeBg : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          icon,
+                          size: 20,
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.primary
+                              : context.appSecondaryText,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          label,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : context.appSecondaryText,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -79,7 +181,7 @@ class SettingsModal extends ConsumerWidget {
         Text(
           AppLocalizations.of(context)!.accentColor,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.primaryText,
+                color: context.appPrimaryText,
                 fontWeight: FontWeight.w600,
               ),
         ),
@@ -87,7 +189,7 @@ class SettingsModal extends ConsumerWidget {
         Text(
           AppLocalizations.of(context)!.chooseAccentColor,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.secondaryText,
+                color: context.appSecondaryText,
               ),
         ),
         const SizedBox(height: 16),
@@ -110,7 +212,7 @@ class SettingsModal extends ConsumerWidget {
                   color: colorPalette.color,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSelected ? Colors.white : Colors.transparent,
+                    color: isSelected ? context.appSurfaceColor : Colors.transparent,
                     width: isSelected ? 3 : 0,
                   ),
                   boxShadow: isSelected
@@ -143,10 +245,10 @@ class SettingsModal extends ConsumerWidget {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Container(
       height: 1,
-      color: Colors.white.withValues(alpha: 0.1),
+      color: context.appDividerColor,
     );
   }
 
@@ -187,7 +289,7 @@ class SettingsModal extends ConsumerWidget {
           children: [
             Icon(
               Icons.bug_report_outlined,
-              color: AppColors.secondaryText,
+              color: context.appSecondaryText,
               size: 18,
             ),
             const SizedBox(width: 12),
@@ -195,14 +297,14 @@ class SettingsModal extends ConsumerWidget {
               child: Text(
                 AppLocalizations.of(context)!.bugReport,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.secondaryText,
+                  color: context.appSecondaryText,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: AppColors.secondaryText.withValues(alpha: 0.6),
+              color: context.appSecondaryText.withValues(alpha: 0.6),
               size: 16,
             ),
           ],
@@ -224,7 +326,7 @@ class SettingsModal extends ConsumerWidget {
           children: [
             Icon(
               Icons.favorite_outline,
-              color: AppColors.secondaryText,
+              color: context.appSecondaryText,
               size: 18,
             ),
             const SizedBox(width: 12),
@@ -232,14 +334,14 @@ class SettingsModal extends ConsumerWidget {
               child: Text(
                 AppLocalizations.of(context)!.supportProject,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.secondaryText,
+                  color: context.appSecondaryText,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
             Icon(
               Icons.open_in_new,
-              color: AppColors.secondaryText.withValues(alpha: 0.6),
+              color: context.appSecondaryText.withValues(alpha: 0.6),
               size: 16,
             ),
           ],
@@ -261,7 +363,7 @@ class SettingsModal extends ConsumerWidget {
           children: [
             Icon(
               icon,
-              color: AppColors.secondaryText,
+              color: context.appSecondaryText,
               size: 18,
             ),
             const SizedBox(width: 12),
@@ -269,14 +371,14 @@ class SettingsModal extends ConsumerWidget {
               child: Text(
                 text,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.secondaryText,
+                  color: context.appSecondaryText,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
             Icon(
               Icons.open_in_new,
-              color: AppColors.secondaryText.withValues(alpha: 0.6),
+              color: context.appSecondaryText.withValues(alpha: 0.6),
               size: 16,
             ),
           ],
@@ -315,7 +417,7 @@ class SettingsModal extends ConsumerWidget {
     return Text(
       AppLocalizations.of(context)!.lastDownloaded(formattedTime),
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-        color: AppColors.secondaryText,
+        color: context.appSecondaryText,
       ),
       textAlign: TextAlign.center,
     );

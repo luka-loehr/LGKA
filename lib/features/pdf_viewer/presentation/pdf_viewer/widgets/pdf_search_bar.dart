@@ -146,7 +146,7 @@ class _PdfSearchBarState extends State<PdfSearchBar>
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
         hintText: l10n.searchHint,
-        prefixIcon: const Icon(Icons.school, color: AppColors.secondaryText),
+        prefixIcon: Icon(Icons.school, color: context.appSecondaryText),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
@@ -161,11 +161,11 @@ class _PdfSearchBarState extends State<PdfSearchBar>
           ),
         ),
         filled: true,
-        fillColor: AppColors.appBackground,
+        fillColor: context.appBgColor,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: AppColors.primaryText,
+            color: context.appPrimaryText,
           ),
       onSubmitted: (_) {
         if (_canSubmit) {

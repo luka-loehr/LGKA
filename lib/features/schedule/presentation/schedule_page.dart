@@ -234,7 +234,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     );
 
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _buildBody(scheduleState),
@@ -254,8 +253,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
             const SizedBox(height: 16),
             Text(
               AppLocalizations.of(context)!.checkingAvailability,
-              style: const TextStyle(
-                color: AppColors.secondaryText,
+              style: TextStyle(
+                color: context.appSecondaryText,
                 fontSize: 16,
               ),
             ),
@@ -288,8 +287,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
             const SizedBox(height: 16),
             Text(
               AppLocalizations.of(context)!.loadingSchedules,
-              style: const TextStyle(
-                color: AppColors.secondaryText,
+              style: TextStyle(
+                color: context.appSecondaryText,
                 fontSize: 16,
               ),
             ),
@@ -325,13 +324,13 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
             Icon(
               Icons.schedule_outlined,
               size: 64,
-              color: AppColors.secondaryText.withValues(alpha: 0.5),
+              color: context.appSecondaryText.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
               AppLocalizations.of(context)!.serverConnectionFailed,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.primaryText,
+                color: context.appPrimaryText,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -341,7 +340,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
             Text(
               AppLocalizations.of(context)!.serverConnectionHint,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.secondaryText,
+                color: context.appSecondaryText,
               ),
               textAlign: TextAlign.center,
               maxLines: 3,
@@ -376,16 +375,16 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       padding: const EdgeInsets.only(top: 24.0),
       child: Column(
         children: [
-          const Icon(
+          Icon(
             Icons.schedule,
-            color: AppColors.secondaryText,
+            color: context.appSecondaryText,
             size: 64,
           ),
           const SizedBox(height: 16),
           Text(
             AppLocalizations.of(context)!.noSchedulesAvailable,
-            style: const TextStyle(
-              color: AppColors.primaryText,
+            style: TextStyle(
+              color: context.appPrimaryText,
               fontSize: 18,
               fontWeight: FontWeight.w500,
             ),
@@ -393,8 +392,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           const SizedBox(height: 8),
           Text(
             AppLocalizations.of(context)!.tryAgainLater,
-            style: const TextStyle(
-              color: AppColors.secondaryText,
+            style: TextStyle(
+              color: context.appSecondaryText,
               fontSize: 14,
             ),
           ),
@@ -430,7 +429,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
               // Separator if both semesters exist
               if (hasBothSemesters) ...[
                 const SizedBox(height: 24),
-                Divider(height: 1, color: AppColors.secondaryText.withValues(alpha: 0.2)),
+                Divider(height: 1, color: context.appSecondaryText.withValues(alpha: 0.2)),
                 const SizedBox(height: 24),
               ],
               
@@ -463,7 +462,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         decoration: BoxDecoration(
-          color: AppColors.appSurface,
+          color: context.appSurfaceColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -495,7 +494,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
                   Text(
                     _localizeGradeLevel(context, schedule.gradeLevel),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.primaryText,
+                      color: context.appPrimaryText,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -503,15 +502,15 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
                   Text(
                     _localizeHalbjahr(context, schedule.halbjahr),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.secondaryText,
+                      color: context.appSecondaryText,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios,
-              color: AppColors.secondaryText,
+              color: context.appSecondaryText,
               size: 16,
             ),
           ],
