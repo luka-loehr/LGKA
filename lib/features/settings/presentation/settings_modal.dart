@@ -71,27 +71,28 @@ class SettingsModal extends ConsumerWidget {
     final currentMode = ref.watch(preferencesManagerProvider).themeMode;
     final accentColor = Theme.of(context).colorScheme.primary;
 
-    // Circle background and icon color for each mode
+    // Fixed circle colors — same in both dark and light mode so they
+    // always look intentional regardless of the current app theme.
     final modes = [
       (
         mode: 'dark',
         label: 'Dunkel',
         icon: Icons.dark_mode_rounded,
-        circleBg: const Color(0xFF1C1C1E),
+        circleBg: const Color(0xFF3A3A3C),
         iconColor: Colors.white,
       ),
       (
         mode: 'light',
         label: 'Hell',
         icon: Icons.light_mode_rounded,
-        circleBg: const Color(0xFFF2F2F7),
+        circleBg: const Color(0xFFFFD60A),
         iconColor: const Color(0xFF1C1C1E),
       ),
       (
         mode: 'system',
         label: 'System',
         icon: Icons.brightness_auto_rounded,
-        circleBg: const Color(0xFF8E8E93),
+        circleBg: const Color(0xFF636366),
         iconColor: Colors.white,
       ),
     ];
@@ -154,7 +155,7 @@ class SettingsModal extends ConsumerWidget {
                       opacity: 1.0,
                       child: Icon(
                         isSelected ? Icons.check_rounded : entry.icon,
-                        color: isSelected ? accentColor : entry.iconColor,
+                        color: entry.iconColor,
                         size: 22,
                       ),
                     ),
