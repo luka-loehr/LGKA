@@ -977,6 +977,10 @@ abstract class AppLocalizations {
   /// **'Error loading weather data'**
   String get errorLoadingWeather;
 
+  String get greetingMorning;
+  String get greetingDay;
+  String get greetingEvening;
+
   /// No description provided for @supportProject.
   ///
   /// In en, this message translates to:
