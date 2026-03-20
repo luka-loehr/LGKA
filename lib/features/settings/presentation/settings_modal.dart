@@ -69,8 +69,6 @@ class SettingsModal extends ConsumerWidget {
 
   Widget _buildThemeModeSetting(BuildContext context, WidgetRef ref) {
     final currentMode = ref.watch(preferencesManagerProvider).themeMode;
-    final accentColor = Theme.of(context).colorScheme.primary;
-
     final isDark = context.appBrightness == Brightness.dark;
     final circleBg = isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5EA);
     final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
@@ -121,13 +119,13 @@ class SettingsModal extends ConsumerWidget {
                       color: circleBg,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: isSelected ? accentColor : Colors.transparent,
+                        color: isSelected ? Colors.white : Colors.transparent,
                         width: isSelected ? 3 : 0,
                       ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: accentColor.withValues(alpha: 0.5),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 blurRadius: 8,
                                 spreadRadius: 2,
                               ),
@@ -136,17 +134,9 @@ class SettingsModal extends ConsumerWidget {
                     ),
                     child: Icon(
                       isSelected ? Icons.check_rounded : entry.icon,
-                      color: iconColor,
+                      color: isSelected ? Colors.white : iconColor,
                       size: 22,
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    entry.label,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: isSelected ? accentColor : context.appSecondaryText,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                        ),
                   ),
                 ],
               ),
