@@ -21,54 +21,47 @@ class SettingsModal extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Wrap(
       children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(
-            16, 
-            16, 
-            16, 
-            _getBottomPadding(context),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: Text(
                 AppLocalizations.of(context)!.settings,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: context.appPrimaryText,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              
-              const SizedBox(height: 16),
-              
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: context.appBgColor,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    _buildThemeModeSetting(context, ref),
-                    const SizedBox(height: 20),
-                    _buildDivider(context),
-                    const SizedBox(height: 20),
-                    _buildAccentColorSetting(context, ref),
-                    const SizedBox(height: 20),
-                    _buildDivider(context),
-                    const SizedBox(height: 20),
-                    _buildLegalLinks(context),
-                    const SizedBox(height: 20),
-                    _buildDivider(context),
-                    const SizedBox(height: 20),
-                    _buildLastDownloadedNotice(context, ref),
-                  ],
-                ),
+            ),
+
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + _getBottomPadding(context)),
+              decoration: BoxDecoration(
+                color: context.appBgColor,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
               ),
-            ],
-          ),
+              child: Column(
+                children: [
+                  _buildThemeModeSetting(context, ref),
+                  const SizedBox(height: 20),
+                  _buildDivider(context),
+                  const SizedBox(height: 20),
+                  _buildAccentColorSetting(context, ref),
+                  const SizedBox(height: 20),
+                  _buildDivider(context),
+                  const SizedBox(height: 20),
+                  _buildLegalLinks(context),
+                  const SizedBox(height: 20),
+                  _buildDivider(context),
+                  const SizedBox(height: 20),
+                  _buildLastDownloadedNotice(context, ref),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
