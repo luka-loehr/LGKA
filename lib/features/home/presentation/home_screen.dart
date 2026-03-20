@@ -304,11 +304,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       elevation: 0,
       scrolledUnderElevation: 0,
       title: Text(
-        'LGKA+',
+        _greeting(context),
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: context.appPrimaryText,
               fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
             ),
       ),
       actions: [
@@ -381,9 +380,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           padding: const EdgeInsets.symmetric(horizontal: 20),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
-              const SizedBox(height: 8),
-              _buildGreeting(),
-              const SizedBox(height: 28),
+              const SizedBox(height: 4),
+              _buildDateLine(),
+              const SizedBox(height: 24),
               _buildSectionHeader(
                   AppLocalizations.of(context)!.substitutionPlan),
               const SizedBox(height: 12),
@@ -402,35 +401,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   // ── Greeting ──────────────────────────────────────────────────────────────
 
-  Widget _buildGreeting() {
+  String _greeting(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final hour = DateTime.now().hour;
-    final greeting = hour < 11
-        ? 'Guten Morgen'
-        : hour < 18
-            ? 'Guten Tag'
-            : 'Guten Abend';
-    final date = DateFormat('EEEE, d. MMMM', 'de_DE').format(DateTime.now());
+    if (hour < 11) return l10n.greetingMorning;
+    if (hour < 18) return l10n.greetingDay;
+    return l10n.greetingEvening;
+  }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          greeting,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: context.appPrimaryText,
-                fontWeight: FontWeight.w800,
-                height: 1.1,
-              ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          date,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: context.appSecondaryText,
-                fontWeight: FontWeight.w500,
-              ),
-        ),
-      ],
+  Widget _buildDateLine() {
+    final locale = Localizations.localeOf(context).languageCode;
+    final date = DateFormat('EEEE, d. MMMM', locale == 'de' ? 'de_DE' : 'en_US')
+        .format(DateTime.now());
+    return Text(
+      date,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: context.appSecondaryText,
+            fontWeight: FontWeight.w500,
+          ),
     );
   }
 
