@@ -254,32 +254,6 @@ final themeModeProvider = Provider<ThemeMode>((ref) {
   }
 });
 
-// App State Providers
-class IsFirstLaunchNotifier extends Notifier<bool> {
-  @override
-  bool build() => true;
-}
-
-class IsAuthenticatedNotifier extends Notifier<bool> {
-  @override
-  bool build() => false;
-}
-
-class IsLoadingNotifier extends Notifier<bool> {
-  @override
-  bool build() => false;
-}
-
-class CurrentRouteNotifier extends Notifier<String> {
-  @override
-  String build() => '/welcome';
-}
-
-final isFirstLaunchProvider = NotifierProvider<IsFirstLaunchNotifier, bool>(IsFirstLaunchNotifier.new);
-final isAuthenticatedProvider = NotifierProvider<IsAuthenticatedNotifier, bool>(IsAuthenticatedNotifier.new);
-final isLoadingProvider = NotifierProvider<IsLoadingNotifier, bool>(IsLoadingNotifier.new);
-final currentRouteProvider = NotifierProvider<CurrentRouteNotifier, String>(CurrentRouteNotifier.new);
-
 // Schedule Provider
 final scheduleServiceProvider = Provider<ScheduleService>((ref) {
   return ScheduleService();

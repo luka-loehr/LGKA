@@ -1,0 +1,6349 @@
+{
+  "schoolYear": "2025-2026",
+  "lastUpdated": "2026-02-11T00:00:00Z",
+  "classSchedules": {
+    "5a": {
+      "className": "5a",
+      "classTeachers": [
+        "Blum",
+        "Weber"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "kR eR eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "Hum",
+          "room": "109"
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Mus",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Spo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Cop Zil Shn",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "D",
+          "teacher": "Blm",
+          "room": "109"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Hum",
+          "teacher": "",
+          "room": "109"
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Smi",
+          "teacher": "",
+          "room": "MUSIK"
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bm",
+          "teacher": "",
+          "room": "WB1"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Geo",
+          "teacher": "Kop",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Spo .Swi",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Bio",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "109",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Bm Bur",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Len",
+          "teacher": "",
+          "room": "NWT1"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Web",
+          "teacher": "",
+          "room": "109"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Hum",
+          "teacher": "",
+          "room": "109"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "M",
+          "teacher": "Web",
+          "room": "109"
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Bk",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Blm",
+          "teacher": "",
+          "room": "109"
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "KL .KL",
+          "teacher": "Blm Web",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Blm",
+          "teacher": "",
+          "room": "109"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Sir",
+          "teacher": "",
+          "room": "BKOG"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Web",
+          "teacher": "",
+          "room": "109"
+        }
+      ]
+    },
+    "5b": {
+      "className": "5b",
+      "classTeachers": [
+        "Balzer",
+        "Hoeffer"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "kR .eR eth eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Spo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "M",
+          "teacher": "Hof",
+          "room": "110"
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Spo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Cop Zil Shn Shö",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Ste",
+          "teacher": "",
+          "room": "WB2"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "KL .KL",
+          "teacher": "Baz Hof",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Hof",
+          "teacher": "",
+          "room": "110"
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Ste",
+          "teacher": "",
+          "room": "WB2"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Geo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Bk",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Hof",
+          "teacher": "",
+          "room": "110"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "309",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Baz",
+          "teacher": "",
+          "room": "110"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Lev",
+          "teacher": "",
+          "room": "BKOG"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Baz",
+          "teacher": "",
+          "room": "110"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "E",
+          "teacher": "Lm",
+          "room": "110"
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Bio",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Mus .Mus",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "D",
+          "teacher": "Baz",
+          "room": "110"
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Lm",
+          "teacher": "",
+          "room": "110"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Shö",
+          "teacher": "",
+          "room": "BIOHS"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Lm",
+          "teacher": "",
+          "room": "110"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Rhe Kau",
+          "teacher": "",
+          "room": "MUSIKMUSIK"
+        }
+      ]
+    },
+    "5c": {
+      "className": "5c",
+      "classTeachers": [
+        "Bartl",
+        "Bernet"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "kR .eR eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Spo .Swi",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Spo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bk",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Cop Zil Shö",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Mit Bur",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Bet",
+          "teacher": "",
+          "room": "201"
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Mit",
+          "teacher": "",
+          "room": "WB1"
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Now",
+          "teacher": "",
+          "room": "BKUG"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bio",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "Btl",
+          "room": "201"
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "Bet",
+          "room": "201"
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Jak",
+          "teacher": "",
+          "room": "BIOHS"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Bet",
+          "teacher": "",
+          "room": "201"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "KL .KL",
+          "teacher": "Btl Bet",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Btl",
+          "teacher": "",
+          "room": "201"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Geo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Mus",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "201",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bur",
+          "teacher": "",
+          "room": "201"
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Btl",
+          "teacher": "",
+          "room": "201"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Bur",
+          "teacher": "",
+          "room": "201"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Bie",
+          "teacher": "",
+          "room": "MUSIK"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "Bur",
+          "room": "201"
+        }
+      ]
+    },
+    "6a": {
+      "className": "6a",
+      "classTeachers": [
+        "Schneider",
+        "Naamnih"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Bk",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "IuM",
+          "teacher": "Fei",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "F .L",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Hof",
+          "teacher": "",
+          "room": "209"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Liw",
+          "teacher": "",
+          "room": "209"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Hld",
+          "teacher": "",
+          "room": "BKUG"
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "401",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Glz Stz",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Mus",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Liw",
+          "teacher": "",
+          "room": "209"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Shn",
+          "teacher": "",
+          "room": "209"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Stü Ste Pie",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Hof",
+          "teacher": "",
+          "room": "209"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bie",
+          "teacher": "",
+          "room": "MUSIK"
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "F .L",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "kR .eR eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Geo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "WB1 WB2",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Glz Stz",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Shn",
+          "teacher": "",
+          "room": "209"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Cop Liw Shn",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Kop",
+          "teacher": "",
+          "room": "209"
+        },
+        {
+          "period": 7,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "KL .KL",
+          "teacher": "Shn Nam",
+          "room": ""
+        }
+      ]
+    },
+    "6b": {
+      "className": "6b",
+      "classTeachers": [
+        "Smikale",
+        "Stürmer"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Geo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "L .F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Smi",
+          "teacher": "",
+          "room": "111"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Lm",
+          "teacher": "",
+          "room": "111"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Mit",
+          "teacher": "",
+          "room": "111"
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Stü",
+          "teacher": "",
+          "room": "111"
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Stz Loi",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "IuM",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Mit",
+          "teacher": "",
+          "room": "111"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Ste Mit",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Lm",
+          "teacher": "",
+          "room": "111"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Smi",
+          "teacher": "",
+          "room": "111"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "401",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bk",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "L .F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Mus",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "kR .eR eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "KL .KL",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Lev",
+          "teacher": "",
+          "room": "BKOG"
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Stz Loi",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Smi",
+          "teacher": "",
+          "room": "MUSIK"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Cop Liw Shn",
+          "teacher": "",
+          "room": ""
+        }
+      ]
+    },
+    "6c": {
+      "className": "6c",
+      "classTeachers": [
+        "Baumer",
+        "Döser"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "IuM",
+          "teacher": "Fei",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "401",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Bm",
+          "teacher": "",
+          "room": "112"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Hir",
+          "teacher": "",
+          "room": "112"
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Liw",
+          "teacher": "",
+          "room": "112"
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Hir",
+          "teacher": "",
+          "room": "112"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bk",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Mus",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Dös",
+          "teacher": "",
+          "room": "BKOG"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Dom",
+          "teacher": "",
+          "room": "112"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Stü Ste Pie",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Bie",
+          "teacher": "",
+          "room": "MUSIK"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bm",
+          "teacher": "",
+          "room": "112"
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Geo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "kR .eR eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "WB1 WB2",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Kop",
+          "teacher": "",
+          "room": "309"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Liw",
+          "teacher": "",
+          "room": "112"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Cop Liw Hei",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Dom",
+          "teacher": "",
+          "room": "112"
+        },
+        {
+          "period": 7,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "KL .KL",
+          "teacher": "",
+          "room": ""
+        }
+      ]
+    },
+    "7a": {
+      "className": "7a",
+      "classTeachers": [
+        "Brucher-L.",
+        "Lenz"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "L .F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "eR .kR eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Geo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Len",
+          "teacher": "",
+          "room": "102"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Kob Btl",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Zil Cop Mai",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Shö",
+          "teacher": "",
+          "room": "102"
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Stt",
+          "teacher": "",
+          "room": "102"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bk",
+          "teacher": "Now",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Vot",
+          "teacher": "",
+          "room": "PHHS"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Blb",
+          "teacher": "",
+          "room": "102"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Stt",
+          "teacher": "",
+          "room": "102"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Kub Dom",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "BKOG",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Mus",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "L .F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Smi",
+          "teacher": "",
+          "room": "MUSIK"
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Vog",
+          "teacher": "",
+          "room": "102"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Len",
+          "teacher": "",
+          "room": "102"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Kob Btl",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Blb",
+          "teacher": "",
+          "room": "102"
+        },
+        {
+          "period": 7,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "KL",
+          "teacher": "Blb",
+          "room": "102"
+        },
+        {
+          "period": 7,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "FUF",
+          "teacher": "Btl",
+          "room": "102"
+        },
+        {
+          "period": 7,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "FUL",
+          "teacher": "Kob",
+          "room": "102"
+        },
+        {
+          "period": 8,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Inf",
+          "teacher": "Del",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "401",
+          "teacher": "",
+          "room": ""
+        }
+      ]
+    },
+    "7b": {
+      "className": "7b",
+      "classTeachers": [
+        "Stein",
+        "Rhee-Dantscher"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "L .F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "eR .kR eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Geo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Zep",
+          "teacher": "",
+          "room": "210"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Kob Nm",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Zil Cop Mai",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Ste",
+          "teacher": "",
+          "room": "210"
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Kop",
+          "teacher": "",
+          "room": "210"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Bio",
+          "teacher": "Sid",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Mus .Mus",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bur",
+          "teacher": "",
+          "room": "210"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Glz",
+          "teacher": "",
+          "room": "210"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "BIOHS",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Kub Dom",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Rhe Kau",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "L .F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Ste",
+          "teacher": "",
+          "room": "210"
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Bur",
+          "teacher": "",
+          "room": "210"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Glz",
+          "teacher": "",
+          "room": "210"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Kob Nm",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Ro",
+          "teacher": "",
+          "room": "PHHS"
+        },
+        {
+          "period": 7,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "KL",
+          "teacher": "Ste",
+          "room": "210"
+        },
+        {
+          "period": 7,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "FUF",
+          "teacher": "Nm",
+          "room": "210"
+        },
+        {
+          "period": 7,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "FUL",
+          "teacher": "Kob",
+          "room": "102"
+        },
+        {
+          "period": 8,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Inf",
+          "teacher": "Hel",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "401",
+          "teacher": "",
+          "room": ""
+        }
+      ]
+    },
+    "7c": {
+      "className": "7c",
+      "classTeachers": [
+        "Mehne",
+        "Zepfel"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bk",
+          "teacher": "Sir",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "eR .eth kR",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "BKOG",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Kas",
+          "teacher": "",
+          "room": "203"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Zil Shö Cop",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Zep",
+          "teacher": "",
+          "room": "203"
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Meh",
+          "teacher": "",
+          "room": "203"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Mus .Mus",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Zep",
+          "teacher": "",
+          "room": "203"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Bas",
+          "teacher": "",
+          "room": "203"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Vot",
+          "teacher": "",
+          "room": "PHHS"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Rhe Kau",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bas",
+          "teacher": "",
+          "room": "203"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Geo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "M",
+          "teacher": "Meh",
+          "room": "203"
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "M",
+          "teacher": "Meh",
+          "room": "203"
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Kop",
+          "teacher": "",
+          "room": "203"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Stü Pie",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Kas",
+          "teacher": "",
+          "room": "203"
+        },
+        {
+          "period": 7,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "WB1 WB1 EBad2EBad2",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 7,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 7,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "FUF",
+          "teacher": "Glz",
+          "room": "203"
+        },
+        {
+          "period": 7,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "KL",
+          "teacher": "Meh",
+          "room": "203"
+        },
+        {
+          "period": 8,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Zep",
+          "teacher": "",
+          "room": "203"
+        }
+      ]
+    },
+    "7d": {
+      "className": "7d",
+      "classTeachers": [
+        "Lohmann",
+        "Heinz"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Mus",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "eR .eth kR",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Meh",
+          "teacher": "",
+          "room": "212"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Smi",
+          "teacher": "",
+          "room": "MUSIK"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Zil Shö Cop",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Meh",
+          "teacher": "",
+          "room": "212"
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Lm",
+          "teacher": "",
+          "room": "212"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Geo",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Bio",
+          "teacher": "Hei",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Hei",
+          "teacher": "",
+          "room": "212"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "BIOPR",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Höh",
+          "teacher": "",
+          "room": "212"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Now",
+          "teacher": "",
+          "room": "212"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Höh",
+          "teacher": "",
+          "room": "212"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "F",
+          "teacher": "Now",
+          "room": "212"
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Hld",
+          "teacher": "",
+          "room": "212"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Lm",
+          "teacher": "",
+          "room": "212"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Stü Pie",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Hof",
+          "teacher": "",
+          "room": "NWT2"
+        },
+        {
+          "period": 7,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "KL",
+          "teacher": "Lm",
+          "room": "212"
+        },
+        {
+          "period": 7,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "WB1 WB1 EBad2EBad2",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "F",
+          "teacher": "Now",
+          "room": "212"
+        },
+        {
+          "period": 9,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "FUF",
+          "teacher": "Now",
+          "room": "211"
+        }
+      ]
+    },
+    "8a": {
+      "className": "8a",
+      "classTeachers": [
+        "Bachmor",
+        "Burger"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bur",
+          "teacher": "",
+          "room": "311"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Bch",
+          "teacher": "",
+          "room": "311"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Bau",
+          "teacher": "",
+          "room": "PHHS"
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Bet Man",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Hum",
+          "teacher": "",
+          "room": "311"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Mus",
+          "teacher": "Bie",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Ch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "Hum",
+          "room": "311"
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "L .F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "MUSIK",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Ger",
+          "teacher": "",
+          "room": "CHHS"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Kob Brn",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bur",
+          "teacher": "",
+          "room": "311"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Kas",
+          "teacher": "",
+          "room": "311"
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Bio",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "L .F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bch",
+          "teacher": "",
+          "room": "311"
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Bet Man",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "KL",
+          "teacher": "Bch",
+          "room": "311"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Jak",
+          "teacher": "",
+          "room": "BIOHS"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Kob Brn",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "WBS",
+          "teacher": "Baz",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Stt Bch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "311",
+          "teacher": "",
+          "room": ""
+        }
+      ]
+    },
+    "8b": {
+      "className": "8b",
+      "classTeachers": [
+        "Bauer",
+        "Breier"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "GK",
+          "teacher": "Brr",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bau",
+          "teacher": "",
+          "room": "309"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Kub",
+          "teacher": "",
+          "room": "309"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "309",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Hei Hir",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bau",
+          "teacher": "",
+          "room": "309"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Ch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Bio",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "F .F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Nam",
+          "teacher": "",
+          "room": "CHHS"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Sid",
+          "teacher": "",
+          "room": "BIOHS"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Hld",
+          "teacher": "",
+          "room": "309"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Brn Glz",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Brn",
+          "teacher": "",
+          "room": "NWT1"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bk",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "F .F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "BKUG",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Hei Hir",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Vog",
+          "teacher": "",
+          "room": "309"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Kub",
+          "teacher": "",
+          "room": "309"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Brn Glz",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 7,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "KL",
+          "teacher": "Bau",
+          "room": "309"
+        },
+        {
+          "period": 8,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "Vog",
+          "room": "309"
+        },
+        {
+          "period": 9,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Stt Bch",
+          "teacher": "",
+          "room": ""
+        }
+      ]
+    },
+    "8c": {
+      "className": "8c",
+      "classTeachers": [
+        "Neumann",
+        "Pietzsch"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bio",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Pie",
+          "teacher": "",
+          "room": "BIOHS"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Jak",
+          "teacher": "",
+          "room": "211"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Brn",
+          "teacher": "",
+          "room": "NWT2"
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Bet Man",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Nm",
+          "teacher": "",
+          "room": "211"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Bk",
+          "teacher": "Now",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Btl",
+          "teacher": "",
+          "room": "211"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Nm",
+          "teacher": "",
+          "room": "211"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "BKUG",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Jak",
+          "teacher": "",
+          "room": "211"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Loi",
+          "teacher": "",
+          "room": "211"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "GK",
+          "teacher": "Brr",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Ch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "211",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Bet Man",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Loi",
+          "teacher": "",
+          "room": "211"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Zep",
+          "teacher": "",
+          "room": "211"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Nam",
+          "teacher": "",
+          "room": "CHHS"
+        },
+        {
+          "period": 8,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "Btl",
+          "room": "211"
+        },
+        {
+          "period": 9,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bm Stü",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "KL",
+          "teacher": "Nm",
+          "room": "211"
+        }
+      ]
+    },
+    "8d": {
+      "className": "8d",
+      "classTeachers": [
+        "Vogel",
+        "Geist"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Mus .Mus",
+          "teacher": "Rhe Bie",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Ch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bio",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "MUSIKMUSIK",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Vog",
+          "teacher": "",
+          "room": "312"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Nam",
+          "teacher": "",
+          "room": "NWT3"
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Nam Hir",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Nam",
+          "teacher": "",
+          "room": "BIOHS"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "GK",
+          "teacher": "Brr",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "OrJ",
+          "teacher": "",
+          "room": "312"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Dit",
+          "teacher": "",
+          "room": "312"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Gei",
+          "teacher": "",
+          "room": "NWT2"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "312",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Dit",
+          "teacher": "",
+          "room": "312"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bm",
+          "teacher": "",
+          "room": "312"
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Nam Hir",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "OrJ",
+          "teacher": "",
+          "room": "312"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Vog",
+          "teacher": "",
+          "room": "312"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bm",
+          "teacher": "",
+          "room": "312"
+        },
+        {
+          "period": 8,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "E",
+          "teacher": "Vog",
+          "room": "312"
+        },
+        {
+          "period": 9,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bm Stü",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "KL",
+          "teacher": "Vog",
+          "room": "312"
+        }
+      ]
+    },
+    "9a": {
+      "className": "9a",
+      "classTeachers": [
+        "Basler",
+        "Dittes"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Bk",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Mus",
+          "teacher": "Smi",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "GK",
+          "teacher": "Brr",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Web",
+          "teacher": "",
+          "room": "NWT2"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Now",
+          "teacher": "",
+          "room": "BKUG"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "MUSIK",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "323",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Brn Blb",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Ch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "D",
+          "teacher": "Bas",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "L .F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Hld",
+          "teacher": "",
+          "room": "323"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Meh",
+          "teacher": "",
+          "room": "323"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Ger",
+          "teacher": "",
+          "room": "CHHS"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "323",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Stz Nm",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "L .F",
+          "teacher": "Stz Nm",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "Bas",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Brn Blb",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Dit",
+          "teacher": "",
+          "room": "323"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "Meh",
+          "room": "323"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Dit",
+          "teacher": "",
+          "room": "323"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "323",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 7,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "FUE",
+          "teacher": "Meh",
+          "room": "323"
+        },
+        {
+          "period": 7,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "KL",
+          "teacher": "Bas",
+          "room": "323"
+        },
+        {
+          "period": 8,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "kR .eR eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Cop Liw Sa",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Stü Mai",
+          "teacher": "",
+          "room": ""
+        }
+      ]
+    },
+    "9b": {
+      "className": "9b",
+      "classTeachers": [
+        "Domin",
+        "Oesterreich"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Ch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "Kub",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "D",
+          "teacher": "Kub",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Del",
+          "teacher": "",
+          "room": "NWT1"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Web",
+          "teacher": "",
+          "room": "NWT2"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "310",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "310",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Fei Vot",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Mus .Mus",
+          "teacher": "Rhe Kau",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "WBS",
+          "teacher": "Blm",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "L .F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Stz",
+          "teacher": "",
+          "room": "310"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Oes",
+          "teacher": "",
+          "room": "310"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "MUSIKMUSIK",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "310",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Stz Nm",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "L .F",
+          "teacher": "Stz Nm",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bk",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Fei Vot",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Dom",
+          "teacher": "",
+          "room": "310"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "Oes",
+          "room": "310"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Dom",
+          "teacher": "",
+          "room": "310"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Now",
+          "teacher": "",
+          "room": "BKUG"
+        },
+        {
+          "period": 7,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "KL",
+          "teacher": "Dom",
+          "room": "310"
+        },
+        {
+          "period": 8,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "kR .eR eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Geo",
+          "teacher": "Kop",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Cop Liw Sa",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "310",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Stü Bm",
+          "teacher": "",
+          "room": ""
+        }
+      ]
+    },
+    "9c": {
+      "className": "9c",
+      "classTeachers": [
+        "Glinz",
+        "Schnaus"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "Len",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "WBS",
+          "teacher": "Baz",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Esp .NWT",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Mit",
+          "teacher": "",
+          "room": "322"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Glz",
+          "teacher": "",
+          "room": "322"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "322",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "322",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Blb Fei",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bio",
+          "teacher": "Shs",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Ch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "NWT3",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Hld",
+          "teacher": "",
+          "room": "322"
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Oes",
+          "teacher": "",
+          "room": "322"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Mit",
+          "teacher": "",
+          "room": "322"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Shs",
+          "teacher": "",
+          "room": "CHHS"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Esp .NWT",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "Oes",
+          "room": "322"
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Bk",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "Len",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Blb Fei",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Dös",
+          "teacher": "",
+          "room": "BKOG"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Vot",
+          "teacher": "",
+          "room": "NWT2"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "322",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "kR .eR eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "F",
+          "teacher": "Glz",
+          "room": "322"
+        },
+        {
+          "period": 9,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Cop Liw Shö",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Bm Hel",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "KL",
+          "teacher": "Glz",
+          "room": "322"
+        }
+      ]
+    },
+    "9d": {
+      "className": "9d",
+      "classTeachers": [
+        "Kubacki",
+        "Mittnacht"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "D",
+          "teacher": "Kub",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Bk",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Bio",
+          "teacher": "Jak",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Esp .NWT",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "409",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Vot",
+          "teacher": "",
+          "room": "PHHS"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Now",
+          "teacher": "",
+          "room": "BKOG"
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "BIOHS",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Vot Shs",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Mus",
+          "teacher": "Smi",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "D",
+          "teacher": "Kub",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "Wez",
+          "room": "409"
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "301",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "409",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "F",
+          "teacher": "",
+          "room": "409"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Zep",
+          "teacher": "",
+          "room": "409"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Mit",
+          "teacher": "",
+          "room": "409"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Esp .NWT",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Ch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Vot Shs",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Wez",
+          "teacher": "",
+          "room": "409"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Mit",
+          "teacher": "",
+          "room": "409"
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Nam",
+          "teacher": "",
+          "room": "CHHS"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "OrJ",
+          "teacher": "",
+          "room": "409"
+        },
+        {
+          "period": 7,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "KL",
+          "teacher": "Kub",
+          "room": "409"
+        },
+        {
+          "period": 8,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "kR .eR eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "GK",
+          "teacher": "Brr",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Cop Liw Shö",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "409",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Mai Kub",
+          "teacher": "",
+          "room": ""
+        }
+      ]
+    },
+    "10a": {
+      "className": "10a",
+      "classTeachers": [
+        "Strotz",
+        "Vogt"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Ph",
+          "teacher": "Vot",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "GK",
+          "teacher": "Brd",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "M",
+          "teacher": "Stt",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "PHHS",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "413",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "413",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "WBS",
+          "teacher": "Brd",
+          "room": "413"
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "413",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "L",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Bk",
+          "teacher": "Sir",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Ch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Meh",
+          "teacher": "",
+          "room": "413"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Del Höh",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Stz",
+          "teacher": "",
+          "room": "413"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "BKUG",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Nam",
+          "teacher": "",
+          "room": "NWT3"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "eth .kR",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Bio",
+          "teacher": "Sid",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "L",
+          "teacher": "Stz",
+          "room": "413"
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Shö Kob",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "BIOHS",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Del Höh",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "E",
+          "teacher": "Meh",
+          "room": "413"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "Stt",
+          "room": "413"
+        },
+        {
+          "period": 8,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Inf",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Stt Pie",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Stz",
+          "teacher": "",
+          "room": "413"
+        },
+        {
+          "period": 9,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Dös",
+          "teacher": "",
+          "room": "414"
+        },
+        {
+          "period": 9,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Del",
+          "teacher": "",
+          "room": "401"
+        },
+        {
+          "period": 10,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "KL",
+          "teacher": "Stz",
+          "room": "413"
+        }
+      ]
+    },
+    "10b": {
+      "className": "10b",
+      "classTeachers": [
+        "Manaia",
+        "Helfrich"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Ch",
+          "teacher": "Nam",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "Kas",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "G",
+          "teacher": "Stz",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "Kas",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "CHHS",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "WBS",
+          "teacher": "Brr",
+          "room": "414"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "414",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "414",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "414",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "F",
+          "teacher": "Man",
+          "room": "414"
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Hel",
+          "teacher": "",
+          "room": "414"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Del Höh",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "Meh",
+          "room": "414"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Man",
+          "teacher": "",
+          "room": "414"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Meh",
+          "teacher": "",
+          "room": "414"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "eth .kR eR",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "GK",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Bk",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Shö Kob Liw",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Brr",
+          "teacher": "",
+          "room": "414"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Del Höh",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "BKUG",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Hel",
+          "teacher": "",
+          "room": "414"
+        },
+        {
+          "period": 7,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "KL",
+          "teacher": "Man",
+          "room": "414"
+        },
+        {
+          "period": 7,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "Hel",
+          "room": "414"
+        },
+        {
+          "period": 8,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bio",
+          "teacher": "Nam",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Inf",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "BIOHS",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Stt Pie",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Ro",
+          "teacher": "",
+          "room": "NWT1"
+        },
+        {
+          "period": 9,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Del",
+          "teacher": "",
+          "room": "401"
+        }
+      ]
+    },
+    "10c": {
+      "className": "10c",
+      "classTeachers": [
+        "Brenner",
+        "Jakobi"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Geo",
+          "teacher": "Dit",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Ch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "403",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Wez",
+          "teacher": "",
+          "room": "403"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Ste",
+          "teacher": "",
+          "room": "403"
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Brn",
+          "teacher": "",
+          "room": "403"
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bet",
+          "teacher": "",
+          "room": "CHHS"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "F",
+          "teacher": "Brn",
+          "room": "403"
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Ro",
+          "teacher": "",
+          "room": "NWT2"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Ro Brd",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "E",
+          "teacher": "Wez",
+          "room": "403"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Hld",
+          "teacher": "",
+          "room": "403"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Ste",
+          "teacher": "",
+          "room": "403"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "eR .kR eth",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "GK",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Zil Cop Shn",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Jak",
+          "teacher": "",
+          "room": "403"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Ro Brd",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Blm",
+          "teacher": "",
+          "room": "403"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Jak",
+          "teacher": "",
+          "room": "403"
+        },
+        {
+          "period": 7,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "Jak",
+          "room": "403"
+        },
+        {
+          "period": 8,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bio",
+          "teacher": "Hei",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "WBS",
+          "teacher": "Blm",
+          "room": "403"
+        },
+        {
+          "period": 8,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Inf",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "NWT1",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "KL",
+          "teacher": "Brn",
+          "room": "403"
+        },
+        {
+          "period": 9,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Ste Mai",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Del",
+          "teacher": "",
+          "room": "401"
+        }
+      ]
+    },
+    "10d": {
+      "className": "10d",
+      "classTeachers": [
+        "Sander",
+        "Debailleul"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "GK",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Brd",
+          "teacher": "",
+          "room": "303"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Mai",
+          "teacher": "",
+          "room": "303"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Del",
+          "teacher": "",
+          "room": "303"
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Web",
+          "teacher": "",
+          "room": "209"
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Del",
+          "teacher": "",
+          "room": "303"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Bio",
+          "teacher": "Ger",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "WBS",
+          "teacher": "Brd",
+          "room": "303"
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Geo",
+          "teacher": "Sa",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "NWT1",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Ro Man",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Sa",
+          "teacher": "",
+          "room": "211"
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "E",
+          "teacher": "Wez",
+          "room": "303"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "210",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "kR .eth eR",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Ch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "NWT .Esp",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "F",
+          "teacher": "Mai",
+          "room": "303"
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Cop Shn Liw",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Ger",
+          "teacher": "",
+          "room": "CHHS"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Ro Man",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Sa",
+          "teacher": "",
+          "room": "212"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "M",
+          "teacher": "Del",
+          "room": "303"
+        },
+        {
+          "period": 7,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "KL",
+          "teacher": "Sa",
+          "room": "211"
+        },
+        {
+          "period": 8,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Inf",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Kas",
+          "teacher": "",
+          "room": "303"
+        },
+        {
+          "period": 9,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Wez",
+          "teacher": "",
+          "room": "303"
+        },
+        {
+          "period": 9,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Ste Mit",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Del",
+          "teacher": "",
+          "room": "401"
+        }
+      ]
+    },
+    "10e": {
+      "className": "10e",
+      "classTeachers": [
+        "Feißt",
+        "Loida"
+      ],
+      "lessons": [
+        {
+          "period": 1,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "GK",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "E",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Bk",
+          "teacher": "Lev",
+          "room": ""
+        },
+        {
+          "period": 1,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Ph",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Baz",
+          "teacher": "",
+          "room": "410"
+        },
+        {
+          "period": 2,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Höh",
+          "teacher": "",
+          "room": "410"
+        },
+        {
+          "period": 2,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Bch",
+          "teacher": "",
+          "room": "410"
+        },
+        {
+          "period": 2,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "BKOG",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 2,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Web",
+          "teacher": "",
+          "room": "PHHS"
+        },
+        {
+          "period": 3,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "F",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Esp .NWT",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Mus",
+          "teacher": "Smi",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "M",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 3,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "D",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Man",
+          "teacher": "",
+          "room": "410"
+        },
+        {
+          "period": 4,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "Man Shs",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "301",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 4,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Fei",
+          "teacher": "",
+          "room": "410"
+        },
+        {
+          "period": 4,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Bch",
+          "teacher": "",
+          "room": "410"
+        },
+        {
+          "period": 5,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "kR .eth eR",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Esp .NWT",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Ch",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 5,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "WBS",
+          "teacher": "Baz",
+          "room": "410"
+        },
+        {
+          "period": 6,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "Cop Shn Liw",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "M",
+          "teacher": "Fei",
+          "room": "410"
+        },
+        {
+          "period": 6,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Man Shs",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 6,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Ger",
+          "teacher": "",
+          "room": "NWT3"
+        },
+        {
+          "period": 6,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "E",
+          "teacher": "",
+          "room": "410"
+        },
+        {
+          "period": 7,
+          "dayIndex": 0,
+          "dayName": "Montag",
+          "subject": "KL",
+          "teacher": "Fei",
+          "room": "410"
+        },
+        {
+          "period": 8,
+          "dayIndex": 1,
+          "dayName": "Dienstag",
+          "subject": "F",
+          "teacher": "Man",
+          "room": "410"
+        },
+        {
+          "period": 8,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "G",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 8,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Inf",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 2,
+          "dayName": "Mittwoch",
+          "subject": "Loi",
+          "teacher": "",
+          "room": "410"
+        },
+        {
+          "period": 9,
+          "dayIndex": 3,
+          "dayName": "Donnerstag",
+          "subject": "Ste Mit",
+          "teacher": "",
+          "room": ""
+        },
+        {
+          "period": 9,
+          "dayIndex": 4,
+          "dayName": "Freitag",
+          "subject": "Del",
+          "teacher": "",
+          "room": "401"
+        }
+      ]
+    }
+  }
+}
