@@ -12,8 +12,6 @@ import '../../substitution/application/substitution_provider.dart';
 import '../../substitution/domain/substitution_models.dart';
 import '../../schedule/application/schedule_provider.dart';
 import '../../schedule/domain/schedule_models.dart';
-import '../../news/application/news_provider.dart';
-import '../../news/domain/news_models.dart';
 import '../../settings/presentation/settings_modal.dart';
 import '../../../../services/haptic_service.dart';
 import '../../../../navigation/app_router.dart';
@@ -38,12 +36,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late Animation<double> _subFadeAnimation;
   bool _subAnimated = false;
 
-  // Schedule availability
+  // Schedule availability — mirrors SchedulePage logic exactly
   List<ScheduleItem> _availableFirstHalbjahr = [];
   List<ScheduleItem> _availableSecondHalbjahr = [];
-  bool _scheduleChecking = false;
-  DateTime? _lastScheduleCheck;
-  static const _scheduleCheckInterval = Duration(minutes: 15);
+  bool _isCheckingAvailability = false;
+  DateTime? _lastAvailabilityCheck;
+  static const _availabilityCheckInterval = Duration(minutes: 15);
 
   @override
   void initState() {
@@ -56,14 +54,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       parent: _subFadeController,
       curve: Curves.easeOutCubic,
     );
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // 1. Boot substitution loading
       await ref.read(substitutionProvider.notifier).initialize();
+
+      // 2. Load schedule list (matches SchedulePage initState exactly)
       final scheduleState = ref.read(scheduleProvider);
       if (!scheduleState.hasSchedules) {
         await ref.read(scheduleProvider.notifier).loadSchedules();
       }
-      await _checkScheduleAvailability();
-      ref.read(newsProvider.notifier).loadNews();
+
+      // 3. Check or restore availability (mirrors SchedulePage exactly)
+      if (_shouldCheckAvailability()) {
+        await _checkScheduleAvailability();
+      } else {
+        // Already checked recently — restore from cached PDFs if lists are empty
+        final allSchedules = [
+          ...scheduleState.firstHalbjahrSchedules,
+          ...scheduleState.secondHalbjahrSchedules,
+        ];
+        if (allSchedules.isNotEmpty &&
+            _availableFirstHalbjahr.isEmpty &&
+            _availableSecondHalbjahr.isEmpty) {
+          await _restoreAvailabilityFromCache(allSchedules);
+        }
+      }
     });
   }
 
@@ -73,34 +89,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     super.dispose();
   }
 
-  // ── Schedule availability ─────────────────────────────────────────────────
+  // ── Schedule availability (exact copy of SchedulePage logic) ──────────────
 
-  bool _shouldCheckSchedule() {
-    if (_lastScheduleCheck != null &&
-        DateTime.now().difference(_lastScheduleCheck!) < _scheduleCheckInterval) {
-      return false;
+  /// Returns true if we should re-run the availability check.
+  /// Mirrors the original SchedulePage._shouldCheckAvailability() including
+  /// its operator-precedence quirk.
+  bool _shouldCheckAvailability() {
+    // ignore: dead_code — intentional: matches original precedence bug for safety
+    if (_lastAvailabilityCheck != null &&
+            _availableFirstHalbjahr.isNotEmpty ||
+        _availableSecondHalbjahr.isNotEmpty) {
+      final elapsed =
+          DateTime.now().difference(_lastAvailabilityCheck ?? DateTime.now());
+      if (elapsed < _availabilityCheckInterval) return false;
     }
     return true;
   }
 
   Future<void> _checkScheduleAvailability() async {
-    if (_scheduleChecking || !_shouldCheckSchedule()) return;
+    if (_isCheckingAvailability) return;
     if (!mounted) return;
-    setState(() => _scheduleChecking = true);
+    setState(() => _isCheckingAvailability = true);
+
     try {
       final notifier = ref.read(scheduleProvider.notifier);
-      final state = ref.read(scheduleProvider);
       final allSchedules = {
-        ...state.firstHalbjahrSchedules,
-        ...state.secondHalbjahrSchedules,
+        ...ref.read(scheduleProvider).firstHalbjahrSchedules,
+        ...ref.read(scheduleProvider).secondHalbjahrSchedules,
       }.toList();
 
       final results = await Future.wait(allSchedules.map((s) async {
         final ok = await notifier.isScheduleAvailable(s);
+        if (mounted) setState(() {}); // progressive update (mirrors original)
         return {'schedule': s, 'ok': ok};
       }));
 
       if (!mounted) return;
+
       final first = <ScheduleItem>{};
       final second = <ScheduleItem>{};
       for (final r in results) {
@@ -113,32 +138,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       _availableFirstHalbjahr = first.toList();
       _availableSecondHalbjahr = second.toList();
 
-      // Fallback: if availability check returned nothing, check for locally cached PDFs
-      if (_availableFirstHalbjahr.isEmpty && _availableSecondHalbjahr.isEmpty) {
-        await _restoreFromCachedFiles(allSchedules);
-      }
-      _lastScheduleCheck = DateTime.now();
+      AppLogger.success(
+        'Schedule availability: ${first.length + second.length} available',
+        module: 'HomeScreen',
+      );
+      setState(() {});
+
+      // Preload PDFs for available schedules in the background
+      _preloadSchedulePDFs();
     } finally {
-      if (mounted) setState(() => _scheduleChecking = false);
+      if (mounted) {
+        setState(() {
+          _isCheckingAvailability = false;
+          _lastAvailabilityCheck = DateTime.now();
+        });
+      }
     }
   }
 
-  Future<void> _restoreFromCachedFiles(List<ScheduleItem> schedules) async {
-    final first = <ScheduleItem>{};
-    final second = <ScheduleItem>{};
-    for (final s in schedules.toSet()) {
+  /// Restore availability by checking which schedules have locally cached PDFs.
+  /// Mirrors SchedulePage._restoreAvailabilityFromCache().
+  Future<void> _restoreAvailabilityFromCache(
+      List<ScheduleItem> allSchedules) async {
+    final unique = allSchedules.toSet().toList();
+    for (final s in unique) {
       final cached = await _cachedScheduleFile(s);
       if (cached != null && await cached.exists()) {
-        final size = await cached.length();
-        if (size > 1000) {
-          if (s.halbjahr == '1. Halbjahr') first.add(s);
-          if (s.halbjahr == '2. Halbjahr') second.add(s);
+        if (s.halbjahr == '1. Halbjahr') {
+          if (!_availableFirstHalbjahr.contains(s)) {
+            _availableFirstHalbjahr.add(s);
+          }
+        } else if (s.halbjahr == '2. Halbjahr') {
+          if (!_availableSecondHalbjahr.contains(s)) {
+            _availableSecondHalbjahr.add(s);
+          }
         }
       }
     }
-    if (mounted) {
-      _availableFirstHalbjahr = first.toList();
-      _availableSecondHalbjahr = second.toList();
+    if (mounted) setState(() {});
+  }
+
+  void _preloadSchedulePDFs() {
+    final all = [..._availableFirstHalbjahr, ..._availableSecondHalbjahr];
+    for (final s in all) {
+      unawaited(_cachedScheduleFile(s).then((cached) async {
+        if (cached != null && await cached.exists()) return;
+        try {
+          await ref.read(scheduleProvider.notifier).downloadSchedule(s);
+        } catch (_) {}
+      }));
     }
   }
 
@@ -162,7 +210,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final cached = await _cachedScheduleFile(schedule);
     if (cached != null && await cached.exists()) {
       if (mounted) {
-        context.push(AppRouter.pdfViewer, extra: {'file': cached, 'dayName': dayName});
+        context.push(AppRouter.pdfViewer,
+            extra: {'file': cached, 'dayName': dayName});
       }
       return;
     }
@@ -172,16 +221,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       context: context,
       barrierDismissible: false,
       builder: (_) => AlertDialog(
-        content: Row(
-          children: [
-            CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(
-                  Theme.of(context).colorScheme.primary),
-            ),
-            const SizedBox(width: 16),
-            Text(l10n.loadingSchedule),
-          ],
-        ),
+        content: Row(children: [
+          CircularProgressIndicator(
+            valueColor:
+                AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
+          ),
+          const SizedBox(width: 16),
+          Text(l10n.loadingSchedule),
+        ]),
       ),
     );
 
@@ -189,7 +236,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       if (!mounted) return;
       Navigator.of(context).pop();
       if (file != null) {
-        context.push(AppRouter.pdfViewer, extra: {'file': file, 'dayName': dayName});
+        context.push(AppRouter.pdfViewer,
+            extra: {'file': file, 'dayName': dayName});
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('$half ${l10n.scheduleNotAvailable}'),
@@ -201,7 +249,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       if (!mounted) return;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(AppLocalizations.of(context)!.errorLoadingGeneric),
+        content:
+            Text(AppLocalizations.of(context)!.errorLoadingGeneric),
         backgroundColor: Colors.red,
       ));
     });
@@ -211,7 +260,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       g == 'Klassen 5-10' ? l.grades5to10 : g == 'J11/J12' ? l.j11j12 : g;
 
   String _localizeHalf(AppLocalizations l, String h) =>
-      h == '1. Halbjahr' ? l.firstSemester : h == '2. Halbjahr' ? l.secondSemester : h;
+      h == '1. Halbjahr'
+          ? l.firstSemester
+          : h == '2. Halbjahr'
+              ? l.secondSemester
+              : h;
 
   // ── Build ─────────────────────────────────────────────────────────────────
 
@@ -225,6 +278,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       WidgetsBinding.instance
           .addPostFrameCallback((_) => _subFadeController.forward());
     }
+
+    // When main.dart finishes preloading the class index (which also downloads
+    // the schedule PDF), re-run availability so we find the newly cached file.
+    ref.listen<ScheduleState>(scheduleProvider, (prev, next) {
+      if (prev?.isIndexBuilt == false && next.isIndexBuilt == true) {
+        if (_availableFirstHalbjahr.isEmpty &&
+            _availableSecondHalbjahr.isEmpty) {
+          _checkScheduleAvailability();
+        }
+      }
+    });
 
     return Scaffold(
       backgroundColor: context.appBgColor,
@@ -254,7 +318,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             context.push(AppRouter.news);
           },
           tooltip: AppLocalizations.of(context)!.news,
-          icon: Icon(Icons.newspaper_outlined, color: context.appSecondaryText),
+          icon:
+              Icon(Icons.newspaper_outlined, color: context.appSecondaryText),
         ),
         IconButton(
           onPressed: () {
@@ -274,7 +339,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             );
           },
           tooltip: AppLocalizations.of(context)!.settings,
-          icon: Icon(Icons.settings_outlined, color: context.appSecondaryText),
+          icon:
+              Icon(Icons.settings_outlined, color: context.appSecondaryText),
         ),
       ],
     );
@@ -317,8 +383,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             delegate: SliverChildListDelegate([
               const SizedBox(height: 8),
               _buildGreeting(),
-              const SizedBox(height: 24),
-              _buildNewsTeaser(),
               const SizedBox(height: 28),
               _buildSectionHeader(
                   AppLocalizations.of(context)!.substitutionPlan),
@@ -391,7 +455,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ]);
     }
     if (state.hasAnyError && !state.hasAnyData) {
-      return _buildSubError(state);
+      return _buildSubError();
     }
     return FadeTransition(
       opacity: _subFadeAnimation,
@@ -400,7 +464,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           pdfState: state.todayState,
           label: AppLocalizations.of(context)!.today,
           onTap: () => _openPdf(state, true),
-          onRetry: () => ref.read(substitutionProvider.notifier).retryPdf(true),
+          onRetry: () =>
+              ref.read(substitutionProvider.notifier).retryPdf(true),
         ),
         const SizedBox(height: 12),
         _SubstitutionCard(
@@ -414,7 +479,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  Widget _buildSubError(SubstitutionProviderState state) {
+  Widget _buildSubError() {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -457,8 +522,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     .colorScheme
                     .primary
                     .withValues(alpha: 0.5)),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10)),
             padding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           ),
@@ -479,136 +544,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final locale = Localizations.localeOf(context).languageCode;
     if (locale == 'en') {
       const de2en = {
-        'Montag': 'Monday', 'Dienstag': 'Tuesday', 'Mittwoch': 'Wednesday',
-        'Donnerstag': 'Thursday', 'Freitag': 'Friday',
-        'Samstag': 'Saturday', 'Sonntag': 'Sunday',
+        'Montag': 'Monday',
+        'Dienstag': 'Tuesday',
+        'Mittwoch': 'Wednesday',
+        'Donnerstag': 'Thursday',
+        'Freitag': 'Friday',
+        'Samstag': 'Saturday',
+        'Sonntag': 'Sunday',
       };
       weekday = de2en[weekday] ?? weekday;
     }
-    AppLogger.pdf('Opening PDF: $weekday (${isToday ? 'today' : 'tomorrow'})');
+    AppLogger.pdf(
+        'Opening PDF: $weekday (${isToday ? 'today' : 'tomorrow'})');
     if (pdfFile != null) {
-      context.push(AppRouter.pdfViewer, extra: {'file': pdfFile, 'dayName': weekday});
+      context.push(AppRouter.pdfViewer,
+          extra: {'file': pdfFile, 'dayName': weekday});
     }
-  }
-
-  // ── News teaser ───────────────────────────────────────────────────────────
-
-  Widget _buildNewsTeaser() {
-    final newsState = ref.watch(newsProvider);
-    final events = newsState.events.take(2).toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                AppLocalizations.of(context)!.news,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: context.appPrimaryText,
-                      fontWeight: FontWeight.w700,
-                    ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                HapticService.light();
-                context.push(AppRouter.news);
-              },
-              child: Row(
-                children: [
-                  Text(
-                    'Alle',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                  const SizedBox(width: 2),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    size: 11,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        if (newsState.isLoading)
-          Column(children: [_SkeletonCard(), const SizedBox(height: 12), _SkeletonCard()])
-        else if (events.isEmpty)
-          const SizedBox.shrink()
-        else
-          Column(
-            children: events.asMap().entries.map((entry) {
-              final i = entry.key;
-              final article = entry.value;
-              return Column(
-                children: [
-                  _buildNewsCard(article),
-                  if (i < events.length - 1) const SizedBox(height: 10),
-                ],
-              );
-            }).toList(),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildNewsCard(NewsEvent article) {
-    final primary = Theme.of(context).colorScheme.primary;
-    return _TappableCard(
-      onTap: () {
-        HapticService.light();
-        context.push(AppRouter.newsDetail, extra: article);
-      },
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(Icons.article_outlined, color: primary, size: 20),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  article.title,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: context.appPrimaryText,
-                        fontWeight: FontWeight.w600,
-                        height: 1.25,
-                      ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  article.createdDate,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: context.appSecondaryText,
-                      ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Icon(Icons.arrow_forward_ios,
-              size: 14,
-              color: context.appSecondaryText.withValues(alpha: 0.5)),
-        ],
-      ),
-    );
   }
 
   // ── Schedule section ──────────────────────────────────────────────────────
@@ -616,12 +567,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget _buildScheduleSection() {
     final scheduleState = ref.watch(scheduleProvider);
 
-    if (scheduleState.isLoading || _scheduleChecking) {
+    // Show spinner while loading schedule list or running availability check
+    // (mirrors SchedulePage: isLoading || _isCheckingAvailability || !isIndexBuilt)
+    if (scheduleState.isLoading ||
+        _isCheckingAvailability ||
+        !scheduleState.isIndexBuilt) {
       return _SkeletonCard();
     }
 
+    // Server-level error: couldn't even fetch the schedule list
     if (scheduleState.hasError) {
       return _buildScheduleError(scheduleState);
+    }
+
+    // No schedule items at all from server
+    if (!scheduleState.hasSchedules) {
+      return _buildScheduleEmpty();
     }
 
     final allAvailable = [
@@ -629,9 +590,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ..._availableSecondHalbjahr,
     ];
 
-    if (allAvailable.isEmpty) {
-      return _buildScheduleEmpty();
-    }
+    // Schedules loaded but none available yet — nothing to show (same as old page)
+    if (allAvailable.isEmpty) return const SizedBox.shrink();
 
     final l10n = AppLocalizations.of(context)!;
     final hasBoth = _availableFirstHalbjahr.isNotEmpty &&
@@ -650,15 +610,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     addGroup(_availableFirstHalbjahr);
     if (hasBoth) {
       items.add(Divider(
-          height: 24, color: context.appSecondaryText.withValues(alpha: 0.2)));
+          height: 24,
+          color: context.appSecondaryText.withValues(alpha: 0.2)));
     }
     addGroup(_availableSecondHalbjahr);
     if (items.isNotEmpty && items.last is SizedBox) items.removeLast();
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: items);
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start, children: items);
   }
 
-  Widget _buildInlineScheduleCard(ScheduleItem schedule, AppLocalizations l10n) {
+  Widget _buildInlineScheduleCard(
+      ScheduleItem schedule, AppLocalizations l10n) {
     final primary = Theme.of(context).colorScheme.primary;
     final grade = _localizeGrade(l10n, schedule.gradeLevel);
     final half = _localizeHalf(l10n, schedule.halbjahr);
@@ -677,7 +640,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             color: primary.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(Icons.table_chart_outlined, color: primary, size: 20),
+          child:
+              Icon(Icons.table_chart_outlined, color: primary, size: 20),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -717,7 +681,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ),
       child: Row(children: [
         Icon(Icons.schedule_outlined,
-            color: context.appSecondaryText.withValues(alpha: 0.5), size: 28),
+            color: context.appSecondaryText.withValues(alpha: 0.5),
+            size: 28),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
@@ -751,7 +716,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ),
       child: Row(children: [
         Icon(Icons.schedule_outlined,
-            color: context.appSecondaryText.withValues(alpha: 0.4), size: 28),
+            color: context.appSecondaryText.withValues(alpha: 0.4),
+            size: 28),
         const SizedBox(width: 12),
         Text(
           AppLocalizations.of(context)!.noSchedulesAvailable,
@@ -768,7 +734,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
 class _SubstitutionCard extends ConsumerStatefulWidget {
   final SubstitutionState pdfState;
-  final String label; // "Heute" / "Morgen" — kept for tap logic, not shown
+  final String label;
   final VoidCallback onTap;
   final VoidCallback onRetry;
 
@@ -846,9 +812,13 @@ class _SubstitutionCardState extends ConsumerState<_SubstitutionCard>
     final locale = Localizations.localeOf(context).languageCode;
     if (locale == 'en' && weekday.isNotEmpty) {
       const de2en = {
-        'Montag': 'Monday', 'Dienstag': 'Tuesday', 'Mittwoch': 'Wednesday',
-        'Donnerstag': 'Thursday', 'Freitag': 'Friday',
-        'Samstag': 'Saturday', 'Sonntag': 'Sunday',
+        'Montag': 'Monday',
+        'Dienstag': 'Tuesday',
+        'Mittwoch': 'Wednesday',
+        'Donnerstag': 'Thursday',
+        'Freitag': 'Friday',
+        'Samstag': 'Saturday',
+        'Sonntag': 'Sunday',
       };
       weekday = de2en[weekday] ?? weekday;
     }
@@ -897,8 +867,12 @@ class _SubstitutionCardState extends ConsumerState<_SubstitutionCard>
                     ),
                   )
                 : Icon(
-                    hasError ? Icons.refresh : Icons.calendar_today_outlined,
-                    color: isDisabled ? primary.withValues(alpha: 0.35) : primary,
+                    hasError
+                        ? Icons.refresh
+                        : Icons.calendar_today_outlined,
+                    color: isDisabled
+                        ? primary.withValues(alpha: 0.35)
+                        : primary,
                     size: 20,
                   ),
           ),
@@ -1059,7 +1033,8 @@ class _TappableCardState extends State<_TappableCard>
         builder: (context, child) => Transform.scale(
           scale: _pressed ? _scale.value : 1.0,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             decoration: BoxDecoration(
               color: context.appSurfaceColor,
               borderRadius: BorderRadius.circular(16),
