@@ -464,6 +464,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get errorLoadingWeather => 'Fehler beim Laden der Wetterdaten';
 
   @override
+  String get greetingMorning => 'Guten Morgen';
+
+  @override
+  String get greetingDay => 'Guten Tag';
+
+  @override
+  String get greetingEvening => 'Guten Abend';
+
+  @override
   String get supportProject => 'Projekt unterstützen';
 
   @override
