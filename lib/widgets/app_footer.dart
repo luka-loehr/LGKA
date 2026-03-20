@@ -29,7 +29,7 @@ class AppFooter extends StatelessWidget {
           Text(
             '© $_currentYear ',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.secondaryText.withValues(alpha: 0.5),
+              color: context.appSecondaryText.withValues(alpha: 0.5),
             ),
           ),
           Text(
@@ -42,7 +42,7 @@ class AppFooter extends StatelessWidget {
           Text(
             ' • v${AppInfo.version}',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.secondaryText.withValues(alpha: 0.5),
+              color: context.appSecondaryText.withValues(alpha: 0.5),
             ),
           ),
         ],

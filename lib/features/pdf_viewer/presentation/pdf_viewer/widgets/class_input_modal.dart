@@ -54,20 +54,18 @@ class ClassInputModal extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
       appBar: AppBar(
-        backgroundColor: AppColors.appBackground,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          color: AppColors.primaryText,
+          color: context.appPrimaryText,
           onPressed: onBack,
         ),
         title: Text(
           l10n.setClassTitle,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.primaryText,
+                color: context.appPrimaryText,
               ),
         ),
       ),
@@ -81,7 +79,7 @@ class ClassInputModal extends StatelessWidget {
               Text(
                 l10n.setClassMessage,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.primaryText,
+                      color: context.appPrimaryText,
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -106,7 +104,7 @@ class ClassInputModal extends StatelessWidget {
       ],
       decoration: InputDecoration(
         hintText: l10n.searchHint,
-        prefixIcon: const Icon(Icons.school, color: AppColors.secondaryText),
+        prefixIcon: Icon(Icons.school, color: context.appSecondaryText),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
@@ -121,11 +119,11 @@ class ClassInputModal extends StatelessWidget {
           ),
         ),
         filled: true,
-        fillColor: AppColors.appSurface,
+        fillColor: context.appSurfaceColor,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: AppColors.primaryText,
+            color: context.appPrimaryText,
           ),
       onSubmitted: (_) {
         if (canSave) {

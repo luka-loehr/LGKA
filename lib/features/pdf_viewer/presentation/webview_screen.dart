@@ -64,12 +64,10 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
       appBar: AppBar(
-        backgroundColor: AppColors.appBackground,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.secondaryText),
+          icon: Icon(Icons.close, color: context.appSecondaryText),
           onPressed: () {
             HapticService.light();
             if (widget.fromKrankmeldungInfo) {
@@ -83,7 +81,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
         ),
         title: Text(
           widget.title ?? AppLocalizations.of(context)!.browserTitle,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.primaryText),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: context.appPrimaryText),
         ),
         centerTitle: true,
         actions: [],
@@ -165,7 +163,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
             ),
             if (_progress < 1.0 && !_hasError)
               Container(
-                color: AppColors.appBackground,
+                color: context.appBgColor,
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -178,7 +176,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                       Text(
                         AppLocalizations.of(context)!.loadingSickNote,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.secondaryText,
+                          color: context.appSecondaryText,
                         ),
                       ),
                     ],
@@ -187,7 +185,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
               ),
             if (_hasError)
               Container(
-                color: AppColors.appBackground,
+                color: context.appBgColor,
                 padding: const EdgeInsets.all(32.0),
                 child: Center(
                   child: Column(
@@ -196,13 +194,13 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                       Icon(
                         Icons.medical_services_outlined,
                         size: 64,
-                        color: AppColors.secondaryText.withValues(alpha: 0.5),
+                        color: context.appSecondaryText.withValues(alpha: 0.5),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         AppLocalizations.of(context)!.serverConnectionFailed,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.primaryText,
+                          color: context.appPrimaryText,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -210,7 +208,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                       Text(
                         AppLocalizations.of(context)!.serverConnectionHint,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.secondaryText,
+                          color: context.appSecondaryText,
                         ),
                         textAlign: TextAlign.center,
                       ),

@@ -127,7 +127,6 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
       body: SafeArea(
         child: AnimatedBuilder(
           animation: Listenable.merge([_contentController, _buttonController]),
@@ -157,7 +156,7 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
                       Text(
                         AppLocalizations.of(context)!.accentColorDescription,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.secondaryText,
+                          color: context.appSecondaryText,
                           height: 1.4,
                         ),
                         textAlign: TextAlign.center,

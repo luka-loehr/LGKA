@@ -19,6 +19,7 @@ class PreferencesManagerState {
   final bool isDebugMode;
   final bool showNavigationDebug;
   final String accentColor;
+  final String themeMode;
   final bool vibrationEnabled;
   final bool krankmeldungInfoShown;
   final String? lastPdfSearchQuery;
@@ -36,6 +37,7 @@ class PreferencesManagerState {
     this.isDebugMode = false,
     this.showNavigationDebug = false,
     this.accentColor = 'blue',
+    this.themeMode = 'system',
     this.vibrationEnabled = true,
     this.krankmeldungInfoShown = false,
     this.lastPdfSearchQuery,
@@ -54,6 +56,7 @@ class PreferencesManagerState {
     bool? isDebugMode,
     bool? showNavigationDebug,
     String? accentColor,
+    String? themeMode,
     bool? vibrationEnabled,
     bool? krankmeldungInfoShown,
     String? lastPdfSearchQuery,
@@ -71,6 +74,7 @@ class PreferencesManagerState {
       isDebugMode: isDebugMode ?? this.isDebugMode,
       showNavigationDebug: showNavigationDebug ?? this.showNavigationDebug,
       accentColor: accentColor ?? this.accentColor,
+      themeMode: themeMode ?? this.themeMode,
       vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
       krankmeldungInfoShown: krankmeldungInfoShown ?? this.krankmeldungInfoShown,
       lastPdfSearchQuery: lastPdfSearchQuery ?? this.lastPdfSearchQuery,
@@ -114,6 +118,7 @@ class PreferencesManagerNotifier extends Notifier<PreferencesManagerState> {
       isDebugMode: _manager.isDebugMode,
       showNavigationDebug: _manager.showNavigationDebug,
       accentColor: _manager.accentColor,
+      themeMode: _manager.themeMode,
       vibrationEnabled: _manager.vibrationEnabled,
       krankmeldungInfoShown: _manager.krankmeldungInfoShown,
       lastPdfSearchQuery: _manager.lastPdfSearchQuery,
@@ -152,6 +157,11 @@ class PreferencesManagerNotifier extends Notifier<PreferencesManagerState> {
 
   Future<void> setAccentColor(String color) async {
     await _manager.setAccentColor(color);
+    _refreshState();
+  }
+
+  Future<void> setThemeMode(String mode) async {
+    await _manager.setThemeMode(mode);
     _refreshState();
   }
 
@@ -207,10 +217,31 @@ class PreferencesManagerNotifier extends Notifier<PreferencesManagerState> {
 // Preferences Manager Provider
 final preferencesManagerProvider = NotifierProvider<PreferencesManagerNotifier, PreferencesManagerState>(PreferencesManagerNotifier.new);
 
-// Theme Provider - listens to accent color changes
+// Light theme provider
+final lightThemeProvider = Provider<ThemeData>((ref) {
+  final prefs = ref.watch(preferencesManagerProvider);
+  return AppTheme.getLightThemeWithAccent(prefs.accentColor);
+});
+
+// Dark theme provider
 final themeProvider = Provider<ThemeData>((ref) {
-  final preferencesManagerState = ref.watch(preferencesManagerProvider);
-  return AppTheme.getDarkThemeWithAccent(preferencesManagerState.accentColor);
+  final prefs = ref.watch(preferencesManagerProvider);
+  return AppTheme.getDarkThemeWithAccent(prefs.accentColor);
+});
+
+// ThemeMode provider
+final themeModeProvider = Provider<ThemeMode>((ref) {
+  final prefs = ref.watch(preferencesManagerProvider);
+  switch (prefs.themeMode) {
+    case 'light':
+      return ThemeMode.light;
+    case 'system':
+      return ThemeMode.system;
+    case 'dark':
+      return ThemeMode.dark;
+    default:
+      return ThemeMode.system;
+  }
 });
 
 // App State Providers
