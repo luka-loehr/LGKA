@@ -191,6 +191,9 @@
   "colorPeach": "Peach",
   "csvFileTooLarge": "CSV file too large or corrupted",
   "errorLoadingWeather": "Error loading weather data",
+  "greetingMorning": "Good morning",
+  "greetingDay": "Good afternoon",
+  "greetingEvening": "Good evening",
   "supportProject": "Support Project",
   "lastDownloaded": "Last updated: {time}",
   "@lastDownloaded": {
