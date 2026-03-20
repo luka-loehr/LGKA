@@ -135,7 +135,7 @@ class SettingsModal extends ConsumerWidget {
                     ),
                     child: Icon(
                       isSelected ? Icons.check_rounded : entry.icon,
-                      color: isSelected ? Colors.white : iconColor,
+                      color: iconColor,
                       size: 22,
                     ),
                   ),
@@ -210,7 +210,7 @@ class SettingsModal extends ConsumerWidget {
                   child: isSelected
                       ? Icon(
                           Icons.check,
-                          color: Colors.white,
+                          color: ringColor,
                           size: 24,
                         )
                       : null,
