@@ -21,8 +21,8 @@ import '../../../../widgets/constrained_modal_bottom_sheet.dart';
 import '../../../../widgets/app_footer.dart';
 import '../../../../providers/app_providers.dart';
 import '../../../../l10n/app_localizations.dart';
-
-const double _kCardHeight = 80.0;
+import 'widgets/skeleton_card.dart';
+import 'widgets/tappable_card.dart';
 
 /// German → English weekday translation map (used for locale-aware display)
 const Map<String, String> _kDeToEn = {
@@ -446,9 +446,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (isLoading) {
       key = 'sub-loading';
       child = Column(children: [
-        _SkeletonCard(),
+        const SkeletonCard(),
         const SizedBox(height: 12),
-        _SkeletonCard(),
+        const SkeletonCard(),
       ]);
     } else if (state.hasAnyError && !state.hasAnyData) {
       key = 'sub-error';
@@ -600,7 +600,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     if (isDisabled) {
       return Container(
-        height: _kCardHeight,
+        height: kHomeCardHeight,
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(
           color: context.appSurfaceColor.withValues(alpha: 0.5),
@@ -610,7 +610,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
 
-    return _TappableCard(
+    return TappableCard(
       onTap: () {
         if (hasError) {
           HapticService.medium();
@@ -656,9 +656,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return _fadeSwitch(
         'sched-loading',
         Column(children: [
-          const _SkeletonCard(),
+          const SkeletonCard(),
           const SizedBox(height: 12),
-          const _SkeletonCard(),
+          const SkeletonCard(),
         ]),
       );
     }
@@ -701,7 +701,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final grade = _localizeGrade(l10n, schedule.gradeLevel);
     final half = _localizeHalf(l10n, schedule.halbjahr);
 
-    return _TappableCard(
+    return TappableCard(
       onTap: () {
         HapticService.medium();
         _openSchedule(schedule);
@@ -801,136 +801,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
         ),
       ]),
-    );
-  }
-}
-
-
-// ── Skeleton ───────────────────────────────────────────────────────────────────
-
-class _SkeletonCard extends StatefulWidget {
-  const _SkeletonCard();
-
-  @override
-  State<_SkeletonCard> createState() => _SkeletonCardState();
-}
-
-class _SkeletonCardState extends State<_SkeletonCard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _anim;
-  late Animation<double> _opacity;
-
-  @override
-  void initState() {
-    super.initState();
-    _anim = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 900))
-      ..repeat(reverse: true);
-    _opacity = Tween(begin: 0.3, end: 0.7).animate(_anim);
-  }
-
-  @override
-  void dispose() {
-    _anim.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _opacity,
-      builder: (context, child) => Opacity(
-        opacity: _opacity.value,
-        child: Container(
-          height: _kCardHeight,
-          decoration: BoxDecoration(
-            color: context.appSurfaceColor,
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Generic tappable card ──────────────────────────────────────────────────────
-
-class _TappableCard extends StatefulWidget {
-  final Widget child;
-  final VoidCallback onTap;
-
-  const _TappableCard({required this.child, required this.onTap});
-
-  @override
-  State<_TappableCard> createState() => _TappableCardState();
-}
-
-class _TappableCardState extends State<_TappableCard>
-    with SingleTickerProviderStateMixin {
-  bool _pressed = false;
-  late final AnimationController _scale;
-
-  @override
-  void initState() {
-    super.initState();
-    _scale = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 120),
-        lowerBound: 0.97,
-        upperBound: 1.0,
-        value: 1.0);
-  }
-
-  @override
-  void dispose() {
-    _scale.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) {
-        setState(() => _pressed = true);
-        _scale.reverse();
-      },
-      onTapUp: (_) {
-        setState(() => _pressed = false);
-        _scale.forward();
-      },
-      onTapCancel: () {
-        setState(() => _pressed = false);
-        _scale.forward();
-      },
-      onTap: widget.onTap,
-      child: AnimatedBuilder(
-        animation: _scale,
-        builder: (context, child) => Transform.scale(
-          scale: _pressed ? _scale.value : 1.0,
-          child: Container(
-            height: _kCardHeight,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-            decoration: BoxDecoration(
-              color: context.appSurfaceColor,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: _pressed
-                  ? null
-                  : [
-                      BoxShadow(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withValues(alpha: 0.06),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-            ),
-            child: widget.child,
-          ),
-        ),
-      ),
     );
   }
 }
