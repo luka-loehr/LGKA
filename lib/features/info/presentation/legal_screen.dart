@@ -13,18 +13,16 @@ class LegalScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
       appBar: AppBar(
         title: Text(
           AppLocalizations.of(context)!.legalLabel,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.primaryText,
+                color: context.appPrimaryText,
               ),
         ),
-        backgroundColor: AppColors.appBackground,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.primaryText),
+        iconTheme: IconThemeData(color: context.appPrimaryText),
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -34,7 +32,7 @@ class LegalScreen extends ConsumerWidget {
             Text(
               'LGKA+',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: AppColors.appOnSurface,
+                    color: context.appPrimaryText,
                     fontWeight: FontWeight.bold,
                   ),
             ),
@@ -43,7 +41,7 @@ class LegalScreen extends ConsumerWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.appSurface,
+                color: context.appSurfaceColor,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(

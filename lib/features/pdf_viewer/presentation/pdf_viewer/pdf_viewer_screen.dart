@@ -856,16 +856,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         headerTitle,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.primaryText,
+              color: context.appPrimaryText,
             ),
       ),
       centerTitle: false,
-      backgroundColor: AppColors.appBackground,
       elevation: 0,
-      iconTheme: const IconThemeData(color: AppColors.primaryText),
+      iconTheme: IconThemeData(color: context.appPrimaryText),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        color: AppColors.primaryText,
+        color: context.appPrimaryText,
         onPressed: () {
           HapticService.light();
           Navigator.of(context).pop();
@@ -879,7 +878,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                 HapticService.light();
                 _showSearchBar();
               },
-              icon: const Icon(Icons.school, color: AppColors.secondaryText),
+              icon: Icon(Icons.school, color: context.appSecondaryText),
               tooltip: _searchResults.isEmpty
                   ? AppLocalizations.of(context)!.searchInPdf
                   : AppLocalizations.of(context)!.newSearch,
@@ -890,7 +889,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
                 HapticService.light();
                 _hideSearchBar();
               },
-              icon: const Icon(Icons.close, color: AppColors.secondaryText),
+              icon: Icon(Icons.close, color: context.appSecondaryText),
               tooltip: AppLocalizations.of(context)!.cancelSearch,
             ),
         ],
@@ -900,7 +899,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
             HapticService.light();
             _sharePdf();
           },
-          icon: const Icon(Icons.share_outlined, color: AppColors.secondaryText),
+          icon: Icon(Icons.share_outlined, color: context.appSecondaryText),
           tooltip: AppLocalizations.of(context)!.sharePdf,
         ),
       ],

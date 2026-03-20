@@ -305,11 +305,15 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ref.watch(themeProvider);
-    
+    final lightTheme = ref.watch(lightThemeProvider);
+    final darkTheme = ref.watch(themeProvider);
+    final themeMode = ref.watch(themeModeProvider);
+
     return MaterialApp.router(
       title: 'LGKA+ Vertretungsplan',
-      theme: theme,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeMode,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
       supportedLocales: AppLocalizations.supportedLocales,

@@ -138,7 +138,7 @@ class NewsDetailScreen extends ConsumerWidget {
                         Text(
                           download.size!,
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.secondaryText.withValues(alpha: 0.7),
+                            color: context.appSecondaryText.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -403,7 +403,7 @@ class NewsDetailScreen extends ConsumerWidget {
                       Text(
                         _getDomainFromUrl(link.url),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.secondaryText.withValues(alpha: 0.7),
+                          color: context.appSecondaryText.withValues(alpha: 0.7),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -464,20 +464,18 @@ class NewsDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final backgroundColor = AppColors.appBackground;
-    final surfaceColor = AppColors.appSurface;
-    final primaryTextColor = AppColors.primaryText;
-    final secondaryTextColor = AppColors.secondaryText;
+    final backgroundColor = context.appBgColor;
+    final surfaceColor = context.appSurfaceColor;
+    final primaryTextColor = context.appPrimaryText;
+    final secondaryTextColor = context.appSecondaryText;
     final accentColor = ref.watch(currentColorProvider);
     final newsState = ref.watch(newsProvider);
     final recommendedArticles = _getRecommendedArticles(newsState.events);
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: backgroundColor,
       extendBody: true,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(

@@ -169,7 +169,6 @@ class _WhatYouCanDoScreenState extends ConsumerState<WhatYouCanDoScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
       body: SafeArea(
         child: AnimatedBuilder(
           animation: Listenable.merge([_contentController, _buttonController]),
@@ -272,7 +271,7 @@ class _WhatYouCanDoScreenState extends ConsumerState<WhatYouCanDoScreen>
 
   Widget _buildFeatureCard(Map<String, dynamic> feature) {
     return Card(
-      color: AppColors.appSurface,
+      color: context.appSurfaceColor,
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
@@ -307,14 +306,14 @@ class _WhatYouCanDoScreenState extends ConsumerState<WhatYouCanDoScreen>
                     _resolveTitle(context, feature['titleKey'] as String),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: AppColors.primaryText,
+                      color: context.appPrimaryText,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     _resolveDesc(context, feature['descKey'] as String),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.secondaryText,
+                      color: context.appSecondaryText,
                       height: 1.3,
                     ),
                   ),
