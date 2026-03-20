@@ -64,7 +64,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
       appBar: _buildAppBar(),
       body: _buildBody(),
     );
@@ -72,16 +71,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: AppColors.appBackground,
       elevation: 0,
       leading: IconButton(
         onPressed: () {
           HapticService.light();
           _showDrawer();
         },
-        icon: const Icon(
+        icon: Icon(
           Icons.menu,
-          color: AppColors.secondaryText,
+          color: context.appSecondaryText,
         ),
       ),
       title: _buildSegmentedControl(),
@@ -92,9 +90,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             HapticService.light();
             _showSettings();
           },
-          icon: const Icon(
+          icon: Icon(
             Icons.settings_outlined,
-            color: AppColors.secondaryText,
+            color: context.appSecondaryText,
           ),
         ),
       ],
@@ -105,7 +103,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Container(
       height: 36,
       decoration: BoxDecoration(
-        color: AppColors.appSurface.withValues(alpha: 0.6),
+        color: context.appSurfaceColor.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
@@ -141,14 +139,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Icon(
               icon,
               size: 18,
-              color: isSelected ? Colors.white : AppColors.secondaryText,
+              color: isSelected ? Colors.white : context.appSecondaryText,
             ),
             if (shouldShowText) ...[
               const SizedBox(width: 6),
               Text(
                 title,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: isSelected ? Colors.white : AppColors.secondaryText,
+                  color: isSelected ? Colors.white : context.appSecondaryText,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),

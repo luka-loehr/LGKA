@@ -74,7 +74,6 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     final logoSize = isSmallScreen ? 120.0 : 160.0;
     
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -121,7 +120,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                     Text(
                       AppLocalizations.of(context)!.welcomeSubtitle,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppColors.secondaryText,
+                        color: context.appSecondaryText,
                         fontSize: isSmallScreen ? 14 : 16,
                       ),
                       textAlign: TextAlign.center,

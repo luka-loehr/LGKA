@@ -10,6 +10,7 @@ class PreferencesManager {
   static const String _keyDebugMode = 'is_debug_mode';
   static const String _keyShowNavigationDebug = 'show_navigation_debug';
   static const String _keyAccentColor = 'accent_color';
+  static const String _keyThemeMode = 'theme_mode';
   static const String _keyVibrationEnabled = 'vibration_enabled';
   static const String _keyKrankmeldungInfoShown = 'krankmeldung_info_shown';
   static const String _keyLastPdfSearch = 'last_pdf_search_query';
@@ -81,6 +82,14 @@ class PreferencesManager {
 
   Future<void> setShowNavigationDebug(bool value) async {
     await _safePrefs.setBool(_keyShowNavigationDebug, value);
+  }
+
+  // Theme mode preference ('dark', 'light', 'system')
+  String get themeMode => _safePrefs.getString(_keyThemeMode) ?? 'system';
+
+  Future<void> setThemeMode(String mode) async {
+    await _safePrefs.setString(_keyThemeMode, mode);
+    AppLogger.info('Theme mode changed to $mode', module: 'Preferences');
   }
 
   // Accent color preference

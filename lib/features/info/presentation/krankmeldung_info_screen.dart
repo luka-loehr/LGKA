@@ -16,24 +16,22 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
       appBar: AppBar(
-        backgroundColor: AppColors.appBackground,
         elevation: 0,
         leading: IconButton(
           onPressed: () {
             HapticService.light();
             context.pop();
           },
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back,
-            color: AppColors.secondaryText,
+            color: context.appSecondaryText,
           ),
         ),
         title: Text(
           AppLocalizations.of(context)!.krankmeldungInfoHeader,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            color: AppColors.appOnSurface,
+            color: context.appPrimaryText,
             fontWeight: FontWeight.bold,
           ),
           maxLines: 1,
@@ -148,7 +146,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
 
   Widget _buildInfoCard(BuildContext context, IconData icon, String title, String description) {
     return Card(
-      color: AppColors.appSurface,
+      color: context.appSurfaceColor,
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 0),
       shape: RoundedRectangleBorder(
@@ -192,7 +190,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                       title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primaryText,
+                        color: context.appPrimaryText,
                         fontSize: 16,
                       ),
                     ),
@@ -201,7 +199,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                   Text(
                     description,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.secondaryText,
+                      color: context.appSecondaryText,
                       height: 1.4,
                       fontSize: 14,
                     ),

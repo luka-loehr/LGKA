@@ -32,18 +32,18 @@ class DrawerModal extends ConsumerWidget {
               Text(
                 AppLocalizations.of(context)!.more,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: AppColors.appOnSurface,
+                  color: context.appPrimaryText,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.appSurface,
+                  color: context.appSurfaceColor,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -112,14 +112,14 @@ class DrawerModal extends ConsumerWidget {
                 child: Text(
                   AppLocalizations.of(context)!.krankmeldung,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.appOnSurface,
+                    color: context.appPrimaryText,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
               Icon(
                 Icons.arrow_forward_ios,
-                color: AppColors.secondaryText.withValues(alpha: 0.5),
+                color: context.appSecondaryText.withValues(alpha: 0.5),
                 size: 14,
               ),
             ],
@@ -161,14 +161,14 @@ class DrawerModal extends ConsumerWidget {
                 child: Text(
                   AppLocalizations.of(context)!.news,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.appOnSurface,
+                    color: context.appPrimaryText,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
               Icon(
                 Icons.arrow_forward_ios,
-                color: AppColors.secondaryText.withValues(alpha: 0.5),
+                color: context.appSecondaryText.withValues(alpha: 0.5),
                 size: 14,
               ),
             ],
@@ -179,9 +179,11 @@ class DrawerModal extends ConsumerWidget {
   }
 
   Widget _buildDivider() {
-    return Container(
-      height: 1,
-      color: Colors.white.withValues(alpha: 0.1),
+    return Builder(
+      builder: (context) => Container(
+        height: 1,
+        color: context.appDividerColor,
+      ),
     );
   }
 
