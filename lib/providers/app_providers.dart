@@ -89,28 +89,28 @@ class PreferencesManagerState {
 
 /// Notifier for preferences manager
 class PreferencesManagerNotifier extends Notifier<PreferencesManagerState> {
-  final PreferencesManager _manager = PreferencesManager();
+  PreferencesManagerNotifier([PreferencesManager? manager])
+      : _manager = manager ?? PreferencesManager();
+
+  final PreferencesManager _manager;
 
   @override
   PreferencesManagerState build() {
-    // Initialize asynchronously
+    if (_manager.isInitialized) {
+      // Pre-initialized before runApp() — return correct state immediately,
+      // no async gap, no theme flash.
+      return _stateFromManager();
+    }
+    // Fallback: async init (should not normally be hit after main() pre-inits)
     Future.microtask(() async {
-      if (!_manager.isInitialized) {
-        await _manager.init();
-        _refreshState();
-      }
+      await _manager.init();
+      _refreshState();
     });
     return const PreferencesManagerState();
   }
 
-  Future<void> init() async {
-    await _manager.init();
-    _refreshState();
-  }
-
-  void _refreshState() {
-    if (!_manager.isInitialized) return;
-    state = PreferencesManagerState(
+  PreferencesManagerState _stateFromManager() {
+    return PreferencesManagerState(
       isInitialized: _manager.isInitialized,
       isFirstLaunch: _manager.isFirstLaunch,
       isAuthenticated: _manager.isAuthenticated,
@@ -128,6 +128,16 @@ class PreferencesManagerNotifier extends Notifier<PreferencesManagerState> {
       lastScheduleQuery5to10: _manager.lastScheduleQuery5to10,
       lastScheduleQueryJ11J12: _manager.lastScheduleQueryJ11J12,
     );
+  }
+
+  Future<void> init() async {
+    await _manager.init();
+    _refreshState();
+  }
+
+  void _refreshState() {
+    if (!_manager.isInitialized) return;
+    state = _stateFromManager();
   }
 
   Future<void> setFirstLaunch(bool value) async {

@@ -111,6 +111,13 @@ void main() async {
   
   runApp(
     ProviderScope(
+      overrides: [
+        // Supply the already-initialized PreferencesManager so the notifier's
+        // build() returns the correct theme/accent immediately — no flash.
+        preferencesManagerProvider.overrideWith(
+          () => PreferencesManagerNotifier(preferencesManager),
+        ),
+      ],
       child: LGKAApp(initialRoute: initialRoute),
     ),
   );
