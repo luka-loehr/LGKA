@@ -585,35 +585,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       return _buildScheduleEmpty();
     }
 
-    final allAvailable = [
-      ..._availableFirstHalbjahr,
-      ..._availableSecondHalbjahr,
-    ];
-
     // Schedules loaded but none available yet — nothing to show (same as old page)
-    if (allAvailable.isEmpty) return const SizedBox.shrink();
+    if (_availableFirstHalbjahr.isEmpty && _availableSecondHalbjahr.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    // Prefer 2nd semester; fall back to 1st if 2nd is not available
+    final activeGroup = _availableSecondHalbjahr.isNotEmpty
+        ? _availableSecondHalbjahr
+        : _availableFirstHalbjahr;
 
     final l10n = AppLocalizations.of(context)!;
-    final hasBoth = _availableFirstHalbjahr.isNotEmpty &&
-        _availableSecondHalbjahr.isNotEmpty;
     final items = <Widget>[];
 
-    void addGroup(List<ScheduleItem> group) {
-      final g5 = group.where((s) => s.gradeLevel == 'Klassen 5-10').toList();
-      final gJ = group.where((s) => s.gradeLevel == 'J11/J12').toList();
-      for (final s in [...g5, ...gJ]) {
-        items.add(_buildInlineScheduleCard(s, l10n));
-        items.add(const SizedBox(height: 12));
-      }
+    final g5 = activeGroup.where((s) => s.gradeLevel == 'Klassen 5-10').toList();
+    final gJ = activeGroup.where((s) => s.gradeLevel == 'J11/J12').toList();
+    for (final s in [...g5, ...gJ]) {
+      items.add(_buildInlineScheduleCard(s, l10n));
+      items.add(const SizedBox(height: 12));
     }
-
-    addGroup(_availableFirstHalbjahr);
-    if (hasBoth) {
-      items.add(Divider(
-          height: 24,
-          color: context.appSecondaryText.withValues(alpha: 0.2)));
-    }
-    addGroup(_availableSecondHalbjahr);
     if (items.isNotEmpty && items.last is SizedBox) items.removeLast();
 
     return Column(
