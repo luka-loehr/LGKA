@@ -33,6 +33,9 @@ class PreferencesManager {
     if (!_prefs!.containsKey(_keyAccentColor)) {
       await _prefs!.setString(_keyAccentColor, 'blue');
     }
+    if (!_prefs!.containsKey(_keyThemeMode)) {
+      await _prefs!.setString(_keyThemeMode, 'system');
+    }
   }
 
   /// Check if preferences manager is initialized
