@@ -72,6 +72,7 @@ class SettingsModal extends ConsumerWidget {
     final isDark = context.appBrightness == Brightness.dark;
     final circleBg = isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5EA);
     final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final ringColor = isDark ? Colors.white : Colors.black;
 
     final modes = [
       (mode: 'dark',   label: 'Dunkel', icon: Icons.dark_mode_rounded),
@@ -119,13 +120,13 @@ class SettingsModal extends ConsumerWidget {
                       color: circleBg,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: isSelected ? Colors.white : Colors.transparent,
+                        color: isSelected ? ringColor : Colors.transparent,
                         width: isSelected ? 3 : 0,
                       ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.3),
+                                color: ringColor.withValues(alpha: 0.3),
                                 blurRadius: 8,
                                 spreadRadius: 2,
                               ),
@@ -150,6 +151,7 @@ class SettingsModal extends ConsumerWidget {
   Widget _buildAccentColorSetting(BuildContext context, WidgetRef ref) {
     final choosableColors = ref.watch(choosableColorsProvider);
     final currentColorName = ref.watch(colorProvider);
+    final ringColor = context.appBrightness == Brightness.dark ? Colors.white : Colors.black;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,7 +190,7 @@ class SettingsModal extends ConsumerWidget {
                   color: colorPalette.color,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSelected ? Colors.white : Colors.transparent,
+                    color: isSelected ? ringColor : Colors.transparent,
                     width: isSelected ? 3 : 0,
                   ),
                   boxShadow: isSelected
