@@ -24,6 +24,17 @@ import '../../../../l10n/app_localizations.dart';
 
 const double _kCardHeight = 80.0;
 
+/// German → English weekday translation map (used for locale-aware display)
+const Map<String, String> _kDeToEn = {
+  'Montag': 'Monday',
+  'Dienstag': 'Tuesday',
+  'Mittwoch': 'Wednesday',
+  'Donnerstag': 'Thursday',
+  'Freitag': 'Friday',
+  'Samstag': 'Saturday',
+  'Sonntag': 'Sunday',
+};
+
 /// Main home screen — scrollable dashboard
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -518,16 +529,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final date = pdfState.date ?? '';
     final locale = Localizations.localeOf(context).languageCode;
     if (locale == 'en' && weekday.isNotEmpty) {
-      const de2en = {
-        'Montag': 'Monday',
-        'Dienstag': 'Tuesday',
-        'Mittwoch': 'Wednesday',
-        'Donnerstag': 'Thursday',
-        'Freitag': 'Friday',
-        'Samstag': 'Saturday',
-        'Sonntag': 'Sunday',
-      };
-      weekday = de2en[weekday] ?? weekday;
+      weekday = _kDeToEn[weekday] ?? weekday;
     }
     final isWeekend = weekday == 'weekend' || weekday.isEmpty;
     final l10n = AppLocalizations.of(context)!;
@@ -633,16 +635,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             : AppLocalizations.of(context)!.tomorrow);
     final locale = Localizations.localeOf(context).languageCode;
     if (locale == 'en') {
-      const de2en = {
-        'Montag': 'Monday',
-        'Dienstag': 'Tuesday',
-        'Mittwoch': 'Wednesday',
-        'Donnerstag': 'Thursday',
-        'Freitag': 'Friday',
-        'Samstag': 'Saturday',
-        'Sonntag': 'Sunday',
-      };
-      weekday = de2en[weekday] ?? weekday;
+      weekday = _kDeToEn[weekday] ?? weekday;
     }
     AppLogger.pdf(
         'Opening PDF: $weekday (${isToday ? 'today' : 'tomorrow'})');
