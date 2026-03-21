@@ -19,9 +19,9 @@ Future<Map<String, int>> _buildClassIndexInIsolate(String pdfPath) async {
     final bytes = await file.readAsBytes();
     final document = syncfusion.PdfDocument(inputBytes: bytes);
     final pageCount = document.pages.count;
-    
+
     final classToPage = <String, int>{};
-    
+
     // Build list of classes to search for
     final classesToFind = <String>[];
     for (int grade = 5; grade <= 10; grade++) {
@@ -29,7 +29,7 @@ Future<Map<String, int>> _buildClassIndexInIsolate(String pdfPath) async {
         classesToFind.add('$grade$letter');
       }
     }
-    
+
     // Search each page and record which classes are found on which page
     final textExtractor = syncfusion.PdfTextExtractor(document);
     for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
@@ -38,7 +38,7 @@ Future<Map<String, int>> _buildClassIndexInIsolate(String pdfPath) async {
           startPageIndex: pageIndex,
           endPageIndex: pageIndex,
         ).toLowerCase();
-        
+
         for (final className in classesToFind) {
           // Only record first occurrence (don't overwrite if already found)
           if (!classToPage.containsKey(className) && pageText.contains(className)) {
@@ -46,12 +46,25 @@ Future<Map<String, int>> _buildClassIndexInIsolate(String pdfPath) async {
             classToPage[className] = pageIndex + 2;
           }
         }
+        // Detect Jahrgang 11 / 12 pages
+        if (!classToPage.containsKey('j11') &&
+            (pageText.contains('j11') || pageText.contains('j 11') ||
+             pageText.contains('jahrgang 11') || pageText.contains('jg11') ||
+             pageText.contains('jg 11'))) {
+          classToPage['j11'] = pageIndex + 2;
+        }
+        if (!classToPage.containsKey('j12') &&
+            (pageText.contains('j12') || pageText.contains('j 12') ||
+             pageText.contains('jahrgang 12') || pageText.contains('jg12') ||
+             pageText.contains('jg 12'))) {
+          classToPage['j12'] = pageIndex + 2;
+        }
       } catch (e) {
         // Skip pages with extraction errors
         continue;
       }
     }
-    
+
     document.dispose();
     return classToPage;
   } catch (e) {
@@ -59,6 +72,7 @@ Future<Map<String, int>> _buildClassIndexInIsolate(String pdfPath) async {
     return {};
   }
 }
+
 
 /// How long between automatic availability re-checks.
 const Duration kScheduleAvailabilityCheckInterval = Duration(minutes: 15);
@@ -480,96 +494,120 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
     AppLogger.debug('Class index invalidated', module: 'ScheduleProvider');
   }
   
-  /// Preload the class index by finding, downloading, and indexing the 5-10 schedule
+  /// Preload the class index by scanning both the 5-10 PDF and the J11/J12 PDF.
+  /// j11/j12 entries in the index are page numbers within the J11/J12 PDF.
   Future<void> preloadClassIndex() async {
     if (state.isIndexBuilt) return; // Already built
-    
+
     try {
-      // Find the 5-10 schedule from available schedules
       final schedules = state.schedules;
       if (schedules.isEmpty) {
         AppLogger.debug('No schedules loaded yet, skipping class index preload', module: 'ScheduleProvider');
         return;
       }
-      
-      // Find a 5-10 schedule (prefer first halbjahr, then second)
+
+      // Find a 5-10 schedule (prefer 2nd halbjahr, then 1st)
       ScheduleItem? schedule5to10;
+      ScheduleItem? scheduleJ11J12;
       for (final schedule in schedules) {
-        if (schedule.gradeLevel == 'Klassen 5-10') {
-          // Check availability
-          if (await isScheduleAvailable(schedule)) {
-            schedule5to10 = schedule;
-            break;
-          }
+        if (schedule.gradeLevel == 'Klassen 5-10' && schedule5to10 == null) {
+          if (await isScheduleAvailable(schedule)) schedule5to10 = schedule;
+        }
+        if (schedule.gradeLevel == 'J11/J12' && scheduleJ11J12 == null) {
+          if (await isScheduleAvailable(schedule)) scheduleJ11J12 = schedule;
         }
       }
-      
+
       if (schedule5to10 == null) {
         AppLogger.debug('No available 5-10 schedule found for indexing', module: 'ScheduleProvider');
         return;
       }
-      
-      // Download the PDF
+
+      // Download and index the 5-10 PDF
       AppLogger.info('Downloading 5-10 schedule for class index...', module: 'ScheduleProvider');
-      final pdfFile = await _scheduleService.downloadSchedule(schedule5to10);
-      
-      if (pdfFile == null) {
-        AppLogger.error('Failed to download 5-10 schedule for indexing', module: 'ScheduleProvider');
-        return;
+      final pdf5to10 = await _scheduleService.downloadSchedule(schedule5to10);
+      if (pdf5to10 == null) return;
+
+      final stopwatch = Stopwatch()..start();
+      final index5to10 = await compute(_buildClassIndexInIsolate, pdf5to10.path);
+
+      // Download and index J11/J12 PDF if available
+      Map<String, int> indexJ11J12 = {};
+      if (scheduleJ11J12 != null) {
+        final pdfJ11J12 = await _scheduleService.downloadSchedule(scheduleJ11J12);
+        if (pdfJ11J12 != null) {
+          indexJ11J12 = await compute(_buildClassIndexInIsolate, pdfJ11J12.path);
+        }
       }
-      
-      // Build the index
-      await buildClassIndex(pdfFile);
+
+      stopwatch.stop();
+      final combined = {...index5to10, ...indexJ11J12};
+      AppLogger.success(
+        'Class index built: ${combined.length} classes in ${stopwatch.elapsedMilliseconds}ms',
+        module: 'ScheduleProvider',
+      );
+
+      state = state.copyWith(
+        classIndex5to10: combined,
+        isIndexBuilt: true,
+      );
     } catch (e) {
       AppLogger.error('Failed to preload class index', module: 'ScheduleProvider', error: e);
+      state = state.copyWith(isIndexBuilt: true);
     }
   }
-  
+
   /// Silently rebuild the class index in the background (app resume scenario)
-  /// This method is designed to be non-intrusive and won't trigger loading states
   Future<void> rebuildClassIndexSilently() async {
     if (state.isIndexBuilt) {
       AppLogger.debug('Class index already built, skipping silent rebuild', module: 'ScheduleProvider');
       return;
     }
-    
+
     try {
       AppLogger.info('Silent rebuild: Starting class index rebuild in background', module: 'ScheduleProvider');
-      
-      // Find the 5-10 schedule from available schedules
+
       final schedules = state.schedules;
       if (schedules.isEmpty) {
         AppLogger.debug('Silent rebuild: No schedules available, skipping', module: 'ScheduleProvider');
         return;
       }
-      
-      // Find a 5-10 schedule (prefer first halbjahr, then second)
+
       ScheduleItem? schedule5to10;
+      ScheduleItem? scheduleJ11J12;
       for (final schedule in schedules) {
-        if (schedule.gradeLevel == 'Klassen 5-10') {
+        if (schedule.gradeLevel == 'Klassen 5-10' && schedule5to10 == null) {
           schedule5to10 = schedule;
-          break;
+        } else if (schedule.gradeLevel == 'J11/J12' && scheduleJ11J12 == null) {
+          scheduleJ11J12 = schedule;
         }
+        if (schedule5to10 != null && scheduleJ11J12 != null) break;
       }
-      
+
       if (schedule5to10 == null) {
         AppLogger.debug('Silent rebuild: No 5-10 schedule found', module: 'ScheduleProvider');
         return;
       }
-      
-      // Try to use cached PDF or download silently (no loading state changes)
-      final pdfFile = await _scheduleService.downloadSchedule(schedule5to10);
-      
-      if (pdfFile == null) {
-        AppLogger.debug('Silent rebuild: PDF not available, will retry later', module: 'ScheduleProvider');
-        return;
+
+      final pdf5to10 = await _scheduleService.downloadSchedule(schedule5to10);
+      if (pdf5to10 == null) return;
+
+      final index5to10 = await compute(_buildClassIndexInIsolate, pdf5to10.path);
+
+      Map<String, int> indexJ11J12 = {};
+      if (scheduleJ11J12 != null) {
+        final pdfJ11J12 = await _scheduleService.downloadSchedule(scheduleJ11J12);
+        if (pdfJ11J12 != null) {
+          indexJ11J12 = await compute(_buildClassIndexInIsolate, pdfJ11J12.path);
+        }
       }
-      
-      // Build the index in background isolate
-      await buildClassIndex(pdfFile);
+
+      state = state.copyWith(
+        classIndex5to10: {...index5to10, ...indexJ11J12},
+        isIndexBuilt: true,
+      );
       AppLogger.success('Silent rebuild: Class index rebuilt successfully', module: 'ScheduleProvider');
     } catch (e) {
-      // Fail silently - don't disrupt user experience
       AppLogger.debug('Silent rebuild: Failed quietly ($e), will retry on next app resume', module: 'ScheduleProvider');
     }
   }
