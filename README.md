@@ -19,7 +19,7 @@ of the Lessing-Gymnasium Karlsruhe. Built with Flutter, featuring a clean Materi
 - **Official timetables** (PDF) with intelligent class search and instant navigation
 - **News feed** with articles, images, and downloadable attachments from the school
 - **Integrated PDF viewer** with zoom, share, and fast class lookup
-- **Live weather data** from [Open-Meteo](https://open-meteo.com) (free, no API key required) with smooth charts
+- **Live weather data** from [Open-Meteo](https://open-meteo.com) with current conditions and 3-day forecast
 - **Customizable accent colors** to personalize your experience
 - **Smart onboarding** with guided setup and color customization
 - **Absence reporting** via official school form
