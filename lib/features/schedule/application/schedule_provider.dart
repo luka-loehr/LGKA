@@ -482,6 +482,26 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
   int? getClassPageJ(String className) {
     return state.classIndexJ11J12[className.toLowerCase()];
   }
+
+  /// Get the cached PDF file for a given grade level (prefers 2nd halbjahr).
+  Future<File?> getCachedFileForGrade(String gradeLevel) async {
+    final all = [
+      ...state.availableSecondHalbjahr,
+      ...state.availableFirstHalbjahr,
+    ];
+    final schedule = all.where((s) => s.gradeLevel == gradeLevel).firstOrNull;
+    if (schedule == null) return null;
+    return getCachedScheduleFile(schedule);
+  }
+
+  /// Get the halbjahr label for a given grade level (prefers 2nd halbjahr).
+  String? getHalbjahrForGrade(String gradeLevel) {
+    final all = [
+      ...state.availableSecondHalbjahr,
+      ...state.availableFirstHalbjahr,
+    ];
+    return all.where((s) => s.gradeLevel == gradeLevel).firstOrNull?.halbjahr;
+  }
   
   /// Invalidate the class index (called on app resume to force rebuild)
   void invalidateClassIndex() {
@@ -531,7 +551,7 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
 
       // Download J11/J12 PDF for caching (so it opens instantly later)
       if (scheduleJ11J12 != null) {
-        unawaited(_scheduleService.downloadSchedule(scheduleJ11J12!));
+        unawaited(_scheduleService.downloadSchedule(scheduleJ11J12));
       }
 
       // j11 is always page 1 and j12 is always page 2 of the J11/J12 PDF
@@ -592,7 +612,7 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
       final index5to10 = await compute(_buildClassIndexInIsolate, pdf5to10.path);
 
       if (scheduleJ11J12 != null) {
-        unawaited(_scheduleService.downloadSchedule(scheduleJ11J12!));
+        unawaited(_scheduleService.downloadSchedule(scheduleJ11J12));
       }
 
       state = state.copyWith(
