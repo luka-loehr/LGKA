@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/news_models.dart';
 import '../data/news_service.dart';
 import '../../../../utils/app_logger.dart';
-import '../../../../providers/app_providers.dart';
 
 /// State class for news data
 class NewsState {
@@ -152,4 +151,7 @@ class NewsNotifier extends Notifier<NewsState> {
 
 /// Provider for news state
 final newsProvider = NotifierProvider<NewsNotifier, NewsState>(NewsNotifier.new);
+
+/// Provider for the shared [NewsService] instance.
+final newsServiceProvider = Provider<NewsService>((ref) => NewsService());
 
