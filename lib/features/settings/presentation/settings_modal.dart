@@ -224,8 +224,7 @@ class SettingsModal extends ConsumerWidget {
   Widget _colorRow(BuildContext context, WidgetRef ref) {
     final choosableColors = ref.watch(choosableColorsProvider);
     final currentColorName = ref.watch(colorProvider);
-    final isDark = context.appBrightness == Brightness.dark;
-    final ringColor = isDark ? Colors.white : Colors.black;
+    const ringColor = Colors.white;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
