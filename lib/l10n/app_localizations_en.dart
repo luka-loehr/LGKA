@@ -270,7 +270,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get featureWeatherTitle => 'Weather Data';
 
   @override
-  String get featureWeatherDesc => 'Access the school\'s own weather station';
+  String get featureWeatherDesc => 'Current weather data via Open-Meteo';
 
   @override
   String get featureNewsTitle => 'News';
