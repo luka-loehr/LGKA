@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../../../../theme/app_theme.dart';
 import '../../substitution/application/substitution_provider.dart';
 import '../../substitution/domain/substitution_models.dart';
@@ -162,7 +161,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: context.appBgColor,
       elevation: 0,
       scrolledUnderElevation: 0,
-      title: _buildDateLine(),
+      title: Text(
+        'LGKA+',
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: context.appPrimaryText,
+              fontWeight: FontWeight.w800,
+            ),
+      ),
       actions: [
         IconButton(
           onPressed: () {
@@ -250,20 +255,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildDateLine() {
-    final locale = Localizations.localeOf(context).languageCode;
-    final date = DateFormat('EEEE, d. MMMM', locale == 'de' ? 'de_DE' : 'en_US')
-        .format(DateTime.now());
-    return Text(
-      date,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: context.appPrimaryText,
-            fontWeight: FontWeight.w800,
-          ),
-    );
-  }
-
-  /// Crossfades between states identified by [key]. Pure opacity — no scale.
+/// Crossfades between states identified by [key]. Pure opacity — no scale.
   Widget _fadeSwitch(String key, Widget child) {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 450),
