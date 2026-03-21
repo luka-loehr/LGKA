@@ -68,6 +68,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   // PDF loading state
   bool _isPdfReady = false;
   bool _hasJumpedToSavedPage = false;
+  int? _pendingTargetPage; // page to jump to the moment the PDF becomes ready
 
   // Class input modal state
   bool _showClassModal = false;
@@ -170,12 +171,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       document: pdfx.PdfDocument.openFile(_effectivePdfFile.path),
     );
 
-    // Navigate to target page if provided
+    // Don't jump immediately — the document isn't rendered yet.
+    // Store the target and let _pageBuilder execute it once the PDF is ready.
     if (widget.targetPages != null && widget.targetPages!.isNotEmpty) {
+      _pendingTargetPage = widget.targetPages!.first;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final targetPage = widget.targetPages!.first;
-        _pdfController.jumpToPage(targetPage - 1);
-
         if (mounted) {
           FloatingToast.show(
             context,
@@ -388,6 +388,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       _showClassModal = false;
       _showClassSuccessFlash = false;
     });
+    _updateClassTitle(classInput.toLowerCase());
 
     _successColorController.reset();
 
@@ -450,17 +451,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     if (_hasJumpedToSavedPage) return;
 
     try {
+      if (!_isSchedule5to10()) return;
+
       final container = ProviderScope.containerOf(context, listen: false);
       final prefs = container.read(preferencesManagerProvider);
-      final dayLabel = (_effectiveDayName ?? '');
-      final isSchedule5to10 =
-          dayLabel.contains('Klassen') || dayLabel.contains('Grades');
-
-      if (!isSchedule5to10) return;
-
       final lastPage = prefs.lastSchedulePage5to10;
 
-      if ((widget.targetPages == null || widget.targetPages!.isEmpty) &&
+      // Only restore the saved page when no explicit target was provided
+      if (_pendingTargetPage == null &&
+          (widget.targetPages == null || widget.targetPages!.isEmpty) &&
           lastPage != null &&
           lastPage > 0) {
         _tryJumpToPage(lastPage, silent: true);
@@ -737,6 +736,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         if (!mounted) return;
 
         _pdfController.jumpToPage(page - 1);
+        _updateClassTitle(trimmedQuery);
 
         final prefsNotifier =
             container.read(preferencesManagerProvider.notifier);
@@ -794,6 +794,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         if (!mounted) return;
 
         _pdfController.jumpToPage(jPage - 1);
+        _updateClassTitle(trimmedQuery);
 
         final prefsNotifier = container.read(preferencesManagerProvider.notifier);
         unawaited(prefsNotifier.setSelectedScheduleClass(trimmedQuery));
@@ -881,15 +882,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       _overrideDayName = newDayName;
       _isPdfReady = false;
       _hasJumpedToSavedPage = false;
+      _pendingTargetPage = targetPage; // executed by _pageBuilder when ready
       _isSearchBarVisible = false;
       _searchResults = [];
     });
 
-    // Jump to target page once the new document is ready
-    _retryTimer?.cancel();
-    _setupRetryMechanism(targetPage);
-
-    // Show toast after the first frame
+    // Show toast after the first frame, then dispose old controller
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         FloatingToast.show(
@@ -900,6 +898,16 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       }
       oldController.dispose();
     });
+  }
+
+  /// Updates the appBar title to reflect [className] while preserving the
+  /// semester suffix (the part after ' – ').
+  void _updateClassTitle(String className) {
+    final classTitle = _formatClassNameForDayName(className);
+    final current = _effectiveDayName ?? '';
+    final sepIdx = current.indexOf(' – ');
+    final suffix = sepIdx >= 0 ? current.substring(sepIdx) : '';
+    setState(() => _overrideDayName = '$classTitle$suffix');
   }
 
   static String _formatClassNameForDayName(String className) {
@@ -1098,7 +1106,14 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       _isPdfReady = true;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!_hasJumpedToSavedPage) {
+        if (_pendingTargetPage != null) {
+          final page = _pendingTargetPage!;
+          _pendingTargetPage = null;
+          _tryJumpToPage(page);
+          if (!_hasJumpedToSavedPage) {
+            _setupRetryMechanism(page);
+          }
+        } else if (!_hasJumpedToSavedPage) {
           _attemptJumpToSavedPage();
         }
       });
