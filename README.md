@@ -8,8 +8,7 @@
 [![App Store](https://img.shields.io/badge/App%20Store-%20-black?style=flat&logo=apple&logoColor=white)](https://apps.apple.com/app/lgka/id6747010920)
 [![Google Play](https://img.shields.io/badge/Google%20Play-%20-3DDC84?style=flat&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.lgka)
 
-**LGKA+** is a mobile app for substitution plans, timetables, news, absence reporting, and weather data  
-of the Lessing-Gymnasium Karlsruhe. Built with Flutter, featuring a clean Material Design 3 interface.  
+**LGKA+** is a mobile app for substitution plans, timetables, news, absence reporting, and weather data of the Lessing-Gymnasium Karlsruhe. Built with Flutter, featuring a clean Material Design 3 interface.
 
 ---
 
