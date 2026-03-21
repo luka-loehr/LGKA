@@ -23,6 +23,7 @@ class PreferencesManagerState {
   final int? lastSchedulePageJ11J12;
   final String? lastScheduleQuery5to10;
   final String? lastScheduleQueryJ11J12;
+  final String? selectedScheduleClass;
 
   const PreferencesManagerState({
     this.isInitialized = false,
@@ -41,6 +42,7 @@ class PreferencesManagerState {
     this.lastSchedulePageJ11J12,
     this.lastScheduleQuery5to10,
     this.lastScheduleQueryJ11J12,
+    this.selectedScheduleClass,
   });
 
   PreferencesManagerState copyWith({
@@ -60,6 +62,7 @@ class PreferencesManagerState {
     int? lastSchedulePageJ11J12,
     String? lastScheduleQuery5to10,
     String? lastScheduleQueryJ11J12,
+    String? selectedScheduleClass,
   }) {
     return PreferencesManagerState(
       isInitialized: isInitialized ?? this.isInitialized,
@@ -78,6 +81,7 @@ class PreferencesManagerState {
       lastSchedulePageJ11J12: lastSchedulePageJ11J12 ?? this.lastSchedulePageJ11J12,
       lastScheduleQuery5to10: lastScheduleQuery5to10 ?? this.lastScheduleQuery5to10,
       lastScheduleQueryJ11J12: lastScheduleQueryJ11J12 ?? this.lastScheduleQueryJ11J12,
+      selectedScheduleClass: selectedScheduleClass ?? this.selectedScheduleClass,
     );
   }
 }
@@ -122,6 +126,7 @@ class PreferencesManagerNotifier extends Notifier<PreferencesManagerState> {
       lastSchedulePageJ11J12: _manager.lastSchedulePageJ11J12,
       lastScheduleQuery5to10: _manager.lastScheduleQuery5to10,
       lastScheduleQueryJ11J12: _manager.lastScheduleQueryJ11J12,
+      selectedScheduleClass: _manager.selectedScheduleClass,
     );
   }
 
@@ -207,6 +212,11 @@ class PreferencesManagerNotifier extends Notifier<PreferencesManagerState> {
 
   Future<void> setLastScheduleQueryJ11J12(String? value) async {
     await _manager.setLastScheduleQueryJ11J12(value);
+    _refreshState();
+  }
+
+  Future<void> setSelectedScheduleClass(String? className) async {
+    await _manager.setSelectedScheduleClass(className);
     _refreshState();
   }
 

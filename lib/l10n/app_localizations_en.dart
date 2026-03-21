@@ -45,10 +45,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverMaintenance => 'Maintenance work in progress';
 
   @override
-  String get weatherStationRepair => 'Repair work in progress';
+  String get weatherStationRepair => 'Weather data temporarily unavailable';
 
   @override
-  String get weatherStationRepairFooter => 'The weather station will be available again soon';
+  String get weatherStationRepairFooter => 'Weather data will be available again soon';
 
   @override
   String get serverConnectionFailed => 'Server connection failed';
@@ -66,10 +66,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dataBeingCollected => 'Data being collected';
 
   @override
-  String get liveWeatherDescription => 'Directly from the school\'s own weather station on the roof. Real-time data from your school!';
+  String get liveWeatherDescription => 'Current weather data for Karlsruhe, provided by Open-Meteo – free and without tracking.';
 
   @override
-  String get dataCollectionDescription => 'The weather station is currently collecting new data for today. Charts and additional values will be displayed once enough data points are available.';
+  String get dataCollectionDescription => 'Open-Meteo is currently collecting new data for today. Charts and additional values will be displayed once enough data points are available.';
 
   @override
   String get welcomeHeadline => 'Welcome!';

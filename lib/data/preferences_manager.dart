@@ -15,6 +15,9 @@ class PreferencesManager {
   static const String _keyKrankmeldungInfoShown = 'krankmeldung_info_shown';
   static const String _keyLastPdfSearch = 'last_pdf_search_query';
   static const String _keyLastPdfPage = 'last_pdf_search_page';
+  // Selected class for schedule (e.g. "10b", "j11", "j12")
+  static const String _keySelectedScheduleClass = 'selected_schedule_class';
+
   // Per-schedule keys (exclude substitution plans)
   static const String _keyLastPage5to10 = 'last_schedule_5_10_page';
   static const String _keyLastPageJ11J12 = 'last_schedule_j11_12_page';
@@ -117,6 +120,17 @@ class PreferencesManager {
 
   Future<void> setKrankmeldungInfoShown(bool value) async {
     await _safePrefs.setBool(_keyKrankmeldungInfoShown, value);
+  }
+
+  // Selected class for schedule (e.g. "10b", "j11", "j12")
+  String? get selectedScheduleClass => _safePrefs.getString(_keySelectedScheduleClass);
+
+  Future<void> setSelectedScheduleClass(String? className) async {
+    if (className == null) {
+      await _safePrefs.remove(_keySelectedScheduleClass);
+    } else {
+      await _safePrefs.setString(_keySelectedScheduleClass, className);
+    }
   }
 
   // Last PDF search query (for schedule convenience)
