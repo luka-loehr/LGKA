@@ -3,13 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:pdfx/pdfx.dart' as pdfx;
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
 import '../../../../../l10n/app_localizations.dart';
-import '../../../../../navigation/app_router.dart';
 import '../../../../../providers/app_providers.dart';
 import '../../../schedule/application/schedule_provider.dart';
 import '../../../../../services/haptic_service.dart';
@@ -47,8 +45,16 @@ class PDFViewerScreen extends StatefulWidget {
 class _PDFViewerScreenState extends State<PDFViewerScreen>
     with TickerProviderStateMixin {
   // PDF controller
-  late final pdfx.PdfController _pdfController;
+  late pdfx.PdfController _pdfController;
   final GlobalKey _shareButtonKey = GlobalKey();
+
+  // In-place PDF switching: when the user searches for a class that lives in
+  // the other PDF, we swap the file without leaving the screen.
+  File? _overridePdfFile;
+  String? _overrideDayName;
+
+  File get _effectivePdfFile => _overridePdfFile ?? widget.pdfFile;
+  String? get _effectiveDayName => _overrideDayName ?? widget.dayName;
 
   // Search functionality
   final TextEditingController _searchController = TextEditingController();
@@ -161,7 +167,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
   void _initializePdfController() {
     _pdfController = pdfx.PdfController(
-      document: pdfx.PdfDocument.openFile(widget.pdfFile.path),
+      document: pdfx.PdfDocument.openFile(_effectivePdfFile.path),
     );
 
     // Navigate to target page if provided
@@ -233,7 +239,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   // ============================================================================
 
   void _checkAndShowClassModal() {
-    final dayLabel = widget.dayName ?? '';
+    final dayLabel = (_effectiveDayName ?? '');
     final isSchedule5to10 =
         dayLabel.contains('Klassen') || dayLabel.contains('Grades');
 
@@ -293,7 +299,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
     // Validate with minimum loading time
     final results = await Future.wait([
-      PdfSearchService.checkQueryExistsInPdf(widget.pdfFile, classInput),
+      PdfSearchService.checkQueryExistsInPdf(_effectivePdfFile, classInput),
       Future.delayed(const Duration(seconds: 1)),
     ]);
     final classExists = results[0] as bool;
@@ -446,7 +452,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     try {
       final container = ProviderScope.containerOf(context, listen: false);
       final prefs = container.read(preferencesManagerProvider);
-      final dayLabel = widget.dayName ?? '';
+      final dayLabel = (_effectiveDayName ?? '');
       final isSchedule5to10 =
           dayLabel.contains('Klassen') || dayLabel.contains('Grades');
 
@@ -537,7 +543,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     }
 
     try {
-      final results = await PdfSearchService.searchInPdf(widget.pdfFile, query);
+      final results = await PdfSearchService.searchInPdf(_effectivePdfFile, query);
 
       setState(() => _searchResults = results);
 
@@ -586,8 +592,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         final container = ProviderScope.containerOf(context, listen: false);
         final prefsNotifier =
             container.read(preferencesManagerProvider.notifier);
-        final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen') ||
-            (widget.dayName ?? '').contains('Grades');
+        final isSchedule5to10 = ((_effectiveDayName ?? '')).contains('Klassen') ||
+            ((_effectiveDayName ?? '')).contains('Grades');
 
         if (isSchedule5to10) {
           unawaited(prefsNotifier.setLastScheduleQuery5to10(result.query));
@@ -823,7 +829,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     }
   }
 
-  /// Navigates cross-PDF: pushes a new viewer for [targetGradeLevel] at [targetPage].
+  /// Switches the PDF in-place (no navigation animation) to [targetGradeLevel]
+  /// at [targetPage], saving the selected class to preferences.
   Future<void> _navigateCrossPdf(
     String className,
     String targetGradeLevel,
@@ -857,10 +864,41 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
     if (!mounted) return;
 
-    context.pushReplacement(AppRouter.pdfViewer, extra: {
-      'file': cachedFile,
-      'dayName': newDayName,
-      'targetPages': [targetPage],
+    _switchPdfInPlace(cachedFile, newDayName, targetPage, className);
+  }
+
+  /// Swaps the displayed PDF without leaving the screen.
+  void _switchPdfInPlace(File newFile, String newDayName, int targetPage, String className) {
+    final oldController = _pdfController;
+
+    // Build new controller before setState so PdfView gets it on the next build
+    _pdfController = pdfx.PdfController(
+      document: pdfx.PdfDocument.openFile(newFile.path),
+    );
+
+    setState(() {
+      _overridePdfFile = newFile;
+      _overrideDayName = newDayName;
+      _isPdfReady = false;
+      _hasJumpedToSavedPage = false;
+      _isSearchBarVisible = false;
+      _searchResults = [];
+    });
+
+    // Jump to target page once the new document is ready
+    _retryTimer?.cancel();
+    _setupRetryMechanism(targetPage);
+
+    // Show toast after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        FloatingToast.show(
+          context,
+          message: AppLocalizations.of(context)!.singleResultFound(className),
+          duration: const Duration(seconds: 2),
+        );
+      }
+      oldController.dispose();
     });
   }
 
@@ -882,8 +920,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
     try {
       await PdfShareService.sharePdf(
-        pdfFile: widget.pdfFile,
-        dayName: widget.dayName,
+        pdfFile: _effectivePdfFile,
+        dayName: _effectiveDayName,
         shareButtonKey: _shareButtonKey,
         l10n: l10n,
       );
@@ -936,8 +974,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   }
 
   String _getHeaderTitle() {
-    if (widget.dayName != null && widget.dayName!.isNotEmpty) {
-      final dn = widget.dayName!;
+    if (_effectiveDayName != null && _effectiveDayName!.isNotEmpty) {
+      final dn = _effectiveDayName!;
       final isSchedule = dn.contains('Klassen') ||
           dn.contains('Grades') ||
           dn.contains('J11/J12');
@@ -950,15 +988,15 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   }
 
   bool _isSchedule5to10() {
-    if (widget.dayName == null || widget.dayName!.isEmpty) return false;
-    final dn = widget.dayName!;
+    if (_effectiveDayName == null || _effectiveDayName!.isEmpty) return false;
+    final dn = _effectiveDayName!;
     // 'Klasse' matches both 'Klasse 10b' and 'Klassen 5-10'; 'Grade' matches both singular/plural
     return dn.contains('Klasse') || dn.contains('Grade');
   }
 
   bool _isScheduleJ11J12() {
-    if (widget.dayName == null || widget.dayName!.isEmpty) return false;
-    final dn = widget.dayName!;
+    if (_effectiveDayName == null || _effectiveDayName!.isEmpty) return false;
+    final dn = _effectiveDayName!;
     return dn.contains('J11/J12') || dn.contains('Jahrgang');
   }
 
@@ -1022,6 +1060,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
   Widget _buildPdfViewer() {
     return pdfx.PdfView(
+      key: ValueKey(_effectivePdfFile.path),
       controller: _pdfController,
       builders: pdfx.PdfViewBuilders<pdfx.DefaultBuilderOptions>(
         options: pdfx.DefaultBuilderOptions(
