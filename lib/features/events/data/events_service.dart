@@ -43,28 +43,34 @@ class EventsService {
       final allEvents = <SchoolEvent>[];
       final seen = <String>{};
 
-      for (int week = 0; week < _weeksToFetch; week++) {
+      // Fetch all weeks in parallel
+      final urls = List.generate(_weeksToFetch, (week) {
         final target = today.add(Duration(days: week * 7));
-        final url = _weekUrl(target);
-        AppLogger.debug('Events: fetching week $week — $url', module: 'EventsService');
+        return _weekUrl(target);
+      });
 
-        final response = await http
+      AppLogger.debug('Events: fetching ${urls.length} weeks in parallel',
+          module: 'EventsService');
+
+      final responses = await Future.wait(
+        urls.map((url) => http
             .get(Uri.parse(url))
-            .timeout(const Duration(seconds: 10));
+            .timeout(const Duration(seconds: 10))),
+      );
 
+      for (int i = 0; i < responses.length; i++) {
+        final response = responses[i];
         if (response.statusCode != 200) {
           AppLogger.warning(
-              'Events: HTTP ${response.statusCode} for week $week',
+              'Events: HTTP ${response.statusCode} for week $i',
               module: 'EventsService');
           continue;
         }
-
         final parsed = _parseWeekHtml(response.body, today);
         for (final event in parsed) {
-          final key = '${event.date.toIso8601String()}|${event.title.toLowerCase().trim()}';
-          if (seen.add(key)) {
-            allEvents.add(event);
-          }
+          final key =
+              '${event.date.toIso8601String()}|${event.title.toLowerCase().trim()}';
+          if (seen.add(key)) allEvents.add(event);
         }
       }
 
