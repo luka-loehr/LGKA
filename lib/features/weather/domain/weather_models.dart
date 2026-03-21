@@ -1,22 +1,120 @@
 // Copyright Luka Löhr 2026
 
-/// Current weather conditions from OWM One Call 3.0
+import 'package:flutter/material.dart';
+import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart'
+    hide WeatherDataState;
+import 'package:weather_icons/weather_icons.dart';
+
+// ── WMO utility ──────────────────────────────────────────────────────────────
+
+class WmoUtils {
+  WmoUtils._();
+
+  /// German description for a WMO weather code.
+  static String description(int code) {
+    switch (code) {
+      case 0:  return 'Klarer Himmel';
+      case 1:  return 'Überwiegend klar';
+      case 2:  return 'Teilweise bewölkt';
+      case 3:  return 'Bedeckt';
+      case 45: return 'Nebel';
+      case 48: return 'Gefrierender Nebel';
+      case 51: return 'Leichter Nieselregen';
+      case 53: return 'Mäßiger Nieselregen';
+      case 55: return 'Dichter Nieselregen';
+      case 56: return 'Leichter gefrierender Nieselregen';
+      case 57: return 'Gefrierender Nieselregen';
+      case 61: return 'Leichter Regen';
+      case 63: return 'Mäßiger Regen';
+      case 65: return 'Starker Regen';
+      case 66: return 'Leichter gefrierender Regen';
+      case 67: return 'Gefrierender Regen';
+      case 71: return 'Leichter Schneefall';
+      case 73: return 'Mäßiger Schneefall';
+      case 75: return 'Starker Schneefall';
+      case 77: return 'Schneekörner';
+      case 80: return 'Leichte Regenschauer';
+      case 81: return 'Mäßige Regenschauer';
+      case 82: return 'Starke Regenschauer';
+      case 85: return 'Leichte Schneeschauer';
+      case 86: return 'Starke Schneeschauer';
+      case 95: return 'Gewitter';
+      case 96: return 'Gewitter mit Hagel';
+      case 99: return 'Gewitter mit schwerem Hagel';
+      default: return 'Unbekannt';
+    }
+  }
+
+  /// Maps a WMO code + day/night flag to a [WeatherType] animation.
+  static WeatherType weatherType(int code, bool isDay) {
+    if (code == 0 || code == 1) return isDay ? WeatherType.sunny : WeatherType.sunnyNight;
+    if (code == 2)              return isDay ? WeatherType.cloudy : WeatherType.cloudyNight;
+    if (code == 3)              return isDay ? WeatherType.overcast : WeatherType.cloudyNight;
+    if (code == 45 || code == 48) return WeatherType.foggy;
+    if (code == 51 || code == 53 || code == 56) return WeatherType.lightRainy;
+    if (code == 55 || code == 57 || code == 66 || code == 67) return WeatherType.middleRainy;
+    if (code == 61 || code == 80) return WeatherType.lightRainy;
+    if (code == 63 || code == 81) return WeatherType.middleRainy;
+    if (code == 65 || code == 82) return WeatherType.heavyRainy;
+    if (code == 71 || code == 77 || code == 85) return WeatherType.lightSnow;
+    if (code == 73) return WeatherType.middleSnow;
+    if (code == 75 || code == 86) return WeatherType.heavySnow;
+    if (code == 95 || code == 96 || code == 99) return WeatherType.thunder;
+    return isDay ? WeatherType.cloudy : WeatherType.cloudyNight;
+  }
+
+  /// Returns the best [IconData] from the weather_icons package for a WMO code.
+  static IconData icon(int code, bool isDay) {
+    switch (code) {
+      case 0:
+      case 1:  return isDay ? WeatherIcons.day_sunny : WeatherIcons.night_clear;
+      case 2:  return isDay ? WeatherIcons.day_cloudy : WeatherIcons.night_alt_cloudy;
+      case 3:  return WeatherIcons.cloudy;
+      case 45:
+      case 48: return WeatherIcons.fog;
+      case 51:
+      case 53: return isDay ? WeatherIcons.day_sprinkle : WeatherIcons.night_alt_sprinkle;
+      case 55: return WeatherIcons.sprinkle;
+      case 56:
+      case 57: return WeatherIcons.sleet;
+      case 61: return isDay ? WeatherIcons.day_rain : WeatherIcons.night_alt_rain;
+      case 63: return WeatherIcons.rain;
+      case 65: return WeatherIcons.rain_wind;
+      case 66:
+      case 67: return WeatherIcons.sleet;
+      case 71: return isDay ? WeatherIcons.day_snow : WeatherIcons.night_alt_snow;
+      case 73: return WeatherIcons.snow;
+      case 75: return WeatherIcons.snow_wind;
+      case 77: return WeatherIcons.snowflake_cold;
+      case 80: return isDay ? WeatherIcons.day_showers : WeatherIcons.night_alt_showers;
+      case 81: return WeatherIcons.showers;
+      case 82: return WeatherIcons.storm_showers;
+      case 85: return isDay ? WeatherIcons.day_snow : WeatherIcons.night_alt_snow;
+      case 86: return WeatherIcons.snow_wind;
+      case 95: return isDay ? WeatherIcons.day_thunderstorm : WeatherIcons.night_alt_thunderstorm;
+      case 96:
+      case 99: return WeatherIcons.thunderstorm;
+      default: return WeatherIcons.cloudy;
+    }
+  }
+}
+
+// ── Models ───────────────────────────────────────────────────────────────────
+
+/// Current weather conditions from Open-Meteo.
 class CurrentWeather {
   final double temp;
   final double feelsLike;
   final int humidity;
-  final double windSpeed; // m/s
+  final double windSpeed; // km/h
   final int windDeg;
-  final double windGust;
-  final int pressure; // hPa
+  final double windGust; // km/h
+  final int pressure; // hPa (mean sea level)
   final int clouds; // %
-  final int visibility; // m
+  final double visibility; // m
   final double uvi;
-  final String description;
-  final String icon; // e.g. "02d"
-  final String main; // e.g. "Clouds"
-  final DateTime sunrise;
-  final DateTime sunset;
+  final int weatherCode; // WMO code
+  final bool isDay;
   final DateTime dt;
 
   const CurrentWeather({
@@ -30,160 +128,60 @@ class CurrentWeather {
     required this.clouds,
     required this.visibility,
     required this.uvi,
-    required this.description,
-    required this.icon,
-    required this.main,
-    required this.sunrise,
-    required this.sunset,
+    required this.weatherCode,
+    required this.isDay,
     required this.dt,
   });
 
-  factory CurrentWeather.fromJson(Map<String, dynamic> json) {
-    final weather = (json['weather'] as List).first as Map<String, dynamic>;
-    return CurrentWeather(
-      temp: (json['temp'] as num).toDouble(),
-      feelsLike: (json['feels_like'] as num).toDouble(),
-      humidity: json['humidity'] as int,
-      windSpeed: (json['wind_speed'] as num).toDouble(),
-      windDeg: json['wind_deg'] as int,
-      windGust: (json['wind_gust'] as num? ?? 0).toDouble(),
-      pressure: json['pressure'] as int,
-      clouds: json['clouds'] as int,
-      visibility: json['visibility'] as int? ?? 10000,
-      uvi: (json['uvi'] as num).toDouble(),
-      description: weather['description'] as String,
-      icon: weather['icon'] as String,
-      main: weather['main'] as String,
-      sunrise: DateTime.fromMillisecondsSinceEpoch(
-          (json['sunrise'] as int) * 1000),
-      sunset:
-          DateTime.fromMillisecondsSinceEpoch((json['sunset'] as int) * 1000),
-      dt: DateTime.fromMillisecondsSinceEpoch((json['dt'] as int) * 1000),
-    );
-  }
+  String get description => WmoUtils.description(weatherCode);
 }
 
-/// One hourly entry from OWM One Call 3.0 (48 entries available)
+/// One hourly entry from Open-Meteo.
 class HourlyForecast {
   final DateTime dt;
   final double temp;
-  final double feelsLike;
   final int humidity;
-  final double windSpeed;
+  final double windSpeed; // km/h
   final int windDeg;
-  final double pop; // probability of precipitation 0.0–1.0
-  final double? rain1h; // mm
-  final double? snow1h; // mm
-  final String description;
-  final String icon;
-  final String main;
+  final double pop; // 0.0–1.0
+  final int weatherCode; // WMO code
+  final bool isDay;
 
   const HourlyForecast({
     required this.dt,
     required this.temp,
-    required this.feelsLike,
     required this.humidity,
     required this.windSpeed,
     required this.windDeg,
     required this.pop,
-    this.rain1h,
-    this.snow1h,
-    required this.description,
-    required this.icon,
-    required this.main,
+    required this.weatherCode,
+    required this.isDay,
   });
-
-  factory HourlyForecast.fromJson(Map<String, dynamic> json) {
-    final weather = (json['weather'] as List).first as Map<String, dynamic>;
-    final rain = json['rain'] as Map<String, dynamic>?;
-    final snow = json['snow'] as Map<String, dynamic>?;
-    return HourlyForecast(
-      dt: DateTime.fromMillisecondsSinceEpoch((json['dt'] as int) * 1000),
-      temp: (json['temp'] as num).toDouble(),
-      feelsLike: (json['feels_like'] as num).toDouble(),
-      humidity: json['humidity'] as int,
-      windSpeed: (json['wind_speed'] as num).toDouble(),
-      windDeg: json['wind_deg'] as int,
-      pop: (json['pop'] as num).toDouble(),
-      rain1h: rain != null ? (rain['1h'] as num?)?.toDouble() : null,
-      snow1h: snow != null ? (snow['1h'] as num?)?.toDouble() : null,
-      description: weather['description'] as String,
-      icon: weather['icon'] as String,
-      main: weather['main'] as String,
-    );
-  }
 }
 
-/// One daily entry from OWM One Call 3.0 (8 entries available)
+/// One daily entry from Open-Meteo.
 class DailyForecast {
   final DateTime dt;
   final DateTime sunrise;
   final DateTime sunset;
-  final double tempDay;
-  final double tempMin;
   final double tempMax;
-  final double tempNight;
-  final double feelsLikeDay;
-  final int humidity;
-  final double windSpeed;
-  final int windDeg;
-  final double pop;
-  final double? rain; // mm
-  final double? snow; // mm
+  final double tempMin;
+  final double pop; // 0.0–1.0
   final double uvi;
-  final String description;
-  final String summary;
-  final String icon;
-  final String main;
+  final double windSpeed; // km/h max
+  final int weatherCode; // WMO code
 
   const DailyForecast({
     required this.dt,
     required this.sunrise,
     required this.sunset,
-    required this.tempDay,
-    required this.tempMin,
     required this.tempMax,
-    required this.tempNight,
-    required this.feelsLikeDay,
-    required this.humidity,
-    required this.windSpeed,
-    required this.windDeg,
+    required this.tempMin,
     required this.pop,
-    this.rain,
-    this.snow,
     required this.uvi,
-    required this.description,
-    required this.summary,
-    required this.icon,
-    required this.main,
+    required this.windSpeed,
+    required this.weatherCode,
   });
 
-  factory DailyForecast.fromJson(Map<String, dynamic> json) {
-    final weather = (json['weather'] as List).first as Map<String, dynamic>;
-    final temp = json['temp'] as Map<String, dynamic>;
-    final feelsLike = json['feels_like'] as Map<String, dynamic>;
-    return DailyForecast(
-      dt: DateTime.fromMillisecondsSinceEpoch((json['dt'] as int) * 1000),
-      sunrise: DateTime.fromMillisecondsSinceEpoch(
-          (json['sunrise'] as int) * 1000),
-      sunset:
-          DateTime.fromMillisecondsSinceEpoch((json['sunset'] as int) * 1000),
-      tempDay: (temp['day'] as num).toDouble(),
-      tempMin: (temp['min'] as num).toDouble(),
-      tempMax: (temp['max'] as num).toDouble(),
-      tempNight: (temp['night'] as num).toDouble(),
-      feelsLikeDay: (feelsLike['day'] as num).toDouble(),
-      humidity: json['humidity'] as int,
-      windSpeed: (json['wind_speed'] as num).toDouble(),
-      windDeg: json['wind_deg'] as int,
-      pop: (json['pop'] as num).toDouble(),
-      rain: (json['rain'] as num?)?.toDouble(),
-      snow: (json['snow'] as num?)?.toDouble(),
-      uvi: (json['uvi'] as num).toDouble(),
-      description: weather['description'] as String,
-      summary: json['summary'] as String? ?? '',
-      icon: weather['icon'] as String,
-      main: weather['main'] as String,
-    );
-  }
+  String get description => WmoUtils.description(weatherCode);
 }

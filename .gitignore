@@ -134,3 +134,4 @@ NOTES.txt
 TEMP*.md
 TODO.txt
 build/
+orin-cli/
