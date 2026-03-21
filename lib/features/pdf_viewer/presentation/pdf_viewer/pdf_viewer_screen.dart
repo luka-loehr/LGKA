@@ -729,6 +729,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
             container.read(preferencesManagerProvider.notifier);
         unawaited(prefsNotifier.setLastSchedulePage5to10(page));
         unawaited(prefsNotifier.setLastScheduleQuery5to10(trimmedQuery));
+        unawaited(prefsNotifier.setSelectedScheduleClass(trimmedQuery));
 
         if (mounted) {
           FloatingToast.show(
