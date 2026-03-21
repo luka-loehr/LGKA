@@ -175,16 +175,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     // Store the target and let _pageBuilder execute it once the PDF is ready.
     if (widget.targetPages != null && widget.targetPages!.isNotEmpty) {
       _pendingTargetPage = widget.targetPages!.first;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          FloatingToast.show(
-            context,
-            message: AppLocalizations.of(context)!
-                .foundPages(widget.targetPages!.join(", ")),
-            duration: const Duration(seconds: 3),
-          );
-        }
-      });
     }
 
     _initializePdfReadyDetection();
