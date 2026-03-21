@@ -46,19 +46,6 @@ Future<Map<String, int>> _buildClassIndexInIsolate(String pdfPath) async {
             classToPage[className] = pageIndex + 2;
           }
         }
-        // Detect Jahrgang 11 / 12 pages
-        if (!classToPage.containsKey('j11') &&
-            (pageText.contains('j11') || pageText.contains('j 11') ||
-             pageText.contains('jahrgang 11') || pageText.contains('jg11') ||
-             pageText.contains('jg 11'))) {
-          classToPage['j11'] = pageIndex + 2;
-        }
-        if (!classToPage.containsKey('j12') &&
-            (pageText.contains('j12') || pageText.contains('j 12') ||
-             pageText.contains('jahrgang 12') || pageText.contains('jg12') ||
-             pageText.contains('jg 12'))) {
-          classToPage['j12'] = pageIndex + 2;
-        }
       } catch (e) {
         // Skip pages with extraction errors
         continue;
@@ -83,7 +70,8 @@ class ScheduleState {
   final bool isLoading;
   final String? error;
   final DateTime? lastUpdated;
-  final Map<String, int> classIndex5to10; // Maps class name -> page number (1-based)
+  final Map<String, int> classIndex5to10;  // Maps 5a-10e → page number in 5-10 PDF
+  final Map<String, int> classIndexJ11J12; // Maps j11/j12 → page number in J11/J12 PDF
   final bool isIndexBuilt;
 
   // Availability — which PDFs are reachable/cached right now
@@ -98,6 +86,7 @@ class ScheduleState {
     this.error,
     this.lastUpdated,
     this.classIndex5to10 = const {},
+    this.classIndexJ11J12 = const {},
     this.isIndexBuilt = false,
     this.availableFirstHalbjahr = const [],
     this.availableSecondHalbjahr = const [],
@@ -112,6 +101,7 @@ class ScheduleState {
     bool clearError = false,
     DateTime? lastUpdated,
     Map<String, int>? classIndex5to10,
+    Map<String, int>? classIndexJ11J12,
     bool? isIndexBuilt,
     List<ScheduleItem>? availableFirstHalbjahr,
     List<ScheduleItem>? availableSecondHalbjahr,
@@ -124,6 +114,7 @@ class ScheduleState {
       error: clearError ? null : (error ?? this.error),
       lastUpdated: lastUpdated ?? this.lastUpdated,
       classIndex5to10: classIndex5to10 ?? this.classIndex5to10,
+      classIndexJ11J12: classIndexJ11J12 ?? this.classIndexJ11J12,
       isIndexBuilt: isIndexBuilt ?? this.isIndexBuilt,
       availableFirstHalbjahr: availableFirstHalbjahr ?? this.availableFirstHalbjahr,
       availableSecondHalbjahr: availableSecondHalbjahr ?? this.availableSecondHalbjahr,
@@ -474,15 +465,22 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
     }
   }
   
-  /// Check if a class exists in the index (instant check, no PDF parsing)
+  /// Check if a class exists in either index
   bool isClassInIndex(String className) {
     if (!state.isIndexBuilt) return true; // If index not built, assume valid
-    return state.classIndex5to10.containsKey(className.toLowerCase());
+    final lc = className.toLowerCase();
+    return state.classIndex5to10.containsKey(lc) ||
+        state.classIndexJ11J12.containsKey(lc);
   }
-  
-  /// Get the page number for a class (1-based), or null if not found
+
+  /// Page number for a 5a-10e class in the 5-10 PDF, or null if not found
   int? getClassPage(String className) {
     return state.classIndex5to10[className.toLowerCase()];
+  }
+
+  /// Page number for a j11/j12 class in the J11/J12 PDF, or null if not found
+  int? getClassPageJ(String className) {
+    return state.classIndexJ11J12[className.toLowerCase()];
   }
   
   /// Invalidate the class index (called on app resume to force rebuild)
@@ -523,7 +521,7 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
         return;
       }
 
-      // Download and index the 5-10 PDF
+      // Download and scan the 5-10 PDF for class pages
       AppLogger.info('Downloading 5-10 schedule for class index...', module: 'ScheduleProvider');
       final pdf5to10 = await _scheduleService.downloadSchedule(schedule5to10);
       if (pdf5to10 == null) return;
@@ -531,24 +529,23 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
       final stopwatch = Stopwatch()..start();
       final index5to10 = await compute(_buildClassIndexInIsolate, pdf5to10.path);
 
-      // Download and index J11/J12 PDF if available
-      Map<String, int> indexJ11J12 = {};
+      // Download J11/J12 PDF for caching (so it opens instantly later)
       if (scheduleJ11J12 != null) {
-        final pdfJ11J12 = await _scheduleService.downloadSchedule(scheduleJ11J12);
-        if (pdfJ11J12 != null) {
-          indexJ11J12 = await compute(_buildClassIndexInIsolate, pdfJ11J12.path);
-        }
+        unawaited(_scheduleService.downloadSchedule(scheduleJ11J12!));
       }
 
+      // j11 is always page 1 and j12 is always page 2 of the J11/J12 PDF
+      const indexJ11J12 = {'j11': 2, 'j12': 3};
+
       stopwatch.stop();
-      final combined = {...index5to10, ...indexJ11J12};
       AppLogger.success(
-        'Class index built: ${combined.length} classes in ${stopwatch.elapsedMilliseconds}ms',
+        'Class index built: ${index5to10.length} classes (5-10) + j11/j12 in ${stopwatch.elapsedMilliseconds}ms',
         module: 'ScheduleProvider',
       );
 
       state = state.copyWith(
-        classIndex5to10: combined,
+        classIndex5to10: index5to10,
+        classIndexJ11J12: indexJ11J12,
         isIndexBuilt: true,
       );
     } catch (e) {
@@ -594,16 +591,13 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
 
       final index5to10 = await compute(_buildClassIndexInIsolate, pdf5to10.path);
 
-      Map<String, int> indexJ11J12 = {};
       if (scheduleJ11J12 != null) {
-        final pdfJ11J12 = await _scheduleService.downloadSchedule(scheduleJ11J12);
-        if (pdfJ11J12 != null) {
-          indexJ11J12 = await compute(_buildClassIndexInIsolate, pdfJ11J12.path);
-        }
+        unawaited(_scheduleService.downloadSchedule(scheduleJ11J12!));
       }
 
       state = state.copyWith(
-        classIndex5to10: {...index5to10, ...indexJ11J12},
+        classIndex5to10: index5to10,
+        classIndexJ11J12: const {'j11': 2, 'j12': 3},
         isIndexBuilt: true,
       );
       AppLogger.success('Silent rebuild: Class index rebuilt successfully', module: 'ScheduleProvider');

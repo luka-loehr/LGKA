@@ -438,17 +438,13 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
         selectedClass != null ? _formatClassName(selectedClass) : _localizeGradeLevel(context, target.gradeLevel);
     final dayName = '$title – $halfLabel';
 
-    // Get target page from class index (j11/j12 are hardcoded)
+    // Look up target page from the appropriate index
     List<int>? targetPages;
-    if (selectedClass != null) {
-      if (selectedClass == 'j11') {
-        targetPages = [2]; // j11 is always page 1 of J11/J12 PDF (index 0 + 2 offset)
-      } else if (selectedClass == 'j12') {
-        targetPages = [3]; // j12 is always page 2 of J11/J12 PDF (index 1 + 2 offset)
-      } else if (scheduleState.isIndexBuilt) {
-        final page = notifier.getClassPage(selectedClass);
-        if (page != null) targetPages = [page];
-      }
+    if (selectedClass != null && scheduleState.isIndexBuilt) {
+      final page = isJahrgang
+          ? notifier.getClassPageJ(selectedClass)
+          : notifier.getClassPage(selectedClass);
+      if (page != null) targetPages = [page];
     }
 
     // Check cached file
@@ -489,8 +485,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
 
       if (file != null) {
         // Re-fetch class page in case index was built during download
-        if (selectedClass != null && selectedClass != 'j11' && selectedClass != 'j12') {
-          final page = notifier.getClassPage(selectedClass);
+        if (selectedClass != null && scheduleState.isIndexBuilt) {
+          final page = isJahrgang
+              ? notifier.getClassPageJ(selectedClass)
+              : notifier.getClassPage(selectedClass);
           if (page != null) targetPages = [page];
         }
         context.push('/pdf-viewer', extra: {
