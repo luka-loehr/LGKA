@@ -3,12 +3,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart' hide WeatherDataState;
+import 'package:weather_icons/weather_icons.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/haptic_service.dart';
 import '../application/weather_provider.dart';
-import '../data/weather_service.dart';
 import '../domain/weather_models.dart';
 
 class WeatherPage extends ConsumerWidget {
@@ -24,36 +25,20 @@ class WeatherPage extends ConsumerWidget {
         backgroundColor: context.appBgColor,
         elevation: 0,
         scrolledUnderElevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: context.appPrimaryText),
+          onPressed: () {
+            HapticService.light();
+            if (context.mounted) context.pop();
+          },
+        ),
         title: Text(
-          'Wetter',
+          'Wetter Karlsruhe',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: context.appPrimaryText,
                 fontWeight: FontWeight.w700,
               ),
         ),
-        actions: [
-          if (state.isLoading)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation(
-                      Theme.of(context).colorScheme.primary),
-                ),
-              ),
-            )
-          else
-            IconButton(
-              onPressed: () {
-                HapticService.light();
-                ref.read(weatherDataProvider.notifier).refreshWeatherData();
-              },
-              icon: Icon(Icons.refresh, color: context.appSecondaryText),
-            ),
-        ],
       ),
       body: _buildBody(context, state),
     );
@@ -121,14 +106,14 @@ class WeatherPage extends ConsumerWidget {
             delegate: SliverChildListDelegate([
               if (state.daily.isNotEmpty) ...[
                 const SizedBox(height: 28),
-                _buildSectionHeader(context, '7 TAGE'),
+                _buildSectionHeader(context, '3 TAGE'),
                 const SizedBox(height: 12),
                 _buildDailyForecast(context, state.daily),
               ],
               const SizedBox(height: 32),
               Center(
                 child: Text(
-                  'Daten: OpenWeatherMap',
+                  'Daten: Open-Meteo · open-meteo.com',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color:
                             context.appSecondaryText.withValues(alpha: 0.4),
@@ -148,7 +133,7 @@ class WeatherPage extends ConsumerWidget {
   Widget _buildCurrentCard(BuildContext context, CurrentWeather current,
       List<DailyForecast> daily) {
     final today = daily.isNotEmpty ? daily.first : null;
-    final scene = _owmIconToWeatherType(current.icon);
+    final scene = WmoUtils.weatherType(current.weatherCode, current.isDay);
     const textShadows = [Shadow(color: Colors.black38, blurRadius: 8)];
 
     return ClipRRect(
@@ -189,15 +174,10 @@ class WeatherPage extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.network(
-                          WeatherService.iconUrl(current.icon),
-                          width: 80,
-                          height: 80,
-                          errorBuilder: (_, e, st) => Icon(
-                            _fallbackIcon(current.icon),
-                            size: 64,
-                            color: Colors.white,
-                          ),
+                        BoxedIcon(
+                          WmoUtils.icon(current.weatherCode, current.isDay),
+                          size: 64,
+                          color: Colors.white,
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -243,30 +223,6 @@ class WeatherPage extends ConsumerWidget {
     );
   }
 
-  WeatherType _owmIconToWeatherType(String icon) {
-    switch (icon) {
-      case '01d': return WeatherType.sunny;
-      case '01n': return WeatherType.sunnyNight;
-      case '02d': return WeatherType.cloudy;
-      case '02n': return WeatherType.cloudyNight;
-      case '03d': return WeatherType.cloudy;
-      case '03n': return WeatherType.cloudyNight;
-      case '04d': return WeatherType.overcast;
-      case '04n': return WeatherType.overcast;
-      case '09d':
-      case '09n': return WeatherType.lightRainy;
-      case '10d':
-      case '10n': return WeatherType.middleRainy;
-      case '11d':
-      case '11n': return WeatherType.thunder;
-      case '13d':
-      case '13n': return WeatherType.middleSnow;
-      case '50d': return WeatherType.foggy;
-      case '50n': return WeatherType.foggy;
-      default:    return WeatherType.cloudy;
-    }
-  }
-
   // ── Stats row ───────────────────────────────────────────────────────────────
 
   Widget _buildStatsRow(BuildContext context, CurrentWeather c) {
@@ -282,7 +238,7 @@ class WeatherPage extends ConsumerWidget {
         const SizedBox(width: 10),
         _statChip(context,
             icon: Icons.air,
-            value: '$windDir ${c.windSpeed.toStringAsFixed(1)} m/s',
+            value: '$windDir ${c.windSpeed.round()} km/h',
             label: 'Wind'),
         const SizedBox(width: 10),
         _statChip(context,
@@ -377,12 +333,10 @@ class WeatherPage extends ConsumerWidget {
                   fontSize: 11,
                 ),
           ),
-          Image.network(
-            WeatherService.iconUrl(h.icon),
-            width: 36,
-            height: 36,
-            errorBuilder: (_, e, st) =>
-                Icon(_fallbackIcon(h.icon), size: 28, color: context.appSecondaryText),
+          BoxedIcon(
+            WmoUtils.icon(h.weatherCode, h.isDay),
+            size: 28,
+            color: context.appSecondaryText,
           ),
           Text(
             '${h.temp.round()}°',
@@ -468,12 +422,10 @@ class WeatherPage extends ConsumerWidget {
             ),
           ),
           // Icon
-          Image.network(
-            WeatherService.iconUrl(d.icon),
-            width: 36,
-            height: 36,
-            errorBuilder: (_, e, st) => Icon(_fallbackIcon(d.icon),
-                size: 28, color: context.appSecondaryText),
+          BoxedIcon(
+            WmoUtils.icon(d.weatherCode, true),
+            size: 28,
+            color: context.appSecondaryText,
           ),
           // Pop
           SizedBox(
@@ -590,18 +542,4 @@ class WeatherPage extends ConsumerWidget {
   String _capitalize(String s) =>
       s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 
-  IconData _fallbackIcon(String icon) {
-    switch (icon.replaceAll('n', 'd')) {
-      case '01d': return Icons.wb_sunny_rounded;
-      case '02d': return Icons.wb_cloudy_rounded;
-      case '03d': return Icons.cloud_rounded;
-      case '04d': return Icons.cloud_rounded;
-      case '09d': return Icons.grain;
-      case '10d': return Icons.water_drop_rounded;
-      case '11d': return Icons.thunderstorm_rounded;
-      case '13d': return Icons.ac_unit_rounded;
-      case '50d': return Icons.foggy;
-      default: return Icons.wb_cloudy_rounded;
-    }
-  }
 }
