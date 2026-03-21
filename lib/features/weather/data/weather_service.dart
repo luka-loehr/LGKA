@@ -1,207 +1,93 @@
 // Copyright Luka Löhr 2026
 
-import 'package:http/http.dart' as http;
-import 'package:csv/csv.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../domain/weather_models.dart';
 import '../../../../utils/app_logger.dart';
-import '../../../../utils/app_info.dart';
-import '../../../../utils/retry_util.dart';
 
+class WeatherResult {
+  final CurrentWeather current;
+  final List<HourlyForecast> hourly; // up to 48 entries
+  final List<DailyForecast> daily; // up to 8 entries
+
+  const WeatherResult({
+    required this.current,
+    required this.hourly,
+    required this.daily,
+  });
+}
+
+/// Fetches weather data from OpenWeatherMap One Call API 3.0.
+/// Coordinates: LGKA school, Karlsruhe (49.00775°N, 8.375°E).
 class WeatherService {
-  static const String csvUrl = 'https://lessing-gymnasium-karlsruhe.de/wetter/lg_wetter_heute.csv';
-  
-  // Safety limits to prevent memory exhaustion
-  static const int maxCsvSizeBytes = 10 * 1024 * 1024; // 10MB max
+  WeatherService._();
+  static final WeatherService instance = WeatherService._();
 
-  Future<List<WeatherData>> fetchWeatherData() async {
-    AppLogger.network('Fetching weather data');
-    
-    return RetryUtil.retry<List<WeatherData>>(
-      operation: () async {
-        // HTTP request with timeout
-        final response = await http.get(
-          Uri.parse(csvUrl),
-          headers: {'User-Agent': AppInfo.userAgent},
-        ).timeout(const Duration(seconds: 10));
-        
-        if (response.statusCode != 200) {
-          throw Exception('Failed to load weather data: ${response.statusCode}');
-        }
+  // API key injected at build time: flutter run --dart-define-from-file=.env.local
+  static const _apiKey =
+      String.fromEnvironment('OWM_API_KEY', defaultValue: '');
+  static const _lat = '49.00775';
+  static const _lon = '8.375';
+  static const _baseUrl =
+      'https://api.openweathermap.org/data/3.0/onecall';
+  static const _cacheDuration = Duration(minutes: 30);
 
-        // Decode and validate size
-        final csvString = utf8.decode(response.bodyBytes, allowMalformed: true);
-        if (csvString.length > maxCsvSizeBytes) {
-          throw Exception('CSV data too large (${(csvString.length / 1024 / 1024).toStringAsFixed(1)}MB). Maximum allowed: ${(maxCsvSizeBytes / 1024 / 1024).toStringAsFixed(1)}MB');
-        }
+  WeatherResult? _cache;
+  DateTime? _cacheTimestamp;
 
-        // Parse CSV
-        final csvData = const CsvToListConverter(
-          eol: '\n',
-          fieldDelimiter: ';',
-        ).convert(csvString);
-        
-        if (csvData.isEmpty) {
-          throw Exception('CSV data is empty');
-        }
+  DateTime? get lastUpdateTime => _cacheTimestamp;
 
-        // Limit to last 24 hours (1440 minutes) to prevent memory issues
-        const int maxDataPoints = 1440;
-        final int startIndex = csvData.length > maxDataPoints + 1 ? csvData.length - maxDataPoints : 1;
+  bool get hasValidCache =>
+      _cache != null &&
+      _cacheTimestamp != null &&
+      DateTime.now().difference(_cacheTimestamp!) < _cacheDuration;
 
-        // Parse data rows
-        final List<WeatherData> allWeatherData = [];
-        for (int i = startIndex; i < csvData.length; i++) {
-          final row = csvData[i];
-          if (row.length < 7) continue;
-          
-          try {
-            final dataIndex = i - startIndex;
-            final now = DateTime.now();
-            final time = DateTime(now.year, now.month, now.day, 0, 0)
-                .add(Duration(minutes: dataIndex));
-            
-            allWeatherData.add(WeatherData(
-              time: time,
-              windSpeed: _parseDouble(row[0]),
-              windDirection: row[1]?.toString() ?? '',
-              temperature: _parseDouble(row[2]),
-              humidity: _parseDouble(row[3]),
-              precipitation: _parseDouble(row[4]),
-              pressure: _parseDouble(row[5]),
-              radiation: _parseDouble(row[6]),
-            ));
-          } catch (e) {
-            // Skip invalid rows
-          }
-        }
-        
-        if (allWeatherData.isNotEmpty) {
-          AppLogger.success('Loaded ${allWeatherData.length} points (${allWeatherData.first.temperature}°C → ${allWeatherData.last.temperature}°C)', module: 'WeatherService');
-        } else {
-          throw Exception('No valid weather data found');
-        }
-        
-        return allWeatherData;
-      },
-      maxRetries: 2,
-      operationName: 'WeatherService',
-      shouldRetry: RetryUtil.isRetryableError,
-    ).catchError((e) {
-      AppLogger.error('Weather fetch failed', module: 'WeatherService', error: e);
-      throw e;
-    });
+  WeatherResult? get cachedResult => _cache;
+
+  /// Returns the OWM icon URL for a given icon code, e.g. "02d".
+  static String iconUrl(String icon) =>
+      'https://openweathermap.org/img/wn/$icon@2x.png';
+
+  Future<WeatherResult> fetchAll() async {
+    if (hasValidCache) {
+      AppLogger.debug('Weather: returning cached result', module: 'WeatherService');
+      return _cache!;
+    }
+
+    final uri = Uri.parse(
+      '$_baseUrl?lat=$_lat&lon=$_lon&appid=$_apiKey'
+      '&units=metric&lang=de&exclude=minutely,alerts',
+    );
+
+    AppLogger.info('Weather: fetching from OWM One Call 3.0', module: 'WeatherService');
+    final response = await http.get(uri).timeout(const Duration(seconds: 10));
+
+    if (response.statusCode != 200) {
+      throw Exception('OWM API ${response.statusCode}: ${response.body}');
+    }
+
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+
+    final current = CurrentWeather.fromJson(
+        json['current'] as Map<String, dynamic>);
+    final hourly = (json['hourly'] as List)
+        .take(24)
+        .map((e) => HourlyForecast.fromJson(e as Map<String, dynamic>))
+        .toList();
+    final daily = (json['daily'] as List)
+        .map((e) => DailyForecast.fromJson(e as Map<String, dynamic>))
+        .toList();
+
+    final result = WeatherResult(current: current, hourly: hourly, daily: daily);
+    _cache = result;
+    _cacheTimestamp = DateTime.now();
+
+    AppLogger.success(
+        'Weather: ${current.temp.round()}° ${current.description} · '
+        '${hourly.length}h hourly · ${daily.length} daily',
+        module: 'WeatherService');
+    return result;
   }
 
-  /// Get the latest weather data point for real-time display
-  Future<WeatherData?> getLatestWeatherData() async {
-    try {
-      return await RetryUtil.retry<WeatherData?>(
-        operation: () async {
-          final response = await http.get(
-            Uri.parse(csvUrl),
-            headers: {'User-Agent': AppInfo.userAgent},
-          ).timeout(const Duration(seconds: 10));
-          
-          if (response.statusCode != 200) return null;
-
-          final csvString = utf8.decode(response.bodyBytes, allowMalformed: true);
-          final csvData = const CsvToListConverter(
-            eol: '\n',
-            fieldDelimiter: ';',
-          ).convert(csvString);
-          
-          if (csvData.length < 2) return null;
-          
-          final lastRow = csvData.last;
-          if (lastRow.length < 7) return null;
-          
-          final minutesSinceMidnight = csvData.length - 2;
-          final now = DateTime.now();
-          final time = DateTime(now.year, now.month, now.day, 0, 0)
-              .add(Duration(minutes: minutesSinceMidnight));
-          
-          return WeatherData(
-            time: time,
-            windSpeed: _parseDouble(lastRow[0]),
-            windDirection: lastRow[1]?.toString() ?? '',
-            temperature: _parseDouble(lastRow[2]),
-            humidity: _parseDouble(lastRow[3]),
-            precipitation: _parseDouble(lastRow[4]),
-            pressure: _parseDouble(lastRow[5]),
-            radiation: _parseDouble(lastRow[6]),
-          );
-        },
-        maxRetries: 2,
-        operationName: 'WeatherService',
-        shouldRetry: RetryUtil.isRetryableError,
-      );
-    } catch (e) {
-      AppLogger.error('Error getting latest weather data', module: 'WeatherService', error: e);
-      return null;
-    }
-  }
-
-  /// Downsample data for chart performance while preserving latest data for display boxes
-  List<WeatherData> downsampleForChart(List<WeatherData> fullData) {
-    if (fullData.isEmpty) return fullData;
-    
-    final length = fullData.length;
-    int samplingRate = 1; // Show every nth value
-    
-    // More aggressive downsampling for better UI performance
-    if (length >= 2000) {
-      samplingRate = 100; // Show every 100th value for very large datasets
-    } else if (length >= 1000) {
-      samplingRate = 60; // Show every 60th value
-    } else if (length >= 600) {
-      samplingRate = 40; // Show every 40th value  
-    } else if (length >= 300) {
-      samplingRate = 25; // Show every 25th value
-    } else if (length >= 150) {
-      samplingRate = 15; // Show every 15th value
-    } else if (length >= 100) {
-      samplingRate = 8; // Show every 8th value
-    }
-    
-    if (samplingRate == 1) {
-      return fullData;
-    }
-    
-    final List<WeatherData> sampledData = [];
-    
-    sampledData.add(fullData.first);
-    
-    for (int i = samplingRate; i < length - samplingRate; i += samplingRate) {
-      sampledData.add(fullData[i]);
-    }
-    
-    if (fullData.length > 1) {
-      sampledData.add(fullData.last);
-    }
-    
-    AppLogger.debug('Downsampled $length → ${sampledData.length} points', module: 'WeatherService');
-    return sampledData;
-  }
-
-  double _parseDouble(dynamic value) {
-    if (value == null) {
-      return 0.0;
-    }
-    
-    if (value is double) {
-      return value;
-    }
-    
-    if (value is int) {
-      return value.toDouble();
-    }
-    
-    if (value is String) {
-      // The CSV already uses dots as decimal separator, no need to replace
-      return double.tryParse(value) ?? 0.0;
-    }
-    
-    return 0.0;
-  }
-} 
+  void invalidateCache() => _cacheTimestamp = null;
+}
