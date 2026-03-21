@@ -20,6 +20,9 @@ import 'widgets/skeleton_card.dart';
 import 'widgets/tappable_card.dart';
 import '../../events/application/events_provider.dart';
 import '../../events/domain/event_model.dart';
+import '../../weather/application/weather_provider.dart';
+import '../../weather/data/weather_service.dart';
+import '../../weather/domain/weather_models.dart';
 import 'package:intl/intl.dart';
 
 /// German → English weekday translation map (used for locale-aware display)
@@ -227,6 +230,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           sliver: SliverList(
             delegate: SliverChildListDelegate([
               const SizedBox(height: 16),
+              _buildWeatherSection(),
+              const SizedBox(height: 28),
               _buildSectionHeader(
                   AppLocalizations.of(context)!.substitutionPlan),
               const SizedBox(height: 12),
@@ -268,6 +273,135 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
     );
   }
+
+  // ── Weather ────────────────────────────────────────────────────────────────
+
+  Widget _buildWeatherSection() {
+    final weatherState = ref.watch(weatherDataProvider);
+
+    final Widget child;
+    final String key;
+
+    if (weatherState.isLoading && weatherState.current == null) {
+      key = 'weather-loading';
+      child = const SkeletonCard();
+    } else if (weatherState.hasError && weatherState.current == null) {
+      key = 'weather-error';
+      child = _buildWeatherError();
+    } else if (weatherState.current != null) {
+      key = 'weather-content';
+      child = _buildWeatherCard(weatherState.current!, weatherState.daily);
+    } else {
+      return const SizedBox.shrink();
+    }
+
+    return _fadeSwitch(key, child);
+  }
+
+  Widget _buildWeatherCard(CurrentWeather current, List<DailyForecast> daily) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final today = daily.isNotEmpty ? daily.first : null;
+
+    final row = Row(
+      children: [
+        Image.network(
+          WeatherService.iconUrl(current.icon),
+          width: 48,
+          height: 48,
+          errorBuilder: (_, e, st) =>
+              Icon(Icons.wb_cloudy_outlined, size: 36, color: primary),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    '${current.temp.round()}°',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: context.appPrimaryText,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      _capitalize(current.description),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: context.appSecondaryText,
+                          ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                today != null
+                    ? 'Gefühlt ${current.feelsLike.round()}°  ·  H ${today.tempMax.round()}°  T ${today.tempMin.round()}°'
+                    : 'Gefühlt ${current.feelsLike.round()}°  ·  ${current.humidity}% Luftfeuchte',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: context.appSecondaryText.withValues(alpha: 0.7),
+                    ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        Icon(Icons.arrow_forward_ios,
+            size: 14,
+            color: context.appSecondaryText.withValues(alpha: 0.5)),
+      ],
+    );
+
+    return TappableCard(
+      onTap: () {
+        HapticService.medium();
+        context.push(AppRouter.weather);
+      },
+      child: row,
+    );
+  }
+
+  Widget _buildWeatherError() {
+    return Container(
+      height: kHomeCardHeight,
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      decoration: BoxDecoration(
+        color: context.appSurfaceColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(children: [
+        Icon(Icons.cloud_off_outlined,
+            size: 20, color: context.appSecondaryText.withValues(alpha: 0.4)),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Text(
+            'Wetterdaten nicht verfügbar',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: context.appSecondaryText,
+                ),
+          ),
+        ),
+        IconButton(
+          onPressed: () {
+            HapticService.light();
+            ref.read(weatherDataProvider.notifier).updateDataInBackground();
+          },
+          icon: Icon(Icons.refresh,
+              color: Theme.of(context).colorScheme.primary, size: 18),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+        ),
+      ]),
+    );
+  }
+
+  String _capitalize(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 
   // ── Substitution ──────────────────────────────────────────────────────────
 
