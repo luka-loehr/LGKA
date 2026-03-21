@@ -1,11 +1,8 @@
 // Copyright Luka Löhr 2026
 
-import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path_provider/path_provider.dart';
 import '../application/schedule_provider.dart';
 import '../../../../services/haptic_service.dart';
 import '../../../../theme/app_theme.dart';
@@ -27,13 +24,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   bool _hasShownButtons = false;
-
-  // Track available schedules
-  List<ScheduleItem> _availableFirstHalbjahr = [];
-  List<ScheduleItem> _availableSecondHalbjahr = [];
-  bool _isCheckingAvailability = false;
-  DateTime? _lastAvailabilityCheck;
-  static const Duration _availabilityCheckInterval = Duration(minutes: 15);
   final _spinnerTracker = LoadingSpinnerTracker();
 
   @override
@@ -50,27 +40,19 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       parent: _fadeController,
       curve: Curves.easeOutCubic,
     ));
-    
-    // Only load schedules if not already loaded (avoid reloading on every screen visit)
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final notifier = ref.read(scheduleProvider.notifier);
       final scheduleState = ref.read(scheduleProvider);
       if (!scheduleState.hasSchedules) {
-        await ref.read(scheduleProvider.notifier).loadSchedules();
+        await notifier.loadSchedules();
       }
-      
-      // Check availability only if it hasn't been checked recently
-      if (_shouldCheckAvailability()) {
-        await _checkScheduleAvailability();
-      } else {
-        // If we have cached availability results, restore them from the schedule state
-        final allSchedules = [
-          ...scheduleState.firstHalbjahrSchedules,
-          ...scheduleState.secondHalbjahrSchedules,
-        ];
-        if (allSchedules.isNotEmpty && (_availableFirstHalbjahr.isEmpty && _availableSecondHalbjahr.isEmpty)) {
-          // Restore availability from cache by checking which schedules have cached PDFs
-          await _restoreAvailabilityFromCache(allSchedules);
-        }
+
+      if (ref.read(scheduleProvider).shouldCheckAvailability) {
+        await notifier.checkAvailability();
+      } else if (ref.read(scheduleProvider).availableFirstHalbjahr.isEmpty &&
+          ref.read(scheduleProvider).availableSecondHalbjahr.isEmpty) {
+        await notifier.restoreAvailabilityFromCache();
       }
     });
   }
@@ -81,147 +63,11 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     super.dispose();
   }
 
-  /// Check if availability should be checked (based on timing and cached data)
-  bool _shouldCheckAvailability() {
-    // If we have cached results and they're recent, don't check again
-    if (_lastAvailabilityCheck != null && 
-        _availableFirstHalbjahr.isNotEmpty || _availableSecondHalbjahr.isNotEmpty) {
-      final timeSinceLastCheck = DateTime.now().difference(_lastAvailabilityCheck!);
-      if (timeSinceLastCheck < _availabilityCheckInterval) {
-        return false;
-      }
-    }
-    return true;
-  }
-  
-  /// Check which schedules have available PDFs
-  Future<void> _checkScheduleAvailability() async {
-    if (_isCheckingAvailability) return;
-    
-    if (!mounted) return;
-    setState(() {
-      _isCheckingAvailability = true;
-    });
-    
-    try {
-      final scheduleNotifier = ref.read(scheduleProvider.notifier);
-      
-      // Get all schedules to check and deduplicate
-      final allSchedules = {
-        ...ref.read(scheduleProvider).firstHalbjahrSchedules,
-        ...ref.read(scheduleProvider).secondHalbjahrSchedules,
-      }.toList(); // Deduplicate
-      
-      // Check availability concurrently instead of sequentially
-      final availabilityFutures = allSchedules.map((schedule) async {
-        final isAvailable = await scheduleNotifier.isScheduleAvailable(schedule);
-        if (mounted) {
-          setState(() {});
-        }
-        return {'schedule': schedule, 'isAvailable': isAvailable};
-      });
-      
-      // Wait for all availability checks to complete
-      final results = await Future.wait(availabilityFutures);
-      
-      if (!mounted) return;
-      
-      // Separate results by halbjahr and deduplicate
-      final firstSemesterSet = <ScheduleItem>{};
-      final secondSemesterSet = <ScheduleItem>{};
-      
-      for (final result in results) {
-        if (result['isAvailable'] as bool) {
-          final schedule = result['schedule'] as ScheduleItem;
-          if (schedule.halbjahr == '1. Halbjahr') {
-            firstSemesterSet.add(schedule);
-          } else if (schedule.halbjahr == '2. Halbjahr') {
-            secondSemesterSet.add(schedule);
-          }
-        }
-      }
-      
-      // Convert sets to lists (automatically deduplicated)
-      _availableFirstHalbjahr = firstSemesterSet.toList();
-      _availableSecondHalbjahr = secondSemesterSet.toList();
-
-      final availableCount = results.where((r) => r['isAvailable'] as bool).length;
-      AppLogger.success('Schedule availability check complete: $availableCount available', module: 'SchedulePage');
-      setState(() {});
-      
-      // Preload PDFs for available schedules in the background
-      _preloadSchedulePDFs();
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isCheckingAvailability = false;
-          _lastAvailabilityCheck = DateTime.now();
-        });
-      }
-    }
-  }
-  
-  /// Restore availability from cache by checking which schedules have cached PDFs
-  Future<void> _restoreAvailabilityFromCache(List<ScheduleItem> allSchedules) async {
-    // Deduplicate input schedules first
-    final uniqueSchedules = allSchedules.toSet().toList();
-    
-    for (final schedule in uniqueSchedules) {
-      final cachedFile = await _getCachedScheduleFile(schedule);
-      if (cachedFile != null && await cachedFile.exists()) {
-        if (schedule.halbjahr == '1. Halbjahr') {
-          if (!_availableFirstHalbjahr.contains(schedule)) {
-            _availableFirstHalbjahr.add(schedule);
-          }
-        } else if (schedule.halbjahr == '2. Halbjahr') {
-          if (!_availableSecondHalbjahr.contains(schedule)) {
-            _availableSecondHalbjahr.add(schedule);
-          }
-        }
-      }
-    }
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  /// Preload PDFs for available schedules in the background
-  void _preloadSchedulePDFs() {
-    final allAvailableSchedules = [
-      ..._availableFirstHalbjahr,
-      ..._availableSecondHalbjahr,
-    ];
-    
-    if (allAvailableSchedules.isEmpty) return;
-    
-    // Preload all available schedules in the background
-    for (final schedule in allAvailableSchedules) {
-      // Check if PDF is already cached before downloading
-      unawaited(
-        _getCachedScheduleFile(schedule).then((cachedFile) async {
-          if (cachedFile != null && await cachedFile.exists()) {
-            AppLogger.debug('Schedule PDF already cached: ${schedule.title}', module: 'SchedulePage');
-            return;
-          }
-          // Download schedule PDF in background only if not cached
-          try {
-            await ref.read(scheduleProvider.notifier).downloadSchedule(schedule);
-          } catch (e) {
-            // Silently handle errors - preloading shouldn't show errors to user
-            AppLogger.debug('Failed to preload schedule PDF: ${schedule.title}', module: 'SchedulePage');
-          }
-        })
-      );
-    }
-    
-    AppLogger.debug('Started preloading ${allAvailableSchedules.length} schedule PDF(s)', module: 'SchedulePage');
-  }
-
   @override
   Widget build(BuildContext context) {
     final scheduleState = ref.watch(scheduleProvider);
 
-    final isShowingSpinner = scheduleState.isLoading || _isCheckingAvailability || !scheduleState.isIndexBuilt;
+    final isShowingSpinner = scheduleState.isLoading || scheduleState.isCheckingAvailability || !scheduleState.isIndexBuilt;
     final hasData = scheduleState.hasSchedules && !scheduleState.hasError && scheduleState.isIndexBuilt;
 
     // Track spinner visibility and trigger haptic feedback when spinner disappears
@@ -275,7 +121,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     }
 
     // Show availability checking state if schedules are loaded but availability or class index is still being checked
-    if (_isCheckingAvailability || !state.isIndexBuilt) {
+    if (state.isCheckingAvailability || !state.isIndexBuilt) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -298,11 +144,13 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
 
     // Start animation when buttons should be visible
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final hasAnyButtons = _availableFirstHalbjahr.isNotEmpty || _availableSecondHalbjahr.isNotEmpty;
+      final hasAnyButtons = state.availableFirstHalbjahr.isNotEmpty ||
+          state.availableSecondHalbjahr.isNotEmpty;
       if (hasAnyButtons && !_hasShownButtons) {
         _hasShownButtons = true;
         _fadeController.forward();
-        AppLogger.schedule('Schedule buttons shown: ${_availableFirstHalbjahr.length + _availableSecondHalbjahr.length} available');
+        AppLogger.schedule(
+            'Schedule buttons shown: ${state.availableFirstHalbjahr.length + state.availableSecondHalbjahr.length} available');
       }
     });
 
@@ -350,7 +198,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
               onPressed: () async {
                 HapticService.medium();
                 await ref.read(scheduleProvider.notifier).refreshSchedules();
-                await _checkScheduleAvailability();
+                await ref.read(scheduleProvider.notifier).checkAvailability();
               },
               icon: const Icon(Icons.refresh),
               label: Text(AppLocalizations.of(context)!.tryAgain),
@@ -402,8 +250,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   }
 
   Widget _buildScheduleList(ScheduleState state) {
-    final firstSemesterSchedules = _availableFirstHalbjahr;
-    final secondSemesterSchedules = _availableSecondHalbjahr;
+    final firstSemesterSchedules = state.availableFirstHalbjahr;
+    final secondSemesterSchedules = state.availableSecondHalbjahr;
     final hasBothSemesters = firstSemesterSchedules.isNotEmpty && 
                              secondSemesterSchedules.isNotEmpty;
     
@@ -560,22 +408,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     }
   }
 
-  /// Get the cached schedule file path (same logic as ScheduleService)
-  Future<File?> _getCachedScheduleFile(ScheduleItem schedule) async {
-    try {
-      final cacheDir = await getTemporaryDirectory();
-      final sanitizedGradeLevel = schedule.gradeLevel.replaceAll('/', '_');
-      final sanitizedHalbjahr = schedule.halbjahr.replaceAll('.', '_');
-      final filename = '${sanitizedGradeLevel}_$sanitizedHalbjahr.pdf';
-      return File('${cacheDir.path}/$filename');
-    } catch (e) {
-      return null;
-    }
-  }
-
   void _openSchedule(ScheduleItem schedule) async {
-    // Check if PDF is already downloaded (from preloading)
-    final cachedFile = await _getCachedScheduleFile(schedule);
+    final cachedFile = await ref.read(scheduleProvider.notifier).getCachedScheduleFile(schedule);
     if (cachedFile != null && await cachedFile.exists()) {
       // PDF is already cached, open immediately
       if (mounted) {

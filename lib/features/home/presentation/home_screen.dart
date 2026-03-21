@@ -1,12 +1,9 @@
 // Copyright Luka Löhr 2026
 
-import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import '../../../../theme/app_theme.dart';
 import '../../substitution/application/substitution_provider.dart';
 import '../../substitution/domain/substitution_models.dart';
@@ -45,13 +42,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
 
-  // Schedule availability — mirrors SchedulePage logic exactly
-  List<ScheduleItem> _availableFirstHalbjahr = [];
-  List<ScheduleItem> _availableSecondHalbjahr = [];
-  bool _isCheckingAvailability = false;
-  DateTime? _lastAvailabilityCheck;
-  static const _availabilityCheckInterval = Duration(minutes: 15);
-
   @override
   void initState() {
     super.initState();
@@ -59,145 +49,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       // 1. Boot substitution loading
       await ref.read(substitutionProvider.notifier).initialize();
 
-      // 2. Load schedule list (matches SchedulePage initState exactly)
+      // 2. Load schedule list if not already loaded
       final scheduleState = ref.read(scheduleProvider);
       if (!scheduleState.hasSchedules) {
         await ref.read(scheduleProvider.notifier).loadSchedules();
       }
 
-      // 3. Check or restore availability (mirrors SchedulePage exactly)
-      if (_shouldCheckAvailability()) {
-        await _checkScheduleAvailability();
-      } else {
-        // Already checked recently — restore from cached PDFs if lists are empty
-        final allSchedules = [
-          ...scheduleState.firstHalbjahrSchedules,
-          ...scheduleState.secondHalbjahrSchedules,
-        ];
-        if (allSchedules.isNotEmpty &&
-            _availableFirstHalbjahr.isEmpty &&
-            _availableSecondHalbjahr.isEmpty) {
-          await _restoreAvailabilityFromCache(allSchedules);
-        }
+      // 3. Check or restore availability via provider
+      final notifier = ref.read(scheduleProvider.notifier);
+      if (ref.read(scheduleProvider).shouldCheckAvailability) {
+        await notifier.checkAvailability();
+      } else if (ref.read(scheduleProvider).availableFirstHalbjahr.isEmpty &&
+          ref.read(scheduleProvider).availableSecondHalbjahr.isEmpty) {
+        await notifier.restoreAvailabilityFromCache();
       }
     });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  // ── Schedule availability (exact copy of SchedulePage logic) ──────────────
-
-  /// Returns true if we should re-run the availability check.
-  /// Mirrors the original SchedulePage._shouldCheckAvailability() including
-  /// its operator-precedence quirk.
-  bool _shouldCheckAvailability() {
-    // ignore: dead_code — intentional: matches original precedence bug for safety
-    if (_lastAvailabilityCheck != null &&
-            _availableFirstHalbjahr.isNotEmpty ||
-        _availableSecondHalbjahr.isNotEmpty) {
-      final elapsed =
-          DateTime.now().difference(_lastAvailabilityCheck ?? DateTime.now());
-      if (elapsed < _availabilityCheckInterval) return false;
-    }
-    return true;
-  }
-
-  Future<void> _checkScheduleAvailability() async {
-    if (_isCheckingAvailability) return;
-    if (!mounted) return;
-    setState(() => _isCheckingAvailability = true);
-
-    try {
-      final notifier = ref.read(scheduleProvider.notifier);
-      final allSchedules = {
-        ...ref.read(scheduleProvider).firstHalbjahrSchedules,
-        ...ref.read(scheduleProvider).secondHalbjahrSchedules,
-      }.toList();
-
-      final results = await Future.wait(allSchedules.map((s) async {
-        final ok = await notifier.isScheduleAvailable(s);
-        if (mounted) setState(() {}); // progressive update (mirrors original)
-        return {'schedule': s, 'ok': ok};
-      }));
-
-      if (!mounted) return;
-
-      final first = <ScheduleItem>{};
-      final second = <ScheduleItem>{};
-      for (final r in results) {
-        if (r['ok'] as bool) {
-          final s = r['schedule'] as ScheduleItem;
-          if (s.halbjahr == '1. Halbjahr') first.add(s);
-          if (s.halbjahr == '2. Halbjahr') second.add(s);
-        }
-      }
-      _availableFirstHalbjahr = first.toList();
-      _availableSecondHalbjahr = second.toList();
-
-      AppLogger.success(
-        'Schedule availability: ${first.length + second.length} available',
-        module: 'HomeScreen',
-      );
-      setState(() {});
-
-      // Preload PDFs for available schedules in the background
-      _preloadSchedulePDFs();
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isCheckingAvailability = false;
-          _lastAvailabilityCheck = DateTime.now();
-        });
-      }
-    }
-  }
-
-  /// Restore availability by checking which schedules have locally cached PDFs.
-  /// Mirrors SchedulePage._restoreAvailabilityFromCache().
-  Future<void> _restoreAvailabilityFromCache(
-      List<ScheduleItem> allSchedules) async {
-    final unique = allSchedules.toSet().toList();
-    for (final s in unique) {
-      final cached = await _cachedScheduleFile(s);
-      if (cached != null && await cached.exists()) {
-        if (s.halbjahr == '1. Halbjahr') {
-          if (!_availableFirstHalbjahr.contains(s)) {
-            _availableFirstHalbjahr.add(s);
-          }
-        } else if (s.halbjahr == '2. Halbjahr') {
-          if (!_availableSecondHalbjahr.contains(s)) {
-            _availableSecondHalbjahr.add(s);
-          }
-        }
-      }
-    }
-    if (mounted) setState(() {});
-  }
-
-  void _preloadSchedulePDFs() {
-    final all = [..._availableFirstHalbjahr, ..._availableSecondHalbjahr];
-    for (final s in all) {
-      unawaited(_cachedScheduleFile(s).then((cached) async {
-        if (cached != null && await cached.exists()) return;
-        try {
-          await ref.read(scheduleProvider.notifier).downloadSchedule(s);
-        } catch (_) {}
-      }));
-    }
-  }
-
-  Future<File?> _cachedScheduleFile(ScheduleItem s) async {
-    try {
-      final dir = await getTemporaryDirectory();
-      final grade = s.gradeLevel.replaceAll('/', '_');
-      final half = s.halbjahr.replaceAll('.', '_');
-      return File('${dir.path}/${grade}_$half.pdf');
-    } catch (_) {
-      return null;
-    }
   }
 
   void _openSchedule(ScheduleItem schedule) async {
@@ -206,7 +72,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final half = _localizeHalf(l10n, schedule.halbjahr);
     final dayName = '$grade - $half';
 
-    final cached = await _cachedScheduleFile(schedule);
+    final cached = await ref.read(scheduleProvider.notifier).getCachedScheduleFile(schedule);
     if (cached != null && await cached.exists()) {
       if (mounted) {
         context.push(AppRouter.pdfViewer,
@@ -276,9 +142,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // the schedule PDF), re-run availability so we find the newly cached file.
     ref.listen<ScheduleState>(scheduleProvider, (prev, next) {
       if (prev?.isIndexBuilt == false && next.isIndexBuilt == true) {
-        if (_availableFirstHalbjahr.isEmpty &&
-            _availableSecondHalbjahr.isEmpty) {
-          _checkScheduleAvailability();
+        if (next.availableFirstHalbjahr.isEmpty &&
+            next.availableSecondHalbjahr.isEmpty) {
+          ref.read(scheduleProvider.notifier).checkAvailability();
         }
       }
     });
@@ -651,7 +517,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final scheduleState = ref.watch(scheduleProvider);
 
     if (scheduleState.isLoading ||
-        _isCheckingAvailability ||
+        scheduleState.isCheckingAvailability ||
         !scheduleState.isIndexBuilt) {
       return _fadeSwitch(
         'sched-loading',
@@ -671,13 +537,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return _fadeSwitch('sched-empty', _buildScheduleEmpty());
     }
 
-    if (_availableFirstHalbjahr.isEmpty && _availableSecondHalbjahr.isEmpty) {
+    if (scheduleState.availableFirstHalbjahr.isEmpty &&
+        scheduleState.availableSecondHalbjahr.isEmpty) {
       return _fadeSwitch('sched-none', const SizedBox.shrink());
     }
 
-    final activeGroup = _availableSecondHalbjahr.isNotEmpty
-        ? _availableSecondHalbjahr
-        : _availableFirstHalbjahr;
+    final activeGroup = scheduleState.availableSecondHalbjahr.isNotEmpty
+        ? scheduleState.availableSecondHalbjahr
+        : scheduleState.availableFirstHalbjahr;
 
     final l10n = AppLocalizations.of(context)!;
     final items = <Widget>[];
@@ -771,7 +638,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           onPressed: () async {
             HapticService.light();
             await ref.read(scheduleProvider.notifier).refreshSchedules();
-            await _checkScheduleAvailability();
+            await ref.read(scheduleProvider.notifier).checkAvailability();
           },
           icon: Icon(Icons.refresh,
               color: Theme.of(context).colorScheme.primary, size: 20),
