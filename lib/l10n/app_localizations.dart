@@ -992,6 +992,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last downloaded: {time}'**
   String lastDownloaded(String time);
+
+  /// No description provided for @termine.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get termine;
+
+  /// No description provided for @noEventsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No events available'**
+  String get noEventsAvailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

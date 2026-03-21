@@ -479,4 +479,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String lastDownloaded(String time) {
     return 'Zuletzt aktualisiert: $time';
   }
+
+  @override
+  String get termine => 'Termine';
+
+  @override
+  String get noEventsAvailable => 'Keine Termine verfügbar';
 }
