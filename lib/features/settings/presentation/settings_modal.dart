@@ -23,48 +23,79 @@ class SettingsModal extends ConsumerWidget {
     return Wrap(
       children: [
         Padding(
-          padding: EdgeInsets.fromLTRB(16, 16, 16, _getBottomPadding(context)),
+          padding: EdgeInsets.fromLTRB(16, 20, 16, _bottomPadding(context)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                AppLocalizations.of(context)!.settings,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: context.appPrimaryText,
-                  fontWeight: FontWeight.bold,
+              // Title
+              Padding(
+                padding: const EdgeInsets.only(left: 4, bottom: 20),
+                child: Text(
+                  AppLocalizations.of(context)!.settings,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: context.appPrimaryText,
+                        fontWeight: FontWeight.w700,
+                      ),
                 ),
               ),
-              const SizedBox(height: 16),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + _getBottomPadding(context)),
-                decoration: const BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+
+              // ── Appearance ─────────────────────────────────────────────
+              _sectionLabel(context, 'DARSTELLUNG'),
+              const SizedBox(height: 8),
+              _card(context, [
+                _appearanceRow(context, ref),
+                _internalDivider(context),
+                _colorRow(context, ref),
+              ]),
+
+              const SizedBox(height: 20),
+
+              // ── Links ───────────────────────────────────────────────────
+              _sectionLabel(context, 'MEHR'),
+              const SizedBox(height: 8),
+              _card(context, [
+                _linkTile(
+                  context,
+                  icon: Icons.bug_report_outlined,
+                  label: AppLocalizations.of(context)!.bugReport,
+                  trailing: const Icon(Icons.chevron_right, size: 18),
+                  onTap: () {
+                    HapticService.light();
+                    context.push(AppRouter.bugReport);
+                  },
                 ),
-                child: Column(
-                  children: [
-                    _buildThemeModeSetting(context, ref),
-                    const SizedBox(height: 20),
-                    _buildDivider(context),
-                    const SizedBox(height: 20),
-                    _buildAccentColorSetting(context, ref),
-                    const SizedBox(height: 20),
-                    _buildDivider(context),
-                    const SizedBox(height: 20),
-                    _buildLegalLinks(context),
-                    const SizedBox(height: 20),
-                    _buildDivider(context),
-                    const SizedBox(height: 20),
-                    _buildLastDownloadedNotice(context, ref),
-                    const SizedBox(height: 20),
-                    _buildDivider(context),
-                    const SizedBox(height: 20),
-                    _buildFooter(context),
-                  ],
+                _internalDivider(context),
+                _linkTile(
+                  context,
+                  icon: Icons.privacy_tip_outlined,
+                  label: AppLocalizations.of(context)!.privacyLabel,
+                  trailing: const Icon(Icons.open_in_new, size: 14),
+                  onTap: () {
+                    HapticService.light();
+                    _launchURL('https://luka-loehr.github.io/LGKA/privacy.html');
+                  },
                 ),
-              ),
+                _internalDivider(context),
+                _linkTile(
+                  context,
+                  icon: Icons.info_outline,
+                  label: AppLocalizations.of(context)!.legalLabel,
+                  trailing: const Icon(Icons.open_in_new, size: 14),
+                  onTap: () {
+                    HapticService.light();
+                    _launchURL('https://luka-loehr.github.io/LGKA/impressum.html');
+                  },
+                ),
+              ]),
+
+              const SizedBox(height: 24),
+
+              // ── Footer ──────────────────────────────────────────────────
+              _buildLastDownloaded(context, ref),
+              const SizedBox(height: 8),
+              _buildFooter(context),
+              const SizedBox(height: 4),
             ],
           ),
         ),
@@ -72,221 +103,219 @@ class SettingsModal extends ConsumerWidget {
     );
   }
 
-  Widget _buildThemeModeSetting(BuildContext context, WidgetRef ref) {
-    final currentMode = ref.watch(preferencesManagerProvider).themeMode;
-    final isDark = context.appBrightness == Brightness.dark;
-    final circleBg = isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5EA);
-    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
-    final ringColor = isDark ? Colors.white : Colors.black;
+  // ── Section helpers ────────────────────────────────────────────────────────
 
-    final modes = [
-      (mode: 'dark',   label: 'Dunkel', icon: Icons.dark_mode_rounded),
-      (mode: 'light',  label: 'Hell',   icon: Icons.light_mode_rounded),
-      (mode: 'system', label: 'System', icon: Icons.brightness_auto_rounded),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Erscheinungsbild',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: context.appPrimaryText,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Wähle zwischen hellem und dunklem Modus.',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: context.appSecondaryText,
-              ),
-        ),
-        const SizedBox(height: 16),
-        Wrap(
-          spacing: 12,
-          runSpacing: 8,
-          children: modes.map((entry) {
-            final isSelected = currentMode == entry.mode;
-            return GestureDetector(
-              onTap: () {
-                HapticService.light();
-                ref.read(preferencesManagerProvider.notifier).setThemeMode(entry.mode);
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 60),
-                    curve: Curves.easeInOut,
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: circleBg,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: isSelected ? ringColor : Colors.transparent,
-                        width: isSelected ? 3 : 0,
-                      ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: ringColor.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Icon(
-                      isSelected ? Icons.check_rounded : entry.icon,
-                      color: iconColor,
-                      size: 22,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+  Widget _sectionLabel(BuildContext context, String label) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: context.appSecondaryText,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.6,
+            ),
+      ),
     );
   }
 
-  Widget _buildAccentColorSetting(BuildContext context, WidgetRef ref) {
-    final choosableColors = ref.watch(choosableColorsProvider);
-    final currentColorName = ref.watch(colorProvider);
-    final ringColor = context.appBrightness == Brightness.dark ? Colors.white : Colors.black;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.of(context)!.accentColor,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: context.appPrimaryText,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          AppLocalizations.of(context)!.chooseAccentColor,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: context.appSecondaryText,
-              ),
-        ),
-        const SizedBox(height: 16),
-        Wrap(
-          spacing: 12,
-          runSpacing: 8,
-          children: choosableColors.map((colorPalette) {
-            final isSelected = currentColorName == colorPalette.name;
-            return GestureDetector(
-              onTap: () {
-                HapticService.light();
-                ref.read(colorProvider.notifier).setColor(colorPalette.name);
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 60),
-                curve: Curves.easeInOut,
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: colorPalette.color,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isSelected ? ringColor : Colors.transparent,
-                    width: isSelected ? 3 : 0,
-                  ),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: colorPalette.color.withValues(alpha: 0.5),
-                            blurRadius: 8,
-                            spreadRadius: 2,
-                          ),
-                        ]
-                      : null,
-                ),
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 60),
-                  curve: Curves.easeInOut,
-                  opacity: isSelected ? 1.0 : 0.0,
-                  child: isSelected
-                      ? Icon(
-                          Icons.check,
-                          color: ringColor,
-                          size: 24,
-                        )
-                      : null,
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDivider(BuildContext context) {
+  Widget _card(BuildContext context, List<Widget> children) {
     return Container(
+      decoration: BoxDecoration(
+        color: context.appSurfaceColor,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: children,
+      ),
+    );
+  }
+
+  Widget _internalDivider(BuildContext context) {
+    return Divider(
       height: 1,
+      thickness: 1,
+      indent: 16,
+      endIndent: 0,
       color: context.appDividerColor,
     );
   }
 
-  Widget _buildLegalLinks(BuildContext context) {
-    return Column(
-      children: [
-        _buildBugReportLink(context),
-        const SizedBox(height: 12),
-        _buildLegalLink(
-          context,
-          Icons.privacy_tip_outlined, 
-          AppLocalizations.of(context)!.privacyLabel, 
-          'https://luka-loehr.github.io/LGKA/privacy.html'
-        ),
-        const SizedBox(height: 12),
-        _buildLegalLink(
-          context,
-          Icons.info_outline, 
-          AppLocalizations.of(context)!.legalLabel, 
-          'https://luka-loehr.github.io/LGKA/impressum.html'
-        ),
-      ],
+  // ── Appearance ─────────────────────────────────────────────────────────────
+
+  Widget _appearanceRow(BuildContext context, WidgetRef ref) {
+    final currentMode = ref.watch(preferencesManagerProvider).themeMode;
+    final isDark = context.appBrightness == Brightness.dark;
+
+    final modes = [
+      (mode: 'dark', icon: Icons.dark_mode_rounded, label: 'Dunkel'),
+      (mode: 'light', icon: Icons.light_mode_rounded, label: 'Hell'),
+      (mode: 'system', icon: Icons.brightness_auto_rounded, label: 'Auto'),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Text(
+            'Erscheinungsbild',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: context.appPrimaryText,
+                  fontWeight: FontWeight.w500,
+                ),
+          ),
+          const Spacer(),
+          Container(
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : Colors.black.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.all(2),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: modes.map((m) {
+                final isSelected = currentMode == m.mode;
+                return GestureDetector(
+                  onTap: () {
+                    HapticService.light();
+                    ref
+                        .read(preferencesManagerProvider.notifier)
+                        .setThemeMode(m.mode);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.white)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              )
+                            ]
+                          : null,
+                    ),
+                    child: Icon(
+                      m.icon,
+                      size: 17,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : context.appSecondaryText,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildBugReportLink(BuildContext context) {
+  Widget _colorRow(BuildContext context, WidgetRef ref) {
+    final choosableColors = ref.watch(choosableColorsProvider);
+    final currentColorName = ref.watch(colorProvider);
+    final isDark = context.appBrightness == Brightness.dark;
+    final ringColor = isDark ? Colors.white : Colors.black;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Text(
+            AppLocalizations.of(context)!.accentColor,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: context.appPrimaryText,
+                  fontWeight: FontWeight.w500,
+                ),
+          ),
+          const Spacer(),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: choosableColors.map((cp) {
+              final isSelected = currentColorName == cp.name;
+              return GestureDetector(
+                onTap: () {
+                  HapticService.light();
+                  ref.read(colorProvider.notifier).setColor(cp.name);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    width: 26,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      color: cp.color,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected ? ringColor : Colors.transparent,
+                        width: 2,
+                      ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: cp.color.withValues(alpha: 0.4),
+                                blurRadius: 6,
+                                spreadRadius: 1,
+                              )
+                            ]
+                          : null,
+                    ),
+                    child: isSelected
+                        ? Icon(Icons.check, size: 13, color: ringColor)
+                        : null,
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Link tile ──────────────────────────────────────────────────────────────
+
+  Widget _linkTile(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Widget trailing,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
-      onTap: () {
-        HapticService.light();
-        context.push(AppRouter.bugReport);
-      },
-      borderRadius: BorderRadius.circular(8),
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Icon(
-              Icons.bug_report_outlined,
-              color: context.appSecondaryText,
-              size: 18,
-            ),
+            Icon(icon, size: 18, color: context.appSecondaryText),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                AppLocalizations.of(context)!.bugReport,
+                label,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: context.appSecondaryText,
-                  fontWeight: FontWeight.w500,
-                ),
+                      color: context.appPrimaryText,
+                      fontWeight: FontWeight.w400,
+                    ),
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: context.appSecondaryText.withValues(alpha: 0.6),
-              size: 16,
+            IconTheme(
+              data: IconThemeData(
+                  color: context.appSecondaryText.withValues(alpha: 0.5),
+                  size: 16),
+              child: trailing,
             ),
           ],
         ),
@@ -294,129 +323,81 @@ class SettingsModal extends ConsumerWidget {
     );
   }
 
-  Widget _buildLegalLink(BuildContext context, IconData icon, String text, String url) {
-    return InkWell(
-      onTap: () {
-        HapticService.light();
-        _launchURL(url);
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: context.appSecondaryText,
-              size: 18,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                text,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: context.appSecondaryText,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Icon(
-              Icons.open_in_new,
-              color: context.appSecondaryText.withValues(alpha: 0.6),
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // ── Footer ─────────────────────────────────────────────────────────────────
 
-  Widget _buildLastDownloadedNotice(BuildContext context, WidgetRef ref) {
+  Widget _buildLastDownloaded(BuildContext context, WidgetRef ref) {
     final substitutionState = ref.watch(substitutionProvider);
-    
-    // Get the most recent download timestamp from both today and tomorrow
-    final todayTimestamp = substitutionState.todayState.downloadTimestamp;
-    final tomorrowTimestamp = substitutionState.tomorrowState.downloadTimestamp;
-    
-    DateTime? mostRecentTimestamp;
-    if (todayTimestamp != null && tomorrowTimestamp != null) {
-      mostRecentTimestamp = todayTimestamp.isAfter(tomorrowTimestamp) 
-          ? todayTimestamp 
-          : tomorrowTimestamp;
-    } else if (todayTimestamp != null) {
-      mostRecentTimestamp = todayTimestamp;
-    } else if (tomorrowTimestamp != null) {
-      mostRecentTimestamp = tomorrowTimestamp;
+    final todayTs = substitutionState.todayState.downloadTimestamp;
+    final tomorrowTs = substitutionState.tomorrowState.downloadTimestamp;
+
+    DateTime? ts;
+    if (todayTs != null && tomorrowTs != null) {
+      ts = todayTs.isAfter(tomorrowTs) ? todayTs : tomorrowTs;
+    } else {
+      ts = todayTs ?? tomorrowTs;
     }
-    
-    // Only show notice if we have a timestamp
-    if (mostRecentTimestamp == null) {
-      return const SizedBox.shrink();
-    }
-    
-    // Format timestamp to show only time with seconds (HH:mm:ss)
-    final dateFormat = DateFormat('HH:mm:ss', 'de_DE');
-    final formattedTime = dateFormat.format(mostRecentTimestamp);
-    
-    return Text(
-      AppLocalizations.of(context)!.lastDownloaded(formattedTime),
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-        color: context.appSecondaryText,
+
+    if (ts == null) return const SizedBox.shrink();
+
+    final formattedTime = DateFormat('HH:mm:ss', 'de_DE').format(ts);
+    return Center(
+      child: Text(
+        AppLocalizations.of(context)!.lastDownloaded(formattedTime),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: context.appSecondaryText.withValues(alpha: 0.6),
+            ),
       ),
-      textAlign: TextAlign.center,
     );
   }
 
   Widget _buildFooter(BuildContext context) {
     final year = DateTime.now().year;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          '© $year ',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: context.appSecondaryText.withValues(alpha: 0.5),
-              ),
-        ),
-        Text(
-          'Luka Löhr',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context)
-                    .colorScheme
-                    .primary
-                    .withValues(alpha: 0.7),
-                fontWeight: FontWeight.w500,
-              ),
-        ),
-        Text(
-          ' • v${AppInfo.version}',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: context.appSecondaryText.withValues(alpha: 0.5),
-              ),
-        ),
-      ],
+    return Center(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '© $year ',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: context.appSecondaryText.withValues(alpha: 0.4),
+                ),
+          ),
+          Text(
+            'Luka Löhr',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.6),
+                  fontWeight: FontWeight.w500,
+                ),
+          ),
+          Text(
+            ' • v${AppInfo.version}',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: context.appSecondaryText.withValues(alpha: 0.4),
+                ),
+          ),
+        ],
+      ),
     );
+  }
+
+  // ── Utils ──────────────────────────────────────────────────────────────────
+
+  double _bottomPadding(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    final gi = mq.systemGestureInsets.bottom;
+    if (gi >= 45) return 54.0;
+    if (gi <= 25) return 8.0;
+    return mq.viewPadding.bottom > 50 ? 54.0 : 8.0;
   }
 
   void _launchURL(String url) async {
     try {
-      final uri = Uri.parse(url);
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     } catch (e) {
       debugPrint('Could not launch URL: $e');
-    }
-  }
-
-  double _getBottomPadding(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final gestureInsets = mediaQuery.systemGestureInsets.bottom;
-
-    if (gestureInsets >= 45) {
-      return 54.0; // Button navigation
-    } else if (gestureInsets <= 25) {
-      return 8.0; // Gesture navigation
-    } else {
-      return mediaQuery.viewPadding.bottom > 50 ? 54.0 : 8.0;
     }
   }
 }
