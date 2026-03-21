@@ -270,7 +270,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get featureWeatherTitle => 'Wetterdaten';
 
   @override
-  String get featureWeatherDesc => 'Zugriff auf die eigene Wetterstation der Schule';
+  String get featureWeatherDesc => 'Aktuelle Wetterdaten via Open-Meteo';
 
   @override
   String get featureNewsTitle => 'Neuigkeiten';
