@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart' as syncfusion;
 import '../domain/schedule_models.dart';
 import '../data/schedule_service.dart';
@@ -59,6 +60,9 @@ Future<Map<String, int>> _buildClassIndexInIsolate(String pdfPath) async {
   }
 }
 
+/// How long between automatic availability re-checks.
+const Duration kScheduleAvailabilityCheckInterval = Duration(minutes: 15);
+
 /// State class for schedule data
 class ScheduleState {
   final List<ScheduleItem> schedules;
@@ -68,6 +72,12 @@ class ScheduleState {
   final Map<String, int> classIndex5to10; // Maps class name -> page number (1-based)
   final bool isIndexBuilt;
 
+  // Availability — which PDFs are reachable/cached right now
+  final List<ScheduleItem> availableFirstHalbjahr;
+  final List<ScheduleItem> availableSecondHalbjahr;
+  final bool isCheckingAvailability;
+  final DateTime? lastAvailabilityCheck;
+
   const ScheduleState({
     this.schedules = const [],
     this.isLoading = false,
@@ -75,6 +85,10 @@ class ScheduleState {
     this.lastUpdated,
     this.classIndex5to10 = const {},
     this.isIndexBuilt = false,
+    this.availableFirstHalbjahr = const [],
+    this.availableSecondHalbjahr = const [],
+    this.isCheckingAvailability = false,
+    this.lastAvailabilityCheck,
   });
 
   ScheduleState copyWith({
@@ -85,6 +99,10 @@ class ScheduleState {
     DateTime? lastUpdated,
     Map<String, int>? classIndex5to10,
     bool? isIndexBuilt,
+    List<ScheduleItem>? availableFirstHalbjahr,
+    List<ScheduleItem>? availableSecondHalbjahr,
+    bool? isCheckingAvailability,
+    DateTime? lastAvailabilityCheck,
   }) {
     return ScheduleState(
       schedules: schedules ?? this.schedules,
@@ -93,25 +111,47 @@ class ScheduleState {
       lastUpdated: lastUpdated ?? this.lastUpdated,
       classIndex5to10: classIndex5to10 ?? this.classIndex5to10,
       isIndexBuilt: isIndexBuilt ?? this.isIndexBuilt,
+      availableFirstHalbjahr: availableFirstHalbjahr ?? this.availableFirstHalbjahr,
+      availableSecondHalbjahr: availableSecondHalbjahr ?? this.availableSecondHalbjahr,
+      isCheckingAvailability: isCheckingAvailability ?? this.isCheckingAvailability,
+      lastAvailabilityCheck: lastAvailabilityCheck ?? this.lastAvailabilityCheck,
     );
   }
 
   /// Check if there are any schedules available
   bool get hasSchedules => schedules.isNotEmpty;
-  
+
   /// Check if there's an error
   bool get hasError => error != null;
-  
+
   /// Get schedules by halbjahr
   List<ScheduleItem> getSchedulesByHalbjahr(String halbjahr) {
     return schedules.where((s) => s.halbjahr == halbjahr).toList();
   }
-  
+
   /// Get first halbjahr schedules
-  List<ScheduleItem> get firstHalbjahrSchedules => getSchedulesByHalbjahr('1. Halbjahr');
-  
+  List<ScheduleItem> get firstHalbjahrSchedules =>
+      getSchedulesByHalbjahr('1. Halbjahr');
+
   /// Get second halbjahr schedules
-  List<ScheduleItem> get secondHalbjahrSchedules => getSchedulesByHalbjahr('2. Halbjahr');
+  List<ScheduleItem> get secondHalbjahrSchedules =>
+      getSchedulesByHalbjahr('2. Halbjahr');
+
+  /// Returns true when availability should be re-checked.
+  ///
+  /// Mirrors the original per-screen logic (including its operator-precedence
+  /// quirk) so behaviour is preserved exactly.
+  bool get shouldCheckAvailability {
+    // ignore: dead_code — intentional: mirrors original precedence quirk
+    if (lastAvailabilityCheck != null &&
+            availableFirstHalbjahr.isNotEmpty ||
+        availableSecondHalbjahr.isNotEmpty) {
+      final elapsed =
+          DateTime.now().difference(lastAvailabilityCheck ?? DateTime.now());
+      if (elapsed < kScheduleAvailabilityCheckInterval) return false;
+    }
+    return true;
+  }
 }
 
 /// Notifier for managing schedule state
@@ -271,6 +311,116 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
     return availableSchedules;
   }
   
+  // ── Availability ────────────────────────────────────────────────────────────
+
+  /// Check which schedule PDFs are reachable/cached and store the result in
+  /// state.  Safe to call concurrently — early-returns if already running.
+  Future<void> checkAvailability() async {
+    if (state.isCheckingAvailability) return;
+
+    state = state.copyWith(isCheckingAvailability: true);
+
+    try {
+      final allSchedules = {
+        ...state.firstHalbjahrSchedules,
+        ...state.secondHalbjahrSchedules,
+      }.toList();
+
+      final results = await Future.wait(allSchedules.map((s) async {
+        final ok = await isScheduleAvailable(s);
+        return {'schedule': s, 'ok': ok};
+      }));
+
+      final first = <ScheduleItem>{};
+      final second = <ScheduleItem>{};
+      for (final r in results) {
+        if (r['ok'] as bool) {
+          final s = r['schedule'] as ScheduleItem;
+          if (s.halbjahr == '1. Halbjahr') first.add(s);
+          if (s.halbjahr == '2. Halbjahr') second.add(s);
+        }
+      }
+
+      AppLogger.success(
+        'Schedule availability: ${first.length + second.length} available',
+        module: 'ScheduleProvider',
+      );
+
+      state = state.copyWith(
+        availableFirstHalbjahr: first.toList(),
+        availableSecondHalbjahr: second.toList(),
+        isCheckingAvailability: false,
+        lastAvailabilityCheck: DateTime.now(),
+      );
+
+      // Preload PDFs for available schedules in the background
+      preloadAvailableSchedulePDFs();
+    } catch (_) {
+      state = state.copyWith(
+        isCheckingAvailability: false,
+        lastAvailabilityCheck: DateTime.now(),
+      );
+    }
+  }
+
+  /// Restore which schedules are available from the local PDF cache
+  /// (used when availability was recently checked and re-check isn't needed).
+  Future<void> restoreAvailabilityFromCache() async {
+    final all = {
+      ...state.firstHalbjahrSchedules,
+      ...state.secondHalbjahrSchedules,
+    }.toList();
+
+    final first = <ScheduleItem>[];
+    final second = <ScheduleItem>[];
+
+    for (final s in all) {
+      final cached = await getCachedScheduleFile(s);
+      if (cached != null && await cached.exists()) {
+        if (s.halbjahr == '1. Halbjahr' &&
+            !first.contains(s)) {
+          first.add(s);
+        } else if (s.halbjahr == '2. Halbjahr' &&
+            !second.contains(s)) {
+          second.add(s);
+        }
+      }
+    }
+
+    state = state.copyWith(
+      availableFirstHalbjahr: first,
+      availableSecondHalbjahr: second,
+    );
+  }
+
+  /// Start background PDF downloads for all currently-available schedules.
+  void preloadAvailableSchedulePDFs() {
+    final all = [
+      ...state.availableFirstHalbjahr,
+      ...state.availableSecondHalbjahr,
+    ];
+    for (final s in all) {
+      unawaited(getCachedScheduleFile(s).then((cached) async {
+        if (cached != null && await cached.exists()) return;
+        try {
+          await _scheduleService.downloadSchedule(s);
+        } catch (_) {}
+      }));
+    }
+  }
+
+  /// Returns the [File] where [schedule]'s PDF is (or would be) cached.
+  Future<File?> getCachedScheduleFile(ScheduleItem schedule) async {
+    try {
+      final dir = await getTemporaryDirectory();
+      final grade = schedule.gradeLevel.replaceAll('/', '_');
+      final half = schedule.halbjahr.replaceAll('.', '_');
+      return File('${dir.path}/${grade}_$half.pdf');
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Build class index from a 5-10 schedule PDF file
   /// Searches for classes 5a-5e, 6a-6e, ... up to 10a-10e and maps them to page numbers
   /// Runs in a background isolate to avoid blocking the main thread
