@@ -433,6 +433,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       const SizedBox(width: 14),
       Expanded(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -588,6 +589,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const SizedBox(width: 14),
         Expanded(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
