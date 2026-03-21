@@ -21,6 +21,7 @@ import 'package:lgka_flutter/l10n/app_localizations.dart';
 import 'utils/app_logger.dart';
 import 'utils/app_info.dart';
 import 'package:lgka_flutter/features/events/application/events_provider.dart';
+import 'package:lgka_flutter/features/weather/data/weather_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -264,10 +265,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
       unawaited(ref.read(substitutionProvider.notifier).refreshInBackground());
     }
 
-    final weatherState = ref.read(weatherDataProvider);
-    final weatherLastUpdate = weatherState.lastUpdateTime;
-    if (weatherLastUpdate == null ||
-        _cacheService.isCacheExpired(CacheKey.weather, lastFetchTime: weatherLastUpdate)) {
+    if (!WeatherService.instance.hasValidCache) {
       AppLogger.info('App resumed: Immediately refreshing weather', module: 'Main');
       unawaited(ref.read(weatherDataProvider.notifier).updateDataInBackground());
     }
@@ -307,10 +305,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
       unawaited(ref.read(scheduleProvider.notifier).refreshInBackground());
     }
 
-    final weatherState = ref.read(weatherDataProvider);
-    final weatherLastUpdate = weatherState.lastUpdateTime;
-    if (weatherLastUpdate == null ||
-        _cacheService.isCacheExpired(CacheKey.weather, lastFetchTime: weatherLastUpdate)) {
+    if (!WeatherService.instance.hasValidCache) {
       AppLogger.debug('Cache refresh timer: Triggering background refresh for weather', module: 'Main');
       unawaited(ref.read(weatherDataProvider.notifier).updateDataInBackground());
     }

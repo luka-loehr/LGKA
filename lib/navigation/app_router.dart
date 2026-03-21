@@ -16,6 +16,7 @@ import '../features/settings/presentation/bug_report_screen.dart';
 import '../features/news/presentation/news_screen.dart';
 import '../features/news/presentation/news_detail_screen.dart';
 import '../features/news/domain/news_models.dart';
+import '../features/weather/presentation/weather_page.dart';
 
 class AppRouter {
   // Route names
@@ -32,6 +33,7 @@ class AppRouter {
   static const String bugReport = '/bug-report';
   static const String news = '/news';
   static const String newsDetail = '/news-detail';
+  static const String weather = '/weather';
 
   static GoRouter createRouter({required String initialLocation}) {
     return GoRouter(
@@ -132,6 +134,27 @@ class AppRouter {
           pageBuilder: (context, state) {
             return CustomTransitionPage(
               child: const NewsScreen(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeInOut,
+                  )),
+                  child: child,
+                );
+              },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+        GoRoute(
+          path: weather,
+          pageBuilder: (context, state) {
+            return CustomTransitionPage(
+              child: const WeatherPage(),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return SlideTransition(
                   position: Tween<Offset>(
