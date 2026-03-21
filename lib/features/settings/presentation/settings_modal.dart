@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:intl/intl.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../providers/app_providers.dart';
 import '../../../../providers/color_provider.dart';
-import '../../substitution/application/substitution_provider.dart';
 import '../../../../services/haptic_service.dart';
 import '../../../../navigation/app_router.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -92,8 +90,6 @@ class SettingsModal extends ConsumerWidget {
               const SizedBox(height: 24),
 
               // ── Footer ──────────────────────────────────────────────────
-              _buildLastDownloaded(context, ref),
-              const SizedBox(height: 8),
               _buildFooter(context),
               const SizedBox(height: 4),
             ],
@@ -323,31 +319,6 @@ class SettingsModal extends ConsumerWidget {
   }
 
   // ── Footer ─────────────────────────────────────────────────────────────────
-
-  Widget _buildLastDownloaded(BuildContext context, WidgetRef ref) {
-    final substitutionState = ref.watch(substitutionProvider);
-    final todayTs = substitutionState.todayState.downloadTimestamp;
-    final tomorrowTs = substitutionState.tomorrowState.downloadTimestamp;
-
-    DateTime? ts;
-    if (todayTs != null && tomorrowTs != null) {
-      ts = todayTs.isAfter(tomorrowTs) ? todayTs : tomorrowTs;
-    } else {
-      ts = todayTs ?? tomorrowTs;
-    }
-
-    if (ts == null) return const SizedBox.shrink();
-
-    final formattedTime = DateFormat('HH:mm:ss', 'de_DE').format(ts);
-    return Center(
-      child: Text(
-        AppLocalizations.of(context)!.lastDownloaded(formattedTime),
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: context.appSecondaryText.withValues(alpha: 0.6),
-            ),
-      ),
-    );
-  }
 
   Widget _buildFooter(BuildContext context) {
     final year = DateTime.now().year;
