@@ -976,11 +976,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   String _getHeaderTitle() {
     if (_effectiveDayName != null && _effectiveDayName!.isNotEmpty) {
       final dn = _effectiveDayName!;
-      final isSchedule = dn.contains('Klassen') ||
-          dn.contains('Grades') ||
-          dn.contains('J11/J12');
-      if (isSchedule) {
-        return AppLocalizations.of(context)!.scheduleTitle;
+      if (_isAnySchedulePdf()) {
+        // Show only the class/grade part before the ' – ' separator
+        final separatorIndex = dn.indexOf(' – ');
+        return separatorIndex >= 0 ? dn.substring(0, separatorIndex) : dn;
       }
       return dn;
     }
