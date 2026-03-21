@@ -726,7 +726,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ref.watch(preferencesManagerProvider).selectedScheduleClass;
 
     return _fadeSwitch(
-      'sched-content',
+      'sched-content-${selectedClass ?? 'none'}',
       _buildInlineScheduleCard(activeGroup, selectedClass, l10n),
     );
   }
