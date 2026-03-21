@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pdfx/pdfx.dart' as pdfx;
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../../navigation/app_router.dart';
 import '../../../../../providers/app_providers.dart';
 import '../../../schedule/application/schedule_provider.dart';
 import '../../../../../services/haptic_service.dart';
@@ -670,35 +672,22 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
     final trimmedQuery = query.trim().toLowerCase();
     final container = ProviderScope.containerOf(context, listen: false);
-    final isSchedule5to10 = (widget.dayName ?? '').contains('Klassen') ||
-        (widget.dayName ?? '').contains('Grades');
-    final isScheduleJ11J12 = (widget.dayName ?? '').contains('J11/J12');
 
-    if (isSchedule5to10) {
+    if (_isSchedule5to10()) {
       await _handleSchedule5to10Search(trimmedQuery, container);
       return;
     }
 
-    // For other schedules (J11/J12), use normal search
-    // Hide search bar first and let animation complete before PDF search
-    setState(() => _isSearchBarVisible = false);
-
-    // Wait for search bar slide/fade animation to complete
-    await Future.delayed(_searchBarAnimationDuration);
-
-    if (!mounted) return;
-
-    _searchInPdf(query);
-
-    try {
-      final prefsNotifier =
-          container.read(preferencesManagerProvider.notifier);
-      if (isScheduleJ11J12) {
-        unawaited(prefsNotifier.setLastScheduleQueryJ11J12(query.trim()));
-      }
-    } catch (e) {
-      AppLogger.debug('Error saving search query: $e', module: 'PDFViewer');
+    if (_isScheduleJ11J12()) {
+      await _handleScheduleJ11J12Search(trimmedQuery, container);
+      return;
     }
+
+    // Non-schedule PDF: normal text search
+    setState(() => _isSearchBarVisible = false);
+    await Future.delayed(_searchBarAnimationDuration);
+    if (!mounted) return;
+    _searchInPdf(query);
   }
 
   /// Duration to wait for search bar animation to complete before PDF operations.
@@ -760,6 +749,16 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       }
     }
 
+    // Not in 5-10 index — check if it's a J11/J12 class (cross-PDF)
+    if (scheduleState.isIndexBuilt) {
+      final jPage = scheduleNotifier.getClassPageJ(trimmedQuery);
+      if (jPage != null) {
+        setState(() => _isSearchBarVisible = false);
+        await _navigateCrossPdf(trimmedQuery, 'J11/J12', jPage, container);
+        return;
+      }
+    }
+
     setState(() => _isSearchBarVisible = false);
 
     if (mounted) {
@@ -770,6 +769,106 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         duration: const Duration(seconds: 2),
       );
     }
+  }
+
+  /// Handles class search when the J11/J12 PDF is open.
+  Future<void> _handleScheduleJ11J12Search(
+    String trimmedQuery,
+    ProviderContainer container,
+  ) async {
+    final scheduleState = container.read(scheduleProvider);
+    final scheduleNotifier = container.read(scheduleProvider.notifier);
+
+    // Check if it's a j11/j12 class within this PDF
+    if (scheduleState.isIndexBuilt) {
+      final jPage = scheduleNotifier.getClassPageJ(trimmedQuery);
+      if (jPage != null) {
+        setState(() => _isSearchBarVisible = false);
+        await Future.delayed(_searchBarAnimationDuration);
+        if (!mounted) return;
+
+        _pdfController.jumpToPage(jPage - 1);
+
+        final prefsNotifier = container.read(preferencesManagerProvider.notifier);
+        unawaited(prefsNotifier.setSelectedScheduleClass(trimmedQuery));
+
+        if (mounted) {
+          FloatingToast.show(
+            context,
+            message: AppLocalizations.of(context)!
+                .classChanged(trimmedQuery.toUpperCase()),
+            duration: const Duration(seconds: 2),
+          );
+        }
+        return;
+      }
+
+      // Check if it's a 5-10 class (cross-PDF)
+      final page = scheduleNotifier.getClassPage(trimmedQuery);
+      if (page != null) {
+        setState(() => _isSearchBarVisible = false);
+        await _navigateCrossPdf(trimmedQuery, 'Klassen 5-10', page, container);
+        return;
+      }
+    }
+
+    setState(() => _isSearchBarVisible = false);
+    if (mounted) {
+      FloatingToast.show(
+        context,
+        message: AppLocalizations.of(context)!
+            .noResultsFound(trimmedQuery.toUpperCase()),
+        duration: const Duration(seconds: 2),
+      );
+    }
+  }
+
+  /// Navigates cross-PDF: pushes a new viewer for [targetGradeLevel] at [targetPage].
+  Future<void> _navigateCrossPdf(
+    String className,
+    String targetGradeLevel,
+    int targetPage,
+    ProviderContainer container,
+  ) async {
+    final notifier = container.read(scheduleProvider.notifier);
+    final cachedFile = await notifier.getCachedFileForGrade(targetGradeLevel);
+
+    if (cachedFile == null || !await cachedFile.exists()) {
+      if (mounted) {
+        FloatingToast.show(
+          context,
+          message: AppLocalizations.of(context)!
+              .noResultsFound(className.toUpperCase()),
+          duration: const Duration(seconds: 2),
+        );
+      }
+      return;
+    }
+
+    final halbjahr = notifier.getHalbjahrForGrade(targetGradeLevel) ?? '';
+    final classTitle = _formatClassNameForDayName(className);
+    final newDayName = halbjahr.isNotEmpty ? '$classTitle – $halbjahr' : classTitle;
+
+    final prefsNotifier = container.read(preferencesManagerProvider.notifier);
+    await prefsNotifier.setSelectedScheduleClass(className);
+    if (targetGradeLevel == 'Klassen 5-10') {
+      await prefsNotifier.setLastScheduleQuery5to10(className);
+    }
+
+    if (!mounted) return;
+
+    context.pushReplacement(AppRouter.pdfViewer, extra: {
+      'file': cachedFile,
+      'dayName': newDayName,
+      'targetPages': [targetPage],
+    });
+  }
+
+  static String _formatClassNameForDayName(String className) {
+    if (className == 'j11') return 'Jahrgang 11';
+    if (className == 'j12') return 'Jahrgang 12';
+    if (className.isEmpty) return className;
+    return 'Klasse ${className[0].toUpperCase()}${className.substring(1)}';
   }
 
   // ============================================================================
@@ -807,6 +906,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   Widget build(BuildContext context) {
     final headerTitle = _getHeaderTitle();
     final isSchedule5to10 = _isSchedule5to10();
+    final isSchedulePdf = _isAnySchedulePdf();
 
     if (_showClassModal) {
       return ClassInputModal(
@@ -825,11 +925,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: _buildAppBar(headerTitle, isSchedule5to10),
+      appBar: _buildAppBar(headerTitle, isSchedule5to10, isSchedulePdf),
       body: Stack(
         children: [
           _buildPdfViewer(),
-          if (isSchedule5to10) _buildSearchBarOverlay(),
+          if (isSchedulePdf) _buildSearchBarOverlay(),
         ],
       ),
     );
@@ -852,10 +952,19 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   bool _isSchedule5to10() {
     if (widget.dayName == null || widget.dayName!.isEmpty) return false;
     final dn = widget.dayName!;
-    return dn.contains('Klassen') || dn.contains('Grades');
+    // 'Klasse' matches both 'Klasse 10b' and 'Klassen 5-10'; 'Grade' matches both singular/plural
+    return dn.contains('Klasse') || dn.contains('Grade');
   }
 
-  AppBar _buildAppBar(String headerTitle, bool isSchedule5to10) {
+  bool _isScheduleJ11J12() {
+    if (widget.dayName == null || widget.dayName!.isEmpty) return false;
+    final dn = widget.dayName!;
+    return dn.contains('J11/J12') || dn.contains('Jahrgang');
+  }
+
+  bool _isAnySchedulePdf() => _isSchedule5to10() || _isScheduleJ11J12();
+
+  AppBar _buildAppBar(String headerTitle, bool isSchedule5to10, bool isSchedulePdf) {
     return AppBar(
       title: Text(
         headerTitle,
@@ -876,7 +985,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         },
       ),
       actions: [
-        if (isSchedule5to10) ...[
+        if (isSchedulePdf) ...[
           if (!_isSearchBarVisible)
             IconButton(
               onPressed: () {
