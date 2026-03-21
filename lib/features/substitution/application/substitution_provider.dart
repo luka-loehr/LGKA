@@ -8,7 +8,6 @@ import '../data/substitution_service.dart';
 import '../../../../services/haptic_service.dart';
 import '../../../../services/cache_service.dart';
 import '../../../../utils/app_logger.dart';
-import '../../../../providers/app_providers.dart';
 
 /// State class for substitution data
 class SubstitutionProviderState {
@@ -149,3 +148,6 @@ class SubstitutionNotifier extends Notifier<SubstitutionProviderState> {
 
 /// Provider for substitution state
 final substitutionProvider = NotifierProvider<SubstitutionNotifier, SubstitutionProviderState>(SubstitutionNotifier.new);
+
+/// Provider for the shared [SubstitutionService] instance.
+final substitutionServiceProvider = Provider<SubstitutionService>((ref) => SubstitutionService());
