@@ -700,14 +700,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (scheduleState.isLoading ||
         scheduleState.isCheckingAvailability ||
         !scheduleState.isIndexBuilt) {
-      return _fadeSwitch(
-        'sched-loading',
-        Column(children: [
-          const SkeletonCard(),
-          const SizedBox(height: 12),
-          const SkeletonCard(),
-        ]),
-      );
+      return _fadeSwitch('sched-loading', const SkeletonCard());
     }
 
     if (scheduleState.hasError) {
