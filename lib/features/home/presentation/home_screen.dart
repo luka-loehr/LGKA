@@ -162,13 +162,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: context.appBgColor,
       elevation: 0,
       scrolledUnderElevation: 0,
-      title: Text(
-        _greeting(context),
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: context.appPrimaryText,
-              fontWeight: FontWeight.w800,
-            ),
-      ),
+      title: _buildDateLine(),
       actions: [
         IconButton(
           onPressed: () {
@@ -239,9 +233,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
-              const SizedBox(height: 4),
-              _buildDateLine(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               _buildSectionHeader(
                   AppLocalizations.of(context)!.substitutionPlan),
               const SizedBox(height: 12),
@@ -258,25 +250,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // ── Greeting ──────────────────────────────────────────────────────────────
-
-  String _greeting(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final hour = DateTime.now().hour;
-    if (hour < 11) return l10n.greetingMorning;
-    if (hour < 18) return l10n.greetingDay;
-    return l10n.greetingEvening;
-  }
-
   Widget _buildDateLine() {
     final locale = Localizations.localeOf(context).languageCode;
     final date = DateFormat('EEEE, d. MMMM', locale == 'de' ? 'de_DE' : 'en_US')
         .format(DateTime.now());
     return Text(
       date,
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: context.appSecondaryText,
-            fontWeight: FontWeight.w500,
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: context.appPrimaryText,
+            fontWeight: FontWeight.w800,
           ),
     );
   }
