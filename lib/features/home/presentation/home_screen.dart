@@ -659,58 +659,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildTermineSection() {
     final eventsState = ref.watch(eventsProvider);
 
+    final Widget child;
+    final String key;
+
     if (eventsState.isLoading) {
-      return _fadeSwitch(
-        'events-loading',
-        Column(children: const [
-          SkeletonCard(),
-          SizedBox(height: 12),
-          SkeletonCard(),
+      key = 'events-loading';
+      child = const Column(children: [
+        SkeletonCard(),
+        SizedBox(height: 12),
+        SkeletonCard(),
+        SizedBox(height: 12),
+        SkeletonCard(),
+        SizedBox(height: 12),
+        SkeletonCard(),
+      ]);
+    } else if (eventsState.hasError && eventsState.events.isEmpty) {
+      key = 'events-error';
+      child = _buildEventsError();
+    } else if (eventsState.events.isEmpty) {
+      key = 'events-empty';
+      child = Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: context.appSurfaceColor,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(children: [
+          Icon(Icons.event_outlined,
+              color: context.appSecondaryText.withValues(alpha: 0.4),
+              size: 28),
+          const SizedBox(width: 12),
+          Text(
+            AppLocalizations.of(context)!.noEventsAvailable,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: context.appSecondaryText,
+                ),
+          ),
         ]),
       );
+    } else {
+      key = 'events-content';
+      final displayEvents = eventsState.events.take(4).toList();
+      final items = <Widget>[];
+      for (final event in displayEvents) {
+        items.add(_buildEventCard(event));
+        items.add(const SizedBox(height: 12));
+      }
+      if (items.isNotEmpty && items.last is SizedBox) items.removeLast();
+      child = Column(
+          crossAxisAlignment: CrossAxisAlignment.start, children: items);
     }
 
-    if (eventsState.hasError && eventsState.events.isEmpty) {
-      return _fadeSwitch('events-error', _buildEventsError());
-    }
-
-    if (eventsState.events.isEmpty) {
-      return _fadeSwitch(
-        'events-empty',
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: context.appSurfaceColor,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(children: [
-            Icon(Icons.event_outlined,
-                color: context.appSecondaryText.withValues(alpha: 0.4),
-                size: 28),
-            const SizedBox(width: 12),
-            Text(
-              AppLocalizations.of(context)!.noEventsAvailable,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: context.appSecondaryText,
-                  ),
-            ),
-          ]),
-        ),
-      );
-    }
-
-    final displayEvents = eventsState.events.take(5).toList();
-    final items = <Widget>[];
-    for (final event in displayEvents) {
-      items.add(_buildEventCard(event));
-      items.add(const SizedBox(height: 12));
-    }
-    if (items.isNotEmpty && items.last is SizedBox) items.removeLast();
-
-    return _fadeSwitch(
-      'events-content',
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: items),
-    );
+    return _fadeSwitch(key, child);
   }
 
   Widget _buildEventCard(SchoolEvent event) {
