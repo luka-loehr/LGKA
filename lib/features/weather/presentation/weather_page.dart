@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:weather_animation/weather_animation.dart';
+import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart' hide WeatherDataState;
 import '../../../theme/app_theme.dart';
 import '../../../services/haptic_service.dart';
 import '../application/weather_provider.dart';
@@ -148,7 +148,7 @@ class WeatherPage extends ConsumerWidget {
   Widget _buildCurrentCard(BuildContext context, CurrentWeather current,
       List<DailyForecast> daily) {
     final today = daily.isNotEmpty ? daily.first : null;
-    final scene = _owmIconToScene(current.icon);
+    final scene = _owmIconToWeatherType(current.icon);
     const textShadows = [Shadow(color: Colors.black38, blurRadius: 8)];
 
     return ClipRRect(
@@ -159,9 +159,12 @@ class WeatherPage extends ConsumerWidget {
           children: [
             // Animated weather scene fills the entire card
             Positioned.fill(
-              child: WrapperScene.weather(
-                scene: scene,
-                sizeCanvas: const Size(400, 400),
+              child: LayoutBuilder(
+                builder: (context, constraints) => WeatherBg(
+                  weatherType: scene,
+                  width: constraints.maxWidth,
+                  height: constraints.maxHeight,
+                ),
               ),
             ),
             // Subtle gradient overlay for text readability
@@ -240,27 +243,27 @@ class WeatherPage extends ConsumerWidget {
     );
   }
 
-  WeatherScene _owmIconToScene(String icon) {
+  WeatherType _owmIconToWeatherType(String icon) {
     switch (icon) {
-      case '01d': return WeatherScene.scorchingSun;
-      case '01n': return WeatherScene.snowfall;
-      case '02d': return WeatherScene.sunset;
-      case '02n': return WeatherScene.snowfall;
-      case '03d':
-      case '03n': return WeatherScene.rainyOvercast;
-      case '04d':
-      case '04n': return WeatherScene.stormy;
+      case '01d': return WeatherType.sunny;
+      case '01n': return WeatherType.sunnyNight;
+      case '02d': return WeatherType.cloudy;
+      case '02n': return WeatherType.cloudyNight;
+      case '03d': return WeatherType.cloudy;
+      case '03n': return WeatherType.cloudyNight;
+      case '04d': return WeatherType.overcast;
+      case '04n': return WeatherType.overcast;
       case '09d':
-      case '09n': return WeatherScene.rainyOvercast;
+      case '09n': return WeatherType.lightRainy;
       case '10d':
-      case '10n': return WeatherScene.rainyOvercast;
+      case '10n': return WeatherType.middleRainy;
       case '11d':
-      case '11n': return WeatherScene.stormy;
+      case '11n': return WeatherType.thunder;
       case '13d':
-      case '13n': return WeatherScene.snowfall;
-      case '50d':
-      case '50n': return WeatherScene.showerSleet;
-      default:    return WeatherScene.sunset;
+      case '13n': return WeatherType.middleSnow;
+      case '50d': return WeatherType.foggy;
+      case '50n': return WeatherType.foggy;
+      default:    return WeatherType.cloudy;
     }
   }
 

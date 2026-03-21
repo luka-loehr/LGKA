@@ -79,7 +79,7 @@ dependencies:
   
   # Modal Bottom Sheets
   modal_bottom_sheet: ^3.0.0
-  weather_animation: ^1.2.0
+  flutter_weather_bg_null_safety: ^1.0.0
 
 dev_dependencies:
   flutter_test:
