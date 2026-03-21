@@ -20,6 +20,7 @@ import 'data/preferences_manager.dart';
 import 'package:lgka_flutter/l10n/app_localizations.dart';
 import 'utils/app_logger.dart';
 import 'utils/app_info.dart';
+import 'package:lgka_flutter/features/events/application/events_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -184,6 +185,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
       _preloadWeatherData(),
       _preloadSchedules(),
       _preloadNews(),
+      _preloadEvents(),
     ]);
     AppLogger.success('Background preload complete');
     await _refreshExpiredCaches();
@@ -232,6 +234,16 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
       AppLogger.success('News preloaded');
     } catch (e) {
       AppLogger.error('Failed to preload news', error: e);
+    }
+  }
+
+  Future<void> _preloadEvents() async {
+    try {
+      AppLogger.init('Preloading events', module: 'Main');
+      await ref.read(eventsProvider.notifier).refresh();
+      AppLogger.success('Events preloaded', module: 'Main');
+    } catch (e) {
+      AppLogger.error('Failed to preload events', module: 'Main', error: e);
     }
   }
 
