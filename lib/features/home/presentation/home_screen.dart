@@ -14,7 +14,6 @@ import '../../../../navigation/app_router.dart';
 import '../../../../utils/app_logger.dart';
 import '../../../../utils/app_info.dart';
 import '../../../../widgets/constrained_modal_bottom_sheet.dart';
-import '../../../../widgets/app_footer.dart';
 import '../../../../providers/app_providers.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'widgets/skeleton_card.dart';
@@ -154,7 +153,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       backgroundColor: context.appBgColor,
       appBar: _buildAppBar(),
-      bottomNavigationBar: _buildPinnedFooter(),
       body: _buildBody(subState, isSubLoading),
     );
   }
@@ -204,19 +202,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ],
     );
-  }
-
-  Widget _buildPinnedFooter() {
-    final mq = MediaQuery.of(context);
-    final gi = mq.systemGestureInsets.bottom;
-    final bottomPadding = gi >= 45
-        ? 34.0
-        : gi <= 25
-            ? 8.0
-            : mq.viewPadding.bottom > 50
-                ? 34.0
-                : 8.0;
-    return AppFooter(bottomPadding: bottomPadding);
   }
 
   void _navigateToKrankmeldung() {

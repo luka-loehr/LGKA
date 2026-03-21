@@ -12,6 +12,7 @@ import '../../substitution/application/substitution_provider.dart';
 import '../../../../services/haptic_service.dart';
 import '../../../../navigation/app_router.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../utils/app_info.dart';
 
 /// Settings bottom sheet
 class SettingsModal extends ConsumerWidget {
@@ -57,6 +58,10 @@ class SettingsModal extends ConsumerWidget {
                     _buildDivider(context),
                     const SizedBox(height: 20),
                     _buildLastDownloadedNotice(context, ref),
+                    const SizedBox(height: 20),
+                    _buildDivider(context),
+                    const SizedBox(height: 20),
+                    _buildFooter(context),
                   ],
                 ),
               ),
@@ -359,6 +364,37 @@ class SettingsModal extends ConsumerWidget {
         color: context.appSecondaryText,
       ),
       textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildFooter(BuildContext context) {
+    final year = DateTime.now().year;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          '© $year ',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: context.appSecondaryText.withValues(alpha: 0.5),
+              ),
+        ),
+        Text(
+          'Luka Löhr',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.7),
+                fontWeight: FontWeight.w500,
+              ),
+        ),
+        Text(
+          ' • v${AppInfo.version}',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: context.appSecondaryText.withValues(alpha: 0.5),
+              ),
+        ),
+      ],
     );
   }
 
