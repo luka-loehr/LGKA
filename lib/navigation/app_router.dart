@@ -66,6 +66,7 @@ class AppRouter {
             return PDFViewerScreen(
               pdfFile: data['file'],
               dayName: data['dayName'],
+              targetPages: data['targetPages'] as List<int>?,
             );
           },
         ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../application/schedule_provider.dart';
+import '../../../../providers/preferences_provider.dart';
 import '../../../../services/haptic_service.dart';
 import '../../../../theme/app_theme.dart';
 import '../domain/schedule_models.dart';
@@ -67,10 +68,13 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   Widget build(BuildContext context) {
     final scheduleState = ref.watch(scheduleProvider);
 
-    final isShowingSpinner = scheduleState.isLoading || scheduleState.isCheckingAvailability || !scheduleState.isIndexBuilt;
-    final hasData = scheduleState.hasSchedules && !scheduleState.hasError && scheduleState.isIndexBuilt;
+    final isShowingSpinner = scheduleState.isLoading ||
+        scheduleState.isCheckingAvailability ||
+        !scheduleState.isIndexBuilt;
+    final hasData = scheduleState.hasSchedules &&
+        !scheduleState.hasError &&
+        scheduleState.isIndexBuilt;
 
-    // Track spinner visibility and trigger haptic feedback when spinner disappears
     _spinnerTracker.trackState(
       isSpinnerVisible: isShowingSpinner,
       hasData: hasData,
@@ -93,15 +97,13 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.primary),
             ),
             const SizedBox(height: 16),
             Text(
               AppLocalizations.of(context)!.checkingAvailability,
-              style: TextStyle(
-                color: context.appSecondaryText,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: context.appSecondaryText, fontSize: 16),
             ),
           ],
         ),
@@ -109,40 +111,32 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     }
 
     if (state.hasError) {
-      return Center(
-        child: _buildErrorState(state.error!),
-      );
+      return Center(child: _buildErrorState(state.error!));
     }
 
     if (!state.hasSchedules) {
-      return Center(
-        child: _buildEmptyState(),
-      );
+      return Center(child: _buildEmptyState());
     }
 
-    // Show availability checking state if schedules are loaded but availability or class index is still being checked
     if (state.isCheckingAvailability || !state.isIndexBuilt) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.primary),
             ),
             const SizedBox(height: 16),
             Text(
               AppLocalizations.of(context)!.loadingSchedules,
-              style: TextStyle(
-                color: context.appSecondaryText,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: context.appSecondaryText, fontSize: 16),
             ),
           ],
         ),
       );
     }
 
-    // Start animation when buttons should be visible
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final hasAnyButtons = state.availableFirstHalbjahr.isNotEmpty ||
           state.availableSecondHalbjahr.isNotEmpty;
@@ -168,17 +162,16 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.schedule_outlined,
-              size: 64,
-              color: context.appSecondaryText.withValues(alpha: 0.5),
-            ),
+            Icon(Icons.schedule_outlined,
+                size: 64,
+                color: context.appSecondaryText.withValues(alpha: 0.5)),
             const SizedBox(height: 16),
             Text(
               AppLocalizations.of(context)!.serverConnectionFailed,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: context.appPrimaryText,
-              ),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(color: context.appPrimaryText),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -186,9 +179,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
             const SizedBox(height: 8),
             Text(
               AppLocalizations.of(context)!.serverConnectionHint,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: context.appSecondaryText,
-              ),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: context.appSecondaryText),
               textAlign: TextAlign.center,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -205,10 +199,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
           ],
@@ -222,27 +216,19 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       padding: const EdgeInsets.only(top: 24.0),
       child: Column(
         children: [
-          Icon(
-            Icons.schedule,
-            color: context.appSecondaryText,
-            size: 64,
-          ),
+          Icon(Icons.schedule, color: context.appSecondaryText, size: 64),
           const SizedBox(height: 16),
           Text(
             AppLocalizations.of(context)!.noSchedulesAvailable,
             style: TextStyle(
-              color: context.appPrimaryText,
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
+                color: context.appPrimaryText,
+                fontSize: 18,
+                fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
           Text(
             AppLocalizations.of(context)!.tryAgainLater,
-            style: TextStyle(
-              color: context.appSecondaryText,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: context.appSecondaryText, fontSize: 14),
           ),
         ],
       ),
@@ -252,9 +238,13 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   Widget _buildScheduleList(ScheduleState state) {
     final firstSemesterSchedules = state.availableFirstHalbjahr;
     final secondSemesterSchedules = state.availableSecondHalbjahr;
-    final hasBothSemesters = firstSemesterSchedules.isNotEmpty && 
-                             secondSemesterSchedules.isNotEmpty;
-    
+    final hasBothSemesters = firstSemesterSchedules.isNotEmpty &&
+        secondSemesterSchedules.isNotEmpty;
+
+    // Determine if user has a class selected
+    final selectedClass =
+        ref.watch(preferencesManagerProvider).selectedScheduleClass;
+
     return Column(
       children: [
         const SizedBox(height: 24),
@@ -262,48 +252,71 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           child: ListView(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
             children: [
-              // First Semester (if available)
+              // First Semester
               if (firstSemesterSchedules.isNotEmpty) ...[
-                ...firstSemesterSchedules
-                    .where((s) => s.gradeLevel == 'Klassen 5-10')
-                    .map((schedule) => _buildScheduleCard(schedule)),
+                _buildHalbjahrCard(
+                  schedules: firstSemesterSchedules,
+                  selectedClass: selectedClass,
+                ),
                 const SizedBox(height: 16),
-                ...firstSemesterSchedules
-                    .where((s) => s.gradeLevel == 'J11/J12')
-                    .map((schedule) => _buildScheduleCard(schedule)),
               ],
-              
-              // Separator if both semesters exist
+
               if (hasBothSemesters) ...[
-                const SizedBox(height: 24),
-                Divider(height: 1, color: context.appSecondaryText.withValues(alpha: 0.2)),
+                const SizedBox(height: 8),
+                Divider(
+                    height: 1,
+                    color: context.appSecondaryText.withValues(alpha: 0.2)),
                 const SizedBox(height: 24),
               ],
-              
-              // Second Semester (if available)
+
+              // Second Semester
               if (secondSemesterSchedules.isNotEmpty) ...[
-                ...secondSemesterSchedules
-                    .where((s) => s.gradeLevel == 'Klassen 5-10')
-                    .map((schedule) => _buildScheduleCard(schedule)),
-                const SizedBox(height: 16),
-                ...secondSemesterSchedules
-                    .where((s) => s.gradeLevel == 'J11/J12')
-                    .map((schedule) => _buildScheduleCard(schedule)),
+                _buildHalbjahrCard(
+                  schedules: secondSemesterSchedules,
+                  selectedClass: selectedClass,
+                ),
               ],
             ],
           ),
         ),
         const SizedBox(height: 20),
-        _buildFooter(context),
+        AppFooter(bottomPadding: _getFooterPadding(context)),
       ],
     );
   }
 
-  Widget _buildScheduleCard(ScheduleItem schedule) {
+  /// ONE card per halbjahr group. Title is the user's class if selected.
+  Widget _buildHalbjahrCard({
+    required List<ScheduleItem> schedules,
+    required String? selectedClass,
+  }) {
+    final halbjahr = schedules.isNotEmpty ? schedules.first.halbjahr : '';
+    final halfLabel = _localizeHalbjahr(context, halbjahr);
+
+    // Determine title based on selected class
+    String title;
+    if (selectedClass != null) {
+      title = _formatClassName(selectedClass);
+    } else {
+      // Show combined label if both grade groups present
+      final has5to10 =
+          schedules.any((s) => s.gradeLevel == 'Klassen 5-10');
+      final hasJ11J12 = schedules.any((s) => s.gradeLevel == 'J11/J12');
+      if (has5to10 && hasJ11J12) {
+        title = _localizeGradeLevel(context, 'Klassen 5-10') +
+            ' & ' +
+            _localizeGradeLevel(context, 'J11/J12');
+      } else if (has5to10) {
+        title = _localizeGradeLevel(context, 'Klassen 5-10');
+      } else {
+        title = _localizeGradeLevel(context, 'J11/J12');
+      }
+    }
+
     return GestureDetector(
       onTap: () {
         HapticService.medium();
-        _openSchedule(schedule);
+        _openScheduleForClass(schedules, selectedClass);
       },
       child: Container(
         width: double.infinity,
@@ -313,7 +326,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+              color: Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -328,103 +344,122 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
                 color: Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.schedule,
-                color: Colors.white,
-                size: 24,
-              ),
+              child: const Icon(Icons.table_chart_outlined,
+                  color: Colors.white, size: 22),
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _localizeGradeLevel(context, schedule.gradeLevel),
+                    title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: context.appPrimaryText,
-                      fontWeight: FontWeight.w500,
-                    ),
+                          color: context.appPrimaryText,
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(height: 2),
                   Text(
-                    _localizeHalbjahr(context, schedule.halbjahr),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: context.appSecondaryText,
-                    ),
+                    halfLabel,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: context.appSecondaryText,
+                        ),
                   ),
                 ],
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: context.appSecondaryText,
-              size: 16,
-            ),
+            Icon(Icons.arrow_forward_ios,
+                color: context.appSecondaryText, size: 16),
           ],
         ),
       ),
     );
   }
 
+  String _formatClassName(String className) {
+    if (className == 'j11') return 'Jahrgang 11';
+    if (className == 'j12') return 'Jahrgang 12';
+    return 'Klasse ${className[0].toUpperCase()}${className.substring(1)}';
+  }
+
   String _localizeGradeLevel(BuildContext context, String gradeLevel) {
     final l10n = AppLocalizations.of(context)!;
-    if (gradeLevel == 'Klassen 5-10') {
-      return l10n.grades5to10;
-    }
-    if (gradeLevel == 'J11/J12') {
-      return l10n.j11j12;
-    }
+    if (gradeLevel == 'Klassen 5-10') return l10n.grades5to10;
+    if (gradeLevel == 'J11/J12') return l10n.j11j12;
     return gradeLevel;
   }
 
   String _localizeHalbjahr(BuildContext context, String halbjahr) {
     final l10n = AppLocalizations.of(context)!;
-    if (halbjahr == '1. Halbjahr') {
-      return l10n.firstSemester;
-    }
-    if (halbjahr == '2. Halbjahr') {
-      return l10n.secondSemester;
-    }
+    if (halbjahr == '1. Halbjahr') return l10n.firstSemester;
+    if (halbjahr == '2. Halbjahr') return l10n.secondSemester;
     return halbjahr;
-  }
-
-  Widget _buildFooter(BuildContext context) {
-    return AppFooter(bottomPadding: _getFooterPadding(context));
   }
 
   double _getFooterPadding(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final gestureInsets = mediaQuery.systemGestureInsets.bottom;
     final viewPadding = mediaQuery.viewPadding.bottom;
-    
-    // Determine navigation mode based on gesture insets
-    if (gestureInsets >= 45) {
-      return 34.0; // Button navigation
-    } else if (gestureInsets <= 25) {
-      return 8.0; // Gesture navigation
-    } else {
-      // Ambiguous range - use viewPadding as secondary indicator
-      return viewPadding > 50 ? 34.0 : 8.0;
-    }
+
+    if (gestureInsets >= 45) return 34.0;
+    if (gestureInsets <= 25) return 8.0;
+    return viewPadding > 50 ? 34.0 : 8.0;
   }
 
-  void _openSchedule(ScheduleItem schedule) async {
-    final cachedFile = await ref.read(scheduleProvider.notifier).getCachedScheduleFile(schedule);
-    if (cachedFile != null && await cachedFile.exists()) {
-      // PDF is already cached, open immediately
+  // ── Open Schedule ──────────────────────────────────────────────────────────
+
+  void _openScheduleForClass(
+      List<ScheduleItem> group, String? selectedClass) async {
+    final notifier = ref.read(scheduleProvider.notifier);
+    final scheduleState = ref.read(scheduleProvider);
+
+    // Determine which PDF to open based on selected class
+    final isJahrgang =
+        selectedClass != null && selectedClass.startsWith('j');
+    ScheduleItem? target;
+    if (isJahrgang) {
+      target = group
+          .where((s) => s.gradeLevel == 'J11/J12')
+          .firstOrNull;
+    }
+    // Fall back to 5-10 for non-Jahrgang classes or if J11/J12 not found
+    target ??= group
+        .where((s) => s.gradeLevel == 'Klassen 5-10')
+        .firstOrNull;
+    target ??= group.firstOrNull;
+
+    if (target == null) return;
+
+    final halbjahr = target.halbjahr;
+    final halfLabel = _localizeHalbjahr(context, halbjahr);
+    final title =
+        selectedClass != null ? _formatClassName(selectedClass) : _localizeGradeLevel(context, target.gradeLevel);
+    final dayName = '$title – $halfLabel';
+
+    // Get target page from class index
+    List<int>? targetPages;
+    if (selectedClass != null && scheduleState.isIndexBuilt) {
+      final page = notifier.getClassPage(selectedClass);
+      if (page != null) targetPages = [page];
+    }
+
+    // Check cached file
+    final cached = await notifier.getCachedScheduleFile(target);
+    if (cached != null && await cached.exists()) {
       if (mounted) {
         context.push('/pdf-viewer', extra: {
-          'file': cachedFile,
-          'dayName': '${_localizeGradeLevel(context, schedule.gradeLevel)} - ${_localizeHalbjahr(context, schedule.halbjahr)}',
+          'file': cached,
+          'dayName': dayName,
+          if (targetPages != null) 'targetPages': targetPages,
         });
       }
       return;
     }
-    
-    // Check mounted before using context after async operation
+
     if (!mounted) return;
-    
-    // Show loading dialog if PDF needs to be downloaded
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -432,7 +467,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
         content: Row(
           children: [
             CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.primary),
             ),
             const SizedBox(width: 16),
             Text(AppLocalizations.of(context)!.loadingSchedule),
@@ -441,39 +477,36 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       ),
     );
 
-    // Download schedule in background
-    ref.read(scheduleProvider.notifier).downloadSchedule(schedule).then((file) {
-      if (mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
-        
-        if (file != null) {
-          // Navigate to PDF viewer
-          context.push('/pdf-viewer', extra: {
-            'file': file,
-            'dayName': '${_localizeGradeLevel(context, schedule.gradeLevel)} - ${_localizeHalbjahr(context, schedule.halbjahr)}',
-          });
-        } else {
-          // PDF is not available yet
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${_localizeHalbjahr(context, schedule.halbjahr)} ${AppLocalizations.of(context)!.scheduleNotAvailable}'),
-              backgroundColor: Colors.orange,
-              duration: const Duration(seconds: 3),
-            ),
-          );
+    notifier.downloadSchedule(target).then((file) {
+      if (!mounted) return;
+      Navigator.of(context).pop();
+
+      if (file != null) {
+        // Re-fetch class page in case index was built during download
+        if (selectedClass != null) {
+          final page = notifier.getClassPage(selectedClass);
+          if (page != null) targetPages = [page];
         }
+        context.push('/pdf-viewer', extra: {
+          'file': file,
+          'dayName': dayName,
+          if (targetPages != null) 'targetPages': targetPages,
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+              '$halfLabel ${AppLocalizations.of(context)!.scheduleNotAvailable}'),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 3),
+        ));
       }
     }).catchError((e) {
-      if (mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
-        
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(AppLocalizations.of(context)!.errorLoadingGeneric),
-                backgroundColor: Colors.red,
-              ),
-            );
-      }
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(AppLocalizations.of(context)!.errorLoadingGeneric),
+        backgroundColor: Colors.red,
+      ));
     });
   }
-} 
+}

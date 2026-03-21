@@ -368,6 +368,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         .read(preferencesManagerProvider.notifier)
         .setLastScheduleQuery5to10(classInput);
 
+    // Save as the user's selected class for home screen personalization
+    await container
+        .read(preferencesManagerProvider.notifier)
+        .setSelectedScheduleClass(classInput.toLowerCase());
+
     if (!mounted) return;
 
     setState(() {

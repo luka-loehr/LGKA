@@ -21,10 +21,11 @@ import 'widgets/tappable_card.dart';
 import '../../events/application/events_provider.dart';
 import '../../events/domain/event_model.dart';
 import '../../weather/application/weather_provider.dart';
-import '../../weather/data/weather_service.dart';
 import '../../weather/domain/weather_models.dart';
+import '../../../../providers/preferences_provider.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart';
+import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart' hide WeatherDataState;
+import 'package:weather_icons/weather_icons.dart';
 
 /// German → English weekday translation map (used for locale-aware display)
 const Map<String, String> _kDeToEn = {
@@ -71,17 +72,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
-  void _openSchedule(ScheduleItem schedule) async {
+  void _openScheduleForClass(
+      List<ScheduleItem> group, String? selectedClass) async {
     final l10n = AppLocalizations.of(context)!;
-    final grade = _localizeGrade(l10n, schedule.gradeLevel);
-    final half = _localizeHalf(l10n, schedule.halbjahr);
-    final dayName = '$grade - $half';
+    final notifier = ref.read(scheduleProvider.notifier);
+    final scheduleState = ref.read(scheduleProvider);
 
-    final cached = await ref.read(scheduleProvider.notifier).getCachedScheduleFile(schedule);
+    // Pick the correct PDF based on selected class
+    final isJahrgang = selectedClass != null && selectedClass.startsWith('j');
+    ScheduleItem? target;
+    if (isJahrgang) {
+      target = group.where((s) => s.gradeLevel == 'J11/J12').firstOrNull;
+    }
+    target ??= group.where((s) => s.gradeLevel == 'Klassen 5-10').firstOrNull;
+    target ??= group.firstOrNull;
+    if (target == null) return;
+
+    final half = _localizeHalf(l10n, target.halbjahr);
+    final title = selectedClass != null
+        ? _formatClassName(selectedClass)
+        : _localizeGrade(l10n, target.gradeLevel);
+    final dayName = '$title – $half';
+
+    // Determine target page from class index
+    List<int>? targetPages;
+    if (selectedClass != null && scheduleState.isIndexBuilt) {
+      final page = notifier.getClassPage(selectedClass);
+      if (page != null) targetPages = [page];
+    }
+
+    final cached = await notifier.getCachedScheduleFile(target);
     if (cached != null && await cached.exists()) {
       if (mounted) {
-        context.push(AppRouter.pdfViewer,
-            extra: {'file': cached, 'dayName': dayName});
+        context.push(AppRouter.pdfViewer, extra: {
+          'file': cached,
+          'dayName': dayName,
+          if (targetPages != null) 'targetPages': targetPages,
+        });
       }
       return;
     }
@@ -102,12 +129,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
 
-    ref.read(scheduleProvider.notifier).downloadSchedule(schedule).then((file) {
+    notifier.downloadSchedule(target).then((file) {
       if (!mounted) return;
       Navigator.of(context).pop();
       if (file != null) {
-        context.push(AppRouter.pdfViewer,
-            extra: {'file': file, 'dayName': dayName});
+        if (selectedClass != null) {
+          final page = notifier.getClassPage(selectedClass);
+          if (page != null) targetPages = [page];
+        }
+        context.push(AppRouter.pdfViewer, extra: {
+          'file': file,
+          'dayName': dayName,
+          if (targetPages != null) 'targetPages': targetPages,
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('$half ${l10n.scheduleNotAvailable}'),
@@ -119,8 +153,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (!mounted) return;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content:
-            Text(AppLocalizations.of(context)!.errorLoadingGeneric),
+        content: Text(AppLocalizations.of(context)!.errorLoadingGeneric),
         backgroundColor: Colors.red,
       ));
     });
@@ -301,7 +334,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildWeatherCard(CurrentWeather current, List<DailyForecast> daily) {
     final today = daily.isNotEmpty ? daily.first : null;
-    final scene = _owmIconToWeatherType(current.icon);
+    final scene = WmoUtils.weatherType(current.weatherCode, current.isDay);
 
     const textShadows = [Shadow(color: Colors.black38, blurRadius: 6)];
 
@@ -309,12 +342,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       child: Row(
         children: [
-          Image.network(
-            WeatherService.iconUrl(current.icon),
-            width: 48,
-            height: 48,
-            errorBuilder: (_, e, st) =>
-                const Icon(Icons.wb_cloudy_outlined, size: 36, color: Colors.white),
+          BoxedIcon(
+            WmoUtils.icon(current.weatherCode, current.isDay),
+            size: 36,
+            color: Colors.white,
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -407,30 +438,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
     );
-  }
-
-  WeatherType _owmIconToWeatherType(String icon) {
-    switch (icon) {
-      case '01d': return WeatherType.sunny;
-      case '01n': return WeatherType.sunnyNight;
-      case '02d': return WeatherType.cloudy;
-      case '02n': return WeatherType.cloudyNight;
-      case '03d': return WeatherType.cloudy;
-      case '03n': return WeatherType.cloudyNight;
-      case '04d': return WeatherType.overcast;
-      case '04n': return WeatherType.overcast;
-      case '09d':
-      case '09n': return WeatherType.lightRainy;
-      case '10d':
-      case '10n': return WeatherType.middleRainy;
-      case '11d':
-      case '11n': return WeatherType.thunder;
-      case '13d':
-      case '13n': return WeatherType.middleSnow;
-      case '50d': return WeatherType.foggy;
-      case '50n': return WeatherType.foggy;
-      default:    return WeatherType.cloudy;
-    }
   }
 
   Widget _buildWeatherError() {
@@ -715,31 +722,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         : scheduleState.availableFirstHalbjahr;
 
     final l10n = AppLocalizations.of(context)!;
-    final items = <Widget>[];
-    final g5 = activeGroup.where((s) => s.gradeLevel == 'Klassen 5-10').toList();
-    final gJ = activeGroup.where((s) => s.gradeLevel == 'J11/J12').toList();
-    for (final s in [...g5, ...gJ]) {
-      items.add(_buildInlineScheduleCard(s, l10n));
-      items.add(const SizedBox(height: 12));
-    }
-    if (items.isNotEmpty && items.last is SizedBox) items.removeLast();
+    final selectedClass =
+        ref.watch(preferencesManagerProvider).selectedScheduleClass;
 
     return _fadeSwitch(
       'sched-content',
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: items),
+      _buildInlineScheduleCard(activeGroup, selectedClass, l10n),
     );
   }
 
   Widget _buildInlineScheduleCard(
-      ScheduleItem schedule, AppLocalizations l10n) {
+      List<ScheduleItem> group, String? selectedClass, AppLocalizations l10n) {
     final primary = Theme.of(context).colorScheme.primary;
-    final grade = _localizeGrade(l10n, schedule.gradeLevel);
-    final half = _localizeHalf(l10n, schedule.halbjahr);
+    final halbjahr = group.isNotEmpty ? group.first.halbjahr : '';
+    final half = _localizeHalf(l10n, halbjahr);
+
+    // Title: user's class if set, else combined grade label
+    String grade;
+    if (selectedClass != null) {
+      grade = _formatClassName(selectedClass);
+    } else {
+      final has5to10 = group.any((s) => s.gradeLevel == 'Klassen 5-10');
+      final hasJ11J12 = group.any((s) => s.gradeLevel == 'J11/J12');
+      if (has5to10 && hasJ11J12) {
+        grade = '${l10n.grades5to10} & ${l10n.j11j12}';
+      } else if (has5to10) {
+        grade = l10n.grades5to10;
+      } else {
+        grade = l10n.j11j12;
+      }
+    }
 
     return TappableCard(
       onTap: () {
         HapticService.medium();
-        _openSchedule(schedule);
+        _openScheduleForClass(group, selectedClass);
         AppLogger.navigation('Opened schedule: $grade $half');
       },
       child: Row(children: [
@@ -750,8 +767,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             color: primary.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(12),
           ),
-          child:
-              Icon(Icons.table_chart_outlined, color: primary, size: 20),
+          child: Icon(Icons.table_chart_outlined, color: primary, size: 20),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -781,6 +797,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             color: context.appSecondaryText.withValues(alpha: 0.5)),
       ]),
     );
+  }
+
+  String _formatClassName(String className) {
+    if (className == 'j11') return 'Jahrgang 11';
+    if (className == 'j12') return 'Jahrgang 12';
+    return 'Klasse ${className[0].toUpperCase()}${className.substring(1)}';
   }
 
   Widget _buildScheduleError(ScheduleState state) {
