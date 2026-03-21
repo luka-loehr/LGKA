@@ -9,7 +9,6 @@ import '../domain/schedule_models.dart';
 import '../data/schedule_service.dart';
 import '../../../../utils/app_logger.dart';
 import '../../../../services/haptic_service.dart';
-import '../../../../providers/app_providers.dart';
 
 /// Top-level function for building class index in background isolate
 /// This must be a top-level function to work with compute()
@@ -427,4 +426,7 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
 }
 
 /// Provider for schedule state
-final scheduleProvider = NotifierProvider<ScheduleNotifier, ScheduleState>(ScheduleNotifier.new); 
+final scheduleProvider = NotifierProvider<ScheduleNotifier, ScheduleState>(ScheduleNotifier.new);
+
+/// Provider for the shared [ScheduleService] instance.
+final scheduleServiceProvider = Provider<ScheduleService>((ref) => ScheduleService()); 
