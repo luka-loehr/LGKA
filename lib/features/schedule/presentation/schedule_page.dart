@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../application/schedule_provider.dart';
+import '../../../../navigation/app_router.dart';
 import '../../../../providers/preferences_provider.dart';
 import '../../../../services/haptic_service.dart';
 import '../../../../theme/app_theme.dart';
@@ -451,7 +452,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     final cached = await notifier.getCachedScheduleFile(target);
     if (cached != null && await cached.exists()) {
       if (mounted) {
-        context.push('/pdf-viewer', extra: {
+        context.push(AppRouter.pdfViewer, extra: {
           'file': cached,
           'dayName': dayName,
           if (targetPages != null) 'targetPages': targetPages,
@@ -491,7 +492,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
               : notifier.getClassPage(selectedClass);
           if (page != null) targetPages = [page];
         }
-        context.push('/pdf-viewer', extra: {
+        context.push(AppRouter.pdfViewer, extra: {
           'file': file,
           'dayName': dayName,
           if (targetPages != null) 'targetPages': targetPages,

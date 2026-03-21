@@ -147,12 +147,11 @@ class ScheduleState {
   /// Mirrors the original per-screen logic (including its operator-precedence
   /// quirk) so behaviour is preserved exactly.
   bool get shouldCheckAvailability {
-    // ignore: dead_code — intentional: mirrors original precedence quirk
     if (lastAvailabilityCheck != null &&
-            availableFirstHalbjahr.isNotEmpty ||
-        availableSecondHalbjahr.isNotEmpty) {
+        (availableFirstHalbjahr.isNotEmpty ||
+            availableSecondHalbjahr.isNotEmpty)) {
       final elapsed =
-          DateTime.now().difference(lastAvailabilityCheck ?? DateTime.now());
+          DateTime.now().difference(lastAvailabilityCheck!);
       if (elapsed < kScheduleAvailabilityCheckInterval) return false;
     }
     return true;
@@ -426,45 +425,6 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
     }
   }
 
-  /// Build class index from a 5-10 schedule PDF file
-  /// Searches for classes 5a-5e, 6a-6e, ... up to 10a-10e and maps them to page numbers
-  /// Runs in a background isolate to avoid blocking the main thread
-  Future<void> buildClassIndex(File pdfFile) async {
-    if (state.isIndexBuilt) return; // Already built
-    
-    try {
-      AppLogger.info('Building class index from PDF in background isolate...', module: 'ScheduleProvider');
-      final stopwatch = Stopwatch()..start();
-      
-      // Run the heavy PDF processing in a background isolate
-      final classToPage = await compute(_buildClassIndexInIsolate, pdfFile.path);
-      
-      stopwatch.stop();
-      AppLogger.success(
-        'Class index built: ${classToPage.length} classes found in ${stopwatch.elapsedMilliseconds}ms',
-        module: 'ScheduleProvider',
-      );
-      
-      // Sort and log classes by grade (5-10) then letter (a-e)
-      final sortedEntries = classToPage.entries.toList()..sort((a, b) {
-        final gradeA = int.tryParse(a.key.replaceAll(RegExp(r'[a-z]'), '')) ?? 0;
-        final gradeB = int.tryParse(b.key.replaceAll(RegExp(r'[a-z]'), '')) ?? 0;
-        if (gradeA != gradeB) return gradeA.compareTo(gradeB);
-        return a.key.compareTo(b.key);
-      });
-      AppLogger.debug('Classes: ${sortedEntries.map((e) => "${e.key}:p${e.value}").join(", ")}', module: 'ScheduleProvider');
-      
-      state = state.copyWith(
-        classIndex5to10: classToPage,
-        isIndexBuilt: true,
-      );
-    } catch (e) {
-      AppLogger.error('Failed to build class index', module: 'ScheduleProvider', error: e);
-      // Don't fail - just mark as built with empty index (will fall back to PDF search)
-      state = state.copyWith(isIndexBuilt: true);
-    }
-  }
-  
   /// Check if a class exists in either index
   bool isClassInIndex(String className) {
     if (!state.isIndexBuilt) return true; // If index not built, assume valid
@@ -507,6 +467,7 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
   void invalidateClassIndex() {
     state = state.copyWith(
       classIndex5to10: {},
+      classIndexJ11J12: const {},
       isIndexBuilt: false,
     );
     AppLogger.debug('Class index invalidated', module: 'ScheduleProvider');
@@ -521,13 +482,19 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
       final schedules = state.schedules;
       if (schedules.isEmpty) {
         AppLogger.debug('No schedules loaded yet, skipping class index preload', module: 'ScheduleProvider');
+        state = state.copyWith(isIndexBuilt: true);
         return;
       }
+
+      // Prefer 2nd halbjahr when selecting which PDF to scan
+      final sorted = [...schedules]..sort((a, b) =>
+          (a.halbjahr == '2. Halbjahr' ? 0 : 1)
+              .compareTo(b.halbjahr == '2. Halbjahr' ? 0 : 1));
 
       // Find a 5-10 schedule (prefer 2nd halbjahr, then 1st)
       ScheduleItem? schedule5to10;
       ScheduleItem? scheduleJ11J12;
-      for (final schedule in schedules) {
+      for (final schedule in sorted) {
         if (schedule.gradeLevel == 'Klassen 5-10' && schedule5to10 == null) {
           if (await isScheduleAvailable(schedule)) schedule5to10 = schedule;
         }
@@ -538,13 +505,17 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
 
       if (schedule5to10 == null) {
         AppLogger.debug('No available 5-10 schedule found for indexing', module: 'ScheduleProvider');
+        state = state.copyWith(isIndexBuilt: true);
         return;
       }
 
       // Download and scan the 5-10 PDF for class pages
       AppLogger.info('Downloading 5-10 schedule for class index...', module: 'ScheduleProvider');
       final pdf5to10 = await _scheduleService.downloadSchedule(schedule5to10);
-      if (pdf5to10 == null) return;
+      if (pdf5to10 == null) {
+        state = state.copyWith(isIndexBuilt: true);
+        return;
+      }
 
       final stopwatch = Stopwatch()..start();
       final index5to10 = await compute(_buildClassIndexInIsolate, pdf5to10.path);
@@ -587,12 +558,18 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
       final schedules = state.schedules;
       if (schedules.isEmpty) {
         AppLogger.debug('Silent rebuild: No schedules available, skipping', module: 'ScheduleProvider');
+        state = state.copyWith(isIndexBuilt: true);
         return;
       }
 
+      // Prefer 2nd halbjahr when selecting which PDF to scan
+      final sorted = [...schedules]..sort((a, b) =>
+          (a.halbjahr == '2. Halbjahr' ? 0 : 1)
+              .compareTo(b.halbjahr == '2. Halbjahr' ? 0 : 1));
+
       ScheduleItem? schedule5to10;
       ScheduleItem? scheduleJ11J12;
-      for (final schedule in schedules) {
+      for (final schedule in sorted) {
         if (schedule.gradeLevel == 'Klassen 5-10' && schedule5to10 == null) {
           schedule5to10 = schedule;
         } else if (schedule.gradeLevel == 'J11/J12' && scheduleJ11J12 == null) {
@@ -603,11 +580,15 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
 
       if (schedule5to10 == null) {
         AppLogger.debug('Silent rebuild: No 5-10 schedule found', module: 'ScheduleProvider');
+        state = state.copyWith(isIndexBuilt: true);
         return;
       }
 
       final pdf5to10 = await _scheduleService.downloadSchedule(schedule5to10);
-      if (pdf5to10 == null) return;
+      if (pdf5to10 == null) {
+        state = state.copyWith(isIndexBuilt: true);
+        return;
+      }
 
       final index5to10 = await compute(_buildClassIndexInIsolate, pdf5to10.path);
 

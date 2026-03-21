@@ -229,9 +229,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   // ============================================================================
 
   void _checkAndShowClassModal() {
-    final dayLabel = (_effectiveDayName ?? '');
-    final isSchedule5to10 =
-        dayLabel.contains('Klassen') || dayLabel.contains('Grades');
+    final isSchedule5to10 = _isSchedule5to10();
 
     if (isSchedule5to10) {
       final container = ProviderScope.containerOf(context, listen: false);
@@ -581,8 +579,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         final container = ProviderScope.containerOf(context, listen: false);
         final prefsNotifier =
             container.read(preferencesManagerProvider.notifier);
-        final isSchedule5to10 = ((_effectiveDayName ?? '')).contains('Klassen') ||
-            ((_effectiveDayName ?? '')).contains('Grades');
+        final isSchedule5to10 = _isSchedule5to10();
 
         if (isSchedule5to10) {
           unawaited(prefsNotifier.setLastScheduleQuery5to10(result.query));
