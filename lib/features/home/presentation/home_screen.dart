@@ -94,11 +94,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         : _localizeGrade(l10n, target.gradeLevel);
     final dayName = '$title – $half';
 
-    // Determine target page from class index
+    // Determine target page from class index (j11/j12 are hardcoded)
     List<int>? targetPages;
-    if (selectedClass != null && scheduleState.isIndexBuilt) {
-      final page = notifier.getClassPage(selectedClass);
-      if (page != null) targetPages = [page];
+    if (selectedClass != null) {
+      if (selectedClass == 'j11') {
+        targetPages = [2]; // j11 is always page 1 of J11/J12 PDF (index 0 + 2 offset)
+      } else if (selectedClass == 'j12') {
+        targetPages = [3]; // j12 is always page 2 of J11/J12 PDF (index 1 + 2 offset)
+      } else if (scheduleState.isIndexBuilt) {
+        final page = notifier.getClassPage(selectedClass);
+        if (page != null) targetPages = [page];
+      }
     }
 
     final cached = await notifier.getCachedScheduleFile(target);
@@ -133,7 +139,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (!mounted) return;
       Navigator.of(context).pop();
       if (file != null) {
-        if (selectedClass != null) {
+        if (selectedClass != null && selectedClass != 'j11' && selectedClass != 'j12') {
           final page = notifier.getClassPage(selectedClass);
           if (page != null) targetPages = [page];
         }
