@@ -202,5 +202,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "termine": "Events",
+  "noEventsAvailable": "No events available"
 }
