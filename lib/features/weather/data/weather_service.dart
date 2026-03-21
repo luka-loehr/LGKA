@@ -24,8 +24,10 @@ class WeatherService {
   static final WeatherService instance = WeatherService._();
 
   // API key injected at build time: flutter run --dart-define-from-file=.env.local
-  static const _apiKey =
-      String.fromEnvironment('OWM_API_KEY', defaultValue: '');
+  static const _apiKey = String.fromEnvironment(
+    'OWM_API_KEY',
+    defaultValue: '53e242067a2c2cc85a61071e557ee6cc',
+  );
   static const _lat = '49.00775';
   static const _lon = '8.375';
   static const _baseUrl =
