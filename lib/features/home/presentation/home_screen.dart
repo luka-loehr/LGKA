@@ -24,7 +24,7 @@ import '../../weather/application/weather_provider.dart';
 import '../../weather/data/weather_service.dart';
 import '../../weather/domain/weather_models.dart';
 import 'package:intl/intl.dart';
-import 'package:weather_animation/weather_animation.dart';
+import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart';
 
 /// German → English weekday translation map (used for locale-aware display)
 const Map<String, String> _kDeToEn = {
@@ -301,7 +301,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildWeatherCard(CurrentWeather current, List<DailyForecast> daily) {
     final today = daily.isNotEmpty ? daily.first : null;
-    final scene = _owmIconToScene(current.icon);
+    final scene = _owmIconToWeatherType(current.icon);
 
     const textShadows = [Shadow(color: Colors.black38, blurRadius: 6)];
 
@@ -381,9 +381,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: WrapperScene.weather(
-                    scene: scene,
-                    sizeCanvas: const Size(400, 150),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) => WeatherBg(
+                      weatherType: scene,
+                      width: constraints.maxWidth,
+                      height: constraints.maxHeight,
+                    ),
                   ),
                 ),
                 Positioned.fill(
@@ -406,27 +409,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  WeatherScene _owmIconToScene(String icon) {
+  WeatherType _owmIconToWeatherType(String icon) {
     switch (icon) {
-      case '01d': return WeatherScene.scorchingSun;
-      case '01n': return WeatherScene.snowfall;       // dark blue night sky
-      case '02d': return WeatherScene.sunset;          // sun + few clouds
-      case '02n': return WeatherScene.snowfall;
-      case '03d':
-      case '03n': return WeatherScene.rainyOvercast;   // scattered clouds
-      case '04d':
-      case '04n': return WeatherScene.stormy;          // broken/overcast clouds
+      case '01d': return WeatherType.sunny;
+      case '01n': return WeatherType.sunnyNight;
+      case '02d': return WeatherType.cloudy;
+      case '02n': return WeatherType.cloudyNight;
+      case '03d': return WeatherType.cloudy;
+      case '03n': return WeatherType.cloudyNight;
+      case '04d': return WeatherType.overcast;
+      case '04n': return WeatherType.overcast;
       case '09d':
-      case '09n': return WeatherScene.rainyOvercast;   // drizzle
+      case '09n': return WeatherType.lightRainy;
       case '10d':
-      case '10n': return WeatherScene.rainyOvercast;   // rain
+      case '10n': return WeatherType.middleRainy;
       case '11d':
-      case '11n': return WeatherScene.stormy;          // thunderstorm
+      case '11n': return WeatherType.thunder;
       case '13d':
-      case '13n': return WeatherScene.snowfall;        // snow
-      case '50d':
-      case '50n': return WeatherScene.showerSleet;     // mist/fog
-      default:    return WeatherScene.sunset;
+      case '13n': return WeatherType.middleSnow;
+      case '50d': return WeatherType.foggy;
+      case '50n': return WeatherType.foggy;
+      default:    return WeatherType.cloudy;
     }
   }
 
