@@ -20,9 +20,7 @@ class PreferencesManager {
 
   // Per-schedule keys (exclude substitution plans)
   static const String _keyLastPage5to10 = 'last_schedule_5_10_page';
-  static const String _keyLastPageJ11J12 = 'last_schedule_j11_12_page';
   static const String _keyLastQuery5to10 = 'last_schedule_5_10_query';
-  static const String _keyLastQueryJ11J12 = 'last_schedule_j11_12_query';
 
   SharedPreferences? _prefs;
   bool _isInitialized = false;
@@ -174,20 +172,6 @@ class PreferencesManager {
     }
   }
 
-  int? get lastSchedulePageJ11J12 {
-    final page = _safePrefs.getInt(_keyLastPageJ11J12);
-    if (page == null || page < 1) return null;
-    return page;
-  }
-
-  Future<void> setLastSchedulePageJ11J12(int? page) async {
-    if (page == null || page < 1) {
-      await _safePrefs.remove(_keyLastPageJ11J12);
-    } else {
-      await _safePrefs.setInt(_keyLastPageJ11J12, page);
-    }
-  }
-
   // Per-schedule: last query (optional convenience)
   String? get lastScheduleQuery5to10 => _safePrefs.getString(_keyLastQuery5to10);
 
@@ -196,16 +180,6 @@ class PreferencesManager {
       await _safePrefs.remove(_keyLastQuery5to10);
     } else {
       await _safePrefs.setString(_keyLastQuery5to10, value);
-    }
-  }
-
-  String? get lastScheduleQueryJ11J12 => _safePrefs.getString(_keyLastQueryJ11J12);
-
-  Future<void> setLastScheduleQueryJ11J12(String? value) async {
-    if (value == null || value.trim().isEmpty) {
-      await _safePrefs.remove(_keyLastQueryJ11J12);
-    } else {
-      await _safePrefs.setString(_keyLastQueryJ11J12, value);
     }
   }
 
