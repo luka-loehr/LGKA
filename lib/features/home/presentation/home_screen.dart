@@ -24,6 +24,7 @@ import '../../weather/application/weather_provider.dart';
 import '../../weather/data/weather_service.dart';
 import '../../weather/domain/weather_models.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_animation/weather_animation.dart';
 
 /// German → English weekday translation map (used for locale-aware display)
 const Map<String, String> _kDeToEn = {
@@ -299,71 +300,134 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildWeatherCard(CurrentWeather current, List<DailyForecast> daily) {
-    final primary = Theme.of(context).colorScheme.primary;
     final today = daily.isNotEmpty ? daily.first : null;
+    final scene = _owmIconToScene(current.icon);
 
-    final row = Row(
-      children: [
-        Image.network(
-          WeatherService.iconUrl(current.icon),
-          width: 48,
-          height: 48,
-          errorBuilder: (_, e, st) =>
-              Icon(Icons.wb_cloudy_outlined, size: 36, color: primary),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    '${current.temp.round()}°',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: context.appPrimaryText,
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      _capitalize(current.description),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: context.appSecondaryText,
+    const textShadows = [Shadow(color: Colors.black38, blurRadius: 6)];
+
+    final content = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      child: Row(
+        children: [
+          Image.network(
+            WeatherService.iconUrl(current.icon),
+            width: 48,
+            height: 48,
+            errorBuilder: (_, e, st) =>
+                const Icon(Icons.wb_cloudy_outlined, size: 36, color: Colors.white),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '${current.temp.round()}°',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            shadows: textShadows,
                           ),
-                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        _capitalize(current.description),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              shadows: textShadows,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  today != null
+                      ? 'Gefühlt ${current.feelsLike.round()}°  ·  H ${today.tempMax.round()}°  T ${today.tempMin.round()}°'
+                      : 'Gefühlt ${current.feelsLike.round()}°  ·  ${current.humidity}% Luftfeuchte',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.75),
+                        shadows: textShadows,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          Icon(Icons.arrow_forward_ios,
+              size: 14, color: Colors.white.withValues(alpha: 0.7)),
+        ],
+      ),
+    );
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        height: kHomeCardHeight,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              HapticService.medium();
+              context.push(AppRouter.weather);
+            },
+            splashColor: Colors.white.withValues(alpha: 0.15),
+            highlightColor: Colors.white.withValues(alpha: 0.05),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: WrapperScene.weather(
+                    scene: scene,
+                    sizeCanvas: const Size(400, 150),
+                  ),
+                ),
+                Positioned.fill(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.black12, Colors.black26],
+                      ),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                today != null
-                    ? 'Gefühlt ${current.feelsLike.round()}°  ·  H ${today.tempMax.round()}°  T ${today.tempMin.round()}°'
-                    : 'Gefühlt ${current.feelsLike.round()}°  ·  ${current.humidity}% Luftfeuchte',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: context.appSecondaryText.withValues(alpha: 0.7),
-                    ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+                ),
+                content,
+              ],
+            ),
           ),
         ),
-        Icon(Icons.arrow_forward_ios,
-            size: 14,
-            color: context.appSecondaryText.withValues(alpha: 0.5)),
-      ],
+      ),
     );
+  }
 
-    return TappableCard(
-      onTap: () {
-        HapticService.medium();
-        context.push(AppRouter.weather);
-      },
-      child: row,
-    );
+  WeatherScene _owmIconToScene(String icon) {
+    switch (icon) {
+      case '01d': return WeatherScene.scorchingSun;
+      case '01n': return WeatherScene.snowfall;       // dark blue night sky
+      case '02d': return WeatherScene.sunset;          // sun + few clouds
+      case '02n': return WeatherScene.snowfall;
+      case '03d':
+      case '03n': return WeatherScene.rainyOvercast;   // scattered clouds
+      case '04d':
+      case '04n': return WeatherScene.stormy;          // broken/overcast clouds
+      case '09d':
+      case '09n': return WeatherScene.rainyOvercast;   // drizzle
+      case '10d':
+      case '10n': return WeatherScene.rainyOvercast;   // rain
+      case '11d':
+      case '11n': return WeatherScene.stormy;          // thunderstorm
+      case '13d':
+      case '13n': return WeatherScene.snowfall;        // snow
+      case '50d':
+      case '50n': return WeatherScene.showerSleet;     // mist/fog
+      default:    return WeatherScene.sunset;
+    }
   }
 
   Widget _buildWeatherError() {

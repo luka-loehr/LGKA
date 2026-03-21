@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_animation/weather_animation.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/haptic_service.dart';
 import '../application/weather_provider.dart';
@@ -146,63 +147,121 @@ class WeatherPage extends ConsumerWidget {
 
   Widget _buildCurrentCard(BuildContext context, CurrentWeather current,
       List<DailyForecast> daily) {
-    final primary = Theme.of(context).colorScheme.primary;
     final today = daily.isNotEmpty ? daily.first : null;
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: context.appSurfaceColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.network(
-                WeatherService.iconUrl(current.icon),
-                width: 80,
-                height: 80,
-                errorBuilder: (_, e, st) => Icon(
-                  _fallbackIcon(current.icon),
-                  size: 64,
-                  color: primary,
+    final scene = _owmIconToScene(current.icon);
+    const textShadows = [Shadow(color: Colors.black38, blurRadius: 8)];
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: SizedBox(
+        height: 260,
+        child: Stack(
+          children: [
+            // Animated weather scene fills the entire card
+            Positioned.fill(
+              child: WrapperScene.weather(
+                scene: scene,
+                sizeCanvas: const Size(400, 400),
+              ),
+            ),
+            // Subtle gradient overlay for text readability
+            Positioned.fill(
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black26],
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
-              Text(
-                '${current.temp.round()}°',
-                style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      color: context.appPrimaryText,
-                      fontWeight: FontWeight.w300,
-                      fontSize: 80,
-                      height: 1,
+            ),
+            // Content
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.network(
+                          WeatherService.iconUrl(current.icon),
+                          width: 80,
+                          height: 80,
+                          errorBuilder: (_, e, st) => Icon(
+                            _fallbackIcon(current.icon),
+                            size: 64,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${current.temp.round()}°',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w300,
+                            fontSize: 80,
+                            height: 1,
+                            shadows: textShadows,
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 10),
+                    Text(
+                      _capitalize(current.description),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Colors.white.withValues(alpha: 0.95),
+                            fontWeight: FontWeight.w500,
+                            shadows: textShadows,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      today != null
+                          ? 'Gefühlt ${current.feelsLike.round()}°  ·  H ${today.tempMax.round()}°  T ${today.tempMin.round()}°'
+                          : 'Gefühlt ${current.feelsLike.round()}°',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            shadows: textShadows,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            _capitalize(current.description),
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: context.appSecondaryText,
-                  fontWeight: FontWeight.w400,
-                ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            today != null
-                ? 'Gefühlt ${current.feelsLike.round()}°  ·  H ${today.tempMax.round()}°  T ${today.tempMin.round()}°'
-                : 'Gefühlt ${current.feelsLike.round()}°',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: context.appSecondaryText.withValues(alpha: 0.7),
-                ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  WeatherScene _owmIconToScene(String icon) {
+    switch (icon) {
+      case '01d': return WeatherScene.scorchingSun;
+      case '01n': return WeatherScene.snowfall;
+      case '02d': return WeatherScene.sunset;
+      case '02n': return WeatherScene.snowfall;
+      case '03d':
+      case '03n': return WeatherScene.rainyOvercast;
+      case '04d':
+      case '04n': return WeatherScene.stormy;
+      case '09d':
+      case '09n': return WeatherScene.rainyOvercast;
+      case '10d':
+      case '10n': return WeatherScene.rainyOvercast;
+      case '11d':
+      case '11n': return WeatherScene.stormy;
+      case '13d':
+      case '13n': return WeatherScene.snowfall;
+      case '50d':
+      case '50n': return WeatherScene.showerSleet;
+      default:    return WeatherScene.sunset;
+    }
   }
 
   // ── Stats row ───────────────────────────────────────────────────────────────
