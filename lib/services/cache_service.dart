@@ -20,7 +20,7 @@ class CacheService {
     CacheKey.substitutions: Duration(minutes: 1),
     CacheKey.schedules: Duration(hours: 24),
     CacheKey.scheduleAvailability: Duration(minutes: 15),
-    CacheKey.news: Duration(minutes: 5),
+    CacheKey.news: Duration(hours: 1),
     CacheKey.weather: Duration(minutes: 1),
   };
 
@@ -45,14 +45,14 @@ class CacheService {
   static const Set<CacheKey> _backgroundInvalidatedKeys = {
     CacheKey.substitutions,
     CacheKey.weather,
-    CacheKey.news,
   };
 
   /// Keys that use a time-based validity window (even while the app is open).
   static const Set<CacheKey> _timeBasedRefreshKeys = {
     CacheKey.substitutions,
     CacheKey.weather,
-    CacheKey.schedules, // 24 h window — never invalidated by backgrounding
+    CacheKey.schedules, // 24 h window
+    CacheKey.news,      // 1 h window
   };
 
   /// Check if cache is valid for a given key.
