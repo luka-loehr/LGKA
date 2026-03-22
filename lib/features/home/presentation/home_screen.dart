@@ -417,21 +417,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
 
-    final shadowColor = WmoUtils.sceneColor(scene);
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withValues(alpha: 0.5),
-            blurRadius: 24,
-            spreadRadius: 0,
-            offset: const Offset(0, 64),
-          ),
-        ],
-      ),
-      child: ClipRRect(
+    return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: SizedBox(
         height: kHomeCardHeight,
@@ -471,7 +457,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
         ),
-      ),
       ),
     );
   }
