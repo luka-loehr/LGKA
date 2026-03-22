@@ -37,6 +37,15 @@ class PreferencesManager {
     if (!_prefs!.containsKey(_keyThemeMode)) {
       await _prefs!.setString(_keyThemeMode, 'system');
     }
+
+    // Migration from v2.4.x: selected_schedule_class is new in v2.5.0.
+    // Old versions stored the class only in last_schedule_5_10_query — copy it over once.
+    if (!_prefs!.containsKey(_keySelectedScheduleClass)) {
+      final legacy = _prefs!.getString(_keyLastQuery5to10);
+      if (legacy != null && legacy.trim().isNotEmpty) {
+        await _prefs!.setString(_keySelectedScheduleClass, legacy.trim());
+      }
+    }
   }
 
   /// Check if preferences manager is initialized
