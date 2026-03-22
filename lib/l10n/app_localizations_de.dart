@@ -419,6 +419,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get accentColorDescription => 'Wähle deine Lieblingsfarbe aus. Diese wird überall in der App verwendet.';
 
   @override
+  String get appearanceTitle => 'Erscheinungsbild';
+
+  @override
   String get news => 'Neuigkeiten';
 
   @override
