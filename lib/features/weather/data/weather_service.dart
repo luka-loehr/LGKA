@@ -101,12 +101,12 @@ class WeatherService {
 
     final now = DateTime.now();
     final hourStart = DateTime(now.year, now.month, now.day, now.hour);
-    final midnight  = DateTime(now.year, now.month, now.day + 1);
+    final hourEnd   = hourStart.add(const Duration(hours: 24));
 
     final hourly = <HourlyForecast>[];
     for (var i = 0; i < hTimes.length; i++) {
       final dt = DateTime.parse(hTimes[i] as String);
-      if (!dt.isBefore(hourStart) && dt.isBefore(midnight)) {
+      if (!dt.isBefore(hourStart) && dt.isBefore(hourEnd)) {
         hourly.add(HourlyForecast(
           dt: dt,
           temp: (hTemps[i] as num).toDouble(),
