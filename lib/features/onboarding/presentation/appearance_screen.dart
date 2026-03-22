@@ -91,10 +91,11 @@ class _AppearanceScreenState extends ConsumerState<AppearanceScreen>
     final selectedColor = ref.watch(colorProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final l = AppLocalizations.of(context)!;
     final modes = [
-      (mode: 'dark', icon: Icons.dark_mode_rounded, label: 'Dunkel'),
-      (mode: 'system', icon: Icons.brightness_auto_rounded, label: 'Auto'),
-      (mode: 'light', icon: Icons.light_mode_rounded, label: 'Hell'),
+      (mode: 'dark', icon: Icons.dark_mode_rounded, label: l.themeDark),
+      (mode: 'system', icon: Icons.brightness_auto_rounded, label: l.themeAuto),
+      (mode: 'light', icon: Icons.light_mode_rounded, label: l.themeLight),
     ];
 
     return Scaffold(
