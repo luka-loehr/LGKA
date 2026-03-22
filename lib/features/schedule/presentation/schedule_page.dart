@@ -43,6 +43,14 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       curve: Curves.easeOutCubic,
     ));
 
+    // If data is already cached, start fully visible — no fade-in on resume.
+    final cached = ref.read(scheduleProvider);
+    if (cached.availableFirstHalbjahr.isNotEmpty ||
+        cached.availableSecondHalbjahr.isNotEmpty) {
+      _fadeController.value = 1.0;
+      _hasShownButtons = true;
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final notifier = ref.read(scheduleProvider.notifier);
       final scheduleState = ref.read(scheduleProvider);
@@ -119,7 +127,11 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       return Center(child: _buildEmptyState());
     }
 
-    if (state.isCheckingAvailability || !state.isIndexBuilt) {
+    // Only block with a spinner on first load — if buttons are already visible,
+    // let the re-check run silently in the background.
+    final hasButtons = state.availableFirstHalbjahr.isNotEmpty ||
+        state.availableSecondHalbjahr.isNotEmpty;
+    if ((state.isCheckingAvailability || !state.isIndexBuilt) && !hasButtons) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
