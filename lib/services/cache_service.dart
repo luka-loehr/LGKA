@@ -15,13 +15,13 @@ class CacheService {
   factory CacheService() => _instance;
   CacheService._internal();
 
-  /// Cache validity durations for each cache type (kept for backward compatibility, but not used)
+  /// Cache validity durations for each data type.
   static const Map<CacheKey, Duration> _cacheValidityDurations = {
     CacheKey.substitutions: Duration(minutes: 1),
-    CacheKey.schedules: Duration(minutes: 5),
+    CacheKey.schedules: Duration(hours: 24),
     CacheKey.scheduleAvailability: Duration(minutes: 15),
     CacheKey.news: Duration(minutes: 5),
-    CacheKey.weather: Duration(minutes: 5),
+    CacheKey.weather: Duration(minutes: 1),
   };
 
   /// Map to store last fetch time for each cache key
@@ -40,39 +40,38 @@ class CacheService {
     _lastBackgroundTime = DateTime.now();
   }
 
-  /// Cache keys that should refresh periodically while app is open (time-based)
+  /// Keys whose cache is invalidated when the app is backgrounded.
+  /// Schedules use a pure 24 h time-based window and are NOT in this set.
+  static const Set<CacheKey> _backgroundInvalidatedKeys = {
+    CacheKey.substitutions,
+    CacheKey.weather,
+    CacheKey.news,
+  };
+
+  /// Keys that use a time-based validity window (even while the app is open).
   static const Set<CacheKey> _timeBasedRefreshKeys = {
     CacheKey.substitutions,
     CacheKey.weather,
+    CacheKey.schedules, // 24 h window — never invalidated by backgrounding
   };
 
-  /// Check if cache is valid for a given key
-  /// Cache is valid if:
-  /// 1. There is a fetch time
-  /// 2. App was not backgrounded since the last fetch (or was never backgrounded)
-  /// 3. For substitutions and weather: if app is open, data is still within validity duration (time-based refresh)
-  /// 4. For schedules and news: always valid while app is open (only invalidate when backgrounded)
+  /// Check if cache is valid for a given key.
   bool isCacheValid(CacheKey key, {DateTime? lastFetchTime}) {
     final fetchTime = lastFetchTime ?? _lastFetchTimes[key];
     if (fetchTime == null) return false;
 
-    // If app was backgrounded, cache is invalid (must refetch when returning)
-    if (_lastBackgroundTime != null) {
-      // Cache is valid only if last fetch happened after the app was backgrounded
-      // (i.e., data was fetched after returning to foreground)
-      return fetchTime.isAfter(_lastBackgroundTime!);
+    // Background-invalidated keys: cache is stale if last fetch pre-dates backgrounding.
+    if (_backgroundInvalidatedKeys.contains(key) && _lastBackgroundTime != null) {
+      if (fetchTime.isBefore(_lastBackgroundTime!)) return false;
     }
 
-    // App is still open
-    // Only substitutions and weather use time-based expiration while app is open
+    // Time-based keys: check elapsed time against validity window.
     if (_timeBasedRefreshKeys.contains(key)) {
-      final validityDuration = getCacheValidity(key);
       final elapsed = DateTime.now().difference(fetchTime);
-      return elapsed < validityDuration;
+      return elapsed < getCacheValidity(key);
     }
 
-    // For schedules, news, and scheduleAvailability: always valid while app is open
-    // (only invalidate when app is backgrounded)
+    // Everything else (scheduleAvailability): valid while app is open.
     return true;
   }
 

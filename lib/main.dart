@@ -270,24 +270,12 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
       unawaited(ref.read(weatherDataProvider.notifier).updateDataInBackground());
     }
 
-    // Refresh schedules and news in background (less critical)
-    final scheduleService = ref.read(scheduleServiceProvider);
-    if (!scheduleService.hasValidCache && scheduleService.cachedSchedules != null) {
-      AppLogger.debug('App resumed: Refreshing schedules in background', module: 'Main');
-      unawaited(ref.read(scheduleProvider.notifier).refreshInBackground());
-    }
-
+    // Refresh news in background if stale.
     final newsService = ref.read(newsServiceProvider);
     if (!newsService.hasValidCache && newsService.cachedEvents != null) {
       AppLogger.debug('App resumed: Refreshing news in background', module: 'Main');
       unawaited(ref.read(newsProvider.notifier).refreshInBackground());
     }
-    
-    // Rebuild class index silently in background (schedule PDF may have changed)
-    // This is non-intrusive and won't show loading spinners
-    final scheduleNotifier = ref.read(scheduleProvider.notifier);
-    scheduleNotifier.invalidateClassIndex();
-    unawaited(scheduleNotifier.rebuildClassIndexSilently());
   }
 
   Future<void> _refreshExpiredCaches() async {
@@ -297,12 +285,6 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
     if (!substitutionState.isCacheValid && substitutionState.hasAnyData) {
       AppLogger.debug('Cache refresh timer: Triggering background refresh for substitutions', module: 'Main');
       unawaited(ref.read(substitutionProvider.notifier).refreshInBackground());
-    }
-
-    final scheduleService = ref.read(scheduleServiceProvider);
-    if (!scheduleService.hasValidCache && scheduleService.cachedSchedules != null) {
-      AppLogger.debug('Cache refresh timer: Triggering background refresh for schedules', module: 'Main');
-      unawaited(ref.read(scheduleProvider.notifier).refreshInBackground());
     }
 
     if (!WeatherService.instance.hasValidCache) {
@@ -315,6 +297,10 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
       AppLogger.debug('Cache refresh timer: Triggering background refresh for news', module: 'Main');
       unawaited(ref.read(newsProvider.notifier).refreshInBackground());
     }
+
+    // Events: service has a 1 h internal cache; calling refresh() is a no-op
+    // until the hour elapses, then it re-fetches.
+    unawaited(ref.read(eventsProvider.notifier).refresh());
   }
 
   @override
