@@ -111,6 +111,7 @@ flutter:
   # Assets configuration - using WebP format for better compression
   assets:
     - assets/images/app-icons/app-icon.webp
+    - assets/images/app-icons/app-icon-transparent.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
