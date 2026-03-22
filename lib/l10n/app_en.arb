@@ -210,5 +210,80 @@
     }
   },
   "termine": "Events",
-  "noEventsAvailable": "No events available"
+  "noEventsAvailable": "No events available",
+  "weatherPageTitle": "Weather Karlsruhe",
+  "weatherDataNotAvailable": "Weather data not available",
+  "checkInternetConnection": "Please check your internet connection.",
+  "hourlyForecastLabel": "HOURLY",
+  "threeDayForecastLabel": "3 DAYS",
+  "weatherAttribution": "Data: Open-Meteo · open-meteo.com",
+  "weatherFeelsLikeHighLow": "Feels like {feelsLike}°  ·  {low}° – {high}°",
+  "@weatherFeelsLikeHighLow": {
+    "placeholders": {
+      "feelsLike": { "type": "int" },
+      "high": { "type": "int" },
+      "low": { "type": "int" }
+    }
+  },
+  "weatherFeelsLikeHumidity": "Feels like {feelsLike}°  ·  {humidity}% humidity",
+  "@weatherFeelsLikeHumidity": {
+    "placeholders": {
+      "feelsLike": { "type": "int" },
+      "humidity": { "type": "int" }
+    }
+  },
+  "weatherHumidityShort": "Humidity",
+  "weatherWindShort": "Wind",
+  "uviLow": "Low",
+  "uviMedium": "Moderate",
+  "uviHigh": "High",
+  "uviVeryHigh": "Very High",
+  "uviExtreme": "Extreme",
+  "scheduleNoClassTitle": "Which class are you in?",
+  "scheduleNoClassSub": "Tap to set your class",
+  "settingsSectionAppearance": "APPEARANCE",
+  "settingsSectionMore": "MORE",
+  "weatherFeelsLike": "Feels like {feelsLike}°",
+  "@weatherFeelsLike": {
+    "placeholders": {
+      "feelsLike": { "type": "int" }
+    }
+  },
+  "jahrgang11": "Year 11",
+  "jahrgang12": "Year 12",
+  "klasseLabel": "Class {name}",
+  "@klasseLabel": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "filenameDocumentDefault": "LGKA_Document.pdf",
+  "wmoClearSky": "Clear sky",
+  "wmoMainlyClear": "Mainly clear",
+  "wmoPartlyCloudy": "Partly cloudy",
+  "wmoOvercast": "Overcast",
+  "wmoFog": "Fog",
+  "wmoDepositingRimeFog": "Depositing rime fog",
+  "wmoDrizzleLight": "Light drizzle",
+  "wmoDrizzleModerate": "Moderate drizzle",
+  "wmoDrizzleDense": "Dense drizzle",
+  "wmoFreezingDrizzleLight": "Light freezing drizzle",
+  "wmoFreezingDrizzleHeavy": "Heavy freezing drizzle",
+  "wmoRainLight": "Light rain",
+  "wmoRainModerate": "Moderate rain",
+  "wmoRainHeavy": "Heavy rain",
+  "wmoFreezingRainLight": "Light freezing rain",
+  "wmoFreezingRainHeavy": "Heavy freezing rain",
+  "wmoSnowLight": "Light snow",
+  "wmoSnowModerate": "Moderate snow",
+  "wmoSnowHeavy": "Heavy snow",
+  "wmoSnowGrains": "Snow grains",
+  "wmoShowersLight": "Light showers",
+  "wmoShowersModerate": "Moderate showers",
+  "wmoShowersHeavy": "Heavy showers",
+  "wmoSnowShowersLight": "Light snow showers",
+  "wmoSnowShowersHeavy": "Heavy snow showers",
+  "wmoThunderstorm": "Thunderstorm",
+  "wmoThunderstormHail": "Thunderstorm with hail",
+  "wmoThunderstormHeavyHail": "Thunderstorm with heavy hail"
 }

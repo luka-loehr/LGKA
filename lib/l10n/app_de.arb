@@ -209,5 +209,80 @@
     }
   },
   "termine": "Termine",
-  "noEventsAvailable": "Keine Termine verfügbar"
+  "noEventsAvailable": "Keine Termine verfügbar",
+  "weatherPageTitle": "Wetter Karlsruhe",
+  "weatherDataNotAvailable": "Wetterdaten nicht verfügbar",
+  "checkInternetConnection": "Bitte prüfe deine Internetverbindung.",
+  "hourlyForecastLabel": "STÜNDLICH",
+  "threeDayForecastLabel": "3 TAGE",
+  "weatherAttribution": "Daten: Open-Meteo · open-meteo.com",
+  "weatherFeelsLikeHighLow": "Gefühlt {feelsLike}°  ·  {low}° – {high}°",
+  "@weatherFeelsLikeHighLow": {
+    "placeholders": {
+      "feelsLike": { "type": "int" },
+      "high": { "type": "int" },
+      "low": { "type": "int" }
+    }
+  },
+  "weatherFeelsLikeHumidity": "Gefühlt {feelsLike}°  ·  {humidity}% Luftfeuchte",
+  "@weatherFeelsLikeHumidity": {
+    "placeholders": {
+      "feelsLike": { "type": "int" },
+      "humidity": { "type": "int" }
+    }
+  },
+  "weatherHumidityShort": "Luftfeuchte",
+  "weatherWindShort": "Wind",
+  "uviLow": "Niedrig",
+  "uviMedium": "Mittel",
+  "uviHigh": "Hoch",
+  "uviVeryHigh": "Sehr hoch",
+  "uviExtreme": "Extrem",
+  "scheduleNoClassTitle": "In welcher Klasse bist du?",
+  "scheduleNoClassSub": "Tippe, um deine Klasse festzulegen",
+  "settingsSectionAppearance": "DARSTELLUNG",
+  "settingsSectionMore": "MEHR",
+  "weatherFeelsLike": "Gefühlt {feelsLike}°",
+  "@weatherFeelsLike": {
+    "placeholders": {
+      "feelsLike": { "type": "int" }
+    }
+  },
+  "jahrgang11": "Jahrgang 11",
+  "jahrgang12": "Jahrgang 12",
+  "klasseLabel": "Klasse {name}",
+  "@klasseLabel": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "filenameDocumentDefault": "LGKA_Document.pdf",
+  "wmoClearSky": "Klarer Himmel",
+  "wmoMainlyClear": "Überwiegend klar",
+  "wmoPartlyCloudy": "Teilweise bewölkt",
+  "wmoOvercast": "Bedeckt",
+  "wmoFog": "Nebel",
+  "wmoDepositingRimeFog": "Gefrierender Nebel",
+  "wmoDrizzleLight": "Leichter Nieselregen",
+  "wmoDrizzleModerate": "Mäßiger Nieselregen",
+  "wmoDrizzleDense": "Dichter Nieselregen",
+  "wmoFreezingDrizzleLight": "Leichter gefrierender Nieselregen",
+  "wmoFreezingDrizzleHeavy": "Gefrierender Nieselregen",
+  "wmoRainLight": "Leichter Regen",
+  "wmoRainModerate": "Mäßiger Regen",
+  "wmoRainHeavy": "Starker Regen",
+  "wmoFreezingRainLight": "Leichter gefrierender Regen",
+  "wmoFreezingRainHeavy": "Gefrierender Regen",
+  "wmoSnowLight": "Leichter Schneefall",
+  "wmoSnowModerate": "Mäßiger Schneefall",
+  "wmoSnowHeavy": "Starker Schneefall",
+  "wmoSnowGrains": "Schneekörner",
+  "wmoShowersLight": "Leichte Regenschauer",
+  "wmoShowersModerate": "Mäßige Regenschauer",
+  "wmoShowersHeavy": "Starke Regenschauer",
+  "wmoSnowShowersLight": "Leichte Schneeschauer",
+  "wmoSnowShowersHeavy": "Starke Schneeschauer",
+  "wmoThunderstorm": "Gewitter",
+  "wmoThunderstormHail": "Gewitter mit Hagel",
+  "wmoThunderstormHeavyHail": "Gewitter mit schwerem Hagel"
 }

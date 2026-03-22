@@ -9,6 +9,7 @@ import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart' hide Wea
 import 'package:weather_icons/weather_icons.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/haptic_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../application/weather_provider.dart';
 import '../domain/weather_models.dart';
 
@@ -33,7 +34,7 @@ class WeatherPage extends ConsumerWidget {
           },
         ),
         title: Text(
-          'Wetter Karlsruhe',
+          AppLocalizations.of(context)!.weatherPageTitle,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: context.appPrimaryText,
                 fontWeight: FontWeight.w700,
@@ -58,7 +59,7 @@ class WeatherPage extends ConsumerWidget {
                 size: 48, color: context.appSecondaryText.withValues(alpha: 0.4)),
             const SizedBox(height: 16),
             Text(
-              'Wetterdaten nicht verfügbar',
+              AppLocalizations.of(context)!.weatherDataNotAvailable,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: context.appPrimaryText,
                     fontWeight: FontWeight.w600,
@@ -66,7 +67,7 @@ class WeatherPage extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Bitte prüfe deine Internetverbindung.',
+              AppLocalizations.of(context)!.checkInternetConnection,
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
@@ -92,7 +93,7 @@ class WeatherPage extends ConsumerWidget {
               _buildStatsRow(context, current),
               if (state.hourly.isNotEmpty) ...[
                 const SizedBox(height: 28),
-                _buildSectionHeader(context, 'STÜNDLICH'),
+                _buildSectionHeader(context, AppLocalizations.of(context)!.hourlyForecastLabel),
                 const SizedBox(height: 12),
               ],
             ]),
@@ -106,14 +107,14 @@ class WeatherPage extends ConsumerWidget {
             delegate: SliverChildListDelegate([
               if (state.daily.isNotEmpty) ...[
                 const SizedBox(height: 28),
-                _buildSectionHeader(context, '3 TAGE'),
+                _buildSectionHeader(context, AppLocalizations.of(context)!.threeDayForecastLabel),
                 const SizedBox(height: 12),
                 _buildDailyForecast(context, state.daily),
               ],
               const SizedBox(height: 32),
               Center(
                 child: Text(
-                  'Daten: Open-Meteo · open-meteo.com',
+                  AppLocalizations.of(context)!.weatherAttribution,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color:
                             context.appSecondaryText.withValues(alpha: 0.4),
@@ -194,7 +195,7 @@ class WeatherPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      _capitalize(current.description),
+                      _capitalize(WmoUtils.localizedDescription(current.weatherCode, AppLocalizations.of(context)!)),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: Colors.white.withValues(alpha: 0.95),
                             fontWeight: FontWeight.w500,
@@ -205,8 +206,8 @@ class WeatherPage extends ConsumerWidget {
                     const SizedBox(height: 4),
                     Text(
                       today != null
-                          ? 'Gefühlt ${current.feelsLike.round()}°  ·  H ${today.tempMax.round()}°  T ${today.tempMin.round()}°'
-                          : 'Gefühlt ${current.feelsLike.round()}°',
+                          ? AppLocalizations.of(context)!.weatherFeelsLikeHighLow(current.feelsLike.round(), today.tempMax.round(), today.tempMin.round())
+                          : AppLocalizations.of(context)!.weatherFeelsLike(current.feelsLike.round()),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Colors.white.withValues(alpha: 0.8),
                             shadows: textShadows,
@@ -226,20 +227,20 @@ class WeatherPage extends ConsumerWidget {
   // ── Stats row ───────────────────────────────────────────────────────────────
 
   Widget _buildStatsRow(BuildContext context, CurrentWeather c) {
-    final windDir = _compassDir(c.windDeg);
-    final uviLabel = _uviLabel(c.uvi);
+    final l = AppLocalizations.of(context)!;
+    final uviLabel = _uviLabel(l, c.uvi);
 
     return Row(
       children: [
         _statChip(context,
             icon: Icons.water_drop_outlined,
             value: '${c.humidity}%',
-            label: 'Luftfeuchte'),
+            label: l.weatherHumidityShort),
         const SizedBox(width: 10),
         _statChip(context,
             icon: Icons.air,
-            value: '$windDir ${c.windSpeed.round()} km/h',
-            label: 'Wind'),
+            value: '${c.windSpeed.round()} km/h',
+            label: l.weatherWindShort),
         const SizedBox(width: 10),
         _statChip(context,
             icon: Icons.speed,
@@ -315,48 +316,69 @@ class WeatherPage extends ConsumerWidget {
   Widget _hourlyItem(BuildContext context, HourlyForecast h) {
     final timeStr = DateFormat('HH:mm').format(h.dt.toLocal());
     final showPop = h.pop >= 0.1;
+    final scene = WmoUtils.weatherType(h.weatherCode, h.isDay);
+    const textShadows = [Shadow(color: Colors.black45, blurRadius: 6)];
 
-    return Container(
-      width: 64,
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: context.appSurfaceColor,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text(
-            timeStr,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: context.appSecondaryText,
-                  fontSize: 11,
-                ),
-          ),
-          BoxedIcon(
-            WmoUtils.icon(h.weatherCode, h.isDay),
-            size: 28,
-            color: context.appSecondaryText,
-          ),
-          Text(
-            '${h.temp.round()}°',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: context.appPrimaryText,
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-          if (showPop)
-            Text(
-              '${(h.pop * 100).round()}%',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: SizedBox(
+        width: 64,
+        height: 110,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: WeatherBg(
+                weatherType: scene,
+                width: 64,
+                height: 110,
+              ),
+            ),
+            Positioned.fill(
+              child: Container(color: Colors.black.withValues(alpha: 0.18)),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    timeStr,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.85),
+                          fontSize: 11,
+                          shadows: textShadows,
+                        ),
                   ),
-            )
-          else
-            const SizedBox(height: 14),
-        ],
+                  BoxedIcon(
+                    WmoUtils.icon(h.weatherCode, h.isDay),
+                    size: 28,
+                    color: Colors.white,
+                  ),
+                  Text(
+                    '${h.temp.round()}°',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          shadows: textShadows,
+                        ),
+                  ),
+                  if (showPop)
+                    Text(
+                      '${(h.pop * 100).round()}%',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            shadows: textShadows,
+                          ),
+                    )
+                  else
+                    const SizedBox(height: 14),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -397,7 +419,7 @@ class WeatherPage extends ConsumerWidget {
       double weekMax) {
     final isToday = _isSameDay(d.dt, DateTime.now());
     final dayLabel = isToday
-        ? 'Heute'
+        ? AppLocalizations.of(context)!.today
         : DateFormat('EEE', 'de_DE').format(d.dt);
     final showPop = d.pop >= 0.1;
     final rangeSpan = (weekMax - weekMin).clamp(1.0, double.infinity);
@@ -526,17 +548,12 @@ class WeatherPage extends ConsumerWidget {
   bool _isSameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
 
-  String _compassDir(int deg) {
-    const dirs = ['N', 'NO', 'O', 'SO', 'S', 'SW', 'W', 'NW'];
-    return dirs[((deg + 22.5) / 45).floor() % 8];
-  }
-
-  String _uviLabel(double uvi) {
-    if (uvi < 3) return 'Niedrig';
-    if (uvi < 6) return 'Mittel';
-    if (uvi < 8) return 'Hoch';
-    if (uvi < 11) return 'Sehr hoch';
-    return 'Extrem';
+String _uviLabel(AppLocalizations l, double uvi) {
+    if (uvi < 3) return l.uviLow;
+    if (uvi < 6) return l.uviMedium;
+    if (uvi < 8) return l.uviHigh;
+    if (uvi < 11) return l.uviVeryHigh;
+    return l.uviExtreme;
   }
 
   String _capitalize(String s) =>

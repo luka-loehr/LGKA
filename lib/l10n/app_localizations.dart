@@ -1054,6 +1054,318 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No events available'**
   String get noEventsAvailable;
+
+  /// No description provided for @weatherPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather Karlsruhe'**
+  String get weatherPageTitle;
+
+  /// No description provided for @weatherDataNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather data not available'**
+  String get weatherDataNotAvailable;
+
+  /// No description provided for @checkInternetConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your internet connection.'**
+  String get checkInternetConnection;
+
+  /// No description provided for @hourlyForecastLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'HOURLY'**
+  String get hourlyForecastLabel;
+
+  /// No description provided for @threeDayForecastLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'3 DAYS'**
+  String get threeDayForecastLabel;
+
+  /// No description provided for @weatherAttribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Data: Open-Meteo · open-meteo.com'**
+  String get weatherAttribution;
+
+  /// No description provided for @weatherFeelsLikeHighLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Feels like {feelsLike}°  ·  {low}° – {high}°'**
+  String weatherFeelsLikeHighLow(int feelsLike, int high, int low);
+
+  /// No description provided for @weatherFeelsLikeHumidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Feels like {feelsLike}°  ·  {humidity}% humidity'**
+  String weatherFeelsLikeHumidity(int feelsLike, int humidity);
+
+  /// No description provided for @weatherHumidityShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity'**
+  String get weatherHumidityShort;
+
+  /// No description provided for @weatherWindShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind'**
+  String get weatherWindShort;
+
+  /// No description provided for @uviLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get uviLow;
+
+  /// No description provided for @uviMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get uviMedium;
+
+  /// No description provided for @uviHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get uviHigh;
+
+  /// No description provided for @uviVeryHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Very High'**
+  String get uviVeryHigh;
+
+  /// No description provided for @uviExtreme.
+  ///
+  /// In en, this message translates to:
+  /// **'Extreme'**
+  String get uviExtreme;
+
+  /// No description provided for @scheduleNoClassTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which class are you in?'**
+  String get scheduleNoClassTitle;
+
+  /// No description provided for @scheduleNoClassSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to set your class'**
+  String get scheduleNoClassSub;
+
+  /// No description provided for @settingsSectionAppearance.
+  ///
+  /// In en, this message translates to:
+  /// **'APPEARANCE'**
+  String get settingsSectionAppearance;
+
+  /// No description provided for @settingsSectionMore.
+  ///
+  /// In en, this message translates to:
+  /// **'MORE'**
+  String get settingsSectionMore;
+
+  /// No description provided for @weatherFeelsLike.
+  ///
+  /// In en, this message translates to:
+  /// **'Feels like {feelsLike}°'**
+  String weatherFeelsLike(int feelsLike);
+
+  /// No description provided for @jahrgang11.
+  ///
+  /// In en, this message translates to:
+  /// **'Year 11'**
+  String get jahrgang11;
+
+  /// No description provided for @jahrgang12.
+  ///
+  /// In en, this message translates to:
+  /// **'Year 12'**
+  String get jahrgang12;
+
+  /// No description provided for @klasseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Class {name}'**
+  String klasseLabel(String name);
+
+  /// No description provided for @filenameDocumentDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'LGKA_Document.pdf'**
+  String get filenameDocumentDefault;
+
+  /// No description provided for @wmoClearSky.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear sky'**
+  String get wmoClearSky;
+
+  /// No description provided for @wmoMainlyClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Mainly clear'**
+  String get wmoMainlyClear;
+
+  /// No description provided for @wmoPartlyCloudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Partly cloudy'**
+  String get wmoPartlyCloudy;
+
+  /// No description provided for @wmoOvercast.
+  ///
+  /// In en, this message translates to:
+  /// **'Overcast'**
+  String get wmoOvercast;
+
+  /// No description provided for @wmoFog.
+  ///
+  /// In en, this message translates to:
+  /// **'Fog'**
+  String get wmoFog;
+
+  /// No description provided for @wmoDepositingRimeFog.
+  ///
+  /// In en, this message translates to:
+  /// **'Depositing rime fog'**
+  String get wmoDepositingRimeFog;
+
+  /// No description provided for @wmoDrizzleLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light drizzle'**
+  String get wmoDrizzleLight;
+
+  /// No description provided for @wmoDrizzleModerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate drizzle'**
+  String get wmoDrizzleModerate;
+
+  /// No description provided for @wmoDrizzleDense.
+  ///
+  /// In en, this message translates to:
+  /// **'Dense drizzle'**
+  String get wmoDrizzleDense;
+
+  /// No description provided for @wmoFreezingDrizzleLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light freezing drizzle'**
+  String get wmoFreezingDrizzleLight;
+
+  /// No description provided for @wmoFreezingDrizzleHeavy.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy freezing drizzle'**
+  String get wmoFreezingDrizzleHeavy;
+
+  /// No description provided for @wmoRainLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light rain'**
+  String get wmoRainLight;
+
+  /// No description provided for @wmoRainModerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate rain'**
+  String get wmoRainModerate;
+
+  /// No description provided for @wmoRainHeavy.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy rain'**
+  String get wmoRainHeavy;
+
+  /// No description provided for @wmoFreezingRainLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light freezing rain'**
+  String get wmoFreezingRainLight;
+
+  /// No description provided for @wmoFreezingRainHeavy.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy freezing rain'**
+  String get wmoFreezingRainHeavy;
+
+  /// No description provided for @wmoSnowLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light snow'**
+  String get wmoSnowLight;
+
+  /// No description provided for @wmoSnowModerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate snow'**
+  String get wmoSnowModerate;
+
+  /// No description provided for @wmoSnowHeavy.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy snow'**
+  String get wmoSnowHeavy;
+
+  /// No description provided for @wmoSnowGrains.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow grains'**
+  String get wmoSnowGrains;
+
+  /// No description provided for @wmoShowersLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light showers'**
+  String get wmoShowersLight;
+
+  /// No description provided for @wmoShowersModerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate showers'**
+  String get wmoShowersModerate;
+
+  /// No description provided for @wmoShowersHeavy.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy showers'**
+  String get wmoShowersHeavy;
+
+  /// No description provided for @wmoSnowShowersLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light snow showers'**
+  String get wmoSnowShowersLight;
+
+  /// No description provided for @wmoSnowShowersHeavy.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy snow showers'**
+  String get wmoSnowShowersHeavy;
+
+  /// No description provided for @wmoThunderstorm.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm'**
+  String get wmoThunderstorm;
+
+  /// No description provided for @wmoThunderstormHail.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm with hail'**
+  String get wmoThunderstormHail;
+
+  /// No description provided for @wmoThunderstormHeavyHail.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm with heavy hail'**
+  String get wmoThunderstormHeavyHail;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

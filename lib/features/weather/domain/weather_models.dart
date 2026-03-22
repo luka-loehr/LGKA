@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart'
     hide WeatherDataState;
 import 'package:weather_icons/weather_icons.dart';
+import '../../../l10n/app_localizations.dart';
 
 // ── WMO utility ──────────────────────────────────────────────────────────────
 
 class WmoUtils {
   WmoUtils._();
 
-  /// German description for a WMO weather code.
+  /// German description for a WMO weather code (used in logs).
   static String description(int code) {
     switch (code) {
       case 0:  return 'Klarer Himmel';
@@ -42,6 +43,41 @@ class WmoUtils {
       case 96: return 'Gewitter mit Hagel';
       case 99: return 'Gewitter mit schwerem Hagel';
       default: return 'Unbekannt';
+    }
+  }
+
+  /// Localized description for a WMO weather code.
+  static String localizedDescription(int code, AppLocalizations l) {
+    switch (code) {
+      case 0:  return l.wmoClearSky;
+      case 1:  return l.wmoMainlyClear;
+      case 2:  return l.wmoPartlyCloudy;
+      case 3:  return l.wmoOvercast;
+      case 45: return l.wmoFog;
+      case 48: return l.wmoDepositingRimeFog;
+      case 51: return l.wmoDrizzleLight;
+      case 53: return l.wmoDrizzleModerate;
+      case 55: return l.wmoDrizzleDense;
+      case 56: return l.wmoFreezingDrizzleLight;
+      case 57: return l.wmoFreezingDrizzleHeavy;
+      case 61: return l.wmoRainLight;
+      case 63: return l.wmoRainModerate;
+      case 65: return l.wmoRainHeavy;
+      case 66: return l.wmoFreezingRainLight;
+      case 67: return l.wmoFreezingRainHeavy;
+      case 71: return l.wmoSnowLight;
+      case 73: return l.wmoSnowModerate;
+      case 75: return l.wmoSnowHeavy;
+      case 77: return l.wmoSnowGrains;
+      case 80: return l.wmoShowersLight;
+      case 81: return l.wmoShowersModerate;
+      case 82: return l.wmoShowersHeavy;
+      case 85: return l.wmoSnowShowersLight;
+      case 86: return l.wmoSnowShowersHeavy;
+      case 95: return l.wmoThunderstorm;
+      case 96: return l.wmoThunderstormHail;
+      case 99: return l.wmoThunderstormHeavyHail;
+      default: return l.unknown;
     }
   }
 

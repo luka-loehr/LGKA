@@ -503,4 +503,168 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get noEventsAvailable => 'Keine Termine verfügbar';
+
+  @override
+  String get weatherPageTitle => 'Wetter Karlsruhe';
+
+  @override
+  String get weatherDataNotAvailable => 'Wetterdaten nicht verfügbar';
+
+  @override
+  String get checkInternetConnection => 'Bitte prüfe deine Internetverbindung.';
+
+  @override
+  String get hourlyForecastLabel => 'STÜNDLICH';
+
+  @override
+  String get threeDayForecastLabel => '3 TAGE';
+
+  @override
+  String get weatherAttribution => 'Daten: Open-Meteo · open-meteo.com';
+
+  @override
+  String weatherFeelsLikeHighLow(int feelsLike, int high, int low) {
+    return 'Gefühlt $feelsLike°  ·  $low° – $high°';
+  }
+
+  @override
+  String weatherFeelsLikeHumidity(int feelsLike, int humidity) {
+    return 'Gefühlt $feelsLike°  ·  $humidity% Luftfeuchte';
+  }
+
+  @override
+  String get weatherHumidityShort => 'Luftfeuchte';
+
+  @override
+  String get weatherWindShort => 'Wind';
+
+  @override
+  String get uviLow => 'Niedrig';
+
+  @override
+  String get uviMedium => 'Mittel';
+
+  @override
+  String get uviHigh => 'Hoch';
+
+  @override
+  String get uviVeryHigh => 'Sehr hoch';
+
+  @override
+  String get uviExtreme => 'Extrem';
+
+  @override
+  String get scheduleNoClassTitle => 'In welcher Klasse bist du?';
+
+  @override
+  String get scheduleNoClassSub => 'Tippe, um deine Klasse festzulegen';
+
+  @override
+  String get settingsSectionAppearance => 'DARSTELLUNG';
+
+  @override
+  String get settingsSectionMore => 'MEHR';
+
+  @override
+  String weatherFeelsLike(int feelsLike) {
+    return 'Gefühlt $feelsLike°';
+  }
+
+  @override
+  String get jahrgang11 => 'Jahrgang 11';
+
+  @override
+  String get jahrgang12 => 'Jahrgang 12';
+
+  @override
+  String klasseLabel(String name) {
+    return 'Klasse $name';
+  }
+
+  @override
+  String get filenameDocumentDefault => 'LGKA_Document.pdf';
+
+  @override
+  String get wmoClearSky => 'Klarer Himmel';
+
+  @override
+  String get wmoMainlyClear => 'Überwiegend klar';
+
+  @override
+  String get wmoPartlyCloudy => 'Teilweise bewölkt';
+
+  @override
+  String get wmoOvercast => 'Bedeckt';
+
+  @override
+  String get wmoFog => 'Nebel';
+
+  @override
+  String get wmoDepositingRimeFog => 'Gefrierender Nebel';
+
+  @override
+  String get wmoDrizzleLight => 'Leichter Nieselregen';
+
+  @override
+  String get wmoDrizzleModerate => 'Mäßiger Nieselregen';
+
+  @override
+  String get wmoDrizzleDense => 'Dichter Nieselregen';
+
+  @override
+  String get wmoFreezingDrizzleLight => 'Leichter gefrierender Nieselregen';
+
+  @override
+  String get wmoFreezingDrizzleHeavy => 'Gefrierender Nieselregen';
+
+  @override
+  String get wmoRainLight => 'Leichter Regen';
+
+  @override
+  String get wmoRainModerate => 'Mäßiger Regen';
+
+  @override
+  String get wmoRainHeavy => 'Starker Regen';
+
+  @override
+  String get wmoFreezingRainLight => 'Leichter gefrierender Regen';
+
+  @override
+  String get wmoFreezingRainHeavy => 'Gefrierender Regen';
+
+  @override
+  String get wmoSnowLight => 'Leichter Schneefall';
+
+  @override
+  String get wmoSnowModerate => 'Mäßiger Schneefall';
+
+  @override
+  String get wmoSnowHeavy => 'Starker Schneefall';
+
+  @override
+  String get wmoSnowGrains => 'Schneekörner';
+
+  @override
+  String get wmoShowersLight => 'Leichte Regenschauer';
+
+  @override
+  String get wmoShowersModerate => 'Mäßige Regenschauer';
+
+  @override
+  String get wmoShowersHeavy => 'Starke Regenschauer';
+
+  @override
+  String get wmoSnowShowersLight => 'Leichte Schneeschauer';
+
+  @override
+  String get wmoSnowShowersHeavy => 'Starke Schneeschauer';
+
+  @override
+  String get wmoThunderstorm => 'Gewitter';
+
+  @override
+  String get wmoThunderstormHail => 'Gewitter mit Hagel';
+
+  @override
+  String get wmoThunderstormHeavyHail => 'Gewitter mit schwerem Hagel';
 }
