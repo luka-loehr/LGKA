@@ -521,6 +521,13 @@ class NewsDetailScreen extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: surfaceColor,
                       borderRadius: BorderRadius.circular(20.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -782,6 +789,13 @@ class NewsDetailScreen extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: surfaceColor,
                         borderRadius: BorderRadius.circular(16.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Material(
                         color: Colors.transparent,
