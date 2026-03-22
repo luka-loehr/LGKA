@@ -316,69 +316,48 @@ class WeatherPage extends ConsumerWidget {
   Widget _hourlyItem(BuildContext context, HourlyForecast h) {
     final timeStr = DateFormat('HH:mm').format(h.dt.toLocal());
     final showPop = h.pop >= 0.1;
-    final scene = WmoUtils.weatherType(h.weatherCode, h.isDay);
-    const textShadows = [Shadow(color: Colors.black45, blurRadius: 6)];
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
-      child: SizedBox(
-        width: 64,
-        height: 110,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: WeatherBg(
-                weatherType: scene,
-                width: 64,
-                height: 110,
-              ),
-            ),
-            Positioned.fill(
-              child: Container(color: Colors.black.withValues(alpha: 0.18)),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(
-                    timeStr,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.85),
-                          fontSize: 11,
-                          shadows: textShadows,
-                        ),
+    return Container(
+      width: 64,
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: context.appSurfaceColor,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text(
+            timeStr,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: context.appSecondaryText,
+                  fontSize: 11,
+                ),
+          ),
+          BoxedIcon(
+            WmoUtils.icon(h.weatherCode, h.isDay),
+            size: 28,
+            color: context.appSecondaryText,
+          ),
+          Text(
+            '${h.temp.round()}°',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: context.appPrimaryText,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+          if (showPop)
+            Text(
+              '${(h.pop * 100).round()}%',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
                   ),
-                  BoxedIcon(
-                    WmoUtils.icon(h.weatherCode, h.isDay),
-                    size: 28,
-                    color: Colors.white,
-                  ),
-                  Text(
-                    '${h.temp.round()}°',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          shadows: textShadows,
-                        ),
-                  ),
-                  if (showPop)
-                    Text(
-                      '${(h.pop * 100).round()}%',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                            shadows: textShadows,
-                          ),
-                    )
-                  else
-                    const SizedBox(height: 14),
-                ],
-              ),
-            ),
-          ],
-        ),
+            )
+          else
+            const SizedBox(height: 14),
+        ],
       ),
     );
   }
