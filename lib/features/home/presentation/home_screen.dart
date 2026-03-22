@@ -47,6 +47,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool _isRefreshing = false;
 
   @override
   void initState() {
@@ -194,7 +195,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       backgroundColor: context.appBgColor,
       appBar: _buildAppBar(),
-      body: _buildBody(subState, isSubLoading),
+      body: _buildBody(subState, isSubLoading, _isRefreshing),
     );
   }
 
@@ -261,15 +262,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _onRefresh() async {
     HapticService.medium();
+    setState(() => _isRefreshing = true);
     await Future.wait([
       ref.read(substitutionProvider.notifier).refresh(),
       ref.read(scheduleProvider.notifier).refreshSchedules().then((_) =>
           ref.read(scheduleProvider.notifier).checkAvailability()),
       ref.read(eventsProvider.notifier).refresh(),
     ]);
+    if (mounted) setState(() => _isRefreshing = false);
   }
 
-  Widget _buildBody(SubstitutionProviderState subState, bool isSubLoading) {
+  Widget _buildBody(SubstitutionProviderState subState, bool isSubLoading, bool isRefreshing) {
     return RefreshIndicator(
       onRefresh: _onRefresh,
       color: Theme.of(context).colorScheme.primary,
@@ -287,15 +290,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               _buildSectionHeader(
                   AppLocalizations.of(context)!.substitutionPlan),
               const SizedBox(height: 12),
-              _buildSubstitution(subState, isSubLoading),
+              _buildSubstitution(subState, isSubLoading || isRefreshing),
               const SizedBox(height: 28),
               _buildSectionHeader(AppLocalizations.of(context)!.schedule),
               const SizedBox(height: 12),
-              _buildScheduleSection(),
+              _buildScheduleSection(isRefreshing: isRefreshing),
               const SizedBox(height: 28),
               _buildSectionHeader(AppLocalizations.of(context)!.termine),
               const SizedBox(height: 12),
-              _buildTermineSection(),
+              _buildTermineSection(isRefreshing: isRefreshing),
               const SizedBox(height: 24),
             ]),
           ),
@@ -709,10 +712,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   // ── Schedule section ──────────────────────────────────────────────────────
 
-  Widget _buildScheduleSection() {
+  Widget _buildScheduleSection({bool isRefreshing = false}) {
     final scheduleState = ref.watch(scheduleProvider);
 
-    if (scheduleState.isLoading ||
+    if (isRefreshing || scheduleState.isLoading ||
         scheduleState.isCheckingAvailability ||
         !scheduleState.isIndexBuilt) {
       return _fadeSwitch('sched-loading', const SkeletonCard());
@@ -966,13 +969,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   // ── Termine (events) section ───────────────────────────────────────────────
 
-  Widget _buildTermineSection() {
+  Widget _buildTermineSection({bool isRefreshing = false}) {
     final eventsState = ref.watch(eventsProvider);
 
     final Widget child;
     final String key;
 
-    if (eventsState.isLoading) {
+    if (isRefreshing || eventsState.isLoading) {
       key = 'events-loading';
       child = const Column(children: [
         SkeletonCard(),
