@@ -52,6 +52,11 @@ class _WhatYouCanDoScreenState extends ConsumerState<WhatYouCanDoScreen>
       'titleKey': 'featureSickTitle',
       'descKey': 'featureSickDesc',
     },
+    {
+      'icon': Icons.event_outlined,
+      'titleKey': 'featureEventsTitle',
+      'descKey': 'featureEventsDesc',
+    },
   ];
 
   String _resolveTitle(BuildContext context, String key) {
@@ -67,6 +72,8 @@ class _WhatYouCanDoScreenState extends ConsumerState<WhatYouCanDoScreen>
         return l.featureNewsTitle;
       case 'featureSickTitle':
         return l.featureSickTitle;
+      case 'featureEventsTitle':
+        return l.featureEventsTitle;
       default:
         return '';
     }
@@ -85,6 +92,8 @@ class _WhatYouCanDoScreenState extends ConsumerState<WhatYouCanDoScreen>
         return l.featureNewsDesc;
       case 'featureSickDesc':
         return l.featureSickDesc;
+      case 'featureEventsDesc':
+        return l.featureEventsDesc;
       default:
         return '';
     }
