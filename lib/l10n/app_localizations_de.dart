@@ -422,6 +422,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get appearanceTitle => 'Erscheinungsbild';
 
   @override
+  String get themeDark => 'Dunkel';
+
+  @override
+  String get themeLight => 'Hell';
+
+  @override
+  String get themeAuto => 'Auto';
+
+  @override
   String get news => 'Neuigkeiten';
 
   @override

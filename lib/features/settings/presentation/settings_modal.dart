@@ -144,10 +144,11 @@ class SettingsModal extends ConsumerWidget {
     final currentMode = ref.watch(preferencesManagerProvider).themeMode;
     final isDark = context.appBrightness == Brightness.dark;
 
+    final l = AppLocalizations.of(context)!;
     final modes = [
-      (mode: 'dark', icon: Icons.dark_mode_rounded, label: 'Dunkel'),
-      (mode: 'light', icon: Icons.light_mode_rounded, label: 'Hell'),
-      (mode: 'system', icon: Icons.brightness_auto_rounded, label: 'Auto'),
+      (mode: 'dark', icon: Icons.dark_mode_rounded, label: l.themeDark),
+      (mode: 'light', icon: Icons.light_mode_rounded, label: l.themeLight),
+      (mode: 'system', icon: Icons.brightness_auto_rounded, label: l.themeAuto),
     ];
 
     return Padding(
