@@ -887,6 +887,12 @@ abstract class AppLocalizations {
   /// **'Choose your favorite color. It will be used throughout the app.'**
   String get accentColorDescription;
 
+  /// No description provided for @appearanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearanceTitle;
+
   /// No description provided for @news.
   ///
   /// In en, this message translates to:
