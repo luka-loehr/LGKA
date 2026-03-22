@@ -357,11 +357,7 @@ class SettingsModal extends ConsumerWidget {
   // ── Utils ──────────────────────────────────────────────────────────────────
 
   double _bottomPadding(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    final gi = mq.systemGestureInsets.bottom;
-    if (gi >= 45) return 54.0;
-    if (gi <= 25) return 8.0;
-    return mq.viewPadding.bottom > 50 ? 54.0 : 8.0;
+    return MediaQuery.of(context).viewPadding.bottom + 16.0;
   }
 
   void _launchURL(String url) async {
