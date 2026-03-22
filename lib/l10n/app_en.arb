@@ -96,6 +96,8 @@
   "featureNewsDesc": "Latest news and announcements from the school",
   "featureSickTitle": "Sick Note",
   "featureSickDesc": "Submit a sick note directly via the app",
+  "featureEventsTitle": "School Events",
+  "featureEventsDesc": "All upcoming school events at a glance",
   "yourAccentColor": "Your accent color",
   "chooseFavoriteColor": "Choose your favorite color. It will be used throughout the app.",
   "letsGo": "Let's go!",

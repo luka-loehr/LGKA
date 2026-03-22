@@ -170,13 +170,13 @@ abstract class AppLocalizations {
   /// No description provided for @weatherStationRepair.
   ///
   /// In en, this message translates to:
-  /// **'Repair work in progress'**
+  /// **'Weather data temporarily unavailable'**
   String get weatherStationRepair;
 
   /// No description provided for @weatherStationRepairFooter.
   ///
   /// In en, this message translates to:
-  /// **'The weather station will be available again soon'**
+  /// **'Weather data will be available again soon'**
   String get weatherStationRepairFooter;
 
   /// No description provided for @serverConnectionFailed.
@@ -212,13 +212,13 @@ abstract class AppLocalizations {
   /// No description provided for @liveWeatherDescription.
   ///
   /// In en, this message translates to:
-  /// **'Directly from the school\'s own weather station on the roof. Real-time data from your school!'**
+  /// **'Current weather data for Karlsruhe, provided by Open-Meteo – free and without tracking.'**
   String get liveWeatherDescription;
 
   /// No description provided for @dataCollectionDescription.
   ///
   /// In en, this message translates to:
-  /// **'The weather station is currently collecting new data for today. Charts and additional values will be displayed once enough data points are available.'**
+  /// **'Open-Meteo is currently collecting new data for today. Charts and additional values will be displayed once enough data points are available.'**
   String get dataCollectionDescription;
 
   /// No description provided for @welcomeHeadline.
@@ -620,7 +620,7 @@ abstract class AppLocalizations {
   /// No description provided for @featureWeatherDesc.
   ///
   /// In en, this message translates to:
-  /// **'Access the school\'s own weather station'**
+  /// **'Current weather data via Open-Meteo'**
   String get featureWeatherDesc;
 
   /// No description provided for @featureNewsTitle.
@@ -646,6 +646,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Submit a sick note directly via the app'**
   String get featureSickDesc;
+
+  /// No description provided for @featureEventsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'School Events'**
+  String get featureEventsTitle;
+
+  /// No description provided for @featureEventsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'All upcoming school events at a glance'**
+  String get featureEventsDesc;
 
   /// No description provided for @yourAccentColor.
   ///
@@ -977,8 +989,22 @@ abstract class AppLocalizations {
   /// **'Error loading weather data'**
   String get errorLoadingWeather;
 
+  /// No description provided for @greetingMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
   String get greetingMorning;
+
+  /// No description provided for @greetingDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon'**
   String get greetingDay;
+
+  /// No description provided for @greetingEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening'**
   String get greetingEvening;
 
   /// No description provided for @supportProject.
@@ -990,7 +1016,7 @@ abstract class AppLocalizations {
   /// No description provided for @lastDownloaded.
   ///
   /// In en, this message translates to:
-  /// **'Last downloaded: {time}'**
+  /// **'Last updated: {time}'**
   String lastDownloaded(String time);
 
   /// No description provided for @termine.
