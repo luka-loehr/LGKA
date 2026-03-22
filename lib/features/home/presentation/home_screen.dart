@@ -193,7 +193,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       backgroundColor: context.appBgColor,
-      extendBodyBehindAppBar: true,
       appBar: _buildAppBar(),
       body: _buildBody(subState, isSubLoading),
     );
@@ -201,7 +200,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: Colors.transparent,
+      backgroundColor: context.appBgColor,
       elevation: 0,
       scrolledUnderElevation: 0,
       title: Text(
@@ -261,7 +260,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildBody(SubstitutionProviderState subState, bool isSubLoading) {
-    final topOffset = MediaQuery.of(context).padding.top + kToolbarHeight + 16;
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
       slivers: [
@@ -269,7 +267,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
-              SizedBox(height: topOffset),
+              const SizedBox(height: 16),
               _buildWeatherSection(),
               const SizedBox(height: 28),
               _buildSectionHeader(
