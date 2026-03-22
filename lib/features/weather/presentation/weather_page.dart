@@ -122,9 +122,7 @@ class WeatherPage extends ConsumerWidget {
                   child: Text(
                     AppLocalizations.of(context)!.weatherAttribution,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: context.appSecondaryText.withValues(alpha: 0.5),
-                          decoration: TextDecoration.underline,
-                          decorationColor: context.appSecondaryText.withValues(alpha: 0.3),
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
                         ),
                   ),
                 ),
