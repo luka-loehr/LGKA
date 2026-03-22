@@ -285,6 +285,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get featureSickDesc => 'Submit a sick note directly via the app';
 
   @override
+  String get featureEventsTitle => 'School Events';
+
+  @override
+  String get featureEventsDesc => 'All upcoming school events at a glance';
+
+  @override
   String get yourAccentColor => 'Your accent color';
 
   @override

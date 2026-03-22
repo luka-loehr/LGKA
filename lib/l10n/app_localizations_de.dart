@@ -285,6 +285,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get featureSickDesc => 'Krankmeldung direkt über die App einreichen';
 
   @override
+  String get featureEventsTitle => 'Schulveranstaltungen';
+
+  @override
+  String get featureEventsDesc => 'Alle anstehenden Schulveranstaltungen auf einen Blick';
+
+  @override
   String get yourAccentColor => 'Deine Akzentfarbe';
 
   @override

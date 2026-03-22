@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../providers/color_provider.dart';
+import '../../../../providers/preferences_provider.dart';
 import '../../../../navigation/app_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../services/haptic_service.dart';
@@ -174,6 +175,11 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
                         ).toList(),
                       ),
 
+                      const SizedBox(height: 32),
+
+                      // Theme mode selector
+                      _buildThemeSelector(context),
+
                       const Spacer(),
 
                       // Continue Button
@@ -236,6 +242,92 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildThemeSelector(BuildContext context) {
+    final currentMode = ref.watch(preferencesManagerProvider).themeMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final modes = [
+      (mode: 'dark', icon: Icons.dark_mode_rounded, label: 'Dunkel'),
+      (mode: 'system', icon: Icons.brightness_auto_rounded, label: 'Auto'),
+      (mode: 'light', icon: Icons.light_mode_rounded, label: 'Hell'),
+    ];
+
+    return Column(
+      children: [
+        Text(
+          'Erscheinungsbild',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: context.appSecondaryText,
+                fontWeight: FontWeight.w500,
+              ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.all(4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: modes.map((m) {
+              final isSelected = currentMode == m.mode;
+              return GestureDetector(
+                onTap: () {
+                  HapticService.light();
+                  ref.read(preferencesManagerProvider.notifier).setThemeMode(m.mode);
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.white)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            )
+                          ]
+                        : null,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        m.icon,
+                        size: 16,
+                        color: isSelected
+                            ? AppColors.getAccentColor(_selectedColor)
+                            : context.appSecondaryText,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        m.label,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: isSelected
+                                  ? AppColors.getAccentColor(_selectedColor)
+                                  : context.appSecondaryText,
+                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
     );
   }
 
