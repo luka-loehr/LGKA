@@ -81,6 +81,26 @@ class WmoUtils {
     }
   }
 
+  /// Representative color for a weather scene — used for card shadows.
+  static Color sceneColor(WeatherType type) {
+    switch (type) {
+      case WeatherType.sunny:       return const Color(0xFFFFB300);
+      case WeatherType.sunnyNight:  return const Color(0xFF1A237E);
+      case WeatherType.cloudy:      return const Color(0xFF78909C);
+      case WeatherType.cloudyNight: return const Color(0xFF263238);
+      case WeatherType.overcast:    return const Color(0xFF546E7A);
+      case WeatherType.foggy:       return const Color(0xFF90A4AE);
+      case WeatherType.lightRainy:  return const Color(0xFF42A5F5);
+      case WeatherType.middleRainy: return const Color(0xFF1565C0);
+      case WeatherType.heavyRainy:  return const Color(0xFF0D47A1);
+      case WeatherType.lightSnow:   return const Color(0xFFB3E5FC);
+      case WeatherType.middleSnow:  return const Color(0xFF81D4FA);
+      case WeatherType.heavySnow:   return const Color(0xFF4FC3F7);
+      case WeatherType.thunder:     return const Color(0xFF311B92);
+      default:                      return const Color(0xFF78909C);
+    }
+  }
+
   /// Maps a WMO code + day/night flag to a [WeatherType] animation.
   static WeatherType weatherType(int code, bool isDay) {
     if (code == 0 || code == 1) return isDay ? WeatherType.sunny : WeatherType.sunnyNight;
