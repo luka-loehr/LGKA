@@ -388,6 +388,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       : AppLocalizations.of(context)!.weatherFeelsLikeHumidity(current.feelsLike.round(), current.humidity),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Colors.white.withValues(alpha: 0.75),
+                        fontWeight: FontWeight.w600,
                         shadows: textShadows,
                       ),
                   overflow: TextOverflow.ellipsis,
