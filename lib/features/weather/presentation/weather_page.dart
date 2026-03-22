@@ -143,7 +143,21 @@ class WeatherPage extends ConsumerWidget {
     final scene = WmoUtils.weatherType(current.weatherCode, current.isDay);
     const textShadows = [Shadow(color: Colors.black38, blurRadius: 8)];
 
-    return ClipRRect(
+    final shadowColor = WmoUtils.sceneColor(scene);
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withValues(alpha: 0.45),
+            blurRadius: 28,
+            spreadRadius: 0,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: SizedBox(
         height: 260,
@@ -226,6 +240,7 @@ class WeatherPage extends ConsumerWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }
