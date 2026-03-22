@@ -258,11 +258,11 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
     return Column(
       children: [
         Text(
-          'Erscheinungsbild',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: context.appSecondaryText,
-                fontWeight: FontWeight.w500,
+          AppLocalizations.of(context)!.appearanceTitle,
+          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                fontWeight: FontWeight.bold,
               ),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 12),
         Container(
