@@ -209,14 +209,14 @@
       }
     }
   },
-  "termine": "Events",
+  "termine": "Upcoming Events",
   "noEventsAvailable": "No events available",
   "weatherPageTitle": "Weather Karlsruhe",
   "weatherDataNotAvailable": "Weather data not available",
   "checkInternetConnection": "Please check your internet connection.",
   "hourlyForecastLabel": "HOURLY",
   "threeDayForecastLabel": "3 DAYS",
-  "weatherAttribution": "Data: Open-Meteo · open-meteo.com",
+  "weatherAttribution": "Weather data by Open-Meteo.com",
   "weatherFeelsLikeHighLow": "Feels like {feelsLike}°  ·  {low}° – {high}°",
   "@weatherFeelsLikeHighLow": {
     "placeholders": {

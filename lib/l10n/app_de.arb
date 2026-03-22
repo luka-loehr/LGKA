@@ -208,14 +208,14 @@
       }
     }
   },
-  "termine": "Termine",
+  "termine": "Bevorstehende Termine",
   "noEventsAvailable": "Keine Termine verfügbar",
   "weatherPageTitle": "Wetter Karlsruhe",
   "weatherDataNotAvailable": "Wetterdaten nicht verfügbar",
   "checkInternetConnection": "Bitte prüfe deine Internetverbindung.",
   "hourlyForecastLabel": "STÜNDLICH",
   "threeDayForecastLabel": "3 TAGE",
-  "weatherAttribution": "Daten: Open-Meteo · open-meteo.com",
+  "weatherAttribution": "Wetterdaten von Open-Meteo.com",
   "weatherFeelsLikeHighLow": "Gefühlt {feelsLike}°  ·  {low}° – {high}°",
   "@weatherFeelsLikeHighLow": {
     "placeholders": {
