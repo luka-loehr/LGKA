@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../providers/color_provider.dart';
-import '../../../../providers/preferences_provider.dart';
 import '../../../../navigation/app_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../services/haptic_service.dart';
@@ -99,29 +98,20 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
     await ref.read(colorProvider.notifier).setColor(colorName);
   }
 
-  Future<void> _navigateToAuth() async {
+  Future<void> _navigateToAppearance() async {
     if (_isNavigating) return;
 
     setState(() {
       _isNavigating = true;
     });
 
-    // Haptic feedback
     HapticService.medium();
-
-    // Button press animation
     await _buttonController.forward();
-
-    // Small delay for the animation to feel natural
     await Future.delayed(const Duration(milliseconds: 50));
-
-    // Release button animation
     _buttonController.reverse();
 
-    // Navigate to auth screen
-    // Note: Onboarding will be marked as completed only after successful authentication
     if (mounted) {
-      context.go(AppRouter.auth);
+      context.go(AppRouter.appearance);
     }
   }
 
@@ -175,11 +165,6 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
                         ).toList(),
                       ),
 
-                      const SizedBox(height: 32),
-
-                      // Theme mode selector
-                      _buildThemeSelector(context),
-
                       const Spacer(),
 
                       // Continue Button
@@ -204,7 +189,7 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
                               ],
                             ),
                             child: ElevatedButton(
-                              onPressed: _isNavigating ? null : _navigateToAuth,
+                              onPressed: _isNavigating ? null : _navigateToAppearance,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
                                 foregroundColor: Colors.white,
@@ -224,7 +209,7 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
                                     ),
                                   )
                                 : Text(
-                                    AppLocalizations.of(context)!.letsGo,
+                                    AppLocalizations.of(context)!.continueLabel,
                                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
@@ -242,92 +227,6 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
           },
         ),
       ),
-    );
-  }
-
-  Widget _buildThemeSelector(BuildContext context) {
-    final currentMode = ref.watch(preferencesManagerProvider).themeMode;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final modes = [
-      (mode: 'dark', icon: Icons.dark_mode_rounded, label: 'Dunkel'),
-      (mode: 'system', icon: Icons.brightness_auto_rounded, label: 'Auto'),
-      (mode: 'light', icon: Icons.light_mode_rounded, label: 'Hell'),
-    ];
-
-    return Column(
-      children: [
-        Text(
-          AppLocalizations.of(context)!.appearanceTitle,
-          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.08)
-                : Colors.black.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: const EdgeInsets.all(4),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: modes.map((m) {
-              final isSelected = currentMode == m.mode;
-              return GestureDetector(
-                onTap: () {
-                  HapticService.light();
-                  ref.read(preferencesManagerProvider.notifier).setThemeMode(m.mode);
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.white)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-                              blurRadius: 4,
-                              offset: const Offset(0, 1),
-                            )
-                          ]
-                        : null,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        m.icon,
-                        size: 16,
-                        color: isSelected
-                            ? AppColors.getAccentColor(_selectedColor)
-                            : context.appSecondaryText,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        m.label,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: isSelected
-                                  ? AppColors.getAccentColor(_selectedColor)
-                                  : context.appSecondaryText,
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-      ],
     );
   }
 

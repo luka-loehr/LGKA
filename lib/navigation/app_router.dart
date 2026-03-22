@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../features/onboarding/presentation/welcome_screen.dart';
 import '../features/onboarding/presentation/what_you_can_do_screen.dart';
 import '../features/onboarding/presentation/accent_color_screen.dart';
+import '../features/onboarding/presentation/appearance_screen.dart';
 import '../features/onboarding/presentation/auth_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/pdf_viewer/presentation/pdf_viewer/pdf_viewer.dart';
@@ -23,6 +24,7 @@ class AppRouter {
   static const String welcome = '/welcome';
   static const String whatYouCanDo = '/what-you-can-do';
   static const String accentColor = '/accent-color';
+  static const String appearance = '/appearance';
   static const String auth = '/auth';
   static const String home = '/';
   static const String pdfViewer = '/pdf-viewer';
@@ -50,6 +52,10 @@ class AppRouter {
         GoRoute(
           path: accentColor,
           builder: (context, state) => const AccentColorScreen(),
+        ),
+        GoRoute(
+          path: appearance,
+          builder: (context, state) => const AppearanceScreen(),
         ),
         GoRoute(
           path: auth,
