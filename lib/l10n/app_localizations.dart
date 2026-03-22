@@ -1046,7 +1046,7 @@ abstract class AppLocalizations {
   /// No description provided for @termine.
   ///
   /// In en, this message translates to:
-  /// **'Events'**
+  /// **'Upcoming Events'**
   String get termine;
 
   /// No description provided for @noEventsAvailable.
@@ -1088,7 +1088,7 @@ abstract class AppLocalizations {
   /// No description provided for @weatherAttribution.
   ///
   /// In en, this message translates to:
-  /// **'Data: Open-Meteo · open-meteo.com'**
+  /// **'Weather data by Open-Meteo.com'**
   String get weatherAttribution;
 
   /// No description provided for @weatherFeelsLikeHighLow.

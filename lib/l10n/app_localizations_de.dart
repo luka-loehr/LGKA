@@ -499,7 +499,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get termine => 'Termine';
+  String get termine => 'Bevorstehende Termine';
 
   @override
   String get noEventsAvailable => 'Keine Termine verfügbar';
@@ -520,7 +520,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get threeDayForecastLabel => '3 TAGE';
 
   @override
-  String get weatherAttribution => 'Daten: Open-Meteo · open-meteo.com';
+  String get weatherAttribution => 'Wetterdaten von Open-Meteo.com';
 
   @override
   String weatherFeelsLikeHighLow(int feelsLike, int high, int low) {

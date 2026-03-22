@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart' hide WeatherDataState;
 import 'package:weather_icons/weather_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/haptic_service.dart';
 import '../../../l10n/app_localizations.dart';
@@ -113,12 +114,19 @@ class WeatherPage extends ConsumerWidget {
               ],
               const SizedBox(height: 32),
               Center(
-                child: Text(
-                  AppLocalizations.of(context)!.weatherAttribution,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color:
-                            context.appSecondaryText.withValues(alpha: 0.4),
-                      ),
+                child: GestureDetector(
+                  onTap: () => launchUrl(
+                    Uri.parse('https://open-meteo.com/'),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.weatherAttribution,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: context.appSecondaryText.withValues(alpha: 0.5),
+                          decoration: TextDecoration.underline,
+                          decorationColor: context.appSecondaryText.withValues(alpha: 0.3),
+                        ),
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
