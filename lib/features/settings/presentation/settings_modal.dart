@@ -39,7 +39,7 @@ class SettingsModal extends ConsumerWidget {
               ),
 
               // ── Appearance ─────────────────────────────────────────────
-              _sectionLabel(context, 'DARSTELLUNG'),
+              _sectionLabel(context, AppLocalizations.of(context)!.settingsSectionAppearance),
               const SizedBox(height: 8),
               _card(context, [
                 _appearanceRow(context, ref),
@@ -50,7 +50,7 @@ class SettingsModal extends ConsumerWidget {
               const SizedBox(height: 20),
 
               // ── Links ───────────────────────────────────────────────────
-              _sectionLabel(context, 'MEHR'),
+              _sectionLabel(context, AppLocalizations.of(context)!.settingsSectionMore),
               const SizedBox(height: 8),
               _card(context, [
                 _linkTile(
@@ -156,7 +156,7 @@ class SettingsModal extends ConsumerWidget {
       child: Row(
         children: [
           Text(
-            'Erscheinungsbild',
+            AppLocalizations.of(context)!.appearanceTitle,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: context.appPrimaryText,
                   fontWeight: FontWeight.w500,

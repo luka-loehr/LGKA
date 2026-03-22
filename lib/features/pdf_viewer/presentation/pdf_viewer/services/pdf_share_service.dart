@@ -41,8 +41,8 @@ class PdfShareService {
           subject = l10n.subjectSubstitution;
         }
       } else {
-        fileName = 'LGKA_Document.pdf';
-        subject = 'LGKA+ Document';
+        fileName = l10n.filenameDocumentDefault;
+        subject = 'LGKA+ ${l10n.documentTitle}';
       }
 
       // Create a temporary file with the nice name for sharing
