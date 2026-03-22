@@ -409,10 +409,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: shadowColor.withValues(alpha: 0.45),
-            blurRadius: 28,
+            color: shadowColor.withValues(alpha: 0.5),
+            blurRadius: 24,
             spreadRadius: 0,
-            offset: const Offset(0, 10),
+            offset: const Offset(0, 64),
           ),
         ],
       ),
