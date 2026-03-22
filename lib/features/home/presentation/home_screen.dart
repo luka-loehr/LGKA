@@ -371,7 +371,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Expanded(
                       child: Text(
                         _capitalize(WmoUtils.localizedDescription(current.weatherCode, AppLocalizations.of(context)!)),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               color: Colors.white.withValues(alpha: 0.9),
                               fontWeight: FontWeight.w600,
                               shadows: textShadows,
