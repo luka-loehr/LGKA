@@ -259,9 +259,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  Future<void> _onRefresh() async {
+    HapticService.medium();
+    await Future.wait([
+      ref.read(substitutionProvider.notifier).refresh(),
+      ref.read(scheduleProvider.notifier).refreshSchedules().then((_) =>
+          ref.read(scheduleProvider.notifier).checkAvailability()),
+      ref.read(eventsProvider.notifier).refresh(),
+    ]);
+  }
+
   Widget _buildBody(SubstitutionProviderState subState, bool isSubLoading) {
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      color: Theme.of(context).colorScheme.primary,
+      child: CustomScrollView(
+      physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics()),
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -287,6 +301,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ],
+    ),
     );
   }
 
