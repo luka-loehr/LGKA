@@ -9,6 +9,7 @@ import '../../../../navigation/app_router.dart';
 import '../../../../services/haptic_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../config/app_credentials.dart';
+import '../../../../theme/app_theme.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   final VoidCallback? onLoginSuccess;
@@ -315,7 +316,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     final double maxFormWidth = 400; // Max width for larger screens
     
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       // This silences the overflow messages without changing behavior
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
@@ -347,20 +348,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       Text(
                         AppLocalizations.of(context)!.authTitle,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: context.appPrimaryText,
                           fontSize: 28 / textScaleFactor, // Adjust for text scale factor
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      
+
                       const SizedBox(height: 12),
-                      
+
                       // Subtitle
                       Text(
                         AppLocalizations.of(context)!.authSubtitle,
                         style: TextStyle(
-                          color: const Color(0xB3FFFFFF), // 70% white
+                          color: context.appSecondaryText,
                           fontSize: 14 / textScaleFactor, // Adjust for text scale factor
                         ),
                         textAlign: TextAlign.center,
@@ -376,7 +377,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         child: Container(
                           width: formWidth,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1E1E1E),
+                            color: context.appSurfaceColor,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Column(
@@ -390,19 +391,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 child: TextField(
                                   controller: _usernameController,
                                   focusNode: _usernameFocusNode,
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: context.appPrimaryText,
                                     fontSize: 16,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: AppLocalizations.of(context)!.username,
-                                    hintStyle: const TextStyle(
-                                      color: Color(0x80FFFFFF),
+                                    hintStyle: TextStyle(
+                                      color: context.appSecondaryText,
                                       fontSize: 16,
                                     ),
-                                    prefixIcon: const Icon(
+                                    prefixIcon: Icon(
                                       Icons.person_outline,
-                                      color: Color(0xFF8E8E93),
+                                      color: context.appSecondaryText,
                                       size: 22,
                                     ),
                                     border: InputBorder.none,
@@ -413,7 +414,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                       vertical: 18,
                                     ),
                                     filled: true,
-                                    fillColor: const Color(0xFF1E1E1E),
+                                    fillColor: context.appSurfaceColor,
                                   ),
                                   textInputAction: TextInputAction.next,
                                   onSubmitted: (_) => _passwordFocusNode.requestFocus(),
@@ -425,7 +426,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               Container(
                                 height: 1,
                                 margin: const EdgeInsets.symmetric(horizontal: 16),
-                                color: Colors.white.withValues(alpha: 0.1),
+                                color: context.appDividerColor,
                               ),
                               
                               // Password Field with rounded corners
@@ -438,19 +439,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                   controller: _passwordController,
                                   focusNode: _passwordFocusNode,
                                   obscureText: true,
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: context.appPrimaryText,
                                     fontSize: 16,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: AppLocalizations.of(context)!.password,
-                                    hintStyle: const TextStyle(
-                                      color: Color(0x80FFFFFF),
+                                    hintStyle: TextStyle(
+                                      color: context.appSecondaryText,
                                       fontSize: 16,
                                     ),
-                                    prefixIcon: const Icon(
+                                    prefixIcon: Icon(
                                       Icons.lock_outline,
-                                      color: Color(0xFF8E8E93),
+                                      color: context.appSecondaryText,
                                       size: 22,
                                     ),
                                     border: InputBorder.none,
@@ -461,7 +462,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                       vertical: 18,
                                     ),
                                     filled: true,
-                                    fillColor: const Color(0xFF1E1E1E),
+                                    fillColor: context.appSurfaceColor,
                                   ),
                                   textInputAction: TextInputAction.done,
                                   onSubmitted: (_) {
