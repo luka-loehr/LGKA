@@ -842,7 +842,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     }
 
     final halbjahr = notifier.getHalbjahrForGrade(targetGradeLevel) ?? '';
-    final classTitle = _formatClassNameForDayName(className);
+    final classTitle = _formatClassNameForDayName(className, AppLocalizations.of(context)!);
     final newDayName = halbjahr.isNotEmpty ? '$classTitle – $halbjahr' : classTitle;
 
     final prefsNotifier = container.read(preferencesManagerProvider.notifier);
@@ -891,18 +891,18 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   /// Updates the appBar title to reflect [className] while preserving the
   /// semester suffix (the part after ' – ').
   void _updateClassTitle(String className) {
-    final classTitle = _formatClassNameForDayName(className);
+    final classTitle = _formatClassNameForDayName(className, AppLocalizations.of(context)!);
     final current = _effectiveDayName ?? '';
     final sepIdx = current.indexOf(' – ');
     final suffix = sepIdx >= 0 ? current.substring(sepIdx) : '';
     setState(() => _overrideDayName = '$classTitle$suffix');
   }
 
-  static String _formatClassNameForDayName(String className) {
-    if (className == 'j11') return 'Jahrgang 11';
-    if (className == 'j12') return 'Jahrgang 12';
+  static String _formatClassNameForDayName(String className, AppLocalizations l) {
+    if (className == 'j11') return l.jahrgang11;
+    if (className == 'j12') return l.jahrgang12;
     if (className.isEmpty) return className;
-    return 'Klasse ${className[0].toUpperCase()}${className.substring(1)}';
+    return l.klasseLabel('${className[0].toUpperCase()}${className.substring(1)}');
   }
 
   // ============================================================================

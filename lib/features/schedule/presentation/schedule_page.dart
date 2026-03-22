@@ -380,9 +380,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   }
 
   String _formatClassName(String className) {
-    if (className == 'j11') return 'Jahrgang 11';
-    if (className == 'j12') return 'Jahrgang 12';
-    return 'Klasse ${className[0].toUpperCase()}${className.substring(1)}';
+    final l = AppLocalizations.of(context)!;
+    if (className == 'j11') return l.jahrgang11;
+    if (className == 'j12') return l.jahrgang12;
+    return l.klasseLabel('${className[0].toUpperCase()}${className.substring(1)}');
   }
 
   String _localizeGradeLevel(BuildContext context, String gradeLevel) {
