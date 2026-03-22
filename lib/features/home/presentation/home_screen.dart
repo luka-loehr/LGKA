@@ -204,7 +204,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       elevation: 0,
       scrolledUnderElevation: 0,
       title: Text(
-        'LGKA+',
+        AppLocalizations.of(context)!.appTitle,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: context.appPrimaryText,
               fontWeight: FontWeight.w800,
@@ -370,7 +370,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        _capitalize(current.description),
+                        _capitalize(WmoUtils.localizedDescription(current.weatherCode, AppLocalizations.of(context)!)),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Colors.white.withValues(alpha: 0.9),
                               shadows: textShadows,
@@ -383,8 +383,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const SizedBox(height: 2),
                 Text(
                   today != null
-                      ? 'Gefühlt ${current.feelsLike.round()}°  ·  H ${today.tempMax.round()}°  T ${today.tempMin.round()}°'
-                      : 'Gefühlt ${current.feelsLike.round()}°  ·  ${current.humidity}% Luftfeuchte',
+                      ? AppLocalizations.of(context)!.weatherFeelsLikeHighLow(current.feelsLike.round(), today.tempMax.round(), today.tempMin.round())
+                      : AppLocalizations.of(context)!.weatherFeelsLikeHumidity(current.feelsLike.round(), current.humidity),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Colors.white.withValues(alpha: 0.75),
                         shadows: textShadows,
@@ -458,7 +458,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const SizedBox(width: 14),
         Expanded(
           child: Text(
-            'Wetterdaten nicht verfügbar',
+            AppLocalizations.of(context)!.weatherDataNotAvailable,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: context.appSecondaryText,
                 ),
@@ -731,24 +731,56 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildInlineScheduleCard(
       List<ScheduleItem> group, String? selectedClass, AppLocalizations l10n) {
     final primary = Theme.of(context).colorScheme.primary;
+
+    if (selectedClass == null) {
+      return TappableCard(
+        onTap: () {
+          HapticService.light();
+          _showSetClassDialog(group);
+        },
+        child: Row(children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(Icons.school_outlined, color: primary, size: 20),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.scheduleNoClassTitle,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: context.appPrimaryText,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  l10n.scheduleNoClassSub,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: context.appSecondaryText,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          Icon(Icons.arrow_forward_ios,
+              size: 14,
+              color: context.appSecondaryText.withValues(alpha: 0.5)),
+        ]),
+      );
+    }
+
     final halbjahr = group.isNotEmpty ? group.first.halbjahr : '';
     final half = _localizeHalf(l10n, halbjahr);
-
-    // Title: user's class if set, else combined grade label
-    String grade;
-    if (selectedClass != null) {
-      grade = _formatClassName(selectedClass);
-    } else {
-      final has5to10 = group.any((s) => s.gradeLevel == 'Klassen 5-10');
-      final hasJ11J12 = group.any((s) => s.gradeLevel == 'J11/J12');
-      if (has5to10 && hasJ11J12) {
-        grade = '${l10n.grades5to10} & ${l10n.j11j12}';
-      } else if (has5to10) {
-        grade = l10n.grades5to10;
-      } else {
-        grade = l10n.j11j12;
-      }
-    }
+    final grade = _formatClassName(selectedClass);
 
     return TappableCard(
       onTap: () {
@@ -796,10 +828,66 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  void _showSetClassDialog(List<ScheduleItem> group) {
+    final l10n = AppLocalizations.of(context)!;
+    final controller = TextEditingController();
+    showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text(l10n.setClassTitle),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLength: 3,
+            textCapitalization: TextCapitalization.characters,
+            decoration: InputDecoration(
+              hintText: l10n.searchHint,
+              prefixIcon: Icon(Icons.school_outlined,
+                  color: context.appSecondaryText),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              counterText: '',
+            ),
+            onSubmitted: (_) {
+              final cls = controller.text.trim().toLowerCase();
+              if (cls.isNotEmpty) {
+                Navigator.of(ctx).pop();
+                ref
+                    .read(preferencesManagerProvider.notifier)
+                    .setSelectedScheduleClass(cls);
+              }
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+            ),
+            TextButton(
+              onPressed: () {
+                final cls = controller.text.trim().toLowerCase();
+                if (cls.isNotEmpty) {
+                  Navigator.of(ctx).pop();
+                  ref
+                      .read(preferencesManagerProvider.notifier)
+                      .setSelectedScheduleClass(cls);
+                }
+              },
+              child: Text(l10n.setClassButton),
+            ),
+          ],
+        );
+      },
+    ).then((_) => controller.dispose());
+  }
+
   String _formatClassName(String className) {
-    if (className == 'j11') return 'Jahrgang 11';
-    if (className == 'j12') return 'Jahrgang 12';
-    return 'Klasse ${className[0].toUpperCase()}${className.substring(1)}';
+    final l = AppLocalizations.of(context)!;
+    if (className == 'j11') return l.jahrgang11;
+    if (className == 'j12') return l.jahrgang12;
+    return l.klasseLabel('${className[0].toUpperCase()}${className.substring(1)}');
   }
 
   Widget _buildScheduleError(ScheduleState state) {
