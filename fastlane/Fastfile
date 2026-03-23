@@ -7,13 +7,13 @@
 #
 # Prerequisites – iOS:
 #   Install simulators in Xcode → Settings → Platforms:
-#     • iPhone 16 Pro Max
-#     • iPad Pro (12.9-inch) (6th generation)
+#     • iPhone 17 Pro Max
+#     • iPad Pro 13-inch (M5)
 #
 # Prerequisites – Android:
 #   Create AVDs in Android Studio → Device Manager:
-#     • Name: "Pixel_8_Pro"   (Pixel 8 Pro, API 34, portrait)
-#     • Name: "Pixel_Tablet"  (Pixel Tablet, API 34, portrait)
+#     • Name: "Pixel_8_Pro"   (Pixel 8 Pro, API 35, portrait)
+#     • Name: "Pixel_Tablet"  (Pixel Tablet, API 35, portrait)
 
 require 'json'
 require 'fileutils'
@@ -22,8 +22,8 @@ SCREENSHOTS_ROOT = File.expand_path("../app_store_assets/screenshots", __dir__)
 LOCALES          = %w[de en].freeze
 
 IOS_DEVICES = {
-  "phone"  => "iPhone 16 Pro Max",
-  "tablet" => "iPad Pro (12.9-inch) (6th generation)",
+  "phone"  => "iPhone 17 Pro Max",
+  "tablet" => "iPad Pro 13-inch (M5)",
 }.freeze
 
 ANDROID_AVDS = {
@@ -128,7 +128,7 @@ def _commit_and_push_screenshots(platform_label)
   end
 end
 
-# Run flutter drive twice: once for the welcome screen, once for home/weather/news.
+# Run flutter drive once per screenshot so xcrun captures the correct screen.
 def _flutter_drive(device:, output_dir:)
   device_flag = device ? "-d '#{device}'" : ""
   base = "cd .. && SCREENSHOT_OUTPUT_DIR='#{output_dir}' " \
@@ -138,7 +138,9 @@ def _flutter_drive(device:, output_dir:)
          "#{device_flag}"
 
   sh("#{base} --dart-define=SCREENSHOT_MODE=welcome")
-  sh("#{base} --dart-define=SCREENSHOT_MODE=main")
+  sh("#{base} --dart-define=SCREENSHOT_MODE=home")
+  sh("#{base} --dart-define=SCREENSHOT_MODE=weather")
+  sh("#{base} --dart-define=SCREENSHOT_MODE=news")
 end
 
 # Boot the named iOS simulator with the given locale, then shut it down so
@@ -155,12 +157,11 @@ def _set_ios_locale(device_name, locale)
             &.fetch("udid", nil)
   UI.user_error!("Simulator not found: #{device_name}") if udid.nil?
 
-  # Shut down if running, boot, set locale, shut down again
+  # Shut down if running, boot, set locale — leave booted so flutter drive can find it
   sh("xcrun simctl shutdown #{udid} 2>/dev/null || true")
   sh("xcrun simctl boot #{udid}")
   sh("xcrun simctl spawn #{udid} defaults write .GlobalPreferences.plist AppleLanguages -array '#{lang}'")
   sh("xcrun simctl spawn #{udid} defaults write .GlobalPreferences.plist AppleLocale   -string '#{lang}'")
-  sh("xcrun simctl shutdown #{udid}")
 end
 
 # Start an Android emulator with the given locale and wait until fully booted.
