@@ -1,0 +1,184 @@
+# LGKA+ Screenshot Automation
+#
+# Usage:
+#   bundle exec fastlane screenshots_ios
+#   bundle exec fastlane screenshots_android
+#   bundle exec fastlane screenshots_all
+#
+# Prerequisites – iOS:
+#   Install simulators in Xcode → Settings → Platforms:
+#     • iPhone 16 Pro Max
+#     • iPad Pro (12.9-inch) (6th generation)
+#
+# Prerequisites – Android:
+#   Create AVDs in Android Studio → Device Manager:
+#     • Name: "Pixel_8_Pro"   (Pixel 8 Pro, API 34, portrait)
+#     • Name: "Pixel_Tablet"  (Pixel Tablet, API 34, portrait)
+
+require 'json'
+require 'fileutils'
+
+SCREENSHOTS_ROOT = File.expand_path("../app_store_assets/screenshots", __dir__)
+LOCALES          = %w[de en].freeze
+
+IOS_DEVICES = {
+  "phone"  => "iPhone 16 Pro Max",
+  "tablet" => "iPad Pro (12.9-inch) (6th generation)",
+}.freeze
+
+ANDROID_AVDS = {
+  "phone"  => "Pixel_8_Pro",
+  "tablet" => "Pixel_Tablet",
+}.freeze
+
+# ─── iOS ─────────────────────────────────────────────────────────────────────
+
+desc "Take iOS screenshots for all locales and form factors"
+lane :screenshots_ios do
+  LOCALES.each do |locale|
+    IOS_DEVICES.each do |form_factor, device_name|
+      output_dir = "#{SCREENSHOTS_ROOT}/#{locale}/ios/#{form_factor}"
+      _clear_screenshots(output_dir)
+
+      UI.message("iOS #{form_factor} | #{locale} | #{device_name}")
+
+      _set_ios_locale(device_name, locale)
+      _flutter_drive(device: device_name, output_dir: output_dir)
+    end
+  end
+
+  _commit_and_push_screenshots("ios")
+end
+
+# ─── Android ─────────────────────────────────────────────────────────────────
+
+desc "Take Android screenshots for all locales and form factors"
+lane :screenshots_android do
+  LOCALES.each do |locale|
+    ANDROID_AVDS.each do |form_factor, avd_name|
+      output_dir = "#{SCREENSHOTS_ROOT}/#{locale}/android/#{form_factor}"
+      _clear_screenshots(output_dir)
+
+      UI.message("Android #{form_factor} | #{locale} | #{avd_name}")
+
+      _start_android_emulator(avd_name, locale)
+      _flutter_drive(device: nil, output_dir: output_dir)
+
+      sh("adb emu kill 2>/dev/null || true")
+      sleep(3)
+    end
+  end
+
+  _commit_and_push_screenshots("android")
+end
+
+desc "Take screenshots for both iOS and Android"
+lane :screenshots_all do
+  LOCALES.each do |locale|
+    IOS_DEVICES.each do |form_factor, device_name|
+      output_dir = "#{SCREENSHOTS_ROOT}/#{locale}/ios/#{form_factor}"
+      _clear_screenshots(output_dir)
+
+      UI.message("iOS #{form_factor} | #{locale} | #{device_name}")
+
+      _set_ios_locale(device_name, locale)
+      _flutter_drive(device: device_name, output_dir: output_dir)
+    end
+
+    ANDROID_AVDS.each do |form_factor, avd_name|
+      output_dir = "#{SCREENSHOTS_ROOT}/#{locale}/android/#{form_factor}"
+      _clear_screenshots(output_dir)
+
+      UI.message("Android #{form_factor} | #{locale} | #{avd_name}")
+
+      _start_android_emulator(avd_name, locale)
+      _flutter_drive(device: nil, output_dir: output_dir)
+
+      sh("adb emu kill 2>/dev/null || true")
+      sleep(3)
+    end
+  end
+
+  _commit_and_push_screenshots("ios + android")
+end
+
+# ─── Helpers ─────────────────────────────────────────────────────────────────
+
+# Delete all PNGs in the output directory so old screenshots never linger.
+def _clear_screenshots(output_dir)
+  FileUtils.mkdir_p(output_dir)
+  Dir.glob("#{output_dir}/*.png").each { |f| FileUtils.rm(f) }
+end
+
+# Stage all screenshot changes and push a commit to the current branch.
+def _commit_and_push_screenshots(platform_label)
+  repo_root = File.expand_path("..", __dir__)
+  Dir.chdir(repo_root) do
+    sh("git add app_store_assets/screenshots/")
+    # Only commit if there is actually something staged
+    diff = sh("git diff --cached --name-only", log: false).strip
+    if diff.empty?
+      UI.message("No screenshot changes to commit.")
+    else
+      branch = sh("git rev-parse --abbrev-ref HEAD", log: false).strip
+      sh("git commit -m 'chore: update #{platform_label} screenshots'")
+      sh("git push origin #{branch}")
+      UI.success("Screenshots committed and pushed to #{branch}")
+    end
+  end
+end
+
+# Run flutter drive twice: once for the welcome screen, once for home/weather/news.
+def _flutter_drive(device:, output_dir:)
+  device_flag = device ? "-d '#{device}'" : ""
+  base = "cd .. && SCREENSHOT_OUTPUT_DIR='#{output_dir}' " \
+         "flutter drive " \
+         "--driver=test_driver/integration_test.dart " \
+         "--target=integration_test/screenshot_test.dart " \
+         "#{device_flag}"
+
+  sh("#{base} --dart-define=SCREENSHOT_MODE=welcome")
+  sh("#{base} --dart-define=SCREENSHOT_MODE=main")
+end
+
+# Boot the named iOS simulator with the given locale, then shut it down so
+# flutter drive can boot it fresh (the locale is persisted in the sim's prefs).
+def _set_ios_locale(device_name, locale)
+  lang = locale == "de" ? "de-DE" : "en-US"
+
+  # Find the simulator UDID
+  raw   = sh("xcrun simctl list devices available -j", log: false)
+  data  = JSON.parse(raw)
+  udid  = data["devices"]
+            .flat_map { |_, devs| devs }
+            .find { |d| d["name"] == device_name }
+            &.fetch("udid", nil)
+  UI.user_error!("Simulator not found: #{device_name}") if udid.nil?
+
+  # Shut down if running, boot, set locale, shut down again
+  sh("xcrun simctl shutdown #{udid} 2>/dev/null || true")
+  sh("xcrun simctl boot #{udid}")
+  sh("xcrun simctl spawn #{udid} defaults write .GlobalPreferences.plist AppleLanguages -array '#{lang}'")
+  sh("xcrun simctl spawn #{udid} defaults write .GlobalPreferences.plist AppleLocale   -string '#{lang}'")
+  sh("xcrun simctl shutdown #{udid}")
+end
+
+# Start an Android emulator with the given locale and wait until fully booted.
+def _start_android_emulator(avd_name, locale)
+  lang, country = locale == "de" ? %w[de DE] : %w[en US]
+  emulator_bin  = "#{ENV.fetch('ANDROID_HOME', '$ANDROID_HOME')}/emulator/emulator"
+
+  sh(
+    "#{emulator_bin} -avd #{avd_name} " \
+    "-no-audio -no-snapshot -no-window " \
+    "-prop persist.sys.language=#{lang} " \
+    "-prop persist.sys.country=#{country} &"
+  )
+
+  sh("adb wait-for-device")
+  # Poll until fully booted
+  sh(
+    "until [ \"$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\\r')\" = \"1\" ]; " \
+    "do sleep 2; done"
+  )
+end

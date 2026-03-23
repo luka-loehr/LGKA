@@ -427,6 +427,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
+            key: const Key('weather_card'),
             onTap: () {
               HapticService.medium();
               context.push(AppRouter.weather);
