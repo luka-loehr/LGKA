@@ -20,7 +20,7 @@ require 'fileutils'
 
 SCREENSHOTS_ROOT = File.expand_path("../app_store_assets/screenshots", __dir__)
 LOCALES          = %w[de en].freeze
-THEME_MODE       = "light" # Change to "dark" for dark mode screenshots
+THEME_MODE       = "dark" # Change to "light" for light mode screenshots
 
 IOS_DEVICES = {
   "phone"  => "iPhone 17 Pro Max",
@@ -43,8 +43,8 @@ lane :screenshots_ios do
 
       UI.message("iOS #{form_factor} | #{locale} | #{device_name}")
 
-      _set_ios_locale(device_name, locale)
-      _flutter_drive(device: device_name, output_dir: output_dir)
+      udid = _set_ios_locale(device_name, locale)
+      _flutter_drive(device: device_name, output_dir: output_dir, udid: udid)
     end
   end
 
@@ -82,8 +82,8 @@ lane :screenshots_all do
 
       UI.message("iOS #{form_factor} | #{locale} | #{device_name}")
 
-      _set_ios_locale(device_name, locale)
-      _flutter_drive(device: device_name, output_dir: output_dir)
+      udid = _set_ios_locale(device_name, locale)
+      _flutter_drive(device: device_name, output_dir: output_dir, udid: udid)
     end
 
     ANDROID_AVDS.each do |form_factor, avd_name|
@@ -130,9 +130,10 @@ def _commit_and_push_screenshots(platform_label)
 end
 
 # Run flutter drive once per screenshot so xcrun captures the correct screen.
-def _flutter_drive(device:, output_dir:)
+def _flutter_drive(device:, output_dir:, udid: nil)
   device_flag = device ? "-d '#{device}'" : ""
-  base = "cd .. && SCREENSHOT_OUTPUT_DIR='#{output_dir}' " \
+  udid_env    = udid ? "SCREENSHOT_DEVICE_UDID='#{udid}' " : ""
+  base = "cd .. && SCREENSHOT_OUTPUT_DIR='#{output_dir}' #{udid_env}" \
          "flutter drive " \
          "--driver=test_driver/integration_test.dart " \
          "--target=integration_test/screenshot_test.dart " \
@@ -164,6 +165,8 @@ def _set_ios_locale(device_name, locale)
   sh("xcrun simctl boot #{udid}")
   sh("xcrun simctl spawn #{udid} defaults write .GlobalPreferences.plist AppleLanguages -array '#{lang}'")
   sh("xcrun simctl spawn #{udid} defaults write .GlobalPreferences.plist AppleLocale   -string '#{lang}'")
+
+  udid
 end
 
 # Start an Android emulator with the given locale and wait until fully booted.
