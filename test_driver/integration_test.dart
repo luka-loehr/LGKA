@@ -16,8 +16,11 @@ Future<void> main() async {
       await file.create(recursive: true);
       // Use xcrun to capture the full simulator screen (includes status bar + Dynamic Island).
       // onScreenshot fires after the test ends, so the simulator is still on the correct screen.
+      // Use SCREENSHOT_DEVICE_UDID when set so we target the correct device when multiple
+      // simulators are booted simultaneously (e.g. phone + tablet).
+      final udid = Platform.environment['SCREENSHOT_DEVICE_UDID'] ?? 'booted';
       final result = await Process.run('xcrun', [
-        'simctl', 'io', 'booted', 'screenshot', file.path,
+        'simctl', 'io', udid, 'screenshot', file.path,
       ]);
       if (result.exitCode != 0) {
         // Fallback to Flutter bytes if simctl fails.
