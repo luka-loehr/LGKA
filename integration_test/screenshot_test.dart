@@ -73,8 +73,9 @@ void _mainScreenshots(IntegrationTestWidgetsFlutterBinding binding) {
     // ── 02 Home ──
     await binding.takeScreenshot('02_home');
 
-    // ── 03 Weather ──
-    // The weather card is the first card on the home screen.
+    // ── 03 Weather screen ──
+    // Tap the home screen's weather card to open the full weather screen,
+    // then screenshot the weather screen once it has settled.
     await tester.tap(find.byKey(const Key('weather_card')));
     await _settle(tester, seconds: 5);
     await binding.takeScreenshot('03_weather');
@@ -83,8 +84,9 @@ void _mainScreenshots(IntegrationTestWidgetsFlutterBinding binding) {
     await tester.pageBack();
     await _settle(tester);
 
-    // ── 04 News ──
-    // The news icon is the first action in the home AppBar.
+    // ── 04 News screen ──
+    // Tap the AppBar news icon to open the full news screen,
+    // then screenshot the news screen once it has settled.
     await tester.tap(find.byIcon(Icons.newspaper_outlined));
     await _settle(tester, seconds: 5);
     await binding.takeScreenshot('04_news');
