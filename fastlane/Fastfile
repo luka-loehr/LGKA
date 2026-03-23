@@ -38,7 +38,7 @@ lane :screenshots_ios do
   LOCALES.each do |locale|
     IOS_DEVICES.each do |form_factor, device_name|
       output_dir = "#{SCREENSHOTS_ROOT}/#{locale}/ios/#{form_factor}"
-      FileUtils.mkdir_p(output_dir)
+      _clear_screenshots(output_dir)
 
       UI.message("📸  iOS #{form_factor} | #{locale} | #{device_name}")
 
@@ -46,6 +46,8 @@ lane :screenshots_ios do
       _flutter_drive(device: device_name, output_dir: output_dir)
     end
   end
+
+  _commit_and_push_screenshots("ios")
 end
 
 # ─── Android ─────────────────────────────────────────────────────────────────
@@ -55,7 +57,7 @@ lane :screenshots_android do
   LOCALES.each do |locale|
     ANDROID_AVDS.each do |form_factor, avd_name|
       output_dir = "#{SCREENSHOTS_ROOT}/#{locale}/android/#{form_factor}"
-      FileUtils.mkdir_p(output_dir)
+      _clear_screenshots(output_dir)
 
       UI.message("📸  Android #{form_factor} | #{locale} | #{avd_name}")
 
@@ -66,15 +68,65 @@ lane :screenshots_android do
       sleep(3)
     end
   end
+
+  _commit_and_push_screenshots("android")
 end
 
 desc "Take screenshots for both iOS and Android"
 lane :screenshots_all do
-  screenshots_ios
-  screenshots_android
+  LOCALES.each do |locale|
+    IOS_DEVICES.each do |form_factor, device_name|
+      output_dir = "#{SCREENSHOTS_ROOT}/#{locale}/ios/#{form_factor}"
+      _clear_screenshots(output_dir)
+
+      UI.message("📸  iOS #{form_factor} | #{locale} | #{device_name}")
+
+      _set_ios_locale(device_name, locale)
+      _flutter_drive(device: device_name, output_dir: output_dir)
+    end
+
+    ANDROID_AVDS.each do |form_factor, avd_name|
+      output_dir = "#{SCREENSHOTS_ROOT}/#{locale}/android/#{form_factor}"
+      _clear_screenshots(output_dir)
+
+      UI.message("📸  Android #{form_factor} | #{locale} | #{avd_name}")
+
+      _start_android_emulator(avd_name, locale)
+      _flutter_drive(device: nil, output_dir: output_dir)
+
+      sh("adb emu kill 2>/dev/null || true")
+      sleep(3)
+    end
+  end
+
+  _commit_and_push_screenshots("ios + android")
 end
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
+
+# Delete all PNGs in the output directory so old screenshots never linger.
+def _clear_screenshots(output_dir)
+  FileUtils.mkdir_p(output_dir)
+  Dir.glob("#{output_dir}/*.png").each { |f| FileUtils.rm(f) }
+end
+
+# Stage all screenshot changes and push a commit to the current branch.
+def _commit_and_push_screenshots(platform_label)
+  repo_root = File.expand_path("..", __dir__)
+  Dir.chdir(repo_root) do
+    sh("git add app_store_assets/screenshots/")
+    # Only commit if there is actually something staged
+    diff = sh("git diff --cached --name-only", log: false).strip
+    if diff.empty?
+      UI.message("No screenshot changes to commit.")
+    else
+      branch = sh("git rev-parse --abbrev-ref HEAD", log: false).strip
+      sh("git commit -m 'chore: update #{platform_label} screenshots'")
+      sh("git push origin #{branch}")
+      UI.success("Screenshots committed and pushed to #{branch}.")
+    end
+  end
+end
 
 # Run flutter drive twice: once for the welcome screen, once for home/weather/news.
 def _flutter_drive(device:, output_dir:)
