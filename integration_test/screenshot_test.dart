@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lgka_flutter/main.dart' as app;
 
 const _mode = String.fromEnvironment('SCREENSHOT_MODE', defaultValue: 'home');
+const _themeMode = String.fromEnvironment('THEME_MODE', defaultValue: 'light');
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +43,7 @@ Future<void> _launchHome(WidgetTester tester) async {
   await prefs.setBool('onboarding_completed', true);
   await prefs.setBool('is_authenticated', true);
   await prefs.setString('accent_color', 'blue');
-  await prefs.setString('theme_mode', 'system');
+  await prefs.setString('theme_mode', _themeMode);
   final originalOnError = FlutterError.onError;
   app.main();
   FlutterError.onError = originalOnError;

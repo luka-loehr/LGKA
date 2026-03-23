@@ -20,6 +20,7 @@ require 'fileutils'
 
 SCREENSHOTS_ROOT = File.expand_path("../app_store_assets/screenshots", __dir__)
 LOCALES          = %w[de en].freeze
+THEME_MODE       = "light" # Change to "dark" for dark mode screenshots
 
 IOS_DEVICES = {
   "phone"  => "iPhone 17 Pro Max",
@@ -135,6 +136,7 @@ def _flutter_drive(device:, output_dir:)
          "flutter drive " \
          "--driver=test_driver/integration_test.dart " \
          "--target=integration_test/screenshot_test.dart " \
+         "--dart-define=THEME_MODE=#{THEME_MODE} " \
          "#{device_flag}"
 
   sh("#{base} --dart-define=SCREENSHOT_MODE=welcome")
