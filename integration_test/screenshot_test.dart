@@ -56,6 +56,7 @@ void _screenshotWelcome(IntegrationTestWidgetsFlutterBinding binding) {
   testWidgets('01_welcome', (tester) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+    await prefs.setString('theme_mode', _themeMode);
     final originalOnError = FlutterError.onError;
     app.main();
     FlutterError.onError = originalOnError;
