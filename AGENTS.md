@@ -102,7 +102,7 @@ Screenshots are automated via `fastlane/` and `integration_test/`.
 | 03 | Weather | `/weather` |
 | 04 | News | `/news` |
 
-For each: 2 locales (`de`, `en`) × 2 form factors (`phone`, `tablet`) × 2 platforms = **16 output files per platform**.
+For each: 2 locales (`de`, `en`) × 2 form factors (`phone`, `tablet`) = **8 output files**.
 
 ### Output location
 
@@ -124,15 +124,12 @@ app_store_assets/screenshots/<locale>/<platform>/<form_factor>/
 ### Running
 
 ```bash
-bundle exec fastlane screenshots_ios       # iOS only
-bundle exec fastlane screenshots_android   # Android only
-bundle exec fastlane screenshots_all       # Both platforms, single commit
+bundle exec fastlane screenshots_ios
 ```
 
 ### Prerequisites
 
 - iOS: Install simulators in Xcode → Platforms: `iPhone 16 Pro Max`, `iPad Pro (12.9-inch) (6th generation)`
-- Android: Create AVDs in Android Studio → Device Manager named exactly `Pixel_8_Pro` and `Pixel_Tablet`
 
 ---
 

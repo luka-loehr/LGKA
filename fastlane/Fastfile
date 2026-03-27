@@ -2,18 +2,11 @@
 #
 # Usage:
 #   bundle exec fastlane screenshots_ios
-#   bundle exec fastlane screenshots_android
-#   bundle exec fastlane screenshots_all
 #
 # Prerequisites – iOS:
 #   Install simulators in Xcode → Settings → Platforms:
 #     • iPhone 17 Pro Max
 #     • iPad Pro 13-inch (M5)
-#
-# Prerequisites – Android:
-#   Create AVDs in Android Studio → Device Manager:
-#     • Name: "Pixel_8_Pro"   (Pixel 8 Pro, API 35, portrait)
-#     • Name: "Pixel_Tablet"  (Pixel Tablet, API 35, portrait)
 
 require 'json'
 require 'fileutils'
@@ -25,11 +18,6 @@ THEME_MODE       = "dark" # Change to "light" for light mode screenshots
 IOS_DEVICES = {
   "phone"  => "iPhone 17 Pro Max",
   "tablet" => "iPad Pro 13-inch (M5)",
-}.freeze
-
-ANDROID_AVDS = {
-  "phone"  => "Pixel_8_Pro",
-  "tablet" => "Pixel_Tablet",
 }.freeze
 
 # ─── iOS ─────────────────────────────────────────────────────────────────────
@@ -49,58 +37,6 @@ lane :screenshots_ios do
   end
 
   _commit_and_push_screenshots("ios")
-end
-
-# ─── Android ─────────────────────────────────────────────────────────────────
-
-desc "Take Android screenshots for all locales and form factors"
-lane :screenshots_android do
-  LOCALES.each do |locale|
-    ANDROID_AVDS.each do |form_factor, avd_name|
-      output_dir = "#{SCREENSHOTS_ROOT}/#{locale}/android/#{form_factor}"
-      _clear_screenshots(output_dir)
-
-      UI.message("Android #{form_factor} | #{locale} | #{avd_name}")
-
-      _start_android_emulator(avd_name, locale)
-      _flutter_drive(device: nil, output_dir: output_dir)
-
-      sh("adb emu kill 2>/dev/null || true")
-      sleep(3)
-    end
-  end
-
-  _commit_and_push_screenshots("android")
-end
-
-desc "Take screenshots for both iOS and Android"
-lane :screenshots_all do
-  LOCALES.each do |locale|
-    IOS_DEVICES.each do |form_factor, device_name|
-      output_dir = "#{SCREENSHOTS_ROOT}/#{locale}/ios/#{form_factor}"
-      _clear_screenshots(output_dir)
-
-      UI.message("iOS #{form_factor} | #{locale} | #{device_name}")
-
-      udid = _set_ios_locale(device_name, locale)
-      _flutter_drive(device: device_name, output_dir: output_dir, udid: udid)
-    end
-
-    ANDROID_AVDS.each do |form_factor, avd_name|
-      output_dir = "#{SCREENSHOTS_ROOT}/#{locale}/android/#{form_factor}"
-      _clear_screenshots(output_dir)
-
-      UI.message("Android #{form_factor} | #{locale} | #{avd_name}")
-
-      _start_android_emulator(avd_name, locale)
-      _flutter_drive(device: nil, output_dir: output_dir)
-
-      sh("adb emu kill 2>/dev/null || true")
-      sleep(3)
-    end
-  end
-
-  _commit_and_push_screenshots("ios + android")
 end
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -169,22 +105,3 @@ def _set_ios_locale(device_name, locale)
   udid
 end
 
-# Start an Android emulator with the given locale and wait until fully booted.
-def _start_android_emulator(avd_name, locale)
-  lang, country = locale == "de" ? %w[de DE] : %w[en US]
-  emulator_bin  = "#{ENV.fetch('ANDROID_HOME', '$ANDROID_HOME')}/emulator/emulator"
-
-  sh(
-    "#{emulator_bin} -avd #{avd_name} " \
-    "-no-audio -no-snapshot -no-window " \
-    "-prop persist.sys.language=#{lang} " \
-    "-prop persist.sys.country=#{country} &"
-  )
-
-  sh("adb wait-for-device")
-  # Poll until fully booted
-  sh(
-    "until [ \"$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\\r')\" = \"1\" ]; " \
-    "do sleep 2; done"
-  )
-end
