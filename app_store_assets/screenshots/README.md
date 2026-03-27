@@ -7,17 +7,11 @@ This directory contains the localized screenshots for the LGKA app, organized fo
 ```text
 screenshots/
 ├── de/                 # German localization
-│   ├── ios/
-│   │   ├── phone/      # iPhone 6.5" (1290x2796)
-│   │   └── tablet/     # iPad 13" (2048x2732)
-│   └── android/
-│       ├── phone/      # Android Phone (1080x2400)
-│       └── tablet/     # Android 10" Tablet (1200x1920)
+│   └── ios/
+│       ├── phone/      # iPhone 6.5" (1290x2796)
+│       └── tablet/     # iPad 13" (2048x2732)
 └── en/                 # English localization
-    ├── ios/
-    │   ├── phone/
-    │   └── tablet/
-    └── android/
+    └── ios/
         ├── phone/
         └── tablet/
 ```
@@ -37,8 +31,3 @@ screenshots/
 ### iOS
 - **Phone (6.5"):** 1290 x 2796 pixels
 - **Tablet (13"):** 2048 x 2732 pixels
-
-### Android
-- **Phone:** 1080 x 2400 pixels (preferred)
-- **Tablet (10"):** 1200 x 1920 pixels (preferred)
-
