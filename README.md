@@ -35,7 +35,7 @@ Source code available for transparency only.
 ## Support
 
 - [Report bugs](https://github.com/luka-loehr/LGKA/issues)  
-- [contact@lukaloehr.de](mailto:contact@lukaloehr.de)  
+- [luka@lukaloehr.com](mailto:luka@lukaloehr.com)  
 
 ---
 
