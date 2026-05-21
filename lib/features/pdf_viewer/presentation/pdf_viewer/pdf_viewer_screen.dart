@@ -31,11 +31,19 @@ class PDFViewerScreen extends ConsumerStatefulWidget {
   /// Optional target pages for direct navigation.
   final List<int>? targetPages;
 
+  /// Explicit flag if it is a schedule PDF.
+  final bool isSchedule;
+
+  /// Explicit grade level of the schedule (e.g., 'Klassen 5-10' or 'J11/J12').
+  final String? gradeLevel;
+
   const PDFViewerScreen({
     super.key,
     required this.pdfFile,
     this.dayName,
     this.targetPages,
+    this.isSchedule = false,
+    this.gradeLevel,
   });
 
   @override
@@ -52,6 +60,7 @@ class _PDFViewerScreenState extends ConsumerState<PDFViewerScreen>
   // the other PDF, we swap the file without leaving the screen.
   File? _overridePdfFile;
   String? _overrideDayName;
+  String? _overrideGradeLevel;
 
   File get _effectivePdfFile => _overridePdfFile ?? widget.pdfFile;
   String? get _effectiveDayName => _overrideDayName ?? widget.dayName;
@@ -863,11 +872,11 @@ class _PDFViewerScreenState extends ConsumerState<PDFViewerScreen>
 
     if (!mounted) return;
 
-    _switchPdfInPlace(cachedFile, newDayName, targetPage, className);
+    _switchPdfInPlace(cachedFile, newDayName, targetPage, className, targetGradeLevel);
   }
 
   /// Swaps the displayed PDF without leaving the screen.
-  void _switchPdfInPlace(File newFile, String newDayName, int targetPage, String className) {
+  void _switchPdfInPlace(File newFile, String newDayName, int targetPage, String className, String targetGradeLevel) {
     final oldController = _pdfController;
     final newFileError = _validatePdfFile(newFile);
 
@@ -879,6 +888,7 @@ class _PDFViewerScreenState extends ConsumerState<PDFViewerScreen>
     setState(() {
       _overridePdfFile = newFile;
       _overrideDayName = newDayName;
+      _overrideGradeLevel = targetGradeLevel;
       _pdfLoadError = newFileError;
       _isPdfReady = false;
       _hasJumpedToSavedPage = false;
@@ -995,19 +1005,18 @@ class _PDFViewerScreenState extends ConsumerState<PDFViewerScreen>
   }
 
   bool _isSchedule5to10() {
-    if (_effectiveDayName == null || _effectiveDayName!.isEmpty) return false;
-    final dn = _effectiveDayName!;
-    // 'Klasse' matches both 'Klasse 10b' and 'Klassen 5-10'; 'Grade' matches both singular/plural
-    return dn.contains('Klasse') || dn.contains('Grade');
+    if (!widget.isSchedule) return false;
+    final gl = _overrideGradeLevel ?? widget.gradeLevel;
+    return gl == 'Klassen 5-10';
   }
 
   bool _isScheduleJ11J12() {
-    if (_effectiveDayName == null || _effectiveDayName!.isEmpty) return false;
-    final dn = _effectiveDayName!;
-    return dn.contains('J11/J12') || dn.contains('Jahrgang');
+    if (!widget.isSchedule) return false;
+    final gl = _overrideGradeLevel ?? widget.gradeLevel;
+    return gl == 'J11/J12';
   }
 
-  bool _isAnySchedulePdf() => _isSchedule5to10() || _isScheduleJ11J12();
+  bool _isAnySchedulePdf() => widget.isSchedule;
 
   AppBar _buildAppBar(String headerTitle, bool isSchedule5to10, bool isSchedulePdf) {
     return AppBar(

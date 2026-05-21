@@ -59,6 +59,8 @@ extension ScheduleNavigationHelper on BuildContext {
             'file': cached,
             'dayName': dayName,
             'targetPages': ?targetPages,
+            'isSchedule': true,
+            'gradeLevel': target.gradeLevel,
           },
         );
       }
@@ -103,6 +105,8 @@ extension ScheduleNavigationHelper on BuildContext {
             'file': file,
             'dayName': dayName,
             'targetPages': ?targetPages,
+            'isSchedule': true,
+            'gradeLevel': target!.gradeLevel,
           },
         );
       } else {

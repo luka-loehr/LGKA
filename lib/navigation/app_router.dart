@@ -67,6 +67,8 @@ class AppRouter {
     final file = extra['file'];
     final dayName = extra['dayName'];
     final targetPages = extra['targetPages'];
+    final isSchedule = extra['isSchedule'] as bool? ?? false;
+    final gradeLevel = extra['gradeLevel'] as String?;
 
     if (file is! File) {
       return _buildRouteErrorScreen(
@@ -87,6 +89,8 @@ class AppRouter {
       pdfFile: file,
       dayName: dayName as String?,
       targetPages: parsedTargetPages,
+      isSchedule: isSchedule,
+      gradeLevel: gradeLevel,
     );
   }
 
