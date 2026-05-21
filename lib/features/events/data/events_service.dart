@@ -3,6 +3,8 @@
 import 'package:http/http.dart' as http;
 import '../domain/event_model.dart';
 import '../../../utils/app_logger.dart';
+import '../../../utils/parser_guard.dart';
+import '../../../services/cache_service.dart';
 
 /// Fetches upcoming school events by scraping the school's JEvents calendar.
 ///
@@ -21,18 +23,19 @@ class EventsService {
   static const String _base =
       'https://lessing-gymnasium-karlsruhe.de/cm3/index.php/termine/week.listevents';
 
-  static const Duration _cacheDuration = Duration(hours: 1);
   static const int _weeksToFetch = 3;
 
   List<SchoolEvent>? _cachedEvents;
-  DateTime? _cacheTimestamp;
+  final _shapeTracker = ParserChangeTracker();
 
   // ── Public API ──────────────────────────────────────────────────────────────
 
   Future<List<SchoolEvent>> fetchUpcomingEvents() async {
     if (_isCacheValid()) {
-      AppLogger.debug('Events: returning cached ${_cachedEvents!.length} events',
-          module: 'EventsService');
+      AppLogger.debug(
+        'Events: returning cached ${_cachedEvents!.length} events',
+        module: 'EventsService',
+      );
       return _cachedEvents!;
     }
 
@@ -42,6 +45,7 @@ class EventsService {
 
       final allEvents = <SchoolEvent>[];
       final seen = <String>{};
+      var parsedWeeks = 0;
 
       // Fetch all weeks in parallel
       final urls = List.generate(_weeksToFetch, (week) {
@@ -49,45 +53,82 @@ class EventsService {
         return _weekUrl(target);
       });
 
-      AppLogger.debug('Events: fetching ${urls.length} weeks in parallel',
-          module: 'EventsService');
+      AppLogger.debug(
+        'Events: fetching ${urls.length} weeks in parallel',
+        module: 'EventsService',
+      );
 
       final responses = await Future.wait(
-        urls.map((url) => http
-            .get(Uri.parse(url))
-            .timeout(const Duration(seconds: 10))),
+        urls.map(
+          (url) =>
+              http.get(Uri.parse(url)).timeout(const Duration(seconds: 10)),
+        ),
       );
 
       for (int i = 0; i < responses.length; i++) {
         final response = responses[i];
         if (response.statusCode != 200) {
           AppLogger.warning(
-              'Events: HTTP ${response.statusCode} for week $i',
-              module: 'EventsService');
+            'Events: HTTP ${response.statusCode} for week $i',
+            module: 'EventsService',
+          );
           continue;
         }
-        final parsed = _parseWeekHtml(response.body, today);
-        for (final event in parsed) {
-          final key =
-              '${event.date.toIso8601String()}|${event.title.toLowerCase().trim()}';
-          if (seen.add(key)) allEvents.add(event);
+        try {
+          final parsed = _parseWeekHtml(response.body, today);
+          if (_shapeTracker.didShapeChange(
+            key: 'events:week:$i',
+            fingerprint: parsed.fingerprint,
+          )) {
+            AppLogger.warning(
+              'Events page shape changed for week $i: ${parsed.fingerprint}',
+              module: 'EventsService',
+            );
+          }
+
+          for (final event in parsed.events) {
+            final key =
+                '${event.date.toIso8601String()}|${event.title.toLowerCase().trim()}';
+            if (seen.add(key)) allEvents.add(event);
+          }
+          parsedWeeks++;
+        } on ParserSchemaException catch (e) {
+          AppLogger.warning(
+            'Events parser warning for week $i: $e',
+            module: 'EventsService',
+          );
         }
       }
+
+      ParserGuard.requireMin(
+        parser: 'Events parser',
+        field: 'successfully parsed week pages',
+        actual: parsedWeeks,
+        min: 1,
+      );
 
       allEvents.sort((a, b) => a.date.compareTo(b.date));
 
       AppLogger.success(
-          'Events: loaded ${allEvents.length} upcoming events',
-          module: 'EventsService');
+        'Events: loaded ${allEvents.length} upcoming events',
+        module: 'EventsService',
+      );
 
       _cachedEvents = allEvents;
-      _cacheTimestamp = DateTime.now();
+      CacheService().updateCacheTimestamp(CacheKey.events, DateTime.now());
       return allEvents;
     } catch (e, st) {
-      AppLogger.error('Events: fetch failed', error: e, stackTrace: st,
-          module: 'EventsService');
+      AppLogger.error(
+        'Events: fetch failed',
+        error: e,
+        stackTrace: st,
+        module: 'EventsService',
+      );
       if (_cachedEvents != null) {
-        AppLogger.debug('Events: returning stale cache', module: 'EventsService');
+        AppLogger.debug(
+          'Events: returning stale cache',
+          module: 'EventsService',
+        );
         return _cachedEvents!;
       }
       rethrow;
@@ -95,15 +136,15 @@ class EventsService {
   }
 
   void invalidateCache() {
-    _cacheTimestamp = null;
+    _cachedEvents = null;
+    CacheService().clearCache(CacheKey.events);
   }
 
   // ── Internals ───────────────────────────────────────────────────────────────
 
   bool _isCacheValid() =>
       _cachedEvents != null &&
-      _cacheTimestamp != null &&
-      DateTime.now().difference(_cacheTimestamp!) < _cacheDuration;
+      !CacheService().isCacheExpired(CacheKey.events);
 
   String _weekUrl(DateTime date) {
     final y = date.year.toString();
@@ -124,15 +165,20 @@ class EventsService {
   static final _titlePattern = RegExp(r'title="([^"]+)"');
   static final _timePattern = RegExp(r'(\d{1,2}:\d{2})\s*Uhr');
 
-  List<SchoolEvent> _parseWeekHtml(String html, DateTime today) {
+  _WeekParseResult _parseWeekHtml(String html, DateTime today) {
     final events = <SchoolEvent>[];
+    var liCount = 0;
+    var hrefCount = 0;
+    var titleCount = 0;
 
     for (final match in _liPattern.allMatches(html)) {
+      liCount++;
       final li = match.group(1)!;
 
       // Extract date from href
       final hrefMatch = _hrefPattern.firstMatch(li);
       if (hrefMatch == null) continue;
+      hrefCount++;
       final year = int.parse(hrefMatch.group(1)!);
       final month = int.parse(hrefMatch.group(2)!);
       final day = int.parse(hrefMatch.group(3)!);
@@ -144,6 +190,7 @@ class EventsService {
       // Extract title from the <a title="..."> attribute
       final titleMatch = _titlePattern.firstMatch(li);
       if (titleMatch == null) continue;
+      titleCount++;
       final title = _decodeHtmlEntities(titleMatch.group(1)!.trim());
       if (title.isEmpty) continue;
 
@@ -154,7 +201,22 @@ class EventsService {
       events.add(SchoolEvent(date: date, time: time, title: title));
     }
 
-    return events;
+    ParserGuard.requireMin(
+      parser: 'Events week parser',
+      field: '<li class="ev_td_li"> entries',
+      actual: liCount,
+      min: 1,
+    );
+
+    return _WeekParseResult(
+      events: events,
+      fingerprint: ParserGuard.buildFingerprint({
+        'liCount': liCount,
+        'hrefCount': hrefCount,
+        'titleCount': titleCount,
+        'futureEvents': events.length,
+      }),
+    );
   }
 
   /// Decodes common HTML entities in event titles.
@@ -172,4 +234,11 @@ class EventsService {
       .replaceAll('&Ouml;', 'Ö')
       .replaceAll('&Uuml;', 'Ü')
       .replaceAll('&szlig;', 'ß');
+}
+
+class _WeekParseResult {
+  const _WeekParseResult({required this.events, required this.fingerprint});
+
+  final List<SchoolEvent> events;
+  final String fingerprint;
 }

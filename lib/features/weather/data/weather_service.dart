@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../domain/weather_models.dart';
 import '../../../../utils/app_logger.dart';
+import '../../../../services/cache_service.dart';
 
 class WeatherResult {
   final CurrentWeather current;
@@ -26,17 +27,12 @@ class WeatherService {
   static const _lat = '49.00775';
   static const _lon = '8.375';
   static const _elevation = '122';
-  static const _cacheDuration = Duration(hours: 1);
-
   WeatherResult? _cache;
-  DateTime? _cacheTimestamp;
 
-  DateTime? get lastUpdateTime => _cacheTimestamp;
+  DateTime? get lastUpdateTime => CacheService().getLastFetchTime(CacheKey.weather);
 
   bool get hasValidCache =>
-      _cache != null &&
-      _cacheTimestamp != null &&
-      DateTime.now().difference(_cacheTimestamp!) < _cacheDuration;
+      _cache != null && CacheService().isCacheValid(CacheKey.weather);
 
   WeatherResult? get cachedResult => _cache;
 
@@ -149,7 +145,7 @@ class WeatherService {
 
     final result = WeatherResult(current: current, hourly: hourly, daily: daily);
     _cache = result;
-    _cacheTimestamp = DateTime.now();
+    CacheService().updateCacheTimestamp(CacheKey.weather, DateTime.now());
 
     AppLogger.success(
         'Weather: ${current.temp.round()}° ${current.description} · '
@@ -158,5 +154,8 @@ class WeatherService {
     return result;
   }
 
-  void invalidateCache() => _cacheTimestamp = null;
+  void invalidateCache() {
+    _cache = null;
+    CacheService().clearCache(CacheKey.weather);
+  }
 }

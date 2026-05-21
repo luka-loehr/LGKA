@@ -7,6 +7,7 @@ enum CacheKey {
   scheduleAvailability,
   news,
   weather,
+  events,
 }
 
 /// Centralized cache service for managing cache validity across all services
@@ -21,7 +22,8 @@ class CacheService {
     CacheKey.schedules: Duration(hours: 24),
     CacheKey.scheduleAvailability: Duration(minutes: 15),
     CacheKey.news: Duration(hours: 1),
-    CacheKey.weather: Duration(minutes: 1),
+    CacheKey.weather: Duration(hours: 1),
+    CacheKey.events: Duration(hours: 1),
   };
 
   /// Map to store last fetch time for each cache key
@@ -53,6 +55,7 @@ class CacheService {
     CacheKey.weather,
     CacheKey.schedules, // 24 h window
     CacheKey.news,      // 1 h window
+    CacheKey.events,    // 1 h window
   };
 
   /// Check if cache is valid for a given key.
