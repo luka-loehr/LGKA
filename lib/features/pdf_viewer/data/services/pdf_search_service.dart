@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart' as syncfusion;
-import '../models/search_result.dart';
+import '../../domain/models/search_result.dart';
 import '../../../../../utils/app_logger.dart';
 
 /// Data class for passing search parameters to isolate

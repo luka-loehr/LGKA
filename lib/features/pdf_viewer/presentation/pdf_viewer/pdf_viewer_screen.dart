@@ -14,9 +14,9 @@ import '../../../../../services/haptic_service.dart';
 import '../../../../../theme/app_theme.dart';
 import '../../../../../utils/app_logger.dart';
 import '../../../../../widgets/floating_toast.dart';
-import 'models/search_result.dart';
-import 'services/pdf_search_service.dart';
-import 'services/pdf_share_service.dart';
+import '../../domain/models/search_result.dart';
+import '../../data/services/pdf_search_service.dart';
+import '../../data/services/pdf_share_service.dart';
 import 'widgets/class_input_modal.dart';
 import 'widgets/pdf_search_bar.dart';
 

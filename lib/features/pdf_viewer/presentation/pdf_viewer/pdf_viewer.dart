@@ -8,9 +8,9 @@
 // - Class-based navigation (for school schedules)
 // - PDF sharing
 
-export 'models/search_result.dart';
+export '../../domain/models/search_result.dart';
 export 'pdf_viewer_screen.dart';
-export 'services/pdf_search_service.dart';
-export 'services/pdf_share_service.dart';
+export '../../data/services/pdf_search_service.dart';
+export '../../data/services/pdf_share_service.dart';
 export 'widgets/class_input_modal.dart';
 export 'widgets/pdf_search_bar.dart';
