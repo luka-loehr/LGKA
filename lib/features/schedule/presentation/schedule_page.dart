@@ -26,6 +26,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   bool _hasShownButtons = false;
+  bool _isPromptingForClass = false;
   final _spinnerTracker = LoadingSpinnerTracker();
 
   @override
@@ -92,6 +93,30 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     );
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            HapticService.light();
+            context.pop();
+          },
+          icon: Icon(
+            Icons.arrow_back,
+            color: context.appSecondaryText,
+          ),
+        ),
+        title: Text(
+          AppLocalizations.of(context)!.schedule,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            color: context.appPrimaryText,
+            fontWeight: FontWeight.bold,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _buildBody(scheduleState),
@@ -249,53 +274,105 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   }
 
   Widget _buildScheduleList(ScheduleState state) {
-    final firstSemesterSchedules = state.availableFirstHalbjahr;
-    final secondSemesterSchedules = state.availableSecondHalbjahr;
-    final hasBothSemesters = firstSemesterSchedules.isNotEmpty &&
-        secondSemesterSchedules.isNotEmpty;
+    final activeGroup = state.availableSecondHalbjahr.isNotEmpty
+        ? state.availableSecondHalbjahr
+        : state.availableFirstHalbjahr;
 
     // Determine if user has a class selected
     final selectedClass =
         ref.watch(preferencesManagerProvider).selectedScheduleClass;
 
+    if (selectedClass == null && !_isPromptingForClass) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _isPromptingForClass) return;
+        _showSetClassDialog();
+      });
+    }
+
     return Column(
       children: [
         const SizedBox(height: 24),
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-            children: [
-              // First Semester
-              if (firstSemesterSchedules.isNotEmpty) ...[
-                _buildHalbjahrCard(
-                  schedules: firstSemesterSchedules,
-                  selectedClass: selectedClass,
+          child: selectedClass == null
+              ? const SizedBox.shrink()
+              : ListView(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                  children: [
+                    if (activeGroup.isNotEmpty) ...[
+                      _buildHalbjahrCard(
+                        schedules: activeGroup,
+                        selectedClass: selectedClass,
+                      ),
+                    ],
+                  ],
                 ),
-                const SizedBox(height: 16),
-              ],
-
-              if (hasBothSemesters) ...[
-                const SizedBox(height: 8),
-                Divider(
-                    height: 1,
-                    color: context.appSecondaryText.withValues(alpha: 0.2)),
-                const SizedBox(height: 24),
-              ],
-
-              // Second Semester
-              if (secondSemesterSchedules.isNotEmpty) ...[
-                _buildHalbjahrCard(
-                  schedules: secondSemesterSchedules,
-                  selectedClass: selectedClass,
-                ),
-              ],
-            ],
-          ),
         ),
         const SizedBox(height: 20),
         AppFooter(bottomPadding: _getFooterPadding(context)),
       ],
     );
+  }
+
+  void _showSetClassDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    final controller = TextEditingController();
+    _isPromptingForClass = true;
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text(l10n.scheduleNoClassTitle),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLength: 3,
+            textCapitalization: TextCapitalization.characters,
+            decoration: InputDecoration(
+              hintText: l10n.searchHint,
+              prefixIcon: Icon(
+                Icons.school_outlined,
+                color: context.appSecondaryText,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              counterText: '',
+            ),
+            onSubmitted: (_) => _submitSelectedClass(ctx, controller),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                if (mounted) {
+                  context.pop();
+                }
+              },
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+            ),
+            TextButton(
+              onPressed: () => _submitSelectedClass(ctx, controller),
+              child: Text(l10n.setClassButton),
+            ),
+          ],
+        );
+      },
+    ).then((_) {
+      controller.dispose();
+      _isPromptingForClass = false;
+    });
+  }
+
+  void _submitSelectedClass(BuildContext dialogContext, TextEditingController controller) {
+    final cls = controller.text.trim().toLowerCase();
+    if (cls.isEmpty) {
+      return;
+    }
+
+    Navigator.of(dialogContext).pop();
+    ref.read(preferencesManagerProvider.notifier).setSelectedScheduleClass(cls);
   }
 
   /// ONE card per halbjahr group. Title is the user's class if selected.
@@ -306,25 +383,9 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     final halbjahr = schedules.isNotEmpty ? schedules.first.halbjahr : '';
     final halfLabel = _localizeHalbjahr(context, halbjahr);
 
-    // Determine title based on selected class
-    String title;
-    if (selectedClass != null) {
-      title = _formatClassName(selectedClass);
-    } else {
-      // Show combined label if both grade groups present
-      final has5to10 =
-          schedules.any((s) => s.gradeLevel == 'Klassen 5-10');
-      final hasJ11J12 = schedules.any((s) => s.gradeLevel == 'J11/J12');
-      if (has5to10 && hasJ11J12) {
-        title = _localizeGradeLevel(context, 'Klassen 5-10') +
-            ' & ' +
-            _localizeGradeLevel(context, 'J11/J12');
-      } else if (has5to10) {
-        title = _localizeGradeLevel(context, 'Klassen 5-10');
-      } else {
-        title = _localizeGradeLevel(context, 'J11/J12');
-      }
-    }
+    final title = selectedClass != null
+        ? _formatClassName(selectedClass)
+        : _localizeGradeLevel(context, schedules.first.gradeLevel);
 
     return GestureDetector(
       onTap: () {

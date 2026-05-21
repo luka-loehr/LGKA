@@ -142,7 +142,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                             child: ElevatedButton(
                               onPressed: _isNavigating ? null : _navigateToAuth,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.appBlueAccent,
+                                backgroundColor: Theme.of(context).colorScheme.primary,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),

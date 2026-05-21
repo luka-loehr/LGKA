@@ -1,6 +1,10 @@
 // Copyright Luka Löhr 2026
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import '../features/onboarding/presentation/welcome_screen.dart';
 import '../features/onboarding/presentation/what_you_can_do_screen.dart';
@@ -20,6 +24,88 @@ import '../features/news/domain/news_models.dart';
 import '../features/weather/presentation/weather_page.dart';
 
 class AppRouter {
+  static Page<dynamic> _buildAdaptivePage({
+    required BuildContext context,
+    required GoRouterState state,
+    required Widget child,
+  }) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return CupertinoPage<dynamic>(
+        key: state.pageKey,
+        child: child,
+      );
+    }
+    
+    return CustomTransitionPage<dynamic>(
+      key: state.pageKey,
+      child: child,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1.0, 0.0),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeInOut,
+          )),
+          child: child,
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 300),
+    );
+  }
+
+  static Widget _buildPdfViewerRoute(BuildContext context, GoRouterState state) {
+    final extra = state.extra;
+    if (extra is! Map<String, dynamic>) {
+      return _buildRouteErrorScreen(
+        context,
+        'Document could not be opened.',
+      );
+    }
+
+    final file = extra['file'];
+    final dayName = extra['dayName'];
+    final targetPages = extra['targetPages'];
+
+    if (file is! File) {
+      return _buildRouteErrorScreen(
+        context,
+        'Document could not be opened.',
+      );
+    }
+
+    final parsedTargetPages = switch (targetPages) {
+      final List<int> pages => pages,
+      final List<dynamic> pages when pages.every((page) => page is int) =>
+        pages.cast<int>(),
+      null => null,
+      _ => null,
+    };
+
+    return PDFViewerScreen(
+      pdfFile: file,
+      dayName: dayName as String?,
+      targetPages: parsedTargetPages,
+    );
+  }
+
+  static Widget _buildRouteErrorScreen(BuildContext context, String message) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            message,
+            style: Theme.of(context).textTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+
   // Route names
   static const String welcome = '/welcome';
   static const String whatYouCanDo = '/what-you-can-do';
@@ -67,14 +153,7 @@ class AppRouter {
         ),
         GoRoute(
           path: pdfViewer,
-          builder: (context, state) {
-            final data = state.extra as Map<String, dynamic>;
-            return PDFViewerScreen(
-              pdfFile: data['file'],
-              dayName: data['dayName'],
-              targetPages: data['targetPages'] as List<int>?,
-            );
-          },
+          builder: _buildPdfViewerRoute,
         ),
         GoRoute(
           path: schedule,
@@ -92,111 +171,66 @@ class AppRouter {
           path: webview,
           pageBuilder: (context, state) {
             final data = state.extra as Map<String, dynamic>;
-            return CustomTransitionPage(
+            return _buildAdaptivePage(
+              context: context,
+              state: state,
               child: InAppWebViewScreen(
                 url: data['url'] as String,
                 title: data['title'] as String?,
                 headers: data['headers'] as Map<String, String>?,
                 fromKrankmeldungInfo: data['fromKrankmeldungInfo'] as bool? ?? false,
               ),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeInOut,
-                  )),
-                  child: child,
-                );
-              },
-              transitionDuration: const Duration(milliseconds: 300),
             );
           },
         ),
         GoRoute(
           path: bugReport,
           pageBuilder: (context, state) {
-            return CustomTransitionPage(
+            return _buildAdaptivePage(
+              context: context,
+              state: state,
               child: const BugReportScreen(),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeInOut,
-                  )),
-                  child: child,
-                );
-              },
-              transitionDuration: const Duration(milliseconds: 300),
             );
           },
         ),
         GoRoute(
           path: news,
           pageBuilder: (context, state) {
-            return CustomTransitionPage(
+            return _buildAdaptivePage(
+              context: context,
+              state: state,
               child: const NewsScreen(),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeInOut,
-                  )),
-                  child: child,
-                );
-              },
-              transitionDuration: const Duration(milliseconds: 300),
             );
           },
         ),
         GoRoute(
           path: weather,
           pageBuilder: (context, state) {
-            return CustomTransitionPage(
+            return _buildAdaptivePage(
+              context: context,
+              state: state,
               child: const WeatherPage(),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeInOut,
-                  )),
-                  child: child,
-                );
-              },
-              transitionDuration: const Duration(milliseconds: 300),
             );
           },
         ),
         GoRoute(
           path: newsDetail,
           pageBuilder: (context, state) {
-            final event = state.extra as NewsEvent;
-            return CustomTransitionPage(
-              child: NewsDetailScreen(event: event),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeInOut,
-                  )),
-                  child: child,
-                );
-              },
-              transitionDuration: const Duration(milliseconds: 300),
+            final extra = state.extra;
+            if (extra is! NewsEvent) {
+              return _buildAdaptivePage(
+                context: context,
+                state: state,
+                child: _buildRouteErrorScreen(
+                  context,
+                  'News article could not be loaded.',
+                ),
+              );
+            }
+            return _buildAdaptivePage(
+              context: context,
+              state: state,
+              child: NewsDetailScreen(event: extra),
             );
           },
         ),
