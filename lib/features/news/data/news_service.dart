@@ -7,27 +7,33 @@ import 'package:timezone/timezone.dart' as tz;
 import '../domain/news_models.dart';
 import '../../../../utils/app_logger.dart';
 import '../../../../utils/app_info.dart';
+import '../../../../utils/parser_guard.dart';
 import '../../../../utils/retry_util.dart';
 import '../../../../services/cache_service.dart';
 
 /// Service for fetching news from the Lessing Gymnasium website
 class NewsService {
-  static const String newsUrl = 'https://lessing-gymnasium-karlsruhe.de/cm3/index.php/neues';
-  
+  static const String newsUrl =
+      'https://lessing-gymnasium-karlsruhe.de/cm3/index.php/neues';
+
   final _cacheService = CacheService();
 
   List<NewsEvent>? _cachedEvents;
   DateTime? _lastFetchTime;
+  final _shapeTracker = ParserChangeTracker();
 
   /// Get cached events if available and valid
   List<NewsEvent>? get cachedEvents => _cachedEvents;
   DateTime? get lastFetchTime => _lastFetchTime;
-  
+
   bool get hasValidCache {
     if (_cachedEvents == null || _lastFetchTime == null) {
       return false;
     }
-    return _cacheService.isCacheValid(CacheKey.news, lastFetchTime: _lastFetchTime);
+    return _cacheService.isCacheValid(
+      CacheKey.news,
+      lastFetchTime: _lastFetchTime,
+    );
   }
 
   /// Extracts all news events from the Lessing Gymnasium news page
@@ -37,20 +43,19 @@ class NewsService {
       AppLogger.debug('Returning cached news events', module: 'NewsService');
       return _cachedEvents!;
     }
-    
+
     // If cache exists but is stale, refresh in background and return stale cache
     if (!forceRefresh && _cachedEvents != null) {
       unawaited(_refreshCacheInBackground());
       return _cachedEvents!;
     }
     AppLogger.network('Fetching news events');
-    
+
     return RetryUtil.retry<List<NewsEvent>>(
       operation: () async {
-        final response = await http.get(
-          Uri.parse(newsUrl),
-          headers: {'User-Agent': AppInfo.userAgent},
-        ).timeout(const Duration(seconds: 15));
+        final response = await http
+            .get(Uri.parse(newsUrl), headers: {'User-Agent': AppInfo.userAgent})
+            .timeout(const Duration(seconds: 15));
 
         if (response.statusCode != 200) {
           throw Exception('Failed to load news: ${response.statusCode}');
@@ -58,122 +63,170 @@ class NewsService {
 
         final document = html_parser.parse(response.body);
 
-        // Find all blog-item divs (news articles)
-        final blogItems = document.querySelectorAll('.blog-item');
+        // Prefer known article container; fallback to generic article cards.
+        var blogItems = document.querySelectorAll('.blog-item');
+        if (blogItems.isEmpty) {
+          blogItems = document.querySelectorAll('article');
+          if (blogItems.isNotEmpty) {
+            AppLogger.warning(
+              'News parser fallback activated: using <article> selector',
+              module: 'NewsService',
+            );
+          }
+        }
+
+        ParserGuard.requireMin(
+          parser: 'News listing parser',
+          field: 'article containers',
+          actual: blogItems.length,
+          min: 1,
+        );
+
+        final listingFingerprint = ParserGuard.buildFingerprint({
+          'items': blogItems.length,
+          'h2Links': document.querySelectorAll('h2 a').length,
+          'createdByNodes': document.querySelectorAll('.createdby').length,
+          'createNodes': document.querySelectorAll('.create').length,
+        });
+
+        if (_shapeTracker.didShapeChange(
+          key: 'news:list',
+          fingerprint: listingFingerprint,
+        )) {
+          AppLogger.warning(
+            'News listing structure changed: $listingFingerprint',
+            module: 'NewsService',
+          );
+        }
 
         // First, extract metadata from all articles
         final List<Map<String, dynamic>> metadataList = [];
         for (var item in blogItems) {
-        try {
-          // Extract title
-          final titleElement = item.querySelector('h2 a');
-          if (titleElement == null) continue;
-          
-          final title = titleElement.text.trim();
-          final articleUrl = titleElement.attributes['href'] ?? '';
-          final fullUrl = articleUrl.startsWith('http') 
-              ? articleUrl 
-              : 'https://lessing-gymnasium-karlsruhe.de$articleUrl';
+          try {
+            // Extract title
+            final titleElement = item.querySelector('h2 a');
+            if (titleElement == null) continue;
 
-          // Extract author
-          String author = 'Unknown';
-          final createdbyElement = item.querySelector('.createdby');
-          if (createdbyElement != null) {
-            final authorText = createdbyElement.text;
-            // Extract text after "Geschrieben von"
-            if (authorText.contains('Geschrieben von')) {
-              author = authorText
-                  .replaceAll('Geschrieben von', '')
-                  .trim()
-                  .split('\n')
-                  .first
-                  .trim();
-            }
-          }
+            final title = titleElement.text.trim();
+            final articleUrl = titleElement.attributes['href'] ?? '';
+            final fullUrl = articleUrl.startsWith('http')
+                ? articleUrl
+                : 'https://lessing-gymnasium-karlsruhe.de$articleUrl';
 
-          // Extract creation date
-          String createdDate = 'Unknown';
-          DateTime? parsedDate;
-          final createElement = item.querySelector('.create');
-          if (createElement != null) {
-            final dateText = createElement.text;
-            // Extract text after "Erstellt:"
-            if (dateText.contains('Erstellt:')) {
-              createdDate = dateText
-                  .replaceAll('Erstellt:', '')
-                  .trim()
-                  .split('\n')
-                  .first
-                  .trim();
-              
-              // Parse the date string (format: DD.MM.YYYY)
-              parsedDate = _parseGermanDate(createdDate);
-            }
-          }
-
-          // Extract view count
-          int views = 0;
-          final hitsElement = item.querySelector('.hits');
-          if (hitsElement != null) {
-            final hitsText = hitsElement.text;
-            // Extract number after "Zugriffe:"
-            if (hitsText.contains('Zugriffe:')) {
-              final viewsStr = hitsText
-                  .replaceAll('Zugriffe:', '')
-                  .trim()
-                  .replaceAll(RegExp(r'[^0-9]'), '');
-              views = int.tryParse(viewsStr) ?? 0;
-            }
-          }
-
-          // Extract description
-          String description = '';
-          final itemContent = item.querySelector('.item-content');
-          if (itemContent != null) {
-            // Get all paragraph text
-            final paragraphs = itemContent.querySelectorAll('p');
-            if (paragraphs.isNotEmpty) {
-              description = paragraphs
-                  .map((p) => p.text.trim())
-                  .where((text) => text.isNotEmpty)
-                  .take(2)
-                  .join(' ');
-            }
-          }
-
-          // Extract tags
-          final List<String> tags = [];
-          final tagsContainer = item.querySelector('ul.tags.list-inline');
-          if (tagsContainer != null) {
-            final tagLinks = tagsContainer.querySelectorAll('a');
-            for (var tagLink in tagLinks) {
-              final tagText = tagLink.text.trim();
-              if (tagText.isNotEmpty) {
-                tags.add(tagText);
+            // Extract author
+            String author = 'Unknown';
+            final createdbyElement = item.querySelector('.createdby');
+            if (createdbyElement != null) {
+              final authorText = createdbyElement.text;
+              // Extract text after "Geschrieben von"
+              if (authorText.contains('Geschrieben von')) {
+                author = authorText
+                    .replaceAll('Geschrieben von', '')
+                    .trim()
+                    .split('\n')
+                    .first
+                    .trim();
               }
             }
-          }
 
-          metadataList.add({
-            'title': title,
-            'author': author,
-            'description': description,
-            'createdDate': createdDate,
-            'parsedDate': parsedDate,
-            'views': views,
-            'url': fullUrl,
-            'tags': tags,
-          });
-        } catch (e) {
-          AppLogger.warning('Error parsing news article metadata: $e', module: 'NewsService');
-          continue;
+            // Extract creation date
+            String createdDate = 'Unknown';
+            DateTime? parsedDate;
+            final createElement = item.querySelector('.create');
+            if (createElement != null) {
+              final dateText = createElement.text;
+              // Extract text after "Erstellt:"
+              if (dateText.contains('Erstellt:')) {
+                createdDate = dateText
+                    .replaceAll('Erstellt:', '')
+                    .trim()
+                    .split('\n')
+                    .first
+                    .trim();
+
+                // Parse the date string (format: DD.MM.YYYY)
+                parsedDate = _parseGermanDate(createdDate);
+              }
+            }
+
+            // Extract view count
+            int views = 0;
+            final hitsElement = item.querySelector('.hits');
+            if (hitsElement != null) {
+              final hitsText = hitsElement.text;
+              // Extract number after "Zugriffe:"
+              if (hitsText.contains('Zugriffe:')) {
+                final viewsStr = hitsText
+                    .replaceAll('Zugriffe:', '')
+                    .trim()
+                    .replaceAll(RegExp(r'[^0-9]'), '');
+                views = int.tryParse(viewsStr) ?? 0;
+              }
+            }
+
+            // Extract description
+            String description = '';
+            final itemContent = item.querySelector('.item-content');
+            if (itemContent != null) {
+              // Get all paragraph text
+              final paragraphs = itemContent.querySelectorAll('p');
+              if (paragraphs.isNotEmpty) {
+                description = paragraphs
+                    .map((p) => p.text.trim())
+                    .where((text) => text.isNotEmpty)
+                    .take(2)
+                    .join(' ');
+              }
+            }
+
+            // Extract tags
+            final List<String> tags = [];
+            final tagsContainer = item.querySelector('ul.tags.list-inline');
+            if (tagsContainer != null) {
+              final tagLinks = tagsContainer.querySelectorAll('a');
+              for (var tagLink in tagLinks) {
+                final tagText = tagLink.text.trim();
+                if (tagText.isNotEmpty) {
+                  tags.add(tagText);
+                }
+              }
+            }
+
+            metadataList.add({
+              'title': title,
+              'author': author,
+              'description': description,
+              'createdDate': createdDate,
+              'parsedDate': parsedDate,
+              'views': views,
+              'url': fullUrl,
+              'tags': tags,
+            });
+          } catch (e) {
+            AppLogger.warning(
+              'Error parsing news article metadata: $e',
+              module: 'NewsService',
+            );
+            continue;
+          }
         }
-      }
+
+        ParserGuard.requireMin(
+          parser: 'News metadata parser',
+          field: 'articles',
+          actual: metadataList.length,
+          min: 1,
+        );
 
         // Fetch full content for all articles concurrently
-        AppLogger.network('Fetching full content for ${metadataList.length} articles', module: 'NewsService');
+        AppLogger.network(
+          'Fetching full content for ${metadataList.length} articles',
+          module: 'NewsService',
+        );
         final contentFutures = metadataList.map((metadata) async {
-          final contentData = await _fetchFullArticleContent(metadata['url'] as String);
+          final contentData = await _fetchFullArticleContent(
+            metadata['url'] as String,
+          );
           return {
             ...metadata,
             'content': contentData['content'],
@@ -210,7 +263,10 @@ class NewsService {
             );
             events.add(event);
           } catch (e) {
-            AppLogger.warning('Error creating news event: $e', module: 'NewsService');
+            AppLogger.warning(
+              'Error creating news event: $e',
+              module: 'NewsService',
+            );
             continue;
           }
         }
@@ -228,23 +284,33 @@ class NewsService {
           return 0;
         });
 
-        AppLogger.success('Fetched ${events.length} news events with full content', module: 'NewsService');
-        
+        AppLogger.success(
+          'Fetched ${events.length} news events with full content',
+          module: 'NewsService',
+        );
+
         // Cache the results
         _cachedEvents = events;
         _lastFetchTime = DateTime.now();
         _cacheService.updateCacheTimestamp(CacheKey.news, _lastFetchTime);
-        
+
         return events;
       },
       maxRetries: 2,
       operationName: 'NewsService',
       shouldRetry: RetryUtil.isRetryableError,
     ).catchError((e) {
-      AppLogger.error('Failed to fetch news events', module: 'NewsService', error: e);
+      AppLogger.error(
+        'Failed to fetch news events',
+        module: 'NewsService',
+        error: e,
+      );
       // Return cached events if available, even if stale
       if (_cachedEvents != null) {
-        AppLogger.debug('Returning stale cached news events due to error', module: 'NewsService');
+        AppLogger.debug(
+          'Returning stale cached news events due to error',
+          module: 'NewsService',
+        );
         return _cachedEvents!;
       }
       throw e;
@@ -261,10 +327,13 @@ class NewsService {
       _cacheService.updateCacheTimestamp(CacheKey.news, _lastFetchTime);
     } catch (e) {
       AppLogger.debug('Background news refresh failed', module: 'NewsService');
-      
+
       // If cache was invalid (app was backgrounded), clear cached data
       if (!wasCacheValid) {
-        AppLogger.info('Refresh failed with invalid cache - clearing cached news', module: 'NewsService');
+        AppLogger.info(
+          'Refresh failed with invalid cache - clearing cached news',
+          module: 'NewsService',
+        );
         _cachedEvents = null;
         _lastFetchTime = null;
       }
@@ -279,32 +348,58 @@ class NewsService {
   }
 
   /// Fetches the full content, links, and images from an individual news article page
-  Future<Map<String, dynamic>> _fetchFullArticleContent(String articleUrl) async {
+  Future<Map<String, dynamic>> _fetchFullArticleContent(
+    String articleUrl,
+  ) async {
     try {
       return await RetryUtil.retry<Map<String, dynamic>>(
         operation: () async {
-          final response = await http.get(
-            Uri.parse(articleUrl),
-            headers: {'User-Agent': AppInfo.userAgent},
-          ).timeout(const Duration(seconds: 15));
+          final response = await http
+              .get(
+                Uri.parse(articleUrl),
+                headers: {'User-Agent': AppInfo.userAgent},
+              )
+              .timeout(const Duration(seconds: 15));
 
           if (response.statusCode != 200) {
-            AppLogger.warning('Failed to load article: ${response.statusCode}', module: 'NewsService');
-            return {'content': null, 'links': <NewsLink>[], 'standaloneLinks': <NewsLink>[], 'images': <NewsImage>[], 'downloads': <NewsDownload>[]};
+            AppLogger.warning(
+              'Failed to load article: ${response.statusCode}',
+              module: 'NewsService',
+            );
+            return {
+              'content': null,
+              'links': <NewsLink>[],
+              'standaloneLinks': <NewsLink>[],
+              'images': <NewsImage>[],
+              'downloads': <NewsDownload>[],
+            };
           }
 
           final document = html_parser.parse(response.body);
-          
+
           // Look for the article body content in .com-content-article__body
-          final articleBody = document.querySelector('.com-content-article__body');
+          final articleBody = document.querySelector(
+            '.com-content-article__body',
+          );
           if (articleBody == null) {
-            AppLogger.warning('Could not find .com-content-article__body element', module: 'NewsService');
-            return {'content': null, 'links': <NewsLink>[], 'standaloneLinks': <NewsLink>[], 'images': <NewsImage>[], 'downloads': <NewsDownload>[]};
+            AppLogger.warning(
+              'Could not find .com-content-article__body element',
+              module: 'NewsService',
+            );
+            return {
+              'content': null,
+              'links': <NewsLink>[],
+              'standaloneLinks': <NewsLink>[],
+              'images': <NewsImage>[],
+              'downloads': <NewsDownload>[],
+            };
           }
 
           // Extract download links first (doclink-insert class)
           final List<NewsDownload> downloads = [];
-          final downloadElements = articleBody.querySelectorAll('a.doclink-insert');
+          final downloadElements = articleBody.querySelectorAll(
+            'a.doclink-insert',
+          );
           for (var downloadElement in downloadElements) {
             try {
               final href = downloadElement.attributes['href'];
@@ -314,8 +409,8 @@ class NewsService {
               final fullUrl = href.startsWith('http')
                   ? href
                   : href.startsWith('/')
-                      ? 'https://lessing-gymnasium-karlsruhe.de$href'
-                      : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
+                  ? 'https://lessing-gymnasium-karlsruhe.de$href'
+                  : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
 
               // Extract title from data-title attribute or text content
               String title = downloadElement.attributes['data-title'] ?? '';
@@ -323,14 +418,18 @@ class NewsService {
                 // Get text content, but remove size information
                 title = downloadElement.text.trim();
                 // Remove size pattern like "(3.64 MB)"
-                title = title.replaceAll(RegExp(r'\s*\([^)]+\)\s*$'), '').trim();
+                title = title
+                    .replaceAll(RegExp(r'\s*\([^)]+\)\s*$'), '')
+                    .trim();
               }
 
               // Extract file type from icon class or visually-hidden span
               String fileType = 'document'; // default
-              
+
               // Check for k-icon-document-{type} class
-              final iconSpan = downloadElement.querySelector('span[class*="k-icon-document"]');
+              final iconSpan = downloadElement.querySelector(
+                'span[class*="k-icon-document"]',
+              );
               if (iconSpan != null) {
                 final classes = iconSpan.classes;
                 for (var className in classes) {
@@ -340,10 +439,12 @@ class NewsService {
                   }
                 }
               }
-              
+
               // Fallback: check visually-hidden span for file type
               if (fileType == 'document') {
-                final hiddenSpan = downloadElement.querySelector('span.k-visually-hidden');
+                final hiddenSpan = downloadElement.querySelector(
+                  'span.k-visually-hidden',
+                );
                 if (hiddenSpan != null) {
                   final typeText = hiddenSpan.text.trim().toLowerCase();
                   if (typeText.isNotEmpty) {
@@ -359,19 +460,29 @@ class NewsService {
               if (sizeMatch != null) {
                 size = sizeMatch.group(1)?.trim();
                 // Check if it looks like a size (contains MB, KB, GB, etc.)
-                if (size != null && !RegExp(r'\d+\s*(MB|KB|GB|B|bytes?)', caseSensitive: false).hasMatch(size)) {
-                  size = null; // Not a size, probably something else in parentheses
+                if (size != null &&
+                    !RegExp(
+                      r'\d+\s*(MB|KB|GB|B|bytes?)',
+                      caseSensitive: false,
+                    ).hasMatch(size)) {
+                  size =
+                      null; // Not a size, probably something else in parentheses
                 }
               }
 
-              downloads.add(NewsDownload(
-                title: title,
-                url: fullUrl,
-                fileType: fileType,
-                size: size,
-              ));
+              downloads.add(
+                NewsDownload(
+                  title: title,
+                  url: fullUrl,
+                  fileType: fileType,
+                  size: size,
+                ),
+              );
             } catch (e) {
-              AppLogger.warning('Error parsing download link: $e', module: 'NewsService');
+              AppLogger.warning(
+                'Error parsing download link: $e',
+                module: 'NewsService',
+              );
               continue;
             }
           }
@@ -380,36 +491,39 @@ class NewsService {
           // Separate embedded links (in text) from standalone links (full URLs in own paragraph)
           final List<NewsLink> embeddedLinks = [];
           final List<NewsLink> standaloneLinks = [];
-          
+
           final linkElements = articleBody.querySelectorAll('a');
           for (var linkElement in linkElements) {
             // Skip download links
             if (linkElement.classes.contains('doclink-insert')) continue;
-            
+
             final href = linkElement.attributes['href'];
             final text = linkElement.text.trim();
             if (href == null || href.isEmpty || text.isEmpty) continue;
-            
+
             // Convert relative URLs to absolute URLs
             final fullUrl = href.startsWith('http')
                 ? href
                 : href.startsWith('/')
-                    ? 'https://lessing-gymnasium-karlsruhe.de$href'
-                    : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
-            
+                ? 'https://lessing-gymnasium-karlsruhe.de$href'
+                : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
+
             // Check if this is a standalone link (link text equals URL, or link is the only content in paragraph)
             final parent = linkElement.parent;
             bool isStandalone = false;
-            
-            if (parent != null && (parent.localName == 'p' || parent.localName == 'div')) {
+
+            if (parent != null &&
+                (parent.localName == 'p' || parent.localName == 'div')) {
               final parentText = parent.text.trim();
               // Standalone if: link text equals URL, or parent text is mostly just the link
-              isStandalone = text == fullUrl || 
-                            text == href ||
-                            (text.startsWith('http') && parentText == text) ||
-                            (text.startsWith('http') && parentText.length <= text.length + 5);
+              isStandalone =
+                  text == fullUrl ||
+                  text == href ||
+                  (text.startsWith('http') && parentText == text) ||
+                  (text.startsWith('http') &&
+                      parentText.length <= text.length + 5);
             }
-            
+
             final link = NewsLink(text: text, url: fullUrl);
             if (isStandalone) {
               standaloneLinks.add(link);
@@ -420,62 +534,67 @@ class NewsService {
 
           // Extract images from gallery plugin (sigFreeContainer) and regular img tags
           final List<NewsImage> images = [];
-          
+
           // Check for gallery plugin images (Simple Image Gallery)
-          final galleryContainers = articleBody.querySelectorAll('.sigFreeContainer');
+          final galleryContainers = articleBody.querySelectorAll(
+            '.sigFreeContainer',
+          );
           for (var gallery in galleryContainers) {
             final galleryLinks = gallery.querySelectorAll('a.sigFreeLink');
             for (var link in galleryLinks) {
               final imageUrl = link.attributes['href'];
               final thumbnailUrl = link.attributes['data-thumb'];
               final imgElement = link.querySelector('img');
-              final alt = imgElement?.attributes['alt'] ?? imgElement?.attributes['title'];
-              
+              final alt =
+                  imgElement?.attributes['alt'] ??
+                  imgElement?.attributes['title'];
+
               if (imageUrl != null && imageUrl.isNotEmpty) {
                 final fullImageUrl = imageUrl.startsWith('http')
                     ? imageUrl
                     : imageUrl.startsWith('/')
-                        ? 'https://lessing-gymnasium-karlsruhe.de$imageUrl'
-                        : 'https://lessing-gymnasium-karlsruhe.de/cm3/$imageUrl';
-                
+                    ? 'https://lessing-gymnasium-karlsruhe.de$imageUrl'
+                    : 'https://lessing-gymnasium-karlsruhe.de/cm3/$imageUrl';
+
                 String? fullThumbnailUrl;
                 if (thumbnailUrl != null && thumbnailUrl.isNotEmpty) {
                   fullThumbnailUrl = thumbnailUrl.startsWith('http')
                       ? thumbnailUrl
                       : thumbnailUrl.startsWith('/')
-                          ? 'https://lessing-gymnasium-karlsruhe.de$thumbnailUrl'
-                          : 'https://lessing-gymnasium-karlsruhe.de/cm3/$thumbnailUrl';
+                      ? 'https://lessing-gymnasium-karlsruhe.de$thumbnailUrl'
+                      : 'https://lessing-gymnasium-karlsruhe.de/cm3/$thumbnailUrl';
                 }
-                
-                images.add(NewsImage(
-                  url: fullImageUrl,
-                  thumbnailUrl: fullThumbnailUrl,
-                  alt: alt,
-                ));
+
+                images.add(
+                  NewsImage(
+                    url: fullImageUrl,
+                    thumbnailUrl: fullThumbnailUrl,
+                    alt: alt,
+                  ),
+                );
               }
             }
           }
-          
+
           // Also check for regular img tags that might not be in galleries
           final imgElements = articleBody.querySelectorAll('img');
           for (var img in imgElements) {
             // Skip images that are already in galleries (they have sigFreeImg class)
             if (img.classes.contains('sigFreeImg')) continue;
-            
+
             final src = img.attributes['src'];
             if (src != null && src.isNotEmpty) {
               final fullImageUrl = src.startsWith('http')
                   ? src
                   : src.startsWith('/')
-                      ? 'https://lessing-gymnasium-karlsruhe.de$src'
-                      : 'https://lessing-gymnasium-karlsruhe.de/cm3/$src';
-              
+                  ? 'https://lessing-gymnasium-karlsruhe.de$src'
+                  : 'https://lessing-gymnasium-karlsruhe.de/cm3/$src';
+
               // Check if this image is already in our list (avoid duplicates)
               if (!images.any((i) => i.url == fullImageUrl)) {
-                images.add(NewsImage(
-                  url: fullImageUrl,
-                  alt: img.attributes['alt'],
-                ));
+                images.add(
+                  NewsImage(url: fullImageUrl, alt: img.attributes['alt']),
+                );
               }
             }
           }
@@ -484,59 +603,66 @@ class NewsService {
           // First, clone the article body and remove download links and standalone links to avoid duplicates
           // Keep embedded links in the text for RichText display
           final articleBodyClone = articleBody.clone(true);
-          
+
           // Remove download links
-          final downloadLinksInClone = articleBodyClone.querySelectorAll('a.doclink-insert');
+          final downloadLinksInClone = articleBodyClone.querySelectorAll(
+            'a.doclink-insert',
+          );
           for (var downloadLink in downloadLinksInClone) {
             // Remove the download link but keep surrounding text
             downloadLink.remove();
           }
-          
+
           // Remove standalone links (they'll be displayed as separate buttons)
           // Keep embedded links in the text
-          final allLinksInClone = articleBodyClone.querySelectorAll('a:not(.doclink-insert)');
+          final allLinksInClone = articleBodyClone.querySelectorAll(
+            'a:not(.doclink-insert)',
+          );
           for (var link in allLinksInClone) {
             final href = link.attributes['href'];
             final text = link.text.trim();
             if (href == null || href.isEmpty || text.isEmpty) continue;
-            
+
             final fullUrl = href.startsWith('http')
                 ? href
                 : href.startsWith('/')
-                    ? 'https://lessing-gymnasium-karlsruhe.de$href'
-                    : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
-            
+                ? 'https://lessing-gymnasium-karlsruhe.de$href'
+                : 'https://lessing-gymnasium-karlsruhe.de/cm3/$href';
+
             // Check if this is a standalone link
             final parent = link.parent;
             bool isStandalone = false;
-            
-            if (parent != null && (parent.localName == 'p' || parent.localName == 'div')) {
+
+            if (parent != null &&
+                (parent.localName == 'p' || parent.localName == 'div')) {
               final parentText = parent.text.trim();
               // Standalone if: link text equals URL, or parent text is mostly just the link
-              isStandalone = text == fullUrl || 
-                            text == href ||
-                            (text.startsWith('http') && parentText == text) ||
-                            (text.startsWith('http') && parentText.length <= text.length + 5);
+              isStandalone =
+                  text == fullUrl ||
+                  text == href ||
+                  (text.startsWith('http') && parentText == text) ||
+                  (text.startsWith('http') &&
+                      parentText.length <= text.length + 5);
             }
-            
+
             // Only remove standalone links, keep embedded links
             if (isStandalone) {
               link.remove();
             }
           }
-          
+
           // Remove HTML comments from innerHTML
           String cleanHtml(String html) {
             // Remove all HTML comments (<!-- ... -->)
             html = html.replaceAll(RegExp(r'<!--.*?-->', dotAll: true), '');
             return html.trim();
           }
-          
+
           // Extract HTML content preserving formatting
           // Get the inner HTML of the cloned article body
           String? htmlContent;
           final paragraphs = articleBodyClone.querySelectorAll('p');
-          
+
           if (paragraphs.isEmpty) {
             // Fallback: get all HTML from the article body
             htmlContent = cleanHtml(articleBodyClone.innerHtml);
@@ -545,11 +671,11 @@ class NewsService {
             final paragraphHtmls = paragraphs
                 .map((p) => cleanHtml(p.innerHtml))
                 .where((html) => html.isNotEmpty);
-            
+
             // Join paragraphs with double line breaks
             htmlContent = paragraphHtmls.join('\n\n');
           }
-          
+
           // Also extract plain text for backward compatibility
           String? fullText;
           if (paragraphs.isEmpty) {
@@ -575,8 +701,17 @@ class NewsService {
         shouldRetry: RetryUtil.isRetryableError,
       );
     } catch (e) {
-      AppLogger.warning('Error extracting full article content from $articleUrl: $e', module: 'NewsService');
-      return {'content': null, 'links': <NewsLink>[], 'standaloneLinks': <NewsLink>[], 'images': <NewsImage>[], 'downloads': <NewsDownload>[]};
+      AppLogger.warning(
+        'Error extracting full article content from $articleUrl: $e',
+        module: 'NewsService',
+      );
+      return {
+        'content': null,
+        'links': <NewsLink>[],
+        'standaloneLinks': <NewsLink>[],
+        'images': <NewsImage>[],
+        'downloads': <NewsDownload>[],
+      };
     }
   }
 
@@ -597,15 +732,17 @@ class NewsService {
 
       // Get Berlin timezone location
       final berlin = tz.getLocation('Europe/Berlin');
-      
+
       // Create DateTime in Berlin timezone at midnight
       final dateTime = tz.TZDateTime(berlin, year, month, day);
-      
+
       return dateTime;
     } catch (e) {
-      AppLogger.warning('Failed to parse date: $dateString', module: 'NewsService');
+      AppLogger.warning(
+        'Failed to parse date: $dateString',
+        module: 'NewsService',
+      );
       return null;
     }
   }
 }
-
