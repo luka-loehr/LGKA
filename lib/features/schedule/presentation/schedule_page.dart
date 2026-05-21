@@ -92,6 +92,9 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
       mounted: mounted,
     );
 
+    final selectedClass =
+        ref.watch(preferencesManagerProvider).selectedScheduleClass;
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -109,13 +112,24 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
         title: Text(
           AppLocalizations.of(context)!.schedule,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            color: context.appPrimaryText,
-            fontWeight: FontWeight.bold,
-          ),
+                color: context.appPrimaryText,
+                fontWeight: FontWeight.bold,
+              ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         centerTitle: true,
+        actions: [
+          if (selectedClass != null)
+            IconButton(
+              icon: Icon(Icons.edit_outlined, color: context.appSecondaryText),
+              tooltip: AppLocalizations.of(context)!.setClassTitle,
+              onPressed: () {
+                HapticService.light();
+                _showSetClassDialog();
+              },
+            ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -274,9 +288,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   }
 
   Widget _buildScheduleList(ScheduleState state) {
-    final activeGroup = state.availableSecondHalbjahr.isNotEmpty
-        ? state.availableSecondHalbjahr
-        : state.availableFirstHalbjahr;
+    final firstSemesterSchedules = state.availableFirstHalbjahr;
+    final secondSemesterSchedules = state.availableSecondHalbjahr;
+    final hasBothSemesters = firstSemesterSchedules.isNotEmpty &&
+        secondSemesterSchedules.isNotEmpty;
 
     // Determine if user has a class selected
     final selectedClass =
@@ -298,9 +313,27 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
               : ListView(
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
                   children: [
-                    if (activeGroup.isNotEmpty) ...[
+                    // First Semester
+                    if (firstSemesterSchedules.isNotEmpty) ...[
                       _buildHalbjahrCard(
-                        schedules: activeGroup,
+                        schedules: firstSemesterSchedules,
+                        selectedClass: selectedClass,
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
+                    if (hasBothSemesters) ...[
+                      const SizedBox(height: 8),
+                      Divider(
+                          height: 1,
+                          color: context.appSecondaryText.withValues(alpha: 0.2)),
+                      const SizedBox(height: 24),
+                    ],
+
+                    // Second Semester
+                    if (secondSemesterSchedules.isNotEmpty) ...[
+                      _buildHalbjahrCard(
+                        schedules: secondSemesterSchedules,
                         selectedClass: selectedClass,
                       ),
                     ],
@@ -316,14 +349,20 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
   void _showSetClassDialog() {
     final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController();
+    
+    final currentClass = ref.read(preferencesManagerProvider).selectedScheduleClass;
+    if (currentClass != null) {
+      controller.text = currentClass.toUpperCase();
+    }
+    
     _isPromptingForClass = true;
 
     showDialog<void>(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: currentClass != null,
       builder: (ctx) {
         return AlertDialog(
-          title: Text(l10n.scheduleNoClassTitle),
+          title: Text(currentClass == null ? l10n.scheduleNoClassTitle : l10n.setClassTitle),
           content: TextField(
             controller: controller,
             autofocus: true,
@@ -346,7 +385,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
             TextButton(
               onPressed: () {
                 Navigator.of(ctx).pop();
-                if (mounted) {
+                if (currentClass == null && mounted) {
                   context.pop();
                 }
               },

@@ -9,7 +9,6 @@ import '../../substitution/application/substitution_provider.dart';
 import '../../substitution/domain/substitution_models.dart';
 import '../../schedule/application/schedule_provider.dart';
 import '../../schedule/domain/schedule_models.dart';
-import '../../schedule/application/schedule_navigation_helper.dart';
 import '../../settings/presentation/settings_modal.dart';
 import '../../../../services/haptic_service.dart';
 import '../../../../navigation/app_router.dart';
@@ -595,8 +594,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return TappableCard(
       onTap: () {
         HapticService.medium();
-        context.openScheduleForClass(ref, group, selectedClass);
-        AppLogger.navigation('Opened schedule: $grade $half');
+        context.push(AppRouter.schedule);
+        AppLogger.navigation('Opened schedule viewer: $grade');
       },
       child: Row(
         children: [
