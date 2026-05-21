@@ -8,6 +8,7 @@ import '../../../../providers/color_provider.dart';
 import '../../../../navigation/app_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../services/haptic_service.dart';
+import '../../../../widgets/scale_button.dart';
 
 class AccentColorScreen extends ConsumerStatefulWidget {
   const AccentColorScreen({super.key});
@@ -17,9 +18,7 @@ class AccentColorScreen extends ConsumerStatefulWidget {
 }
 
 class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _buttonController;
-  late Animation<double> _buttonScale;
+    with SingleTickerProviderStateMixin {
   late AnimationController _contentController;
   late Animation<double> _contentOpacity;
   late Animation<Offset> _contentSlide;
@@ -42,15 +41,6 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
       'name': palette.name,
       'color': palette.color,
     }));
-
-    // Button animation
-    _buttonController = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-    _buttonScale = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _buttonController, curve: Curves.easeInOut),
-    );
 
     // Content animation
     _contentController = AnimationController(
@@ -81,7 +71,6 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
 
   @override
   void dispose() {
-    _buttonController.dispose();
     _contentController.dispose();
     super.dispose();
   }
@@ -98,21 +87,14 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
     await ref.read(colorProvider.notifier).setColor(colorName);
   }
 
-  Future<void> _navigateToAppearance() async {
+  void _navigateToAppearance() {
     if (_isNavigating) return;
 
     setState(() {
       _isNavigating = true;
     });
 
-    HapticService.medium();
-    await _buttonController.forward();
-    await Future.delayed(const Duration(milliseconds: 50));
-    _buttonController.reverse();
-
-    if (mounted) {
-      context.go(AppRouter.appearance);
-    }
+    context.go(AppRouter.appearance);
   }
 
   @override
@@ -120,7 +102,7 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
     return Scaffold(
       body: SafeArea(
         child: AnimatedBuilder(
-          animation: Listenable.merge([_contentController, _buttonController]),
+          animation: _contentController,
           builder: (context, child) {
             return FadeTransition(
               opacity: _contentOpacity,
@@ -168,54 +150,16 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
                       const Spacer(),
 
                       // Continue Button
-                      ScaleTransition(
-                        scale: _buttonScale,
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeInOut,
-                            decoration: BoxDecoration(
-                              color: AppColors.getAccentColor(_selectedColor),
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: _isNavigating ? null : [
-                                BoxShadow(
-                                  color: AppColors.getAccentColor(_selectedColor).withValues(alpha: 0.3),
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: _isNavigating ? null : _navigateToAppearance,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                foregroundColor: Colors.white,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 0,
-                              ),
-                              child: _isNavigating
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                    ),
-                                  )
-                                : Text(
-                                    AppLocalizations.of(context)!.continueLabel,
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                            ),
+                      ScaleButton(
+                        onTap: _isNavigating ? null : _navigateToAppearance,
+                        isLoading: _isNavigating,
+                        backgroundColor: AppColors.getAccentColor(_selectedColor),
+                        height: 50,
+                        child: Text(
+                          AppLocalizations.of(context)!.continueLabel,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
                         ),
                       ),

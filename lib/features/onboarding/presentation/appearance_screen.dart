@@ -9,6 +9,7 @@ import '../../../../providers/preferences_provider.dart';
 import '../../../../navigation/app_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../services/haptic_service.dart';
+import '../../../../widgets/scale_button.dart';
 
 class AppearanceScreen extends ConsumerStatefulWidget {
   const AppearanceScreen({super.key});
@@ -18,9 +19,7 @@ class AppearanceScreen extends ConsumerStatefulWidget {
 }
 
 class _AppearanceScreenState extends ConsumerState<AppearanceScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _buttonController;
-  late Animation<double> _buttonScale;
+    with SingleTickerProviderStateMixin {
   late AnimationController _contentController;
   late Animation<double> _contentOpacity;
   late Animation<Offset> _contentSlide;
@@ -29,14 +28,6 @@ class _AppearanceScreenState extends ConsumerState<AppearanceScreen>
   @override
   void initState() {
     super.initState();
-
-    _buttonController = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-    _buttonScale = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _buttonController, curve: Curves.easeInOut),
-    );
 
     _contentController = AnimationController(
       duration: const Duration(milliseconds: 800),
@@ -63,26 +54,18 @@ class _AppearanceScreenState extends ConsumerState<AppearanceScreen>
 
   @override
   void dispose() {
-    _buttonController.dispose();
     _contentController.dispose();
     super.dispose();
   }
 
-  Future<void> _navigateToAuth() async {
+  void _navigateToAuth() {
     if (_isNavigating) return;
 
     setState(() {
       _isNavigating = true;
     });
 
-    HapticService.medium();
-    await _buttonController.forward();
-    await Future.delayed(const Duration(milliseconds: 50));
-    _buttonController.reverse();
-
-    if (mounted) {
-      context.go(AppRouter.auth);
-    }
+    context.go(AppRouter.auth);
   }
 
   @override
@@ -101,7 +84,7 @@ class _AppearanceScreenState extends ConsumerState<AppearanceScreen>
     return Scaffold(
       body: SafeArea(
         child: AnimatedBuilder(
-          animation: Listenable.merge([_contentController, _buttonController]),
+          animation: _contentController,
           builder: (context, child) {
             return FadeTransition(
               opacity: _contentOpacity,
@@ -202,62 +185,20 @@ class _AppearanceScreenState extends ConsumerState<AppearanceScreen>
                       const Spacer(),
 
                       // Los geht's button
-                      ScaleTransition(
-                        scale: _buttonScale,
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeInOut,
-                            decoration: BoxDecoration(
-                              color: AppColors.getAccentColor(selectedColor),
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: _isNavigating
-                                  ? null
-                                  : [
-                                      BoxShadow(
-                                        color: AppColors.getAccentColor(selectedColor)
-                                            .withValues(alpha: 0.3),
-                                        blurRadius: 8,
-                                        spreadRadius: 2,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: _isNavigating ? null : _navigateToAuth,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                foregroundColor: Colors.white,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 0,
+                      ScaleButton(
+                        onTap: _isNavigating ? null : _navigateToAuth,
+                        isLoading: _isNavigating,
+                        backgroundColor: AppColors.getAccentColor(selectedColor),
+                        height: 50,
+                        child: Text(
+                          AppLocalizations.of(context)!.letsGo,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
                               ),
-                              child: _isNavigating
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                            Colors.white),
-                                      ),
-                                    )
-                                  : Text(
-                                      AppLocalizations.of(context)!.letsGo,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
-                                          ),
-                                    ),
-                            ),
-                          ),
                         ),
                       ),
                     ],
