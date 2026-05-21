@@ -21,7 +21,7 @@ import 'widgets/class_input_modal.dart';
 import 'widgets/pdf_search_bar.dart';
 
 /// A screen for viewing PDF documents with search and share functionality.
-class PDFViewerScreen extends StatefulWidget {
+class PDFViewerScreen extends ConsumerStatefulWidget {
   /// The PDF file to display.
   final File pdfFile;
 
@@ -39,10 +39,10 @@ class PDFViewerScreen extends StatefulWidget {
   });
 
   @override
-  State<PDFViewerScreen> createState() => _PDFViewerScreenState();
+  ConsumerState<PDFViewerScreen> createState() => _PDFViewerScreenState();
 }
 
-class _PDFViewerScreenState extends State<PDFViewerScreen>
+class _PDFViewerScreenState extends ConsumerState<PDFViewerScreen>
     with TickerProviderStateMixin {
   // PDF controller
   late pdfx.PdfController _pdfController;
@@ -67,6 +67,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
   // PDF loading state
   bool _isPdfReady = false;
+  String? _pdfLoadError;
   bool _hasJumpedToSavedPage = false;
   int? _pendingTargetPage; // page to jump to the moment the PDF becomes ready
 
@@ -167,6 +168,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   }
 
   void _initializePdfController() {
+    _pdfLoadError = _validatePdfFile(_effectivePdfFile);
     _pdfController = pdfx.PdfController(
       document: pdfx.PdfDocument.openFile(_effectivePdfFile.path),
     );
@@ -178,6 +180,23 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     }
 
     _initializePdfReadyDetection();
+  }
+
+  String? _validatePdfFile(File file) {
+    if (!file.existsSync()) {
+      return 'Document file is no longer available.';
+    }
+
+    try {
+      final length = file.lengthSync();
+      if (length <= 0) {
+        return 'Document file is empty.';
+      }
+    } catch (_) {
+      return 'Document file could not be read.';
+    }
+
+    return null;
   }
 
   @override
@@ -232,8 +251,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     final isSchedule5to10 = _isSchedule5to10();
 
     if (isSchedule5to10) {
-      final container = ProviderScope.containerOf(context, listen: false);
-      final prefsState = container.read(preferencesManagerProvider);
+      final prefsState = ref.read(preferencesManagerProvider);
       final currentClass = prefsState.lastScheduleQuery5to10;
 
       if (currentClass == null || currentClass.trim().isEmpty) {
@@ -248,9 +266,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
     HapticService.medium();
 
-    final container = ProviderScope.containerOf(context, listen: false);
-    final scheduleState = container.read(scheduleProvider);
-    final scheduleNotifier = container.read(scheduleProvider.notifier);
+    final scheduleState = ref.read(scheduleProvider);
+    final scheduleNotifier = ref.read(scheduleProvider.notifier);
 
     // Check class index for instant validation
     if (scheduleState.isIndexBuilt &&
@@ -275,7 +292,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
       if (!mounted) return;
 
-      await _handleSuccessfulValidation(classInput, pageFromIndex, container, skipAnimation: true);
+      await _handleSuccessfulValidation(classInput, pageFromIndex, skipAnimation: true);
       return;
     }
 
@@ -299,7 +316,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       return;
     }
 
-    await _handleSuccessfulValidation(classInput, pageFromIndex, container);
+    await _handleSuccessfulValidation(classInput, pageFromIndex);
   }
 
   void _showInstantError() {
@@ -340,8 +357,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
   Future<void> _handleSuccessfulValidation(
     String classInput,
-    int? pageFromIndex,
-    ProviderContainer container, {
+    int? pageFromIndex, {
     bool skipAnimation = false,
   }) async {
     // If not coming from instant success path, start the animation now
@@ -360,12 +376,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
     if (!mounted) return;
 
-    await container
+    await ref
         .read(preferencesManagerProvider.notifier)
         .setLastScheduleQuery5to10(classInput);
 
     // Save as the user's selected class for home screen personalization
-    await container
+    await ref
         .read(preferencesManagerProvider.notifier)
         .setSelectedScheduleClass(classInput.toLowerCase());
 
@@ -386,7 +402,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
     if (pageFromIndex != null) {
       _pdfController.jumpToPage(pageFromIndex - 1);
-      await container
+      await ref
           .read(preferencesManagerProvider.notifier)
           .setLastSchedulePage5to10(pageFromIndex);
 
@@ -441,8 +457,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     try {
       if (!_isSchedule5to10()) return;
 
-      final container = ProviderScope.containerOf(context, listen: false);
-      final prefs = container.read(preferencesManagerProvider);
+      final prefs = ref.read(preferencesManagerProvider);
       final lastPage = prefs.lastSchedulePage5to10;
 
       // Only restore the saved page when no explicit target was provided
@@ -576,9 +591,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       _pdfController.jumpToPage(result.pageNumber - 1);
 
       try {
-        final container = ProviderScope.containerOf(context, listen: false);
         final prefsNotifier =
-            container.read(preferencesManagerProvider.notifier);
+            ref.read(preferencesManagerProvider.notifier);
         final isSchedule5to10 = _isSchedule5to10();
 
         if (isSchedule5to10) {
@@ -663,15 +677,14 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     if (query.trim().isEmpty) return;
 
     final trimmedQuery = query.trim().toLowerCase();
-    final container = ProviderScope.containerOf(context, listen: false);
 
     if (_isSchedule5to10()) {
-      await _handleSchedule5to10Search(trimmedQuery, container);
+      await _handleSchedule5to10Search(trimmedQuery);
       return;
     }
 
     if (_isScheduleJ11J12()) {
-      await _handleScheduleJ11J12Search(trimmedQuery, container);
+      await _handleScheduleJ11J12Search(trimmedQuery);
       return;
     }
 
@@ -688,11 +701,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
   Future<void> _handleSchedule5to10Search(
     String trimmedQuery,
-    ProviderContainer container,
   ) async {
-    final scheduleState = container.read(scheduleProvider);
-    final scheduleNotifier = container.read(scheduleProvider.notifier);
-    final prefsState = container.read(preferencesManagerProvider);
+    final scheduleState = ref.read(scheduleProvider);
+    final scheduleNotifier = ref.read(scheduleProvider.notifier);
+    final prefsState = ref.read(preferencesManagerProvider);
     final currentClass = prefsState.lastScheduleQuery5to10?.toLowerCase();
 
     if (currentClass != null && currentClass == trimmedQuery) {
@@ -726,7 +738,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         _updateClassTitle(trimmedQuery);
 
         final prefsNotifier =
-            container.read(preferencesManagerProvider.notifier);
+            ref.read(preferencesManagerProvider.notifier);
         unawaited(prefsNotifier.setLastSchedulePage5to10(page));
         unawaited(prefsNotifier.setLastScheduleQuery5to10(trimmedQuery));
         unawaited(prefsNotifier.setSelectedScheduleClass(trimmedQuery));
@@ -748,7 +760,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       final jPage = scheduleNotifier.getClassPageJ(trimmedQuery);
       if (jPage != null) {
         setState(() => _isSearchBarVisible = false);
-        await _navigateCrossPdf(trimmedQuery, 'J11/J12', jPage, container);
+        await _navigateCrossPdf(trimmedQuery, 'J11/J12', jPage);
         return;
       }
     }
@@ -768,10 +780,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   /// Handles class search when the J11/J12 PDF is open.
   Future<void> _handleScheduleJ11J12Search(
     String trimmedQuery,
-    ProviderContainer container,
   ) async {
-    final scheduleState = container.read(scheduleProvider);
-    final scheduleNotifier = container.read(scheduleProvider.notifier);
+    final scheduleState = ref.read(scheduleProvider);
+    final scheduleNotifier = ref.read(scheduleProvider.notifier);
 
     // Check if it's a j11/j12 class within this PDF
     if (scheduleState.isIndexBuilt) {
@@ -784,7 +795,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
         _pdfController.jumpToPage(jPage - 1);
         _updateClassTitle(trimmedQuery);
 
-        final prefsNotifier = container.read(preferencesManagerProvider.notifier);
+        final prefsNotifier = ref.read(preferencesManagerProvider.notifier);
         unawaited(prefsNotifier.setSelectedScheduleClass(trimmedQuery));
 
         if (mounted) {
@@ -802,7 +813,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       final page = scheduleNotifier.getClassPage(trimmedQuery);
       if (page != null) {
         setState(() => _isSearchBarVisible = false);
-        await _navigateCrossPdf(trimmedQuery, 'Klassen 5-10', page, container);
+        await _navigateCrossPdf(trimmedQuery, 'Klassen 5-10', page);
         return;
       }
     }
@@ -824,9 +835,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     String className,
     String targetGradeLevel,
     int targetPage,
-    ProviderContainer container,
   ) async {
-    final notifier = container.read(scheduleProvider.notifier);
+    final notifier = ref.read(scheduleProvider.notifier);
     final cachedFile = await notifier.getCachedFileForGrade(targetGradeLevel);
 
     if (cachedFile == null || !await cachedFile.exists()) {
@@ -845,7 +855,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     final classTitle = _formatClassNameForDayName(className, AppLocalizations.of(context)!);
     final newDayName = halbjahr.isNotEmpty ? '$classTitle – $halbjahr' : classTitle;
 
-    final prefsNotifier = container.read(preferencesManagerProvider.notifier);
+    final prefsNotifier = ref.read(preferencesManagerProvider.notifier);
     await prefsNotifier.setSelectedScheduleClass(className);
     if (targetGradeLevel == 'Klassen 5-10') {
       await prefsNotifier.setLastScheduleQuery5to10(className);
@@ -859,6 +869,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   /// Swaps the displayed PDF without leaving the screen.
   void _switchPdfInPlace(File newFile, String newDayName, int targetPage, String className) {
     final oldController = _pdfController;
+    final newFileError = _validatePdfFile(newFile);
 
     // Build new controller before setState so PdfView gets it on the next build
     _pdfController = pdfx.PdfController(
@@ -868,6 +879,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     setState(() {
       _overridePdfFile = newFile;
       _overrideDayName = newDayName;
+      _pdfLoadError = newFileError;
       _isPdfReady = false;
       _hasJumpedToSavedPage = false;
       _pendingTargetPage = targetPage; // executed by _pageBuilder when ready
@@ -1054,6 +1066,20 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   }
 
   Widget _buildPdfViewer() {
+    final fileError = _pdfLoadError;
+    if (fileError != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            fileError,
+            style: Theme.of(context).textTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
     return pdfx.PdfView(
       key: ValueKey(_effectivePdfFile.path),
       controller: _pdfController,
