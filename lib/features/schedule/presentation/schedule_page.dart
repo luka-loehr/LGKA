@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../application/schedule_provider.dart';
-import '../../../../navigation/app_router.dart';
+import '../application/schedule_navigation_helper.dart';
 import '../../../../providers/preferences_provider.dart';
 import '../../../../services/haptic_service.dart';
 import '../../../../theme/app_theme.dart';
@@ -390,7 +390,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     return GestureDetector(
       onTap: () {
         HapticService.medium();
-        _openScheduleForClass(schedules, selectedClass);
+        context.openScheduleForClass(ref, schedules, selectedClass);
       },
       child: Container(
         width: double.infinity,
@@ -483,109 +483,4 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     return viewPadding > 50 ? 34.0 : 8.0;
   }
 
-  // ── Open Schedule ──────────────────────────────────────────────────────────
-
-  void _openScheduleForClass(
-      List<ScheduleItem> group, String? selectedClass) async {
-    final notifier = ref.read(scheduleProvider.notifier);
-    final scheduleState = ref.read(scheduleProvider);
-
-    // Determine which PDF to open based on selected class
-    final isJahrgang =
-        selectedClass != null && selectedClass.startsWith('j');
-    ScheduleItem? target;
-    if (isJahrgang) {
-      target = group
-          .where((s) => s.gradeLevel == 'J11/J12')
-          .firstOrNull;
-    }
-    // Fall back to 5-10 for non-Jahrgang classes or if J11/J12 not found
-    target ??= group
-        .where((s) => s.gradeLevel == 'Klassen 5-10')
-        .firstOrNull;
-    target ??= group.firstOrNull;
-
-    if (target == null) return;
-
-    final halbjahr = target.halbjahr;
-    final halfLabel = _localizeHalbjahr(context, halbjahr);
-    final title =
-        selectedClass != null ? _formatClassName(selectedClass) : _localizeGradeLevel(context, target.gradeLevel);
-    final dayName = '$title – $halfLabel';
-
-    // Look up target page from the appropriate index
-    List<int>? targetPages;
-    if (selectedClass != null && scheduleState.isIndexBuilt) {
-      final page = isJahrgang
-          ? notifier.getClassPageJ(selectedClass)
-          : notifier.getClassPage(selectedClass);
-      if (page != null) targetPages = [page];
-    }
-
-    // Check cached file
-    final cached = await notifier.getCachedScheduleFile(target);
-    if (cached != null && await cached.exists()) {
-      if (mounted) {
-        context.push(AppRouter.pdfViewer, extra: {
-          'file': cached,
-          'dayName': dayName,
-          if (targetPages != null) 'targetPages': targetPages,
-        });
-      }
-      return;
-    }
-
-    if (!mounted) return;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        content: Row(
-          children: [
-            CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(
-                  Theme.of(context).colorScheme.primary),
-            ),
-            const SizedBox(width: 16),
-            Text(AppLocalizations.of(context)!.loadingSchedule),
-          ],
-        ),
-      ),
-    );
-
-    notifier.downloadSchedule(target).then((file) {
-      if (!mounted) return;
-      Navigator.of(context).pop();
-
-      if (file != null) {
-        // Re-fetch class page in case index was built during download
-        if (selectedClass != null && scheduleState.isIndexBuilt) {
-          final page = isJahrgang
-              ? notifier.getClassPageJ(selectedClass)
-              : notifier.getClassPage(selectedClass);
-          if (page != null) targetPages = [page];
-        }
-        context.push(AppRouter.pdfViewer, extra: {
-          'file': file,
-          'dayName': dayName,
-          if (targetPages != null) 'targetPages': targetPages,
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              '$halfLabel ${AppLocalizations.of(context)!.scheduleNotAvailable}'),
-          backgroundColor: Colors.orange,
-          duration: const Duration(seconds: 3),
-        ));
-      }
-    }).catchError((e) {
-      if (!mounted) return;
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(AppLocalizations.of(context)!.errorLoadingGeneric),
-        backgroundColor: Colors.red,
-      ));
-    });
-  }
 }
