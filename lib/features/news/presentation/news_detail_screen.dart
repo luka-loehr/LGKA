@@ -720,7 +720,7 @@ class NewsDetailScreen extends ConsumerWidget {
                                             color: Colors.black.withValues(alpha: 0.5),
                                             borderRadius: BorderRadius.circular(8.0),
                                           ),
-                                          child: Icon(
+                                          child: const Icon(
                                             Icons.open_in_new,
                                             color: Colors.white,
                                             size: 16,

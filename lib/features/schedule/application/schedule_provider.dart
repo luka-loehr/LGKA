@@ -169,6 +169,10 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
   Future<void> loadSchedules({bool forceRefresh = false}) async {
     if (state.isLoading && !forceRefresh) return;
 
+    // Prime the service cache from disk so a cold start reuses the persisted
+    // schedule list (within its 1 h TTL) instead of re-scraping on every open.
+    if (!forceRefresh) await _scheduleService.hydrateFromDisk();
+
     final cachedSchedules = _scheduleService.cachedSchedules;
     final lastFetchTime = _scheduleService.lastFetchTime;
 

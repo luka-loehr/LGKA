@@ -38,10 +38,11 @@ class EventsNotifier extends Notifier<EventsState> {
     return const EventsState(isLoading: true);
   }
 
-  Future<void> _load() async {
+  Future<void> _load({bool forceRefresh = false}) async {
     state = state.copyWith(isLoading: true, hasError: false);
     try {
-      final events = await EventsService.instance.fetchUpcomingEvents();
+      final events = await EventsService.instance
+          .fetchUpcomingEvents(forceRefresh: forceRefresh);
       state = EventsState(events: events, isLoading: false, hasError: false);
     } catch (_) {
       state = EventsState(
@@ -52,8 +53,17 @@ class EventsNotifier extends Notifier<EventsState> {
     }
   }
 
-  /// Refreshes events by bypassing cache (forces re-fetch).
-  Future<void> refresh() => _load();
+  /// Refreshes events by bypassing the cache (forces a re-fetch).
+  /// Use for user-initiated refresh (pull-to-refresh).
+  Future<void> refresh() => _load(forceRefresh: true);
+
+  /// Re-fetches only if the cached events have expired. Cheap to call
+  /// repeatedly — used by the startup preload and the periodic cache timer.
+  Future<void> loadIfStale() async {
+    if (!EventsService.instance.hasValidCache) {
+      await _load();
+    }
+  }
 }
 
 final eventsProvider =

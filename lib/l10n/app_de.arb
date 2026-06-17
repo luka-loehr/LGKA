@@ -1,40 +1,25 @@
 {
   "@@locale": "de",
   "appTitle": "LGKA+",
-  "welcomeTitle": "Willkommen bei LGKA+",
   "substitutionPlan": "Vertretungsplan",
   "weather": "Wetter",
   "schedule": "Stundenplan",
-  "legal": "Impressum",
-  "privacy": "Datenschutz",
   "krankmeldung": "Krankmeldung",
   "krankmeldungDisclaimer": "Die Krankmeldung wird vom Lessing-Gymnasium bereitgestellt und ist unabhängig von der LGKA+ App.",
   "krankmeldungContact": "Bei technischen Fragen oder Problemen wende dich bitte direkt an das Lessing-Gymnasium Karlsruhe.",
   "krankmeldungButton": "Zur Krankmeldung",
-  "serverMaintenance": "Reparaturarbeiten werden durchgeführt",
-  "weatherStationRepair": "Wetterdaten vorübergehend nicht verfügbar",
-  "weatherStationRepairFooter": "Die Wetterdaten werden bald wieder verfügbar sein",
   "serverConnectionFailed": "Serververbindung fehlgeschlagen",
   "serverConnectionHint": "Möglicherweise besteht keine Internetverbindung oder es finden gerade Wartungsarbeiten am Lessing-Gymnasium statt.",
   "tryAgain": "Erneut versuchen",
-  "liveWeatherData": "Live Wetterdaten",
-  "dataBeingCollected": "Daten werden gesammelt",
-  "liveWeatherDescription": "Aktuelle Wetterdaten für Karlsruhe, bereitgestellt von Open-Meteo – kostenlos und ohne Tracking.",
-  "dataCollectionDescription": "Open-Meteo sammelt gerade neue Daten für heute. Diagramme und weitere Werte werden angezeigt, sobald genügend Datenpunkte vorhanden sind.",
   "welcomeHeadline": "Willkommen!",
   "welcomeSubtitle": "Bei der neuen App fürs Lessing-Gymnasium Karlsruhe.",
   "continueLabel": "Weiter",
   "today": "Heute",
   "tomorrow": "Morgen",
-  "loadingSubstitutions": "Lade Vertretungspläne...",
   "errorLoading": "Fehler beim Laden",
   "noInfoYet": "Noch keine Infos",
   "settings": "Einstellungen",
   "accentColor": "Akzentfarbe",
-  "chooseAccentColor": "Wähle deine bevorzugte Akzentfarbe",
-  "classes5to7": "Klassenstufe 5-7",
-  "classes8to10": "Klassenstufe 8-10",
-  "upperSchool": "Oberstufe",
   "privacyLabel": "Datenschutzerklärung",
   "legalLabel": "Impressum",
   "bugReport": "Fehler gefunden?",
@@ -55,43 +40,21 @@
   "featureSickDesc": "Krankmeldung direkt über die App einreichen",
   "featureEventsTitle": "Schulveranstaltungen",
   "featureEventsDesc": "Alle anstehenden Schulveranstaltungen auf einen Blick",
-  "yourAccentColor": "Deine Akzentfarbe",
-  "chooseFavoriteColor": "Wähle deine Lieblingsfarbe aus. Diese wird überall in der App verwendet.",
   "letsGo": "Los geht's!",
   "krankmeldungInfoHeader": "Hinweis zur Krankmeldung",
   "loadingSickNote": "Lade Krankmeldung...",
-  "loadingWeather": "Lade Wetterdaten...",
-  "noWeatherData": "Keine Wetterdaten verfügbar",
-  "temperatureLabel": "Temperatur",
-  "humidityLabel": "Luftfeuchtigkeit",
-  "windSpeedLabel": "Wind",
-  "pressureLabel": "Sonne",
-  "temperatureTodayTitle": "Temperatur",
-  "humidityTodayTitle": "Luftfeuchtigkeit",
-  "windSpeedTodayTitle": "Windgeschwindigkeit",
-  "pressureTodayTitle": "Sonneneinstrahlung",
-  "yAxisTemperature": "Temperatur (°C)",
-  "yAxisHumidity": "Luftfeuchtigkeit (%)",
-  "yAxisWindSpeed": "Wind (km/h)",
-  "yAxisPressure": "Sonne (W/m²)",
-  "timeLabel": "Uhrzeit",
-  "chartsAvailableAt": "Diagramme sind ab 0:30 Uhr verfügbar.",
   "checkingAvailability": "Prüfe Verfügbarkeit...",
   "loadingSchedules": "Lade Stundenpläne...",
   "loadingNews": "Lade Neuigkeiten...",
   "noSchedulesAvailable": "Keine Stundenpläne verfügbar",
   "tryAgainLater": "Versuche es später erneut",
   "loadingSchedule": "Lade Stundenplan...",
-  "notAvailableYet": "ist noch nicht verfügbar",
   "errorLoadingGeneric": "Fehler beim Laden",
   "browserTitle": "Browser",
   "searchInPdf": "Im PDF suchen",
   "cancelSearch": "Suche abbrechen",
-  "previousResult": "Vorheriges Ergebnis",
-  "nextResult": "Nächstes Ergebnis",
   "newSearch": "Neue Suche",
   "sharePdf": "PDF teilen",
-  "scheduleTitle": "Stundenplan",
   "documentTitle": "Dokument",
   "filenameSchedulePrefix": "LGKA_Stundenplan_",
   "subjectSchedule": "LGKA+ Stundenplan",
@@ -115,17 +78,20 @@
   "saturday": "Samstag",
   "sunday": "Sonntag",
   "scheduleNotAvailable": "ist noch nicht verfügbar",
-  "chartLoading": "Diagramm wird geladen...",
   "singleResultFound": "Dir wird jetzt immer Klasse {query} angezeigt.",
   "@singleResultFound": {
     "placeholders": {
-      "query": { "type": "String" }
+      "query": {
+        "type": "String"
+      }
     }
   },
   "classAlreadySet": "Klasse {className} ist bereits eingestellt.",
   "@classAlreadySet": {
     "placeholders": {
-      "className": { "type": "String" }
+      "className": {
+        "type": "String"
+      }
     }
   },
   "multipleResultsFound": "{count} Ergebnisse gefunden",
@@ -139,7 +105,9 @@
   "noResultsFound": "Klasse {className} existiert nicht.",
   "@noResultsFound": {
     "placeholders": {
-      "className": { "type": "String" }
+      "className": {
+        "type": "String"
+      }
     }
   },
   "shareError": "Fehler beim Teilen",
@@ -147,14 +115,6 @@
   "@errorNavigatingToPage": {
     "placeholders": {
       "page": {
-        "type": "String"
-      }
-    }
-  },
-  "foundPages": "Gefundene Seiten: {pages}",
-  "@foundPages": {
-    "placeholders": {
-      "pages": {
         "type": "String"
       }
     }
@@ -170,9 +130,6 @@
       }
     }
   },
-  "privacyConsentPrefix": "Ich habe die ",
-  "privacyPolicy": "Datenschutzerklärung",
-  "privacyConsentSuffix": " gelesen.",
   "accentColorTitle": "Deine Akzentfarbe",
   "accentColorDescription": "Wähle deine Lieblingsfarbe aus. Diese wird überall in der App verwendet.",
   "appearanceTitle": "Erscheinungsbild",
@@ -180,34 +137,12 @@
   "themeLight": "Hell",
   "themeAuto": "Auto",
   "news": "Neuigkeiten",
-  "more": "Weiteres",
   "learnMore": "Mehr erfahren",
   "noNewsAvailable": "Keine Neuigkeiten verfügbar",
   "noNewsFound": "Keine Neuigkeiten gefunden",
   "errorLoadingNews": "Fehler beim Laden der Neuigkeiten",
   "unknown": "Unbekannt",
-  "openInBrowser": "Im Browser öffnen",
-  "continueReading": "Weiterlesen:",
   "weitereNeuigkeiten": "Weitere Neuigkeiten",
-  "colorBlue": "Blau",
-  "colorMint": "Mint",
-  "colorLavender": "Lavendel",
-  "colorRose": "Rose",
-  "colorPeach": "Pfirsich",
-  "csvFileTooLarge": "CSV-Datei zu groß oder beschädigt",
-  "errorLoadingWeather": "Fehler beim Laden der Wetterdaten",
-  "greetingMorning": "Guten Morgen",
-  "greetingDay": "Guten Tag",
-  "greetingEvening": "Guten Abend",
-  "supportProject": "Projekt unterstützen",
-  "lastDownloaded": "Zuletzt aktualisiert: {time}",
-  "@lastDownloaded": {
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
   "termine": "Bevorstehende Termine",
   "noEventsAvailable": "Keine Termine verfügbar",
   "weatherPageTitle": "Wetter Karlsruhe",
@@ -219,16 +154,26 @@
   "weatherFeelsLikeHighLow": "Gefühlt {feelsLike}°  ·  {low}° – {high}°",
   "@weatherFeelsLikeHighLow": {
     "placeholders": {
-      "feelsLike": { "type": "int" },
-      "high": { "type": "int" },
-      "low": { "type": "int" }
+      "feelsLike": {
+        "type": "int"
+      },
+      "high": {
+        "type": "int"
+      },
+      "low": {
+        "type": "int"
+      }
     }
   },
   "weatherFeelsLikeHumidity": "Gefühlt {feelsLike}°  ·  {humidity}% Luftfeuchte",
   "@weatherFeelsLikeHumidity": {
     "placeholders": {
-      "feelsLike": { "type": "int" },
-      "humidity": { "type": "int" }
+      "feelsLike": {
+        "type": "int"
+      },
+      "humidity": {
+        "type": "int"
+      }
     }
   },
   "weatherHumidityShort": "Luftfeuchte",
@@ -245,7 +190,9 @@
   "weatherFeelsLike": "Gefühlt {feelsLike}°",
   "@weatherFeelsLike": {
     "placeholders": {
-      "feelsLike": { "type": "int" }
+      "feelsLike": {
+        "type": "int"
+      }
     }
   },
   "jahrgang11": "Jahrgang 11",
@@ -253,7 +200,9 @@
   "klasseLabel": "Klasse {name}",
   "@klasseLabel": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "filenameDocumentDefault": "LGKA_Document.pdf",

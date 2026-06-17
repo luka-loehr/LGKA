@@ -1,5 +1,7 @@
 // Copyright Luka Löhr 2026
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 /// Cache keys for different data types
 enum CacheKey {
   substitutions,
@@ -19,7 +21,10 @@ class CacheService {
   /// Cache validity durations for each data type.
   static const Map<CacheKey, Duration> _cacheValidityDurations = {
     CacheKey.substitutions: Duration(minutes: 1),
-    CacheKey.schedules: Duration(hours: 24),
+    // Schedules (semester timetable PDFs) refresh at most hourly — they
+    // survive across app launches via the persisted timestamp below, so the
+    // schedule is no longer re-scraped on every app open.
+    CacheKey.schedules: Duration(hours: 1),
     CacheKey.scheduleAvailability: Duration(minutes: 15),
     CacheKey.news: Duration(hours: 1),
     CacheKey.weather: Duration(hours: 1),
@@ -28,9 +33,28 @@ class CacheService {
 
   /// Map to store last fetch time for each cache key
   final Map<CacheKey, DateTime?> _lastFetchTimes = {};
-  
+
+  /// SharedPreferences instance used to persist fetch timestamps across launches.
+  /// Null until [init] is called (e.g. in unit tests), in which case the service
+  /// degrades gracefully to in-memory-only behaviour.
+  SharedPreferences? _prefs;
+
+  static const String _tsKeyPrefix = 'cache_ts_';
+
   /// Timestamp when app was last backgrounded (null if never backgrounded in this session)
   DateTime? _lastBackgroundTime;
+
+  /// Hydrate persisted fetch timestamps from disk. Call once at startup before
+  /// any data preload so cold-start cache validity reflects the last real fetch.
+  Future<void> init(SharedPreferences prefs) async {
+    _prefs = prefs;
+    for (final key in CacheKey.values) {
+      final millis = prefs.getInt('$_tsKeyPrefix${key.name}');
+      if (millis != null) {
+        _lastFetchTimes[key] = DateTime.fromMillisecondsSinceEpoch(millis);
+      }
+    }
+  }
 
   /// Get the cache validity duration for a specific cache key
   Duration getCacheValidity(CacheKey key) {
@@ -78,9 +102,11 @@ class CacheService {
     return true;
   }
 
-  /// Update the last fetch time for a cache key
+  /// Update the last fetch time for a cache key (persisted across launches).
   void updateCacheTimestamp(CacheKey key, DateTime? timestamp) {
-    _lastFetchTimes[key] = timestamp ?? DateTime.now();
+    final ts = timestamp ?? DateTime.now();
+    _lastFetchTimes[key] = ts;
+    _prefs?.setInt('$_tsKeyPrefix${key.name}', ts.millisecondsSinceEpoch);
   }
 
   /// Get the last fetch time for a cache key
@@ -96,11 +122,15 @@ class CacheService {
   /// Clear cache timestamp for a specific key
   void clearCache(CacheKey key) {
     _lastFetchTimes[key] = null;
+    _prefs?.remove('$_tsKeyPrefix${key.name}');
   }
 
   /// Clear all cache timestamps
   void clearAllCaches() {
     _lastFetchTimes.clear();
+    for (final key in CacheKey.values) {
+      _prefs?.remove('$_tsKeyPrefix${key.name}');
+    }
   }
 
   /// Mark app as backgrounded (clears cache validity)
@@ -111,17 +141,5 @@ class CacheService {
   /// Check if cache is expired (opposite of isCacheValid)
   bool isCacheExpired(CacheKey key, {DateTime? lastFetchTime}) {
     return !isCacheValid(key, lastFetchTime: lastFetchTime);
-  }
-
-  /// Get time until cache expires (returns Duration.zero if already expired)
-  Duration getTimeUntilExpiry(CacheKey key, {DateTime? lastFetchTime}) {
-    final fetchTime = lastFetchTime ?? _lastFetchTimes[key];
-    if (fetchTime == null) return Duration.zero;
-
-    final validityDuration = getCacheValidity(key);
-    final elapsed = DateTime.now().difference(fetchTime);
-    final remaining = validityDuration - elapsed;
-
-    return remaining.isNegative ? Duration.zero : remaining;
   }
 }

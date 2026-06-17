@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:lgka_flutter/navigation/app_router.dart';
@@ -96,6 +97,12 @@ void main() async {
   final preferencesManager = PreferencesManager();
   await preferencesManager.init();
   AppLogger.success('Preferences manager initialized');
+
+  // Hydrate persisted cache freshness timestamps so cold-start cache validity
+  // reflects the last real fetch. This is what stops the schedule (and other
+  // data) from being re-loaded on every app open — see CacheService.
+  final prefs = await SharedPreferences.getInstance();
+  await CacheService().init(prefs);
   
   // Determine initial route with onboarding + auth gating
   String initialRoute;
@@ -241,7 +248,7 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
   Future<void> _preloadEvents() async {
     try {
       AppLogger.init('Preloading events', module: 'Main');
-      await ref.read(eventsProvider.notifier).refresh();
+      await ref.read(eventsProvider.notifier).loadIfStale();
       AppLogger.success('Events preloaded', module: 'Main');
     } catch (e) {
       AppLogger.error('Failed to preload events', module: 'Main', error: e);
@@ -292,9 +299,9 @@ class _LGKAAppState extends ConsumerState<LGKAApp> with WidgetsBindingObserver {
       unawaited(ref.read(newsProvider.notifier).refreshInBackground());
     }
 
-    // Events: service has a 1 h internal cache; calling refresh() is a no-op
-    // until the hour elapses, then it re-fetches.
-    unawaited(ref.read(eventsProvider.notifier).refresh());
+    // Events: only re-fetches when the 1 h cache window has elapsed; a no-op
+    // otherwise, so this is safe to call on every timer tick.
+    unawaited(ref.read(eventsProvider.notifier).loadIfStale());
   }
 
   @override

@@ -151,8 +151,8 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
           },
           onReceivedHttpAuthRequest: (controller, challenge) async {
             // Provide basic auth when challenged
-            final String username = 'vertretungsplan';
-            final String password = 'ephraim';
+            const String username = 'vertretungsplan';
+            const String password = 'ephraim';
             return HttpAuthResponse(
               username: username,
               password: password,

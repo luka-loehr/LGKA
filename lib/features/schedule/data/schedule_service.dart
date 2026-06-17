@@ -1,18 +1,18 @@
 // Copyright Luka Löhr 2026
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html;
 import 'package:path_provider/path_provider.dart';
 import '../domain/schedule_models.dart';
 import '../../../../utils/app_logger.dart';
-import '../../../../utils/app_info.dart';
-import '../../../../config/app_credentials.dart';
 import '../../../../utils/parser_guard.dart';
 import '../../../../utils/retry_util.dart';
 import '../../../../services/cache_service.dart';
+import '../../../../services/disk_cache.dart';
+import '../../../../services/authed_http_client.dart';
 
 /// Service for managing schedule PDFs through web scraping
 class ScheduleService {
@@ -48,6 +48,9 @@ class ScheduleService {
 
   /// Get all available schedules, using cache if valid
   Future<List<ScheduleItem>> getSchedules({bool forceRefresh = false}) async {
+    // Prime the in-memory cache from disk on first access after a cold start,
+    // so the schedule list is reused instead of re-scraped on every app open.
+    if (!forceRefresh && _cachedSchedules == null) await hydrateFromDisk();
     if (!forceRefresh && _cachedSchedules != null) {
       if (hasValidCache) {
         return _cachedSchedules!;
@@ -59,9 +62,7 @@ class ScheduleService {
 
     try {
       final schedules = await _scrapeSchedules();
-      _cachedSchedules = schedules;
-      _lastFetchTime = DateTime.now();
-      _cacheService.updateCacheTimestamp(CacheKey.schedules, _lastFetchTime);
+      _storeSchedules(schedules);
       return schedules;
     } catch (e) {
       if (_cachedSchedules != null) {
@@ -71,19 +72,46 @@ class ScheduleService {
     }
   }
 
+  /// Stores freshly-scraped schedules in memory, records the fetch time
+  /// (persisted via CacheService), and persists the list to disk so a cold
+  /// start can reuse it without re-scraping.
+  void _storeSchedules(List<ScheduleItem> schedules) {
+    _cachedSchedules = schedules;
+    _lastFetchTime = DateTime.now();
+    _cacheService.updateCacheTimestamp(CacheKey.schedules, _lastFetchTime);
+    unawaited(DiskCache.instance.write(
+      _cacheBlob,
+      jsonEncode(schedules.map((s) => s.toJson()).toList()),
+    ));
+  }
+
+  static const String _cacheBlob = 'schedules';
+
+  /// Loads last-persisted schedules from disk into the in-memory cache so the
+  /// app shows them instantly on a cold start instead of re-scraping. The
+  /// freshness timestamp is restored from the persisted CacheService value.
+  Future<void> hydrateFromDisk() async {
+    if (_cachedSchedules != null) return;
+    final raw = await DiskCache.instance.read(_cacheBlob);
+    if (raw == null) return;
+    try {
+      final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+      _cachedSchedules = list.map(ScheduleItem.fromJson).toList();
+      _lastFetchTime = _cacheService.getLastFetchTime(CacheKey.schedules);
+      AppLogger.debug('Schedules: hydrated ${_cachedSchedules!.length} from disk',
+          module: 'ScheduleService');
+    } catch (e) {
+      AppLogger.debug('Schedules: disk hydrate failed: $e',
+          module: 'ScheduleService');
+    }
+  }
+
   void _refreshCacheInBackground() {
     if (_isRefreshing) return;
 
     _isRefreshing = true;
     _scrapeSchedules()
-        .then((schedules) {
-          _cachedSchedules = schedules;
-          _lastFetchTime = DateTime.now();
-          _cacheService.updateCacheTimestamp(
-            CacheKey.schedules,
-            _lastFetchTime,
-          );
-        })
+        .then(_storeSchedules)
         .catchError((_) {
           // Ignore background refresh errors
         })
@@ -104,9 +132,7 @@ class ScheduleService {
 
     try {
       final schedules = await _scrapeSchedules();
-      _cachedSchedules = schedules;
-      _lastFetchTime = DateTime.now();
-      _cacheService.updateCacheTimestamp(CacheKey.schedules, _lastFetchTime);
+      _storeSchedules(schedules);
       AppLogger.success(
         'Background refresh complete: Schedules',
         module: 'ScheduleService',
@@ -137,19 +163,10 @@ class ScheduleService {
   Future<List<ScheduleItem>> _scrapeSchedules() async {
     return RetryUtil.retry<List<ScheduleItem>>(
       operation: () async {
-        final credentials = base64Encode(
-          utf8.encode('${AppCredentials.username}:${AppCredentials.password}'),
+        final response = await AuthedHttpClient.get(
+          Uri.parse(_schedulePageUrl),
+          timeout: _timeout,
         );
-
-        final response = await http
-            .get(
-              Uri.parse(_schedulePageUrl),
-              headers: {
-                'Authorization': 'Basic $credentials',
-                'User-Agent': AppInfo.userAgent,
-              },
-            )
-            .timeout(_timeout);
 
         if (response.statusCode != 200) {
           throw Exception(
@@ -162,25 +179,22 @@ class ScheduleService {
           throw Exception('Server returned empty or invalid response');
         }
 
-        final document = html.parse(response.body);
-        final primaryLinks = document.querySelectorAll(
-          '#mod-custom213 a[href*="stundenplan"]',
-        );
-        final fallbackLinks = document.querySelectorAll(
-          'a[href*="stundenplan"]',
-        );
+        // Parse once, in a background isolate. The isolate also returns the
+        // link/module counts used for shape-change detection, so the HTML is
+        // no longer parsed a second time on the UI thread.
+        final parsed = await compute(_parseScheduleHtml, response.body);
 
         ParserGuard.requireMin(
           parser: 'Schedule parser',
           field: 'stundenplan links',
-          actual: fallbackLinks.length,
+          actual: parsed.fallbackLinks,
           min: 1,
         );
 
         final fingerprint = ParserGuard.buildFingerprint({
-          'primaryLinks': primaryLinks.length,
-          'fallbackLinks': fallbackLinks.length,
-          'hasModule': document.querySelector('#mod-custom213') != null ? 1 : 0,
+          'primaryLinks': parsed.primaryLinks,
+          'fallbackLinks': parsed.fallbackLinks,
+          'hasModule': parsed.hasModule ? 1 : 0,
         });
 
         if (_shapeTracker.didShapeChange(
@@ -193,7 +207,7 @@ class ScheduleService {
           );
         }
 
-        return await compute(_parseScheduleHtml, response.body);
+        return parsed.schedules;
       },
       maxRetries: 2,
       operationName: 'ScheduleService',
@@ -246,21 +260,10 @@ class ScheduleService {
 
       final isAvailable = await RetryUtil.retry<bool>(
         operation: () async {
-          final credentials = base64Encode(
-            utf8.encode(
-              '${AppCredentials.username}:${AppCredentials.password}',
-            ),
+          final response = await AuthedHttpClient.head(
+            uri,
+            timeout: _availabilityCheckTimeout,
           );
-
-          final response = await http
-              .head(
-                uri,
-                headers: {
-                  'Authorization': 'Basic $credentials',
-                  'User-Agent': AppInfo.userAgent,
-                },
-              )
-              .timeout(_availabilityCheckTimeout);
 
           return response.statusCode == 200;
         },
@@ -339,25 +342,11 @@ class ScheduleService {
 
       return RetryUtil.retry<File?>(
         operation: () async {
-          final credentials = base64Encode(
-            utf8.encode(
-              '${AppCredentials.username}:${AppCredentials.password}',
-            ),
-          );
-
           AppLogger.debug(
             'Making HTTP request for PDF',
             module: 'ScheduleService',
           );
-          final response = await http
-              .get(
-                uri,
-                headers: {
-                  'Authorization': 'Basic $credentials',
-                  'User-Agent': AppInfo.userAgent,
-                },
-              )
-              .timeout(_timeout);
+          final response = await AuthedHttpClient.get(uri, timeout: _timeout);
 
           if (response.statusCode == 404) {
             AppLogger.warning(
@@ -453,6 +442,7 @@ class ScheduleService {
     _availabilityCache.clear();
     _lastAvailabilityCheck = null;
     _isRefreshing = false;
+    unawaited(DiskCache.instance.delete(_cacheBlob));
   }
 
   /// Check if PDF content appears to be valid
@@ -488,14 +478,20 @@ class ScheduleService {
   }
 }
 
-/// Parse HTML to extract schedule information
-List<ScheduleItem> _parseScheduleHtml(String htmlContent) {
+/// Parse HTML to extract schedule information (runs in a background isolate).
+_ScheduleScrapeResult _parseScheduleHtml(String htmlContent) {
   final document = html.parse(htmlContent);
   final schedules = <ScheduleItem>[];
 
   try {
     // Find the module containing schedule links
     final module = document.querySelector('#mod-custom213');
+    // Counts for shape-change detection, computed here so the UI thread no
+    // longer re-parses the same HTML just to build the fingerprint.
+    final primaryLinks =
+        document.querySelectorAll('#mod-custom213 a[href*="stundenplan"]').length;
+    final fallbackLinks =
+        document.querySelectorAll('a[href*="stundenplan"]').length;
     final links = (module ?? document).querySelectorAll(
       'a[href*="stundenplan"]',
     );
@@ -589,11 +585,32 @@ List<ScheduleItem> _parseScheduleHtml(String htmlContent) {
       min: 1,
     );
 
-    return schedules;
+    return _ScheduleScrapeResult(
+      schedules: schedules,
+      primaryLinks: primaryLinks,
+      fallbackLinks: fallbackLinks,
+      hasModule: module != null,
+    );
   } catch (e) {
     // Convert any parsing error to generic server connection error
     throw Exception('Serververbindung fehlgeschlagen');
   }
+}
+
+/// Result of parsing the schedule listing page in a background isolate: the
+/// parsed schedules plus the link/module counts used for shape tracking.
+class _ScheduleScrapeResult {
+  const _ScheduleScrapeResult({
+    required this.schedules,
+    required this.primaryLinks,
+    required this.fallbackLinks,
+    required this.hasModule,
+  });
+
+  final List<ScheduleItem> schedules;
+  final int primaryLinks;
+  final int fallbackLinks;
+  final bool hasModule;
 }
 
 /// Extract halbjahr information from title

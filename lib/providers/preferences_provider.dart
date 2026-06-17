@@ -11,14 +11,10 @@ class PreferencesManagerState {
   final bool isFirstLaunch;
   final bool isAuthenticated;
   final bool onboardingCompleted;
-  final bool isDebugMode;
-  final bool showNavigationDebug;
   final String accentColor;
   final String themeMode;
   final bool vibrationEnabled;
   final bool krankmeldungInfoShown;
-  final String? lastPdfSearchQuery;
-  final int? lastPdfSearchPage;
   final int? lastSchedulePage5to10;
   final String? lastScheduleQuery5to10;
   final String? selectedScheduleClass;
@@ -28,14 +24,10 @@ class PreferencesManagerState {
     this.isFirstLaunch = true,
     this.isAuthenticated = false,
     this.onboardingCompleted = false,
-    this.isDebugMode = false,
-    this.showNavigationDebug = false,
     this.accentColor = 'blue',
     this.themeMode = 'system',
     this.vibrationEnabled = true,
     this.krankmeldungInfoShown = false,
-    this.lastPdfSearchQuery,
-    this.lastPdfSearchPage,
     this.lastSchedulePage5to10,
     this.lastScheduleQuery5to10,
     this.selectedScheduleClass,
@@ -46,14 +38,10 @@ class PreferencesManagerState {
     bool? isFirstLaunch,
     bool? isAuthenticated,
     bool? onboardingCompleted,
-    bool? isDebugMode,
-    bool? showNavigationDebug,
     String? accentColor,
     String? themeMode,
     bool? vibrationEnabled,
     bool? krankmeldungInfoShown,
-    String? lastPdfSearchQuery,
-    int? lastPdfSearchPage,
     int? lastSchedulePage5to10,
     String? lastScheduleQuery5to10,
     String? selectedScheduleClass,
@@ -63,19 +51,47 @@ class PreferencesManagerState {
       isFirstLaunch: isFirstLaunch ?? this.isFirstLaunch,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
-      isDebugMode: isDebugMode ?? this.isDebugMode,
-      showNavigationDebug: showNavigationDebug ?? this.showNavigationDebug,
       accentColor: accentColor ?? this.accentColor,
       themeMode: themeMode ?? this.themeMode,
       vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
       krankmeldungInfoShown: krankmeldungInfoShown ?? this.krankmeldungInfoShown,
-      lastPdfSearchQuery: lastPdfSearchQuery ?? this.lastPdfSearchQuery,
-      lastPdfSearchPage: lastPdfSearchPage ?? this.lastPdfSearchPage,
       lastSchedulePage5to10: lastSchedulePage5to10 ?? this.lastSchedulePage5to10,
       lastScheduleQuery5to10: lastScheduleQuery5to10 ?? this.lastScheduleQuery5to10,
       selectedScheduleClass: selectedScheduleClass ?? this.selectedScheduleClass,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is PreferencesManagerState &&
+        other.isInitialized == isInitialized &&
+        other.isFirstLaunch == isFirstLaunch &&
+        other.isAuthenticated == isAuthenticated &&
+        other.onboardingCompleted == onboardingCompleted &&
+        other.accentColor == accentColor &&
+        other.themeMode == themeMode &&
+        other.vibrationEnabled == vibrationEnabled &&
+        other.krankmeldungInfoShown == krankmeldungInfoShown &&
+        other.lastSchedulePage5to10 == lastSchedulePage5to10 &&
+        other.lastScheduleQuery5to10 == lastScheduleQuery5to10 &&
+        other.selectedScheduleClass == selectedScheduleClass;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        isInitialized,
+        isFirstLaunch,
+        isAuthenticated,
+        onboardingCompleted,
+        accentColor,
+        themeMode,
+        vibrationEnabled,
+        krankmeldungInfoShown,
+        lastSchedulePage5to10,
+        lastScheduleQuery5to10,
+        selectedScheduleClass,
+      );
 }
 
 /// Notifier for preferences manager
@@ -106,14 +122,10 @@ class PreferencesManagerNotifier extends Notifier<PreferencesManagerState> {
       isFirstLaunch: _manager.isFirstLaunch,
       isAuthenticated: _manager.isAuthenticated,
       onboardingCompleted: _manager.onboardingCompleted,
-      isDebugMode: _manager.isDebugMode,
-      showNavigationDebug: _manager.showNavigationDebug,
       accentColor: _manager.accentColor,
       themeMode: _manager.themeMode,
       vibrationEnabled: _manager.vibrationEnabled,
       krankmeldungInfoShown: _manager.krankmeldungInfoShown,
-      lastPdfSearchQuery: _manager.lastPdfSearchQuery,
-      lastPdfSearchPage: _manager.lastPdfSearchPage,
       lastSchedulePage5to10: _manager.lastSchedulePage5to10,
       lastScheduleQuery5to10: _manager.lastScheduleQuery5to10,
       selectedScheduleClass: _manager.selectedScheduleClass,
@@ -145,16 +157,6 @@ class PreferencesManagerNotifier extends Notifier<PreferencesManagerState> {
     _refreshState();
   }
 
-  Future<void> setDebugMode(bool value) async {
-    await _manager.setDebugMode(value);
-    _refreshState();
-  }
-
-  Future<void> setShowNavigationDebug(bool value) async {
-    await _manager.setShowNavigationDebug(value);
-    _refreshState();
-  }
-
   Future<void> setAccentColor(String color) async {
     await _manager.setAccentColor(color);
     _refreshState();
@@ -175,16 +177,6 @@ class PreferencesManagerNotifier extends Notifier<PreferencesManagerState> {
     _refreshState();
   }
 
-  Future<void> setLastPdfSearchQuery(String? value) async {
-    await _manager.setLastPdfSearchQuery(value);
-    _refreshState();
-  }
-
-  Future<void> setLastPdfSearchPage(int? page) async {
-    await _manager.setLastPdfSearchPage(page);
-    _refreshState();
-  }
-
   Future<void> setLastSchedulePage5to10(int? page) async {
     await _manager.setLastSchedulePage5to10(page);
     _refreshState();
@@ -197,11 +189,6 @@ class PreferencesManagerNotifier extends Notifier<PreferencesManagerState> {
 
   Future<void> setSelectedScheduleClass(String? className) async {
     await _manager.setSelectedScheduleClass(className);
-    _refreshState();
-  }
-
-  Future<void> clearAllPreferences() async {
-    await _manager.clearAllPreferences();
     _refreshState();
   }
 

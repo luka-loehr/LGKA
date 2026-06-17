@@ -101,12 +101,6 @@ abstract class AppLocalizations {
   /// **'LGKA+'**
   String get appTitle;
 
-  /// No description provided for @welcomeTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome to LGKA+'**
-  String get welcomeTitle;
-
   /// No description provided for @substitutionPlan.
   ///
   /// In en, this message translates to:
@@ -124,18 +118,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Schedule'**
   String get schedule;
-
-  /// No description provided for @legal.
-  ///
-  /// In en, this message translates to:
-  /// **'Legal Notice'**
-  String get legal;
-
-  /// No description provided for @privacy.
-  ///
-  /// In en, this message translates to:
-  /// **'Privacy Policy'**
-  String get privacy;
 
   /// No description provided for @krankmeldung.
   ///
@@ -161,24 +143,6 @@ abstract class AppLocalizations {
   /// **'To Sick Note'**
   String get krankmeldungButton;
 
-  /// No description provided for @serverMaintenance.
-  ///
-  /// In en, this message translates to:
-  /// **'Maintenance work in progress'**
-  String get serverMaintenance;
-
-  /// No description provided for @weatherStationRepair.
-  ///
-  /// In en, this message translates to:
-  /// **'Weather data temporarily unavailable'**
-  String get weatherStationRepair;
-
-  /// No description provided for @weatherStationRepairFooter.
-  ///
-  /// In en, this message translates to:
-  /// **'Weather data will be available again soon'**
-  String get weatherStationRepairFooter;
-
   /// No description provided for @serverConnectionFailed.
   ///
   /// In en, this message translates to:
@@ -196,30 +160,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try again'**
   String get tryAgain;
-
-  /// No description provided for @liveWeatherData.
-  ///
-  /// In en, this message translates to:
-  /// **'Live Weather Data'**
-  String get liveWeatherData;
-
-  /// No description provided for @dataBeingCollected.
-  ///
-  /// In en, this message translates to:
-  /// **'Data being collected'**
-  String get dataBeingCollected;
-
-  /// No description provided for @liveWeatherDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Current weather data for Karlsruhe, provided by Open-Meteo – free and without tracking.'**
-  String get liveWeatherDescription;
-
-  /// No description provided for @dataCollectionDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Open-Meteo is currently collecting new data for today. Charts and additional values will be displayed once enough data points are available.'**
-  String get dataCollectionDescription;
 
   /// No description provided for @welcomeHeadline.
   ///
@@ -251,12 +191,6 @@ abstract class AppLocalizations {
   /// **'Tomorrow'**
   String get tomorrow;
 
-  /// No description provided for @loadingSubstitutions.
-  ///
-  /// In en, this message translates to:
-  /// **'Loading substitution plans...'**
-  String get loadingSubstitutions;
-
   /// No description provided for @errorLoading.
   ///
   /// In en, this message translates to:
@@ -280,30 +214,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Accent color'**
   String get accentColor;
-
-  /// No description provided for @chooseAccentColor.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose your preferred accent color'**
-  String get chooseAccentColor;
-
-  /// No description provided for @classes5to7.
-  ///
-  /// In en, this message translates to:
-  /// **'Grades 5-7'**
-  String get classes5to7;
-
-  /// No description provided for @classes8to10.
-  ///
-  /// In en, this message translates to:
-  /// **'Grades 8-10'**
-  String get classes8to10;
-
-  /// No description provided for @upperSchool.
-  ///
-  /// In en, this message translates to:
-  /// **'Upper school'**
-  String get upperSchool;
 
   /// No description provided for @privacyLabel.
   ///
@@ -359,102 +269,6 @@ abstract class AppLocalizations {
   /// **'Loading sick note...'**
   String get loadingSickNote;
 
-  /// No description provided for @loadingWeather.
-  ///
-  /// In en, this message translates to:
-  /// **'Loading weather data...'**
-  String get loadingWeather;
-
-  /// No description provided for @noWeatherData.
-  ///
-  /// In en, this message translates to:
-  /// **'No weather data available'**
-  String get noWeatherData;
-
-  /// No description provided for @temperatureLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Temperature'**
-  String get temperatureLabel;
-
-  /// No description provided for @humidityLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Humidity'**
-  String get humidityLabel;
-
-  /// No description provided for @windSpeedLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Wind'**
-  String get windSpeedLabel;
-
-  /// No description provided for @pressureLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Sun'**
-  String get pressureLabel;
-
-  /// No description provided for @temperatureTodayTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Temperature'**
-  String get temperatureTodayTitle;
-
-  /// No description provided for @humidityTodayTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Humidity'**
-  String get humidityTodayTitle;
-
-  /// No description provided for @windSpeedTodayTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Wind Speed'**
-  String get windSpeedTodayTitle;
-
-  /// No description provided for @pressureTodayTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Solar Radiation'**
-  String get pressureTodayTitle;
-
-  /// No description provided for @yAxisTemperature.
-  ///
-  /// In en, this message translates to:
-  /// **'Temperature (°C)'**
-  String get yAxisTemperature;
-
-  /// No description provided for @yAxisHumidity.
-  ///
-  /// In en, this message translates to:
-  /// **'Humidity (%)'**
-  String get yAxisHumidity;
-
-  /// No description provided for @yAxisWindSpeed.
-  ///
-  /// In en, this message translates to:
-  /// **'Wind (km/h)'**
-  String get yAxisWindSpeed;
-
-  /// No description provided for @yAxisPressure.
-  ///
-  /// In en, this message translates to:
-  /// **'Sun (W/m²)'**
-  String get yAxisPressure;
-
-  /// No description provided for @timeLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Time'**
-  String get timeLabel;
-
-  /// No description provided for @chartsAvailableAt.
-  ///
-  /// In en, this message translates to:
-  /// **'Charts are available from 0:30 AM.'**
-  String get chartsAvailableAt;
-
   /// No description provided for @checkingAvailability.
   ///
   /// In en, this message translates to:
@@ -491,12 +305,6 @@ abstract class AppLocalizations {
   /// **'Loading schedule...'**
   String get loadingSchedule;
 
-  /// No description provided for @notAvailableYet.
-  ///
-  /// In en, this message translates to:
-  /// **'is not available yet'**
-  String get notAvailableYet;
-
   /// No description provided for @errorLoadingGeneric.
   ///
   /// In en, this message translates to:
@@ -521,18 +329,6 @@ abstract class AppLocalizations {
   /// **'Cancel search'**
   String get cancelSearch;
 
-  /// No description provided for @previousResult.
-  ///
-  /// In en, this message translates to:
-  /// **'Previous result'**
-  String get previousResult;
-
-  /// No description provided for @nextResult.
-  ///
-  /// In en, this message translates to:
-  /// **'Next result'**
-  String get nextResult;
-
   /// No description provided for @newSearch.
   ///
   /// In en, this message translates to:
@@ -544,12 +340,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Share PDF'**
   String get sharePdf;
-
-  /// No description provided for @scheduleTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Schedule'**
-  String get scheduleTitle;
 
   /// No description provided for @documentTitle.
   ///
@@ -658,18 +448,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All upcoming school events at a glance'**
   String get featureEventsDesc;
-
-  /// No description provided for @yourAccentColor.
-  ///
-  /// In en, this message translates to:
-  /// **'Your accent color'**
-  String get yourAccentColor;
-
-  /// No description provided for @chooseFavoriteColor.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose your favorite color. It will be used throughout the app.'**
-  String get chooseFavoriteColor;
 
   /// No description provided for @letsGo.
   ///
@@ -785,12 +563,6 @@ abstract class AppLocalizations {
   /// **'is not available yet'**
   String get scheduleNotAvailable;
 
-  /// No description provided for @chartLoading.
-  ///
-  /// In en, this message translates to:
-  /// **'Chart is loading...'**
-  String get chartLoading;
-
   /// No description provided for @singleResultFound.
   ///
   /// In en, this message translates to:
@@ -827,12 +599,6 @@ abstract class AppLocalizations {
   /// **'Error navigating to page {page}'**
   String errorNavigatingToPage(String page);
 
-  /// No description provided for @foundPages.
-  ///
-  /// In en, this message translates to:
-  /// **'Found pages: {pages}'**
-  String foundPages(String pages);
-
   /// No description provided for @setClassTitle.
   ///
   /// In en, this message translates to:
@@ -856,24 +622,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your class has been changed to {className}.'**
   String classChanged(String className);
-
-  /// No description provided for @privacyConsentPrefix.
-  ///
-  /// In en, this message translates to:
-  /// **'I have read the '**
-  String get privacyConsentPrefix;
-
-  /// No description provided for @privacyPolicy.
-  ///
-  /// In en, this message translates to:
-  /// **'privacy policy'**
-  String get privacyPolicy;
-
-  /// No description provided for @privacyConsentSuffix.
-  ///
-  /// In en, this message translates to:
-  /// **'.'**
-  String get privacyConsentSuffix;
 
   /// No description provided for @accentColorTitle.
   ///
@@ -917,12 +665,6 @@ abstract class AppLocalizations {
   /// **'News'**
   String get news;
 
-  /// No description provided for @more.
-  ///
-  /// In en, this message translates to:
-  /// **'More'**
-  String get more;
-
   /// No description provided for @learnMore.
   ///
   /// In en, this message translates to:
@@ -953,95 +695,11 @@ abstract class AppLocalizations {
   /// **'Unknown'**
   String get unknown;
 
-  /// No description provided for @openInBrowser.
-  ///
-  /// In en, this message translates to:
-  /// **'Open in Browser'**
-  String get openInBrowser;
-
-  /// No description provided for @continueReading.
-  ///
-  /// In en, this message translates to:
-  /// **'Continue Reading:'**
-  String get continueReading;
-
   /// No description provided for @weitereNeuigkeiten.
   ///
   /// In en, this message translates to:
   /// **'More News'**
   String get weitereNeuigkeiten;
-
-  /// No description provided for @colorBlue.
-  ///
-  /// In en, this message translates to:
-  /// **'Blue'**
-  String get colorBlue;
-
-  /// No description provided for @colorMint.
-  ///
-  /// In en, this message translates to:
-  /// **'Mint'**
-  String get colorMint;
-
-  /// No description provided for @colorLavender.
-  ///
-  /// In en, this message translates to:
-  /// **'Lavender'**
-  String get colorLavender;
-
-  /// No description provided for @colorRose.
-  ///
-  /// In en, this message translates to:
-  /// **'Rose'**
-  String get colorRose;
-
-  /// No description provided for @colorPeach.
-  ///
-  /// In en, this message translates to:
-  /// **'Peach'**
-  String get colorPeach;
-
-  /// No description provided for @csvFileTooLarge.
-  ///
-  /// In en, this message translates to:
-  /// **'CSV file too large or corrupted'**
-  String get csvFileTooLarge;
-
-  /// No description provided for @errorLoadingWeather.
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading weather data'**
-  String get errorLoadingWeather;
-
-  /// No description provided for @greetingMorning.
-  ///
-  /// In en, this message translates to:
-  /// **'Good morning'**
-  String get greetingMorning;
-
-  /// No description provided for @greetingDay.
-  ///
-  /// In en, this message translates to:
-  /// **'Good afternoon'**
-  String get greetingDay;
-
-  /// No description provided for @greetingEvening.
-  ///
-  /// In en, this message translates to:
-  /// **'Good evening'**
-  String get greetingEvening;
-
-  /// No description provided for @supportProject.
-  ///
-  /// In en, this message translates to:
-  /// **'Support Project'**
-  String get supportProject;
-
-  /// No description provided for @lastDownloaded.
-  ///
-  /// In en, this message translates to:
-  /// **'Last updated: {time}'**
-  String lastDownloaded(String time);
 
   /// No description provided for @termine.
   ///

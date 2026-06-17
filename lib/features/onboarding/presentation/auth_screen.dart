@@ -313,7 +313,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     final bool isSmallScreen = screenSize.height < 700;
     final double topSpacing = isSmallScreen ? 60 : 100;
     final double formWidth = screenSize.width * 0.85;
-    final double maxFormWidth = 400; // Max width for larger screens
+    const double maxFormWidth = 400; // Max width for larger screens
     
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -371,7 +371,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       
                       // Card with form fields
                       ConstrainedBox(
-                        constraints: BoxConstraints(
+                        constraints: const BoxConstraints(
                           maxWidth: maxFormWidth,
                         ),
                         child: Container(
@@ -480,7 +480,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       
                       // Login Button with animated color
                       ConstrainedBox(
-                        constraints: BoxConstraints(
+                        constraints: const BoxConstraints(
                           maxWidth: maxFormWidth,
                         ),
                         child: AnimatedBuilder(
@@ -525,7 +525,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                             )
                                           : Text(
                                               AppLocalizations.of(context)!.login,
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 fontWeight: FontWeight.w600,
                                                 color: Colors.white,
                                                 fontSize: 15 / textScaleFactor,

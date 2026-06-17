@@ -181,7 +181,7 @@ class _AccentColorScreenState extends ConsumerState<AccentColorScreen>
     // Calculate responsive box size to fit 5 colors in one line with better constraints
     final screenWidth = MediaQuery.of(context).size.width;
     final availableWidth = screenWidth - 32; // Subtract padding (16px on each side)
-    final spacingWidth = 4 * 12; // 4 gaps between 5 boxes × 12px spacing
+    const spacingWidth = 4 * 12; // 4 gaps between 5 boxes × 12px spacing
     final calculatedSize = (availableWidth - spacingWidth) / 5;
     final boxSize = calculatedSize.clamp(48.0, 72.0); // Better min/max constraints
 

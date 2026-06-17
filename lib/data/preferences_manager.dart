@@ -7,14 +7,10 @@ class PreferencesManager {
   static const String _keyFirstLaunch = 'is_first_launch';
   static const String _keyAuthenticated = 'is_authenticated';
   static const String _keyOnboardingCompleted = 'onboarding_completed';
-  static const String _keyDebugMode = 'is_debug_mode';
-  static const String _keyShowNavigationDebug = 'show_navigation_debug';
   static const String _keyAccentColor = 'accent_color';
   static const String _keyThemeMode = 'theme_mode';
   static const String _keyVibrationEnabled = 'vibration_enabled';
   static const String _keyKrankmeldungInfoShown = 'krankmeldung_info_shown';
-  static const String _keyLastPdfSearch = 'last_pdf_search_query';
-  static const String _keyLastPdfPage = 'last_pdf_search_page';
   // Selected class for schedule (e.g. "10b", "j11", "j12")
   static const String _keySelectedScheduleClass = 'selected_schedule_class';
 
@@ -80,23 +76,6 @@ class PreferencesManager {
     await _safePrefs.setBool(_keyOnboardingCompleted, value);
   }
 
-  // Debug mode status
-  bool get isDebugMode => _safePrefs.getBool(_keyDebugMode) ?? false;
-
-  Future<void> setDebugMode(bool value) async {
-    await _safePrefs.setBool(_keyDebugMode, value);
-    AppLogger.info('Debug mode ${value ? 'enabled' : 'disabled'}', module: 'Preferences');
-  }
-
-
-  
-  // Show navigation debug window (disabled by default)
-  bool get showNavigationDebug => _safePrefs.getBool(_keyShowNavigationDebug) ?? false;
-
-  Future<void> setShowNavigationDebug(bool value) async {
-    await _safePrefs.setBool(_keyShowNavigationDebug, value);
-  }
-
   // Theme mode preference ('dark', 'light', 'system')
   String get themeMode => _safePrefs.getString(_keyThemeMode) ?? 'system';
 
@@ -140,32 +119,6 @@ class PreferencesManager {
     }
   }
 
-  // Last PDF search query (for schedule convenience)
-  String? get lastPdfSearchQuery => _safePrefs.getString(_keyLastPdfSearch);
-
-  Future<void> setLastPdfSearchQuery(String? value) async {
-    if (value == null || value.trim().isEmpty) {
-      await _safePrefs.remove(_keyLastPdfSearch);
-    } else {
-      await _safePrefs.setString(_keyLastPdfSearch, value);
-    }
-  }
-
-  // Last matched PDF page (1-based for readability)
-  int? get lastPdfSearchPage {
-    final page = _safePrefs.getInt(_keyLastPdfPage);
-    if (page == null || page < 1) return null;
-    return page;
-  }
-
-  Future<void> setLastPdfSearchPage(int? page) async {
-    if (page == null || page < 1) {
-      await _safePrefs.remove(_keyLastPdfPage);
-    } else {
-      await _safePrefs.setInt(_keyLastPdfPage, page);
-    }
-  }
-
   // Per-schedule: last page (1-based)
   int? get lastSchedulePage5to10 {
     final page = _safePrefs.getInt(_keyLastPage5to10);
@@ -192,8 +145,4 @@ class PreferencesManager {
     }
   }
 
-  // Clear all preferences
-  Future<void> clearAllPreferences() async {
-    await _safePrefs.clear();
-  }
-} 
+}

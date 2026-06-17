@@ -1,19 +1,16 @@
 // Copyright Luka Löhr 2026
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../domain/substitution_models.dart';
-import '../../../../utils/app_info.dart';
 import '../../../../utils/retry_util.dart';
 import '../../../../utils/app_logger.dart';
 import '../../../../utils/parser_guard.dart';
-import '../../../../config/app_credentials.dart';
 import '../../../../services/cache_service.dart';
+import '../../../../services/authed_http_client.dart';
 
 /// Service for managing substitution plan PDFs
 class SubstitutionService {
@@ -269,19 +266,7 @@ class SubstitutionService {
 
     return RetryUtil.retry<File>(
       operation: () async {
-        final credentials = base64Encode(
-          utf8.encode('${AppCredentials.username}:${AppCredentials.password}'),
-        );
-
-        final response = await http
-            .get(
-              uri,
-              headers: {
-                'Authorization': 'Basic $credentials',
-                'User-Agent': AppInfo.userAgent,
-              },
-            )
-            .timeout(_timeout);
+        final response = await AuthedHttpClient.get(uri, timeout: _timeout);
 
         if (response.statusCode != 200) {
           throw Exception('HTTP ${response.statusCode}');

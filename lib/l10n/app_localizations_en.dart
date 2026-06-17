@@ -12,9 +12,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'LGKA+';
 
   @override
-  String get welcomeTitle => 'Welcome to LGKA+';
-
-  @override
   String get substitutionPlan => 'Substitution Plan';
 
   @override
@@ -22,12 +19,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get schedule => 'Schedule';
-
-  @override
-  String get legal => 'Legal Notice';
-
-  @override
-  String get privacy => 'Privacy Policy';
 
   @override
   String get krankmeldung => 'Sick Note';
@@ -42,15 +33,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get krankmeldungButton => 'To Sick Note';
 
   @override
-  String get serverMaintenance => 'Maintenance work in progress';
-
-  @override
-  String get weatherStationRepair => 'Weather data temporarily unavailable';
-
-  @override
-  String get weatherStationRepairFooter => 'Weather data will be available again soon';
-
-  @override
   String get serverConnectionFailed => 'Server connection failed';
 
   @override
@@ -58,18 +40,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tryAgain => 'Try again';
-
-  @override
-  String get liveWeatherData => 'Live Weather Data';
-
-  @override
-  String get dataBeingCollected => 'Data being collected';
-
-  @override
-  String get liveWeatherDescription => 'Current weather data for Karlsruhe, provided by Open-Meteo – free and without tracking.';
-
-  @override
-  String get dataCollectionDescription => 'Open-Meteo is currently collecting new data for today. Charts and additional values will be displayed once enough data points are available.';
 
   @override
   String get welcomeHeadline => 'Welcome!';
@@ -87,9 +57,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tomorrow => 'Tomorrow';
 
   @override
-  String get loadingSubstitutions => 'Loading substitution plans...';
-
-  @override
   String get errorLoading => 'Error loading';
 
   @override
@@ -100,18 +67,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accentColor => 'Accent color';
-
-  @override
-  String get chooseAccentColor => 'Choose your preferred accent color';
-
-  @override
-  String get classes5to7 => 'Grades 5-7';
-
-  @override
-  String get classes8to10 => 'Grades 8-10';
-
-  @override
-  String get upperSchool => 'Upper school';
 
   @override
   String get privacyLabel => 'Privacy Policy';
@@ -141,54 +96,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingSickNote => 'Loading sick note...';
 
   @override
-  String get loadingWeather => 'Loading weather data...';
-
-  @override
-  String get noWeatherData => 'No weather data available';
-
-  @override
-  String get temperatureLabel => 'Temperature';
-
-  @override
-  String get humidityLabel => 'Humidity';
-
-  @override
-  String get windSpeedLabel => 'Wind';
-
-  @override
-  String get pressureLabel => 'Sun';
-
-  @override
-  String get temperatureTodayTitle => 'Temperature';
-
-  @override
-  String get humidityTodayTitle => 'Humidity';
-
-  @override
-  String get windSpeedTodayTitle => 'Wind Speed';
-
-  @override
-  String get pressureTodayTitle => 'Solar Radiation';
-
-  @override
-  String get yAxisTemperature => 'Temperature (°C)';
-
-  @override
-  String get yAxisHumidity => 'Humidity (%)';
-
-  @override
-  String get yAxisWindSpeed => 'Wind (km/h)';
-
-  @override
-  String get yAxisPressure => 'Sun (W/m²)';
-
-  @override
-  String get timeLabel => 'Time';
-
-  @override
-  String get chartsAvailableAt => 'Charts are available from 0:30 AM.';
-
-  @override
   String get checkingAvailability => 'Checking availability...';
 
   @override
@@ -207,9 +114,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingSchedule => 'Loading schedule...';
 
   @override
-  String get notAvailableYet => 'is not available yet';
-
-  @override
   String get errorLoadingGeneric => 'Error loading';
 
   @override
@@ -222,19 +126,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancelSearch => 'Cancel search';
 
   @override
-  String get previousResult => 'Previous result';
-
-  @override
-  String get nextResult => 'Next result';
-
-  @override
   String get newSearch => 'New search';
 
   @override
   String get sharePdf => 'Share PDF';
-
-  @override
-  String get scheduleTitle => 'Schedule';
 
   @override
   String get documentTitle => 'Document';
@@ -289,12 +184,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get featureEventsDesc => 'All upcoming school events at a glance';
-
-  @override
-  String get yourAccentColor => 'Your accent color';
-
-  @override
-  String get chooseFavoriteColor => 'Choose your favorite color. It will be used throughout the app.';
 
   @override
   String get letsGo => 'Let\'s go!';
@@ -354,9 +243,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scheduleNotAvailable => 'is not available yet';
 
   @override
-  String get chartLoading => 'Chart is loading...';
-
-  @override
   String singleResultFound(String query) {
     return 'We\'ll always show class $query for you now.';
   }
@@ -385,11 +271,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String foundPages(String pages) {
-    return 'Found pages: $pages';
-  }
-
-  @override
   String get setClassTitle => 'Enter Class';
 
   @override
@@ -402,15 +283,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String classChanged(String className) {
     return 'Your class has been changed to $className.';
   }
-
-  @override
-  String get privacyConsentPrefix => 'I have read the ';
-
-  @override
-  String get privacyPolicy => 'privacy policy';
-
-  @override
-  String get privacyConsentSuffix => '.';
 
   @override
   String get accentColorTitle => 'Your accent color';
@@ -434,9 +306,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get news => 'News';
 
   @override
-  String get more => 'More';
-
-  @override
   String get learnMore => 'Learn more';
 
   @override
@@ -452,51 +321,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unknown => 'Unknown';
 
   @override
-  String get openInBrowser => 'Open in Browser';
-
-  @override
-  String get continueReading => 'Continue Reading:';
-
-  @override
   String get weitereNeuigkeiten => 'More News';
-
-  @override
-  String get colorBlue => 'Blue';
-
-  @override
-  String get colorMint => 'Mint';
-
-  @override
-  String get colorLavender => 'Lavender';
-
-  @override
-  String get colorRose => 'Rose';
-
-  @override
-  String get colorPeach => 'Peach';
-
-  @override
-  String get csvFileTooLarge => 'CSV file too large or corrupted';
-
-  @override
-  String get errorLoadingWeather => 'Error loading weather data';
-
-  @override
-  String get greetingMorning => 'Good morning';
-
-  @override
-  String get greetingDay => 'Good afternoon';
-
-  @override
-  String get greetingEvening => 'Good evening';
-
-  @override
-  String get supportProject => 'Support Project';
-
-  @override
-  String lastDownloaded(String time) {
-    return 'Last updated: $time';
-  }
 
   @override
   String get termine => 'Upcoming Events';

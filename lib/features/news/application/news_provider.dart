@@ -53,6 +53,10 @@ class NewsNotifier extends Notifier<NewsState> {
   Future<void> loadNews({bool forceRefresh = false}) async {
     if (state.isLoading && !forceRefresh) return;
 
+    // Prime the service cache from disk so a cold start shows last-known news
+    // instantly (within the 1 h TTL) instead of re-scraping.
+    if (!forceRefresh) await _newsService.hydrateFromDisk();
+
     // Check cache first if not forcing refresh
     final cachedEvents = _newsService.cachedEvents;
     final lastFetchTime = _newsService.lastFetchTime;

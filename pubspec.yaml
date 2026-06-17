@@ -47,7 +47,7 @@ dependencies:
   
   # File Handling
   path_provider: ^2.1.5
-  share_plus: ^12.0.1
+  share_plus: ^13.1.0
   
   # PDF Processing
   syncfusion_flutter_pdf: ^33.1.44
@@ -64,7 +64,7 @@ dependencies:
   timezone: ^0.11.0
   
   # App Info
-  package_info_plus: ^9.0.0
+  package_info_plus: ^10.1.0
   url_launcher: ^6.2.5
   flutter_inappwebview: ^6.1.5
   
@@ -74,7 +74,11 @@ dependencies:
   # Modal Bottom Sheets
   modal_bottom_sheet: ^3.0.0
   flutter_weather_bg_null_safety: ^1.0.0
-  weather_icons: ^3.0.0
+  # Vendored & patched: upstream weather_icons 3.0.0 is abandoned and its
+  # `WIData extends IconData` breaks under Flutter 3.44 (IconData is now a
+  # final class). The local copy uses plain IconData; same font/glyphs.
+  weather_icons:
+    path: third_party/weather_icons
 
 dev_dependencies:
   flutter_test:
@@ -91,9 +95,6 @@ dev_dependencies:
   
   # App Icon Generation
   flutter_launcher_icons: ^0.14.1
-  
-  # Configuration Management
-  yaml: ^3.1.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

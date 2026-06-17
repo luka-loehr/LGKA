@@ -268,7 +268,7 @@ class SettingsModal extends ConsumerWidget {
                           : null,
                     ),
                     child: isSelected
-                        ? Icon(Icons.check, size: 13, color: ringColor)
+                        ? const Icon(Icons.check, size: 13, color: ringColor)
                         : null,
                   ),
                 ),

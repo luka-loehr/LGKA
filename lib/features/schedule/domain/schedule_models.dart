@@ -16,6 +16,22 @@ class ScheduleItem {
     required this.fullUrl,
   });
 
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'url': url,
+        'halbjahr': halbjahr,
+        'gradeLevel': gradeLevel,
+        'fullUrl': fullUrl,
+      };
+
+  factory ScheduleItem.fromJson(Map<String, dynamic> json) => ScheduleItem(
+        title: json['title'] as String,
+        url: json['url'] as String,
+        halbjahr: json['halbjahr'] as String,
+        gradeLevel: json['gradeLevel'] as String,
+        fullUrl: json['fullUrl'] as String,
+      );
+
   @override
   String toString() {
     return 'ScheduleItem(title: $title, halbjahr: $halbjahr, gradeLevel: $gradeLevel)';

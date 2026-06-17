@@ -1,10 +1,14 @@
 // Copyright Luka Löhr 2026
 
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import '../domain/event_model.dart';
 import '../../../utils/app_logger.dart';
 import '../../../utils/parser_guard.dart';
 import '../../../services/cache_service.dart';
+import '../../../services/disk_cache.dart';
 
 /// Fetches upcoming school events by scraping the school's JEvents calendar.
 ///
@@ -26,12 +30,18 @@ class EventsService {
   static const int _weeksToFetch = 3;
 
   List<SchoolEvent>? _cachedEvents;
+  Future<List<SchoolEvent>>? _inFlight;
   final _shapeTracker = ParserChangeTracker();
+
+  /// Whether cached events are present and still within the cache window.
+  bool get hasValidCache => _isCacheValid();
 
   // ── Public API ──────────────────────────────────────────────────────────────
 
-  Future<List<SchoolEvent>> fetchUpcomingEvents() async {
-    if (_isCacheValid()) {
+  Future<List<SchoolEvent>> fetchUpcomingEvents({bool forceRefresh = false}) async {
+    // Prime the in-memory cache from disk on first access after a cold start.
+    if (_cachedEvents == null) await hydrateFromDisk();
+    if (!forceRefresh && _isCacheValid()) {
       AppLogger.debug(
         'Events: returning cached ${_cachedEvents!.length} events',
         module: 'EventsService',
@@ -39,6 +49,22 @@ class EventsService {
       return _cachedEvents!;
     }
 
+    // Coalesce concurrent fetches so overlapping callers (startup preload,
+    // periodic timer, pull-to-refresh) don't fan out into duplicate
+    // multi-week request storms.
+    final existing = _inFlight;
+    if (existing != null) return existing;
+
+    final future = _fetchAndCache();
+    _inFlight = future;
+    try {
+      return await future;
+    } finally {
+      _inFlight = null;
+    }
+  }
+
+  Future<List<SchoolEvent>> _fetchAndCache() async {
     try {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
@@ -116,6 +142,10 @@ class EventsService {
 
       _cachedEvents = allEvents;
       CacheService().updateCacheTimestamp(CacheKey.events, DateTime.now());
+      unawaited(DiskCache.instance.write(
+        _cacheBlob,
+        jsonEncode(allEvents.map((e) => e.toJson()).toList()),
+      ));
       return allEvents;
     } catch (e, st) {
       AppLogger.error(
@@ -135,9 +165,29 @@ class EventsService {
     }
   }
 
+  static const String _cacheBlob = 'events';
+
+  /// Loads last-persisted events from disk into the in-memory cache so the app
+  /// can show them instantly on a cold start. Validity is gated by the
+  /// persisted CacheService timestamp.
+  Future<void> hydrateFromDisk() async {
+    if (_cachedEvents != null) return;
+    final raw = await DiskCache.instance.read(_cacheBlob);
+    if (raw == null) return;
+    try {
+      final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+      _cachedEvents = list.map(SchoolEvent.fromJson).toList();
+      AppLogger.debug('Events: hydrated ${_cachedEvents!.length} from disk',
+          module: 'EventsService');
+    } catch (e) {
+      AppLogger.debug('Events: disk hydrate failed: $e', module: 'EventsService');
+    }
+  }
+
   void invalidateCache() {
     _cachedEvents = null;
     CacheService().clearCache(CacheKey.events);
+    unawaited(DiskCache.instance.delete(_cacheBlob));
   }
 
   // ── Internals ───────────────────────────────────────────────────────────────

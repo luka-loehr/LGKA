@@ -1,10 +1,12 @@
 // Copyright Luka Löhr 2026
 
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../domain/weather_models.dart';
 import '../../../../utils/app_logger.dart';
 import '../../../../services/cache_service.dart';
+import '../../../../services/disk_cache.dart';
 
 class WeatherResult {
   final CurrentWeather current;
@@ -37,6 +39,8 @@ class WeatherService {
   WeatherResult? get cachedResult => _cache;
 
   Future<WeatherResult> fetchAll() async {
+    // Prime the in-memory cache from disk on first access after a cold start.
+    if (_cache == null) await hydrateFromDisk();
     if (hasValidCache) {
       AppLogger.debug('Weather: returning cached result', module: 'WeatherService');
       return _cache!;
@@ -65,7 +69,21 @@ class WeatherService {
     }
 
     final json = jsonDecode(response.body) as Map<String, dynamic>;
+    final result = _parseWeatherJson(json);
+    _cache = result;
+    CacheService().updateCacheTimestamp(CacheKey.weather, DateTime.now());
+    // Persist the raw response so a cold start can show weather instantly.
+    unawaited(DiskCache.instance.write(_cacheBlob, response.body));
 
+    AppLogger.success(
+        'Weather: ${result.current.temp.round()}° ${result.current.description} · '
+        '${result.hourly.length}h hourly · ${result.daily.length} daily',
+        module: 'WeatherService');
+    return result;
+  }
+
+  /// Parses an Open-Meteo forecast JSON payload into a [WeatherResult].
+  WeatherResult _parseWeatherJson(Map<String, dynamic> json) {
     // ── Current ──────────────────────────────────────────────────────────────
     final c = json['current'] as Map<String, dynamic>;
     final current = CurrentWeather(
@@ -143,19 +161,29 @@ class WeatherService {
       ));
     }
 
-    final result = WeatherResult(current: current, hourly: hourly, daily: daily);
-    _cache = result;
-    CacheService().updateCacheTimestamp(CacheKey.weather, DateTime.now());
+    return WeatherResult(current: current, hourly: hourly, daily: daily);
+  }
 
-    AppLogger.success(
-        'Weather: ${current.temp.round()}° ${current.description} · '
-        '${hourly.length}h hourly · ${daily.length} daily',
-        module: 'WeatherService');
-    return result;
+  static const String _cacheBlob = 'weather';
+
+  /// Loads last-persisted weather from disk into the in-memory cache so the app
+  /// can render it instantly on a cold start. Validity is still gated by the
+  /// persisted CacheService timestamp, so stale data triggers a background refresh.
+  Future<void> hydrateFromDisk() async {
+    if (_cache != null) return;
+    final raw = await DiskCache.instance.read(_cacheBlob);
+    if (raw == null) return;
+    try {
+      _cache = _parseWeatherJson(jsonDecode(raw) as Map<String, dynamic>);
+      AppLogger.debug('Weather: hydrated from disk', module: 'WeatherService');
+    } catch (e) {
+      AppLogger.debug('Weather: disk hydrate failed: $e', module: 'WeatherService');
+    }
   }
 
   void invalidateCache() {
     _cache = null;
     CacheService().clearCache(CacheKey.weather);
+    unawaited(DiskCache.instance.delete(_cacheBlob));
   }
 }

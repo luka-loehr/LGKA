@@ -12,9 +12,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get appTitle => 'LGKA+';
 
   @override
-  String get welcomeTitle => 'Willkommen bei LGKA+';
-
-  @override
   String get substitutionPlan => 'Vertretungsplan';
 
   @override
@@ -22,12 +19,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get schedule => 'Stundenplan';
-
-  @override
-  String get legal => 'Impressum';
-
-  @override
-  String get privacy => 'Datenschutz';
 
   @override
   String get krankmeldung => 'Krankmeldung';
@@ -42,15 +33,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get krankmeldungButton => 'Zur Krankmeldung';
 
   @override
-  String get serverMaintenance => 'Reparaturarbeiten werden durchgeführt';
-
-  @override
-  String get weatherStationRepair => 'Wetterdaten vorübergehend nicht verfügbar';
-
-  @override
-  String get weatherStationRepairFooter => 'Die Wetterdaten werden bald wieder verfügbar sein';
-
-  @override
   String get serverConnectionFailed => 'Serververbindung fehlgeschlagen';
 
   @override
@@ -58,18 +40,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tryAgain => 'Erneut versuchen';
-
-  @override
-  String get liveWeatherData => 'Live Wetterdaten';
-
-  @override
-  String get dataBeingCollected => 'Daten werden gesammelt';
-
-  @override
-  String get liveWeatherDescription => 'Aktuelle Wetterdaten für Karlsruhe, bereitgestellt von Open-Meteo – kostenlos und ohne Tracking.';
-
-  @override
-  String get dataCollectionDescription => 'Open-Meteo sammelt gerade neue Daten für heute. Diagramme und weitere Werte werden angezeigt, sobald genügend Datenpunkte vorhanden sind.';
 
   @override
   String get welcomeHeadline => 'Willkommen!';
@@ -87,9 +57,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tomorrow => 'Morgen';
 
   @override
-  String get loadingSubstitutions => 'Lade Vertretungspläne...';
-
-  @override
   String get errorLoading => 'Fehler beim Laden';
 
   @override
@@ -100,18 +67,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get accentColor => 'Akzentfarbe';
-
-  @override
-  String get chooseAccentColor => 'Wähle deine bevorzugte Akzentfarbe';
-
-  @override
-  String get classes5to7 => 'Klassenstufe 5-7';
-
-  @override
-  String get classes8to10 => 'Klassenstufe 8-10';
-
-  @override
-  String get upperSchool => 'Oberstufe';
 
   @override
   String get privacyLabel => 'Datenschutzerklärung';
@@ -141,54 +96,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get loadingSickNote => 'Lade Krankmeldung...';
 
   @override
-  String get loadingWeather => 'Lade Wetterdaten...';
-
-  @override
-  String get noWeatherData => 'Keine Wetterdaten verfügbar';
-
-  @override
-  String get temperatureLabel => 'Temperatur';
-
-  @override
-  String get humidityLabel => 'Luftfeuchtigkeit';
-
-  @override
-  String get windSpeedLabel => 'Wind';
-
-  @override
-  String get pressureLabel => 'Sonne';
-
-  @override
-  String get temperatureTodayTitle => 'Temperatur';
-
-  @override
-  String get humidityTodayTitle => 'Luftfeuchtigkeit';
-
-  @override
-  String get windSpeedTodayTitle => 'Windgeschwindigkeit';
-
-  @override
-  String get pressureTodayTitle => 'Sonneneinstrahlung';
-
-  @override
-  String get yAxisTemperature => 'Temperatur (°C)';
-
-  @override
-  String get yAxisHumidity => 'Luftfeuchtigkeit (%)';
-
-  @override
-  String get yAxisWindSpeed => 'Wind (km/h)';
-
-  @override
-  String get yAxisPressure => 'Sonne (W/m²)';
-
-  @override
-  String get timeLabel => 'Uhrzeit';
-
-  @override
-  String get chartsAvailableAt => 'Diagramme sind ab 0:30 Uhr verfügbar.';
-
-  @override
   String get checkingAvailability => 'Prüfe Verfügbarkeit...';
 
   @override
@@ -207,9 +114,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get loadingSchedule => 'Lade Stundenplan...';
 
   @override
-  String get notAvailableYet => 'ist noch nicht verfügbar';
-
-  @override
   String get errorLoadingGeneric => 'Fehler beim Laden';
 
   @override
@@ -222,19 +126,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get cancelSearch => 'Suche abbrechen';
 
   @override
-  String get previousResult => 'Vorheriges Ergebnis';
-
-  @override
-  String get nextResult => 'Nächstes Ergebnis';
-
-  @override
   String get newSearch => 'Neue Suche';
 
   @override
   String get sharePdf => 'PDF teilen';
-
-  @override
-  String get scheduleTitle => 'Stundenplan';
 
   @override
   String get documentTitle => 'Dokument';
@@ -289,12 +184,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get featureEventsDesc => 'Alle anstehenden Schulveranstaltungen auf einen Blick';
-
-  @override
-  String get yourAccentColor => 'Deine Akzentfarbe';
-
-  @override
-  String get chooseFavoriteColor => 'Wähle deine Lieblingsfarbe aus. Diese wird überall in der App verwendet.';
 
   @override
   String get letsGo => 'Los geht\'s!';
@@ -354,9 +243,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get scheduleNotAvailable => 'ist noch nicht verfügbar';
 
   @override
-  String get chartLoading => 'Diagramm wird geladen...';
-
-  @override
   String singleResultFound(String query) {
     return 'Dir wird jetzt immer Klasse $query angezeigt.';
   }
@@ -385,11 +271,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String foundPages(String pages) {
-    return 'Gefundene Seiten: $pages';
-  }
-
-  @override
   String get setClassTitle => 'Klasse eingeben';
 
   @override
@@ -402,15 +283,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String classChanged(String className) {
     return 'Deine Klasse wurde auf $className geändert.';
   }
-
-  @override
-  String get privacyConsentPrefix => 'Ich habe die ';
-
-  @override
-  String get privacyPolicy => 'Datenschutzerklärung';
-
-  @override
-  String get privacyConsentSuffix => ' gelesen.';
 
   @override
   String get accentColorTitle => 'Deine Akzentfarbe';
@@ -434,9 +306,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get news => 'Neuigkeiten';
 
   @override
-  String get more => 'Weiteres';
-
-  @override
   String get learnMore => 'Mehr erfahren';
 
   @override
@@ -452,51 +321,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get unknown => 'Unbekannt';
 
   @override
-  String get openInBrowser => 'Im Browser öffnen';
-
-  @override
-  String get continueReading => 'Weiterlesen:';
-
-  @override
   String get weitereNeuigkeiten => 'Weitere Neuigkeiten';
-
-  @override
-  String get colorBlue => 'Blau';
-
-  @override
-  String get colorMint => 'Mint';
-
-  @override
-  String get colorLavender => 'Lavendel';
-
-  @override
-  String get colorRose => 'Rose';
-
-  @override
-  String get colorPeach => 'Pfirsich';
-
-  @override
-  String get csvFileTooLarge => 'CSV-Datei zu groß oder beschädigt';
-
-  @override
-  String get errorLoadingWeather => 'Fehler beim Laden der Wetterdaten';
-
-  @override
-  String get greetingMorning => 'Guten Morgen';
-
-  @override
-  String get greetingDay => 'Guten Tag';
-
-  @override
-  String get greetingEvening => 'Guten Abend';
-
-  @override
-  String get supportProject => 'Projekt unterstützen';
-
-  @override
-  String lastDownloaded(String time) {
-    return 'Zuletzt aktualisiert: $time';
-  }
 
   @override
   String get termine => 'Bevorstehende Termine';

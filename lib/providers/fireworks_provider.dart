@@ -15,10 +15,14 @@ class FireworksNotifier extends Notifier<bool> {
   bool build() {
     // Check initial state and start periodic checking after build completes
     final initialState = _isNewYearsDay();
-    
+
     // Schedule the periodic check to start after build
     Future.microtask(() => _startChecking());
-    
+
+    // Ensure the periodic timer is cancelled when the provider is disposed,
+    // so it does not leak and keep firing for the app's whole lifetime.
+    ref.onDispose(() => _checkTimer?.cancel());
+
     return initialState;
   }
 
@@ -52,11 +56,6 @@ class FireworksNotifier extends Notifier<bool> {
       // State changed - update it
       state = isNewYear;
     }
-  }
-
-  /// Cleanup when provider is disposed
-  void cleanup() {
-    _checkTimer?.cancel();
   }
 }
 

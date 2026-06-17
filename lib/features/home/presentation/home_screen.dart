@@ -270,11 +270,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     if (isLoading) {
       key = 'sub-loading';
-      child = Column(
+      child = const Column(
         children: [
-          const SkeletonCard(),
-          const SizedBox(height: 12),
-          const SkeletonCard(),
+          SkeletonCard(),
+          SizedBox(height: 12),
+          SkeletonCard(),
         ],
       );
     } else if (state.hasAnyError && !state.hasAnyData) {

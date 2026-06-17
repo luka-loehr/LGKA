@@ -9,6 +9,7 @@ class AppLogger {
 
   /// Print startup message
   static void welcome() {
+    if (!kDebugMode) return;
     debugPrint('$_appName - Made by $_developer');
     debugPrint('Initializing app...');
   }
@@ -54,11 +55,6 @@ class AppLogger {
     }
   }
 
-  /// Weather service specific logs
-  static void weather(String message) {
-    _log('[Weather]', message);
-  }
-
   /// PDF/Repository specific logs
   static void pdf(String message) {
     _log('[PDF]', message);
@@ -72,11 +68,6 @@ class AppLogger {
   /// UI/Navigation specific logs
   static void navigation(String message) {
     _log('[Navigation]', message);
-  }
-
-  /// Chart/Visualization specific logs
-  static void chart(String message) {
-    _log('[Chart]', message);
   }
 
   /// Search specific logs
@@ -96,13 +87,11 @@ class AppLogger {
     _log(prefix, message);
   }
 
-  /// Data processing logs
-  static void data(String message) {
-    _log('[Data]', message);
-  }
-
-  /// Core logging method
+  /// Core logging method. Gated on [kDebugMode] so logs (and their string
+  /// interpolation cost) are stripped from release builds — debugPrint is
+  /// otherwise NOT a no-op in release.
   static void _log(String prefix, String message) {
+    if (!kDebugMode) return;
     debugPrint('$prefix $message');
   }
 }

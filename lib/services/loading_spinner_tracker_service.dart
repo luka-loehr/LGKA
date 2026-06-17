@@ -83,23 +83,9 @@ class LoadingSpinnerTracker {
   /// Check if the spinner was visible for the minimum required duration
   bool _wasSpinnerVisibleLongEnough() {
     if (_spinnerShowTime == null) return false;
-    
+
     final duration = DateTime.now().difference(_spinnerShowTime!);
     return duration.inMilliseconds >= minimumSpinnerDurationMs;
   }
-
-  /// Reset the tracker state (useful when navigating away or reinitializing)
-  void reset() {
-    _wasSpinnerVisible = false;
-    _hadDataPreviously = false;
-    _hapticScheduled = false;
-    _spinnerShowTime = null;
-  }
-
-  /// Get whether a spinner is currently being tracked as visible
-  bool get isSpinnerVisible => _wasSpinnerVisible;
-
-  /// Get whether haptic feedback has been scheduled
-  bool get isHapticScheduled => _hapticScheduled;
 }
 

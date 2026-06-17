@@ -152,10 +152,14 @@ class WeatherPage extends ConsumerWidget {
             // Animated weather scene fills the entire card
             Positioned.fill(
               child: LayoutBuilder(
-                builder: (context, constraints) => WeatherBg(
-                  weatherType: scene,
-                  width: constraints.maxWidth,
-                  height: constraints.maxHeight,
+                // RepaintBoundary isolates the continuously-animating
+                // background so its repaints don't invalidate the rest of the page.
+                builder: (context, constraints) => RepaintBoundary(
+                  child: WeatherBg(
+                    weatherType: scene,
+                    width: constraints.maxWidth,
+                    height: constraints.maxHeight,
+                  ),
                 ),
               ),
             ),

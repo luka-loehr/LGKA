@@ -51,6 +51,9 @@ class WeatherDataNotifier extends Notifier<WeatherDataState> {
   WeatherDataState build() => const WeatherDataState();
 
   Future<void> preloadWeatherData() async {
+    // Prime the in-memory cache from disk so a cold start can show last-known
+    // weather instantly instead of flashing a loading state.
+    await WeatherService.instance.hydrateFromDisk();
     // If service cache is still hot, hydrate state without a network call
     if (WeatherService.instance.hasValidCache) {
       final r = WeatherService.instance.cachedResult!;

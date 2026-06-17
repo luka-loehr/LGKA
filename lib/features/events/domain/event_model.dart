@@ -11,4 +11,16 @@ class SchoolEvent {
     this.time,
     required this.title,
   });
+
+  Map<String, dynamic> toJson() => {
+        'date': date.toIso8601String(),
+        if (time != null) 'time': time,
+        'title': title,
+      };
+
+  factory SchoolEvent.fromJson(Map<String, dynamic> json) => SchoolEvent(
+        date: DateTime.parse(json['date'] as String),
+        time: json['time'] as String?,
+        title: json['title'] as String,
+      );
 }

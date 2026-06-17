@@ -46,7 +46,9 @@ Future<List<SearchResult>> _searchInPdfIsolate(_SearchParams params) async {
             final context = pageText.substring(contextStart, contextEnd);
 
             results.add(SearchResult(
-              pageNumber: pageIndex + 2, // +2 to fix the offset
+              // pageIndex is 0-based; SearchResult.pageNumber is 1-based to
+              // match the rest of the viewer (which calls jumpToPage(n - 1)).
+              pageNumber: pageIndex + 1,
               context: context,
               query: params.query,
               matchIndex: index - contextStart,

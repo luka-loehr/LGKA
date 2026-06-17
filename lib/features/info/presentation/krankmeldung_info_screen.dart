@@ -98,7 +98,7 @@ class KrankmeldungInfoScreen extends ConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.medical_services_outlined,
                         size: 20,
                       ),

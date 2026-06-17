@@ -860,6 +860,8 @@ class _PDFViewerScreenState extends ConsumerState<PDFViewerScreen>
       return;
     }
 
+    // Guard the BuildContext use below across the awaits above.
+    if (!mounted) return;
     final halbjahr = notifier.getHalbjahrForGrade(targetGradeLevel) ?? '';
     final classTitle = _formatClassNameForDayName(className, AppLocalizations.of(context)!);
     final newDayName = halbjahr.isNotEmpty ? '$classTitle – $halbjahr' : classTitle;
@@ -1093,8 +1095,8 @@ class _PDFViewerScreenState extends ConsumerState<PDFViewerScreen>
       key: ValueKey(_effectivePdfFile.path),
       controller: _pdfController,
       builders: pdfx.PdfViewBuilders<pdfx.DefaultBuilderOptions>(
-        options: pdfx.DefaultBuilderOptions(
-          loaderSwitchDuration: const Duration(milliseconds: 200),
+        options: const pdfx.DefaultBuilderOptions(
+          loaderSwitchDuration: Duration(milliseconds: 200),
           transitionBuilder: _smoothTransition,
         ),
         documentLoaderBuilder: (_) => const SizedBox.shrink(),

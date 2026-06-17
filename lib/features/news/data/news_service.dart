@@ -1,6 +1,7 @@
 // Copyright Luka Löhr 2026
 
 import 'dart:async';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
 import 'package:timezone/timezone.dart' as tz;
@@ -10,6 +11,7 @@ import '../../../../utils/app_info.dart';
 import '../../../../utils/parser_guard.dart';
 import '../../../../utils/retry_util.dart';
 import '../../../../services/cache_service.dart';
+import '../../../../services/disk_cache.dart';
 
 /// Service for fetching news from the Lessing Gymnasium website
 class NewsService {
@@ -20,6 +22,7 @@ class NewsService {
 
   List<NewsEvent>? _cachedEvents;
   DateTime? _lastFetchTime;
+  Future<List<NewsEvent>>? _inFlightFetch;
   final _shapeTracker = ParserChangeTracker();
 
   /// Get cached events if available and valid
@@ -38,6 +41,8 @@ class NewsService {
 
   /// Extracts all news events from the Lessing Gymnasium news page
   Future<List<NewsEvent>> fetchNewsEvents({bool forceRefresh = false}) async {
+    // Prime the in-memory cache from disk on first access after a cold start.
+    if (_cachedEvents == null) await hydrateFromDisk();
     // Return cached events if valid and not forcing refresh
     if (!forceRefresh && hasValidCache && _cachedEvents != null) {
       AppLogger.debug('Returning cached news events', module: 'NewsService');
@@ -49,6 +54,21 @@ class NewsService {
       unawaited(_refreshCacheInBackground());
       return _cachedEvents!;
     }
+    // Coalesce concurrent network fetches so overlapping callers don't fan
+    // out into duplicate listing + per-article request storms.
+    final existing = _inFlightFetch;
+    if (existing != null) return existing;
+
+    final future = _fetchFromNetwork();
+    _inFlightFetch = future;
+    try {
+      return await future;
+    } finally {
+      _inFlightFetch = null;
+    }
+  }
+
+  Future<List<NewsEvent>> _fetchFromNetwork() {
     AppLogger.network('Fetching news events');
 
     return RetryUtil.retry<List<NewsEvent>>(
@@ -293,6 +313,11 @@ class NewsService {
         _cachedEvents = events;
         _lastFetchTime = DateTime.now();
         _cacheService.updateCacheTimestamp(CacheKey.news, _lastFetchTime);
+        // Persist so a cold start can show news instantly without re-scraping.
+        unawaited(DiskCache.instance.write(
+          _cacheBlob,
+          jsonEncode(events.map((e) => e.toJson()).toList()),
+        ));
 
         return events;
       },
@@ -319,6 +344,8 @@ class NewsService {
 
   /// Refresh cache in background
   Future<void> _refreshCacheInBackground() async {
+    // A fetch is already running; its result will populate the cache.
+    if (_inFlightFetch != null) return;
     final wasCacheValid = hasValidCache;
     try {
       final events = await fetchNewsEvents(forceRefresh: true);
@@ -341,10 +368,31 @@ class NewsService {
     }
   }
 
+  static const String _cacheBlob = 'news';
+
+  /// Loads last-persisted news from disk into the in-memory cache so the app
+  /// can show it instantly on a cold start. The freshness timestamp is restored
+  /// from the persisted CacheService value so stale data triggers a refresh.
+  Future<void> hydrateFromDisk() async {
+    if (_cachedEvents != null) return;
+    final raw = await DiskCache.instance.read(_cacheBlob);
+    if (raw == null) return;
+    try {
+      final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+      _cachedEvents = list.map(NewsEvent.fromJson).toList();
+      _lastFetchTime = _cacheService.getLastFetchTime(CacheKey.news);
+      AppLogger.debug('News: hydrated ${_cachedEvents!.length} from disk',
+          module: 'NewsService');
+    } catch (e) {
+      AppLogger.debug('News: disk hydrate failed: $e', module: 'NewsService');
+    }
+  }
+
   /// Clear the cache
   void clearCache() {
     _cachedEvents = null;
     _lastFetchTime = null;
+    unawaited(DiskCache.instance.delete(_cacheBlob));
   }
 
   /// Fetches the full content, links, and images from an individual news article page

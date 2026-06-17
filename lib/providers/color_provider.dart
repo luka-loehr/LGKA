@@ -100,8 +100,3 @@ final currentColorProvider = Provider<Color>((ref) {
 final choosableColorsProvider = Provider<List<ColorPalette>>((ref) {
   return ColorProvider.choosableColors;
 });
-
-/// Provider to get all colors
-final allColorsProvider = Provider<List<ColorPalette>>((ref) {
-  return ColorProvider.allColors;
-});

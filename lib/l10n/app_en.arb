@@ -1,40 +1,25 @@
 {
   "@@locale": "en",
   "appTitle": "LGKA+",
-  "welcomeTitle": "Welcome to LGKA+",
   "substitutionPlan": "Substitution Plan",
   "weather": "Weather",
   "schedule": "Schedule",
-  "legal": "Legal Notice",
-  "privacy": "Privacy Policy",
   "krankmeldung": "Sick Note",
   "krankmeldungDisclaimer": "The sick note is provided by Lessing-Gymnasium and is independent of the LGKA+ app.",
   "krankmeldungContact": "For technical questions or problems, please contact Lessing-Gymnasium Karlsruhe directly.",
   "krankmeldungButton": "To Sick Note",
-  "serverMaintenance": "Maintenance work in progress",
-  "weatherStationRepair": "Weather data temporarily unavailable",
-  "weatherStationRepairFooter": "Weather data will be available again soon",
   "serverConnectionFailed": "Server connection failed",
   "serverConnectionHint": "This may be due to no internet connection or ongoing maintenance at Lessing-Gymnasium.",
   "tryAgain": "Try again",
-  "liveWeatherData": "Live Weather Data",
-  "dataBeingCollected": "Data being collected",
-  "liveWeatherDescription": "Current weather data for Karlsruhe, provided by Open-Meteo – free and without tracking.",
-  "dataCollectionDescription": "Open-Meteo is currently collecting new data for today. Charts and additional values will be displayed once enough data points are available.",
   "welcomeHeadline": "Welcome!",
   "welcomeSubtitle": "To the new app for Lessing-Gymnasium Karlsruhe.",
   "continueLabel": "Continue",
   "today": "Today",
   "tomorrow": "Tomorrow",
-  "loadingSubstitutions": "Loading substitution plans...",
   "errorLoading": "Error loading",
   "noInfoYet": "No info yet",
   "settings": "Settings",
   "accentColor": "Accent color",
-  "chooseAccentColor": "Choose your preferred accent color",
-  "classes5to7": "Grades 5-7",
-  "classes8to10": "Grades 8-10",
-  "upperSchool": "Upper school",
   "privacyLabel": "Privacy Policy",
   "legalLabel": "Legal Notice",
   "bugReport": "Found a Bug?",
@@ -42,44 +27,20 @@
   "loading": "Loading...",
   "formLoadError": "Form could not be loaded",
   "formLoadErrorHint": "Please check your internet connection and try again.",
-  "settings": "Settings",
-  "accentColor": "Accent color",
-  "chooseAccentColor": "Choose your preferred accent color",
   "krankmeldungInfoHeader": "Sick Note Information",
   "loadingSickNote": "Loading sick note...",
-  "loadingWeather": "Loading weather data...",
-  "noWeatherData": "No weather data available",
-  "temperatureLabel": "Temperature",
-  "humidityLabel": "Humidity",
-  "windSpeedLabel": "Wind",
-  "pressureLabel": "Sun",
-  "temperatureTodayTitle": "Temperature",
-  "humidityTodayTitle": "Humidity",
-  "windSpeedTodayTitle": "Wind Speed",
-  "pressureTodayTitle": "Solar Radiation",
-  "yAxisTemperature": "Temperature (°C)",
-  "yAxisHumidity": "Humidity (%)",
-  "yAxisWindSpeed": "Wind (km/h)",
-  "yAxisPressure": "Sun (W/m²)",
-  "timeLabel": "Time",
-  "chartsAvailableAt": "Charts are available from 0:30 AM.",
   "checkingAvailability": "Checking availability...",
   "loadingSchedules": "Loading schedules...",
   "loadingNews": "Loading news...",
   "noSchedulesAvailable": "No schedules available",
   "tryAgainLater": "Please try again later",
   "loadingSchedule": "Loading schedule...",
-  "notAvailableYet": "is not available yet",
   "errorLoadingGeneric": "Error loading",
   "browserTitle": "Browser",
-  "serverConnectionFailed": "Server connection failed",
   "searchInPdf": "Search in PDF",
   "cancelSearch": "Cancel search",
-  "previousResult": "Previous result",
-  "nextResult": "Next result",
   "newSearch": "New search",
   "sharePdf": "Share PDF",
-  "scheduleTitle": "Schedule",
   "documentTitle": "Document",
   "filenameSchedulePrefix": "LGKA_Schedule_",
   "subjectSchedule": "LGKA+ Schedule",
@@ -98,8 +59,6 @@
   "featureSickDesc": "Submit a sick note directly via the app",
   "featureEventsTitle": "School Events",
   "featureEventsDesc": "All upcoming school events at a glance",
-  "yourAccentColor": "Your accent color",
-  "chooseFavoriteColor": "Choose your favorite color. It will be used throughout the app.",
   "letsGo": "Let's go!",
   "username": "Username",
   "password": "Password",
@@ -119,17 +78,20 @@
   "saturday": "Saturday",
   "sunday": "Sunday",
   "scheduleNotAvailable": "is not available yet",
-  "chartLoading": "Chart is loading...",
   "singleResultFound": "We'll always show class {query} for you now.",
   "@singleResultFound": {
     "placeholders": {
-      "query": { "type": "String" }
+      "query": {
+        "type": "String"
+      }
     }
   },
   "classAlreadySet": "Class {className} is already set.",
   "@classAlreadySet": {
     "placeholders": {
-      "className": { "type": "String" }
+      "className": {
+        "type": "String"
+      }
     }
   },
   "multipleResultsFound": "{count} results found",
@@ -143,7 +105,9 @@
   "noResultsFound": "Class {className} doesn't exist.",
   "@noResultsFound": {
     "placeholders": {
-      "className": { "type": "String" }
+      "className": {
+        "type": "String"
+      }
     }
   },
   "shareError": "Error sharing",
@@ -151,13 +115,8 @@
   "@errorNavigatingToPage": {
     "placeholders": {
       "page": {
-        "type": "String" }
-    }
-  },
-  "foundPages": "Found pages: {pages}",
-  "@foundPages": {
-    "placeholders": {
-      "pages": { "type": "String" }
+        "type": "String"
+      }
     }
   },
   "setClassTitle": "Enter Class",
@@ -171,9 +130,6 @@
       }
     }
   },
-  "privacyConsentPrefix": "I have read the ",
-  "privacyPolicy": "privacy policy",
-  "privacyConsentSuffix": ".",
   "accentColorTitle": "Your accent color",
   "accentColorDescription": "Choose your favorite color. It will be used throughout the app.",
   "appearanceTitle": "Appearance",
@@ -181,34 +137,12 @@
   "themeLight": "Light",
   "themeAuto": "Auto",
   "news": "News",
-  "more": "More",
   "learnMore": "Learn more",
   "noNewsAvailable": "No news available",
   "noNewsFound": "No news found",
   "errorLoadingNews": "Error loading news",
   "unknown": "Unknown",
-  "openInBrowser": "Open in Browser",
-  "continueReading": "Continue Reading:",
   "weitereNeuigkeiten": "More News",
-  "colorBlue": "Blue",
-  "colorMint": "Mint",
-  "colorLavender": "Lavender",
-  "colorRose": "Rose",
-  "colorPeach": "Peach",
-  "csvFileTooLarge": "CSV file too large or corrupted",
-  "errorLoadingWeather": "Error loading weather data",
-  "greetingMorning": "Good morning",
-  "greetingDay": "Good afternoon",
-  "greetingEvening": "Good evening",
-  "supportProject": "Support Project",
-  "lastDownloaded": "Last updated: {time}",
-  "@lastDownloaded": {
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
   "termine": "Upcoming Events",
   "noEventsAvailable": "No events available",
   "weatherPageTitle": "Weather Karlsruhe",
@@ -220,16 +154,26 @@
   "weatherFeelsLikeHighLow": "Feels like {feelsLike}°  ·  {low}° – {high}°",
   "@weatherFeelsLikeHighLow": {
     "placeholders": {
-      "feelsLike": { "type": "int" },
-      "high": { "type": "int" },
-      "low": { "type": "int" }
+      "feelsLike": {
+        "type": "int"
+      },
+      "high": {
+        "type": "int"
+      },
+      "low": {
+        "type": "int"
+      }
     }
   },
   "weatherFeelsLikeHumidity": "Feels like {feelsLike}°  ·  {humidity}% humidity",
   "@weatherFeelsLikeHumidity": {
     "placeholders": {
-      "feelsLike": { "type": "int" },
-      "humidity": { "type": "int" }
+      "feelsLike": {
+        "type": "int"
+      },
+      "humidity": {
+        "type": "int"
+      }
     }
   },
   "weatherHumidityShort": "Humidity",
@@ -246,7 +190,9 @@
   "weatherFeelsLike": "Feels like {feelsLike}°",
   "@weatherFeelsLike": {
     "placeholders": {
-      "feelsLike": { "type": "int" }
+      "feelsLike": {
+        "type": "int"
+      }
     }
   },
   "jahrgang11": "Year 11",
@@ -254,7 +200,9 @@
   "klasseLabel": "Class {name}",
   "@klasseLabel": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "filenameDocumentDefault": "LGKA_Document.pdf",
