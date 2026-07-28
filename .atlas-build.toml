@@ -1,9 +1,9 @@
 # Remote build on atlas — see the `atlas` CLI (github.com/luka-loehr/atlas).
 #   atlas build   # flutter build apk --release on atlas, APKs synced back
 #
-# The Flutter SDK + Android SDK live in the atlas-flutter-builder image; the
+# Flutter + Android SDK live in the atlas-universal-mobile image; the
 # Gradle/pub caches persist on atlas, so warm APK builds skip the cold download.
 name = lgka-app
-image = flutter
+image = mobile
 build = flutter build apk --release
 artifacts = build/app/outputs/flutter-apk
