@@ -1,3 +1,4 @@
+# migrated from .atlas-build.toml by 'atlas migrate'
 # Remote build on atlas — see the `atlas` CLI (github.com/luka-loehr/atlas).
 #   atlas build   # flutter build apk --release on atlas, APKs synced back
 #
