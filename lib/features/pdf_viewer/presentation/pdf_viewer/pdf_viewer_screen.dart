@@ -666,13 +666,17 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     final trimmedQuery = query.trim().toLowerCase();
     final container = ProviderScope.containerOf(context, listen: false);
 
+    // In a schedule PDF the query is a class, so accept the same spellings the
+    // set-class dialog does ("11" and "J11" both mean j11).
+    final classQuery = GradeLevels.normalizeClass(query) ?? trimmedQuery;
+
     if (_isSchedule5to10()) {
-      await _handleSchedule5to10Search(trimmedQuery, container);
+      await _handleSchedule5to10Search(classQuery, container);
       return;
     }
 
     if (_isScheduleJ11J12()) {
-      await _handleScheduleJ11J12Search(trimmedQuery, container);
+      await _handleScheduleJ11J12Search(classQuery, container);
       return;
     }
 

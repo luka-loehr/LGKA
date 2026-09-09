@@ -50,6 +50,25 @@ abstract final class GradeLevels {
   static const String j11j12 = 'J11/J12';
   static const String unknown = 'Unbekannt';
 
+  /// Normalizes free-form user input to the internal class key used everywhere
+  /// else in the app (`selectedScheduleClass`).
+  ///
+  /// Whitespace and separators are stripped and the result is lowercased, so
+  /// `"10 B"` becomes `"10b"`. The upper grades are stored as `j11`/`j12`, but
+  /// users type them in many ways — `"11"`, `"12"`, `"J11"`, `"Jahrgang 12"` —
+  /// so all of those are mapped onto the `j`-prefixed key.
+  ///
+  /// Returns `null` if the input is empty.
+  static String? normalizeClass(String raw) {
+    final cleaned = raw.toLowerCase().replaceAll(RegExp(r'[\s./_-]'), '');
+    if (cleaned.isEmpty) return null;
+
+    final jahrgang = RegExp(r'^(?:j|jg|jahrgang)?(11|12)$').firstMatch(cleaned);
+    if (jahrgang != null) return 'j${jahrgang.group(1)}';
+
+    return cleaned;
+  }
+
   /// Whether [className] belongs to the upper grades (`j11`/`j12`).
   static bool isJahrgangClass(String? className) =>
       className != null && className.startsWith('j');

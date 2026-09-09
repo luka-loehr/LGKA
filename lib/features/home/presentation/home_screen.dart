@@ -870,7 +870,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           content: TextField(
             controller: controller,
             autofocus: true,
-            maxLength: 3,
             textCapitalization: TextCapitalization.characters,
             decoration: InputDecoration(
               hintText: l10n.searchHint,
@@ -882,8 +881,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               counterText: '',
             ),
             onSubmitted: (_) {
-              final cls = controller.text.trim().toLowerCase();
-              if (cls.isNotEmpty) {
+              final cls = GradeLevels.normalizeClass(controller.text);
+              if (cls != null) {
                 Navigator.of(ctx).pop();
                 ref
                     .read(preferencesManagerProvider.notifier)
@@ -898,8 +897,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             TextButton(
               onPressed: () {
-                final cls = controller.text.trim().toLowerCase();
-                if (cls.isNotEmpty) {
+                final cls = GradeLevels.normalizeClass(controller.text);
+                if (cls != null) {
                   Navigator.of(ctx).pop();
                   ref
                       .read(preferencesManagerProvider.notifier)
