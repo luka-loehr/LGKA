@@ -992,8 +992,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   bool _isSchedule5to10() {
     if (_effectiveDayName == null || _effectiveDayName!.isEmpty) return false;
     final dn = _effectiveDayName!;
-    // 'Klasse' matches both 'Klasse 10b' and 'Klassen 5-10'; 'Grade' matches both singular/plural
-    return dn.contains('Klasse') || dn.contains('Grade');
+    // 'Klasse' matches both 'Klasse 10b' and 'Klassen 5-10', 'Grade' matches
+    // 'Grades 5-10', and 'Class' matches the English single-class title.
+    return dn.contains('Klasse') ||
+        dn.contains('Grade') ||
+        dn.contains('Class');
   }
 
   bool _isScheduleJ11J12() {
