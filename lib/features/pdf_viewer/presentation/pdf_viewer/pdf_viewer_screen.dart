@@ -10,6 +10,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_providers.dart';
 import '../../../schedule/application/schedule_provider.dart';
+import '../../../schedule/domain/schedule_models.dart';
 import '../../../../../services/haptic_service.dart';
 import '../../../../../theme/app_theme.dart';
 import '../../../../../utils/app_logger.dart';
@@ -746,9 +747,10 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
     // Not in 5-10 index — check if it's a J11/J12 class (cross-PDF)
     if (scheduleState.isIndexBuilt) {
       final jPage = scheduleNotifier.getClassPageJ(trimmedQuery);
-      if (jPage != null) {
+      final jGradeLevel = scheduleNotifier.gradeLevelForClass(trimmedQuery);
+      if (jPage != null && jGradeLevel != null) {
         setState(() => _isSearchBarVisible = false);
-        await _navigateCrossPdf(trimmedQuery, 'J11/J12', jPage, container);
+        await _navigateCrossPdf(trimmedQuery, jGradeLevel, jPage, container);
         return;
       }
     }
@@ -802,7 +804,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
       final page = scheduleNotifier.getClassPage(trimmedQuery);
       if (page != null) {
         setState(() => _isSearchBarVisible = false);
-        await _navigateCrossPdf(trimmedQuery, 'Klassen 5-10', page, container);
+        await _navigateCrossPdf(
+            trimmedQuery, GradeLevels.grades5to10, page, container);
         return;
       }
     }
@@ -847,7 +850,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
 
     final prefsNotifier = container.read(preferencesManagerProvider.notifier);
     await prefsNotifier.setSelectedScheduleClass(className);
-    if (targetGradeLevel == 'Klassen 5-10') {
+    if (targetGradeLevel == GradeLevels.grades5to10) {
       await prefsNotifier.setLastScheduleQuery5to10(className);
     }
 
@@ -992,7 +995,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen>
   bool _isScheduleJ11J12() {
     if (_effectiveDayName == null || _effectiveDayName!.isEmpty) return false;
     final dn = _effectiveDayName!;
-    return dn.contains('J11/J12') || dn.contains('Jahrgang');
+    return dn.contains('J11/J12') ||
+        dn.contains('Jahrgang') ||
+        dn.contains('Year');
   }
 
   bool _isAnySchedulePdf() => _isSchedule5to10() || _isScheduleJ11J12();

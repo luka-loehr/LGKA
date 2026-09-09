@@ -429,8 +429,12 @@ String _extractHalbjahr(String title) {
 
 /// Extract grade level information from title
 String _extractGradeLevel(String title) {
-  if (title.contains('5-10')) return 'Klassen 5-10';
-  if (title.contains('J11/12')) return 'J11/J12';
-  if (title.contains('11-12')) return 'J11/J12'; // Fallback for different formats
-  return 'Unbekannt';
+  if (title.contains('5-10')) return GradeLevels.grades5to10;
+  // Combined variants first — 'J11/12' also contains 'J11'.
+  if (title.contains('J11/12')) return GradeLevels.j11j12;
+  if (title.contains('11-12')) return GradeLevels.j11j12;
+  // Since 2026/2027 each Jahrgang gets its own PDF.
+  if (title.contains('J11')) return GradeLevels.j11;
+  if (title.contains('J12')) return GradeLevels.j12;
+  return GradeLevels.unknown;
 } 

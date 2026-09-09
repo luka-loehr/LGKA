@@ -80,12 +80,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final scheduleState = ref.read(scheduleProvider);
 
     // Pick the correct PDF based on selected class
-    final isJahrgang = selectedClass != null && selectedClass.startsWith('j');
+    final isJahrgang = GradeLevels.isJahrgangClass(selectedClass);
     ScheduleItem? target;
-    if (isJahrgang) {
-      target = group.where((s) => s.gradeLevel == 'J11/J12').firstOrNull;
+    if (selectedClass != null) {
+      for (final gradeLevel in GradeLevels.forClass(selectedClass)) {
+        target = group.where((s) => s.gradeLevel == gradeLevel).firstOrNull;
+        if (target != null) break;
+      }
     }
-    target ??= group.where((s) => s.gradeLevel == 'Klassen 5-10').firstOrNull;
+    target ??=
+        group.where((s) => s.gradeLevel == GradeLevels.grades5to10).firstOrNull;
     target ??= group.firstOrNull;
     if (target == null) return;
 
@@ -165,7 +169,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   String _localizeGrade(AppLocalizations l, String g) =>
-      g == 'Klassen 5-10' ? l.grades5to10 : g == 'J11/J12' ? l.j11j12 : g;
+      switch (g) {
+        GradeLevels.grades5to10 => l.grades5to10,
+        GradeLevels.j11 => l.jahrgang11,
+        GradeLevels.j12 => l.jahrgang12,
+        GradeLevels.j11j12 => l.j11j12,
+        _ => g,
+      };
 
   String _localizeHalf(AppLocalizations l, String h) =>
       h == '1. Halbjahr'

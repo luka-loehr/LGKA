@@ -443,6 +443,19 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
     return state.classIndexJ11J12[className.toLowerCase()];
   }
 
+  /// The grade level whose PDF contains [className]'s timetable, or `null` if
+  /// no matching schedule is available.
+  String? gradeLevelForClass(String className) {
+    final all = [
+      ...state.availableSecondHalbjahr,
+      ...state.availableFirstHalbjahr,
+    ];
+    for (final gradeLevel in GradeLevels.forClass(className)) {
+      if (all.any((s) => s.gradeLevel == gradeLevel)) return gradeLevel;
+    }
+    return null;
+  }
+
   /// Get the cached PDF file for a given grade level (prefers 2nd halbjahr).
   Future<File?> getCachedFileForGrade(String gradeLevel) async {
     final all = [
@@ -493,13 +506,21 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
 
       // Find a 5-10 schedule (prefer 2nd halbjahr, then 1st)
       ScheduleItem? schedule5to10;
-      ScheduleItem? scheduleJ11J12;
+      final jahrgangSchedules = <String, ScheduleItem>{};
       for (final schedule in sorted) {
-        if (schedule.gradeLevel == 'Klassen 5-10' && schedule5to10 == null) {
-          if (await isScheduleAvailable(schedule)) schedule5to10 = schedule;
+        if (schedule.gradeLevel == GradeLevels.grades5to10) {
+          if (schedule5to10 == null && await isScheduleAvailable(schedule)) {
+            schedule5to10 = schedule;
+          }
+          continue;
         }
-        if (schedule.gradeLevel == 'J11/J12' && scheduleJ11J12 == null) {
-          if (await isScheduleAvailable(schedule)) scheduleJ11J12 = schedule;
+        final covered = GradeLevels.jahrgangClassesIn(schedule.gradeLevel);
+        if (covered.isEmpty || covered.every(jahrgangSchedules.containsKey)) {
+          continue;
+        }
+        if (!await isScheduleAvailable(schedule)) continue;
+        for (final cls in covered) {
+          jahrgangSchedules.putIfAbsent(cls, () => schedule);
         }
       }
 
@@ -520,17 +541,19 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
       final stopwatch = Stopwatch()..start();
       final index5to10 = await compute(_buildClassIndexInIsolate, pdf5to10.path);
 
-      // Download J11/J12 PDF for caching (so it opens instantly later)
-      if (scheduleJ11J12 != null) {
-        unawaited(_scheduleService.downloadSchedule(scheduleJ11J12));
+      // Download the Jahrgang PDFs for caching (so they open instantly later)
+      for (final schedule in jahrgangSchedules.values.toSet()) {
+        unawaited(_scheduleService.downloadSchedule(schedule));
       }
 
-      // j11 is always page 1 and j12 is always page 2 of the J11/J12 PDF
-      const indexJ11J12 = {'j11': 2, 'j12': 3};
+      final indexJ11J12 = {
+        for (final entry in jahrgangSchedules.entries)
+          entry.key: GradeLevels.jahrgangPage(entry.value.gradeLevel, entry.key),
+      };
 
       stopwatch.stop();
       AppLogger.success(
-        'Class index built: ${index5to10.length} classes (5-10) + j11/j12 in ${stopwatch.elapsedMilliseconds}ms',
+        'Class index built: ${index5to10.length} classes (5-10) + ${indexJ11J12.keys.join('/')} in ${stopwatch.elapsedMilliseconds}ms',
         module: 'ScheduleProvider',
       );
 
@@ -568,14 +591,15 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
               .compareTo(b.halbjahr == '2. Halbjahr' ? 0 : 1));
 
       ScheduleItem? schedule5to10;
-      ScheduleItem? scheduleJ11J12;
+      final jahrgangSchedules = <String, ScheduleItem>{};
       for (final schedule in sorted) {
-        if (schedule.gradeLevel == 'Klassen 5-10' && schedule5to10 == null) {
-          schedule5to10 = schedule;
-        } else if (schedule.gradeLevel == 'J11/J12' && scheduleJ11J12 == null) {
-          scheduleJ11J12 = schedule;
+        if (schedule.gradeLevel == GradeLevels.grades5to10) {
+          schedule5to10 ??= schedule;
+          continue;
         }
-        if (schedule5to10 != null && scheduleJ11J12 != null) break;
+        for (final cls in GradeLevels.jahrgangClassesIn(schedule.gradeLevel)) {
+          jahrgangSchedules.putIfAbsent(cls, () => schedule);
+        }
       }
 
       if (schedule5to10 == null) {
@@ -592,13 +616,17 @@ class ScheduleNotifier extends Notifier<ScheduleState> {
 
       final index5to10 = await compute(_buildClassIndexInIsolate, pdf5to10.path);
 
-      if (scheduleJ11J12 != null) {
-        unawaited(_scheduleService.downloadSchedule(scheduleJ11J12));
+      for (final schedule in jahrgangSchedules.values.toSet()) {
+        unawaited(_scheduleService.downloadSchedule(schedule));
       }
 
       state = state.copyWith(
         classIndex5to10: index5to10,
-        classIndexJ11J12: const {'j11': 2, 'j12': 3},
+        classIndexJ11J12: {
+          for (final entry in jahrgangSchedules.entries)
+            entry.key:
+                GradeLevels.jahrgangPage(entry.value.gradeLevel, entry.key),
+        },
         isIndexBuilt: true,
       );
       AppLogger.success('Silent rebuild: Class index rebuilt successfully', module: 'ScheduleProvider');

@@ -24,8 +24,11 @@ class PdfShareService {
       String subject;
 
       if (dayName != null && dayName.isNotEmpty) {
-        // Check if this is a schedule (contains "Klassen" or "J11/J12")
-        if (dayName.contains('Klassen') || dayName.contains('J11/J12')) {
+        // Check if this is a schedule (a class, a grade range or a Jahrgang)
+        if (dayName.contains('Klassen') ||
+            dayName.contains('J11/J12') ||
+            dayName.contains('Jahrgang') ||
+            dayName.contains('Year')) {
           // This is a schedule PDF
           final cleanName = dayName
               .replaceAll('Klassen ', '')

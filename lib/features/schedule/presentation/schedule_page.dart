@@ -313,17 +313,17 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     } else {
       // Show combined label if both grade groups present
       final has5to10 =
-          schedules.any((s) => s.gradeLevel == 'Klassen 5-10');
-      final hasJ11J12 = schedules.any((s) => s.gradeLevel == 'J11/J12');
-      if (has5to10 && hasJ11J12) {
-        title = _localizeGradeLevel(context, 'Klassen 5-10') +
-            ' & ' +
-            _localizeGradeLevel(context, 'J11/J12');
-      } else if (has5to10) {
-        title = _localizeGradeLevel(context, 'Klassen 5-10');
-      } else {
-        title = _localizeGradeLevel(context, 'J11/J12');
-      }
+          schedules.any((s) => s.gradeLevel == GradeLevels.grades5to10);
+      final jahrgangLevels = schedules
+          .map((s) => s.gradeLevel)
+          .where(GradeLevels.isJahrgang)
+          .toSet()
+          .map((g) => _localizeGradeLevel(context, g));
+      final parts = [
+        if (has5to10) _localizeGradeLevel(context, GradeLevels.grades5to10),
+        ...jahrgangLevels,
+      ];
+      title = parts.join(' & ');
     }
 
     return GestureDetector(
@@ -400,8 +400,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
 
   String _localizeGradeLevel(BuildContext context, String gradeLevel) {
     final l10n = AppLocalizations.of(context)!;
-    if (gradeLevel == 'Klassen 5-10') return l10n.grades5to10;
-    if (gradeLevel == 'J11/J12') return l10n.j11j12;
+    if (gradeLevel == GradeLevels.grades5to10) return l10n.grades5to10;
+    if (gradeLevel == GradeLevels.j11) return l10n.jahrgang11;
+    if (gradeLevel == GradeLevels.j12) return l10n.jahrgang12;
+    if (gradeLevel == GradeLevels.j11j12) return l10n.j11j12;
     return gradeLevel;
   }
 
@@ -430,17 +432,17 @@ class _SchedulePageState extends ConsumerState<SchedulePage>
     final scheduleState = ref.read(scheduleProvider);
 
     // Determine which PDF to open based on selected class
-    final isJahrgang =
-        selectedClass != null && selectedClass.startsWith('j');
+    final isJahrgang = GradeLevels.isJahrgangClass(selectedClass);
     ScheduleItem? target;
-    if (isJahrgang) {
-      target = group
-          .where((s) => s.gradeLevel == 'J11/J12')
-          .firstOrNull;
+    if (selectedClass != null) {
+      for (final gradeLevel in GradeLevels.forClass(selectedClass)) {
+        target = group.where((s) => s.gradeLevel == gradeLevel).firstOrNull;
+        if (target != null) break;
+      }
     }
-    // Fall back to 5-10 for non-Jahrgang classes or if J11/J12 not found
+    // Fall back to 5-10 for non-Jahrgang classes or if no Jahrgang PDF is there
     target ??= group
-        .where((s) => s.gradeLevel == 'Klassen 5-10')
+        .where((s) => s.gradeLevel == GradeLevels.grades5to10)
         .firstOrNull;
     target ??= group.firstOrNull;
 
