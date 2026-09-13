@@ -1,4 +1,4 @@
-![LGKA+ Banner](app_store_assets/banners/lgka_banner_1024x500.png)
+![LGKA+ Flutter (archived)](app_store_assets/banners/banner.png)
 
 > [!IMPORTANT]
 > **This repository is archived.** LGKA+ 3.0 replaces the Flutter app with native apps:
