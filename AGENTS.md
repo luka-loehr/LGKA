@@ -10,7 +10,7 @@ LGKA+ is a Flutter mobile app for Lessing-Gymnasium Karlsruhe. It shows substitu
 
 - **Package:** `com.lgka`
 - **Version source of truth:** `pubspec.yaml` (`version: <name>+<build>`)
-- **Platforms:** iOS 12.0+, Android SDK 21+
+- **Platforms:** iOS 16.0+, Android SDK 21+
 - **Languages:** German (`de`) and English (`en`)
 
 ---
@@ -29,7 +29,7 @@ integration_test/          Integration tests (screenshot automation)
 ios/                       iOS Xcode project
 lib/                       All Flutter/Dart source code
 test_driver/               flutter drive entry point
-.github/workflows/         CI/CD workflows (see below)
+.github/                   CI/CD workflows and Dependabot config (see below)
 ```
 
 ---
@@ -152,12 +152,12 @@ The workflow covers: version bump in `pubspec.yaml`, git tag, GitHub release cre
 
 ---
 
-## GitHub Workflows (.github/workflows/)
+## GitHub Automation (.github/)
 
 | File | Trigger | Purpose |
 |------|---------|---------|
-| `deploy-ghpages.yml` | Push to `main` touching `docs/` or HTML files | Deploys `docs/` to GitHub Pages (privacy policy, imprint) |
-| `dependabot.yml` | Daily 13:00 UTC | Opens PRs for outdated pub and GitHub Actions dependencies |
+| `workflows/deploy-ghpages.yml` | Push to `main` touching `docs/` or HTML files | Deploys `docs/` to GitHub Pages (privacy policy, imprint) |
+| `dependabot.yml` | Daily 13:00 Europe/Berlin | Dependabot config (not a workflow): opens PRs for outdated pub and GitHub Actions dependencies |
 
 ---
 

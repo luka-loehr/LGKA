@@ -6,7 +6,7 @@ Initiate when user says: "prepare release", "release", "create release", "new re
 
 ## Pre-Workflow
 
-**CRITICAL**: Before starting, create a task list with all tasks below using the todo_write tool. Mark tasks as you complete them.
+**CRITICAL**: Before starting, create a checklist of all tasks below (using your agent's task or todo tracking, or a plain list). Mark tasks as you complete them.
 
 ## Tasks
 
