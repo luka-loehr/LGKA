@@ -1,5 +1,9 @@
 ![LGKA+ Banner](app_store_assets/banners/lgka_banner_1024x500.png)
 
+> [!IMPORTANT]
+> **This repository is archived.** LGKA+ 3.0 replaces the Flutter app with native apps:
+> [lgka-app/lgka-ios](https://github.com/lgka-app/lgka-ios) (SwiftUI) and [lgka-app/lgka-android](https://github.com/lgka-app/lgka-android) (Jetpack Compose), with data from [lgka-app/api](https://github.com/lgka-app/api).
+
 # LGKA+ – The app for Lessing-Gymnasium Karlsruhe
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.8%2B-02569B?style=flat&logo=flutter&logoColor=white)](https://flutter.dev)
